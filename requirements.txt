@@ -1,0 +1,14 @@
+# basic
+Django==4.0.4
+Jinja2==3.1.2
+mysqlclient==2.1.0
+djangorestframework==3.13.1
+drf-extensions==0.7.1
+django-apscheduler==0.6.2
+jsonpickle==2.2.0
+Wand==0.6.7
+
+# plugins
+requests==2.27.1
+jsonpath-python==1.0.6
+
