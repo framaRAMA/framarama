@@ -1,0 +1,9 @@
+{% extends "config/base.frame.sorting.html" %}
+
+{% block content_frame_sorting %}
+{{ lib.form_start(form, csrf_input) }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_title='Update', submit_class="btn-primary", cancel=url('frame_sorting_list', args=[frame.id])) }}
+
+{% endblock %}
+

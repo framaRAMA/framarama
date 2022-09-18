@@ -1,0 +1,14 @@
+{% extends "config/base.display.html" %}
+
+{% block content_display %}
+<div class="pt-2">
+  {{ lib.field_text('Type', display.device_type) }}
+  {{ lib.field_text('Width', display.device_width) }}
+  {{ lib.field_text('Height', display.device_height) }}
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.edit', 'url': url('display_device_edit', args=[display.id]), 'type': 'primary'},
+]) }}
+
+{% endblock %}

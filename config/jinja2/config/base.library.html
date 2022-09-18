@@ -1,0 +1,597 @@
+{% macro icon(type, style='me-1', raw=False) %}
+  {% set icons = {
+    'action.add' : 'plus',
+    'action.delete' : 'trash',
+    'action.edit' : 'edit',
+    'action.back' : 'circle-chevron-left',
+    'action.refresh' : 'arrows-rotate',
+    'action.loading' : 'spinner',
+    'action.run' : 'play',
+    'action.list' : 'list',
+    'action.view' : 'eye',
+    'action.up' : 'angles-up',
+    'action.down' : 'angles-down',
+    'action.begin' : 'fast-backward',
+    'action.end' : 'fast-forward',
+    'action.prev' : 'backward',
+    'action.next' : 'forward',
+    'action.generate' : 'dice',
+    
+    'mapped': 'arrow-right-long',
+    
+    'enabled': 'square-check',
+    'disabled': 'square-xmark',
+    'error': 'exclamation-triangle',
+    
+    'bullet': 'caret-right',
+
+    'setup.local': 'computer',
+    'setup.cloud': 'globe',
+    
+    'frontend': 'tablet-screen-button',
+    'frontend.overview': 'columns',
+    'frontend.config': 'gear',
+    'frontend.device': 'display',
+    
+    'dashboard' : 'columns',
+    'info': 'info-circle',
+    'display' : 'display',
+    'system': 'server',
+
+    'frame' : 'image',
+    'frames' : 'images',
+    'frames.info': 'info-circle',
+    'frames.general': 'file-lines',
+    'frames.sources': 'box',
+    'frames.ordering': 'sort',
+    'frames.finishing': 'hat-wizard',
+    'frames.settings': 'sliders',
+    
+    'source.plugin.network': 'cloud-arrow-down',
+    'source.plugin.data': 'shuffle',
+    'source.instance' : 'object-group',
+    'source.input' : 'file-import',
+    'source.output' : 'file-export',
+    'source.loopout': 'maximize',
+    'source.mergein': 'down-left-and-up-right-to-center',
+    
+    'sorting.plugin.custom': 'sliders',
+    'sorting.plugin.date': 'calendar-days',
+    
+    'finishing.plugin.shape': 'shapes',
+    'finishing.plugin.text': 'align-left',
+    'finishing.input' : 'file-import',
+    'finishing.output' : 'file-export',
+
+    'display.info' : 'info-circle',
+    'display.device' : 'display',
+    'display.time' : 'clock',
+    'display.access' : 'key',
+  } %}
+  <i class="fas fa-{% if raw %}{{ type }}{% else %}{{ icons[type] }}{% endif %} {{ style }}"></i>
+{% endmacro %}
+
+{% macro html_start() %}
+<!doctype html>
+<html lang="en">
+  <head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ static('config/bootstrap-5.1.3/bootstrap.min.css') }}">
+    <script src="{{ static('config/bootstrap-5.1.3/bootstrap.min.js') }}"></script>
+
+    <!-- MDB setup -->    
+    <link rel="stylesheet" href="{{ static('config/fontawesome-free-6.1.1-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ static('config/mdb-ui-kit-4.0.0/css/mdb.min.css') }}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ static('config/framarama.css') }}">
+
+    <title>framaRAMA</title>
+  </head>
+<body>
+{% endmacro %}
+
+{% macro html_nav(request, config, user) %}
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url('index') }}">
+      <img
+        src="{{ static('config/logo.svg') }}"
+        class="me-2 border-0"
+        height="20"
+        alt="Logo"
+        loading="lazy"
+      />
+      <small>framaRAMA</small></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link{{ nav_active(request, 'index') }}" href="{{ url('index') }}">
+              {{ icon('dashboard') }} Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{{ nav_active(request, 'frame_list') }}" href="{{ url('frame_list') }}">
+              {{ icon('frames') }} Frames
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{{ nav_active(request, 'display_list') }}" href="{{ url('display_list') }}">
+              {{ icon('display') }} Displays
+            </a>
+          </li>
+          {% if config != None %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url('fe_dashboard') }}">
+              {{ icon('frontend') }} Frontend
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2 border-warning" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-warning" type="submit">Search</button>
+        </form>
+        <div class="dropdown ps-2">
+          <a
+            class="dropdown-toggle d-flex align-items-center hidden-arrow"
+            href="#" id="avatarMenu" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false"
+          >
+            <img
+              src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+              class="rounded-circle" height="32" alt="{{ request.user.username }}" loading="lazy"/>
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="avatarMenu"
+          >
+            <!-- li>
+              <a class="dropdown-item" href="#">My profile</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">Settings</a>
+            </li -->
+            <li>
+              <a class="dropdown-item" href="{{ url('logout') }}">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+{% endmacro %}
+
+{% macro html_end() %}
+  <!-- Import own JS -->
+  <script src="{{ static('config/framarama.js') }}"></script>
+</body>
+</html>
+{% endmacro %}
+
+{% macro html_dialog_start() %}
+<section>
+  <div class="container py-5">
+    <div class="row d-flex justify-content-center align-items-center">
+      <div class="col-md-8 col-xl-6">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-12">
+              <div class="card-body">
+
+                <div class="text-center">
+                   <img
+                      src="{{ static('config/logo.svg') }}"
+                      class="me-2 border-0"
+                      height="80"
+                      alt="Logo"
+                      loading="lazy"
+                    />
+                  <h4 class="mt-5 mb-3 pb-1">framaRAMA</h4>
+                </div>
+{% endmacro %}
+
+{% macro html_dialog_end() %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endmacro %}
+
+{% macro status_loading(name) %}
+  <div id="spinner-{{ name }}" class="spinner-border spinner-border-sm text-secondary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+{% endmacro %}
+
+{% macro status_icons() %}
+  <div class="status-testing position-absolute mt-2 text-warning" style="right:1em">{{ icon('action.refresh') }}</div>
+  <div class="status-error position-absolute mt-2 text-danger d-none" style="right:1em">{{ icon('error') }}</div>
+  <div class="status-success position-absolute mt-2 text-success d-none" style="right:1em">{{ icon('enabled') }}</div>
+{% endmacro %}
+
+{% macro status_script(name, callback) %}
+<script type="text/javascript">
+  let statusCount_{{ name}} = 0;
+  function status_fetch_{{ name }}() {
+    fetch("/frontend/status/{{ name }}")
+      .then(function (res) {
+        if (res.ok) {
+          return res.json();
+        }
+        return {
+          status: false,
+          message: "Status endpoint returns code " + res.status
+        }
+      })
+      .then(function (json) {
+         statusCount_{{ name }}++;
+         const element = window.document.querySelector('#status-{{ name }}');
+         const elementTesting = element.querySelector('.status-testing');
+         const elementStatusSuccess = element.querySelector('.status-success');
+         const elementStatusError = element.querySelector('.status-error');
+         elementTesting.className = elementTesting.className + ' d-none';
+         if (json.status) {
+             elementStatusError.className = elementStatusError.className.replace('d-none', '') + ' d-none';
+             elementStatusSuccess.className = elementStatusSuccess.className.replace('d-none', '');
+             elementStatusSuccess.title = 'Test ' + statusCount_{{ name }} + ': ' + json.message;
+         } else {
+             elementStatusSuccess.className = elementStatusSuccess.className.replace('d-none', '') + ' d-none';
+             elementStatusError.className = elementStatusError.className.replace('d-none', '');
+             elementStatusError.title = 'Test ' + statusCount_{{ name }} + ': ' + json.message;
+            setTimeout(status_fetch_{{ name }}, 5000);
+         }
+         {% if callback %}{{ callback }}(json.status, json.data || {});{% endif %}
+      })
+      .catch(function (err) {
+         setTimeout(status_fetch_{{ name }}, 5000);
+      });
+   }
+   setTimeout(status_fetch_{{ name }}, 250);
+</script>
+{% endmacro %}
+
+{% macro note_start(title, type) %}
+  <p class="note note-{{ type }}">
+    <b>{{ title }}</b><br/>
+{% endmacro %}
+
+{% macro note_end() %}
+  </p>
+{% endmacro %}
+
+{% macro note(title, type) %}
+  {{ note_start(title, type) }}
+  {{ note_end() }}
+{% endmacro %}
+
+{% macro nav_active(request, page, args=[]) %}
+  {%- if nav(request, page, args) %} active" aria-current="page{% endif -%}
+{% endmacro %}
+
+{% macro nav_actions(actions) %}
+  <div class="fixed-action-btn" style="height:{{ actions|length * 50 + 50 }}px;">
+    {% for action in actions|reverse %}
+      {% set classes = 'btn btn-' + action['type'] + ' btn-floating btn-lg' %}
+      {% if loop.index != 0 %}{% set classes = classes + ' mb-3' %}{% endif %}
+      {% if action['url'] %}
+        <a href="{{ action['url'] }}" class="{{ classes }}">{{ icon(action['icon'], '') }}</a>
+      {% elif action['modal'] %}
+        <button class="{{ classes }}"data-bs-toggle="modal" data-bs-target="#{{ action['modal'] }}">{{ icon(action['icon'], '') }}</button>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro form_start(form, csrf, title) %}
+  {% if title %}<h5 class="pt-2">{{ title }}</h5>{% endif %}
+  <form class="pt-2" method="post">
+    {{ csrf }}
+    {% if form.is_bound and not form.is_valid() %}
+      {{ note_start('The following errors occurred', 'danger') }}
+        {% for type in form.errors %}
+          {{ icon('bullet') }}{% for error in form.errors[type] %}{{ error }}<br/>{% endfor %}
+        {% endfor %}
+        {% for field in form if field.errors %}
+          {{ icon('bullet') }}{% for error in field.errors %}{{ field.label }} - {{ error }}<br/>{% endfor %}
+        {% endfor %}
+      {{ note_end() }}
+    {% endif %}
+    {% if form.is_bound and form.is_valid() %}
+      <p class="note note-success">
+        <strong>Data saved</strong>
+      </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro form_field(form, field) %}
+  {% set input_class = 'form-check' if field.field.widget.input_type == 'checkbox' else 'form-floating' %}
+  {% set input_error_class = 'is-invalid' if field.name in form.errors else '' %}
+  {% if field.is_hidden %}
+    {{ field }}
+  {% else %}
+    <div class="mb-3 {{ input_class }} {{ input_error_class }}">
+        {{ field }}
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {% if field.field.widget.__class__.__name__ == 'GenerateKeyTextInput' %}
+          <button id="{{ field.id_for_label }}pwdgen" tabindex="0" type="button" class="password-generator-button">
+            {{ icon('action.generate') }}
+          </button>
+          <script type="text/javascript">
+            window.document.getElementById('{{ field.id_for_label }}pwdgen').onclick = function () {
+              const field = window.document.getElementById('{{ field.id_for_label }}')
+              const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+              let gen = '';
+              for (let i=0; i<field.getAttribute('generate-length'); i++) gen += chars[Math.floor(Math.random()*chars.length)];
+              field.value = gen;
+            }
+          </script>
+        {% endif %}
+        {% if field.help_text %}
+          <div id="help{{ field.id_for_label }}" class="form-text">{{ field.help_text|safe }}</div>
+        {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro form_fields(form) %}
+  {% set field_groups = form.field_groups()|default({}) %}
+  {% if field_groups|count %}
+    {% for field_group_name, field_group in field_groups.items() %}
+      <div class="pt-3 fw-bold">{{ field_group['title'] }}</div>
+      <div class="mb-3 w-100 gradient-form-group"></div>
+      {% for field_name in field_group['fields'] %}{{ form_field(form, form[field_name]) }}{% endfor %}
+    {% endfor %}
+  {% else %}
+    {% for field in form %}{{ form_field(form, field) }}{% endfor %}
+  {% endif %}
+{% endmacro %}
+
+{% macro form_end(form, submit_title='Create', submit_class='btn-primary', cancel=None, cancel_title='Cancel') %}
+  {% if submit_title %}
+    <button type="submit" class="btn {{ submit_class }}">{{ submit_title }}</button>
+  {% endif %}
+  {% if cancel %}
+    <a href="{{ cancel }}" class="btn btn-secondary">{{ cancel_title }}</a>
+  {% endif %}
+  </form>
+{% endmacro %}
+
+{% macro form(form, csrf_input, submit_title='Create', submit_class='btn-primary', cancel=None, cancel_title='Cancel') %}
+  {{ form_start(form, csrf_input) }}
+  {% for field in form %}{{ form_field(form, field) }}{% endfor %}
+  {{ form_end(form, submit_title=submit_title, submit_class=submit_class, cancel=cancel, cancel_title=cancel_title) }}
+{% endmacro %}
+
+{% macro field_text(name, value) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-auto pt-2">
+      {{ value or '(no value)' }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro field_textarea(name, value) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-auto pt-2">
+      {{ value or '(no value)'}}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro field_pre(name, value) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-auto pt-2 fs-5">
+      <pre><code>{{ value }}</code></pre>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro field_check(name, value) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-auto pt-2">{% if value %}{{ icon('enabled') }}{% else %}{{ icon('disabled') }}{% endif %}</div>
+  </div>
+{% endmacro %}
+
+{% macro field_toggle(name, value) %}
+  <div class="row">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="{{ id }}Toggle" {% if value %}checked{% endif %} disabled />
+      <label class="form-check-label" for="{{ id }}Toggle">{{ name }}</label>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro field_list(name, values) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-10 pt-2">
+      {% if values is mapping %}
+        <ul>
+          {% for key in values %}
+            <li>{{ key }} {{ icon('mapped', '') }} {{ values[key] }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <ul>
+          {% for value in values %}
+            <li>{{ value }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro list_paginator(id, title, items, link, pages=7) %}
+  {% set pager_top = title != '' %}
+  <div class="row w-100 {% if pager_top %}mt-3 pt-1 pb-1 bg-light border-top border-bottom{% endif %} m-0">
+    {% if pager_top %}
+      <h5 class="col-auto pt-1 ps-2">
+        {{ title }}
+        {% if items.paginator.count %} ({{ items.start_index() }}-{{ items.end_index() }} of {{ items.paginator.count }}){% endif %}
+      </h5>
+    {% endif %}
+    <div class="col">
+    <nav aria-label="..." class="col d-flex justify-content-center float-end">
+      <ul class="pagination m-0">
+        <li class="page-item {% if items.number == 0 %}disabled{% endif %} me-2">
+          <a class="page-link" {% if items.number != 0 %}href="{{ link }}?page=1"{% endif %}>{{ icon('action.begin', '') }}</a>
+        </li>
+        <li class="page-item {% if not items.has_previous() %}disabled{% endif %} me-2">
+          <a class="page-link" {% if items.has_previous() %}href="{{ link }}?page={{ items.number - 1 }}"{% endif %}>{{ icon('action.prev', '') }}</a>
+        </li>
+        {% for page in range(items.number - (pages/2)|int, items.number + (pages/2)|int + 1) %}
+          {% if page > 0 and page <= items.paginator.num_pages %}
+            <li class="page-item {% if page == items.number %}active{% endif %} me-2" aria-current="page">
+              <a class="page-link" href="{{ link }}?page={{ page }}">{{ page }} <span class="visually-hidden">(current)</span></a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not items.has_next() %}disabled{% endif %} ms-2">
+          <a class="page-link" {% if items.has_next() %}href="{{ link }}?page={{ items.number + 1 }}"{% endif %}>{{ icon('action.next', '') }}</a>
+        </li>
+        <li class="page-item {% if items.number == items.paginator.num_pages  %}disabled{% endif %} me-2">
+          <a class="page-link" {% if items.number != items.paginator.num_pages %}href="{{ link }}?page={{ items.paginator.num_pages }}"{% endif %}>{{ icon('action.end', '') }}</a>
+        </li>
+      </ul>
+    </nav>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro list_table(items, columns={}) %}
+  <table class="table">
+    <thead>
+      <tr>
+        {% for col in columns %}<th class="p-2" scope="col"><strong>{{ columns[col] }}</strong></th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          {% for col in columns %}
+            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>{{ item[col] }}</th>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      {% if items.paginator.count == 0 %}
+        <tr><td colspan="{{ columns|length }}">No items in this list</td></tr>
+      {% endif %}
+    </tbody>
+  </table>    
+{% endmacro %}
+
+{% macro card_item(title, body, actions=[], icon=None) %}
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="ms-3">
+            <p class="fw-bold mb-1">{% if icon %}{{ icon }}{% endif %}{{ title }}</p>
+            <p class="text-muted mb-0">{{ body }}</p>
+          </div>
+        </div>
+      </div>
+      {% if actions %}
+        <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
+          {% for action in actions %}
+            <a class="btn btn-link m-0 text-reset" href="{{ action['url'] }}"
+              role="button" data-ripple-color="primary">{{ action['title'] }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro modal_start(id, title, classes='') %}
+  <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}Label" aria-hidden="true">
+    <div class="modal-dialog {{ classes }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="{{ id }}Label">{{ title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+{% endmacro %}
+
+{% macro modal_end(submit=None, submit_title='Yes', submit_class='btn-primary', cancel_title='Close', cancel_args=[]) %}
+        </div>
+        <div class="modal-footer">
+          {% if submit %}
+            <a href="{{ submit }}" class="btn {{ submit_class }}">{{ submit_title }}</a>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ cancel_title }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro modal_delete(id, title, message, submit) %}
+  {{ modal_start(id, title) }}
+    <strong>{{ message }}</strong>
+  {{ modal_end(submit=submit, submit_class='btn-danger', submit_title='Yes, delete', cancel_title='No, go back') }}
+{% endmacro %}
+
+{% macro modal_confirm(id, title, message, submit, submit_title) %}
+  {{ modal_start(id, title) }}
+    <strong>{{ message }}</strong>
+  {{ modal_end(submit=submit, submit_class='btn-primary', submit_title=submit_title, cancel_title='Close') }}
+{% endmacro %}
+
+{% macro frame_header(title, description) %}
+<div class="row pt-3">
+  <div class="col-md-12 mb-4">
+    <div class="card border rounded-5">
+      <div class="card-body">
+
+        <div class="d-flex align-items-center">
+          <a href="{{ url('frame_list') }}">{{ icon('action.back') }}</a>
+          <div class="ms-3">
+            <p class="fw-bold mb-1">{{ title }}</p>
+            <p class="text-muted mb-0">{% if description != '' %}{{ description }}{% else %}(no description){% endif %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro display_header(title, description) %}
+<div class="row pt-3">
+  <div class="col-md-12 mb-4">
+    <div class="card border rounded-5">
+      <div class="card-body">
+
+        <div class="d-flex align-items-center">
+          <a href="{{ url('display_list') }}">{{ icon('action.back') }}</a>
+          <div class="ms-3">
+            <p class="fw-bold mb-1">{{ title }}</p>
+            <p class="text-muted mb-0">{% if description != '' %}{{ description }}{% else %}(no description){% endif %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+

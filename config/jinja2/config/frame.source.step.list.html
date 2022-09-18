@@ -1,0 +1,92 @@
+{% extends "config/base.frame.source.html" %}
+
+{% block content_frame_source %}
+
+<ul class="list-group list-group-light">
+{% for source_step in source.steps.all() %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="">
+      <div class="position-absolute">
+        <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
+        <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
+      </div>
+      <div class="ms-5 fw-bold">
+        {{ loop.index }}. {{ source_step.title }}
+        {% if source_step.merge_in %}
+          {{ lib.icon('source.mergein', '') }}
+        {% endif %}
+        {% if source_step.loop_out %}
+          {{ lib.icon('source.loopout', '') }}
+        {% endif %}
+        <span class="badge rounded-pill badge-success">
+          {{ lib.icon('source.plugin.'+source_plugins[source_step.plugin].cat) }}
+          {{ source_step.plugin }}
+        </span>
+        {% if source_step.instance %}
+          <span class="badge rounded-pill badge-info">
+            {{ lib.icon('source.instance') }}
+            {{ source_step.instance }}
+          </span>
+        {% endif %}
+        {% if source_step.data_in %}
+          <span class="badge rounded-pill badge-warning">{{ lib.icon('source.input') }} {{ source_step.data_in }}</span>
+        {% endif %}
+        {% if source_step.data_out %}
+          <span class="badge rounded-pill badge-warning">{{ lib.icon('source.output') }} {{ source_step.data_out }}</span>
+        {% endif %}
+      </div>
+      <div class="ms-5 text-muted">
+        {{ source_step.description }}
+      </div>
+    </div>
+    <div class="ms-0 pt-2 pb-2">
+      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
+        <a href="{{ url('frame_source_step_edit', args=[frame.id, source.id, source_step.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit') }}</a>
+        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteStep%s'|format(source_step.id) }}">{{ lib.icon('action.delete') }}</a>
+      </div>
+    </div>
+    {{ lib.modal_delete('deleteStep%s'|format(source_step.id), 'Delete step', 'Do you really want to delete the selected step "%s"?'|format(source_step.title), url('frame_source_step_action', args=[frame.id, source.id, source_step.id])+'?action=delete') }}
+  </li>
+{% else %}
+  <div class="col-12">
+    {{ lib.note('No step defined in this source. Click on the add button to create a new one.', 'info') }}
+  </div>
+{% endfor %}
+</ul>
+
+{{ lib.nav_actions([
+  {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary'},
+  {'icon': 'action.add', 'modal': 'createStepType', 'type': 'success'},
+]) }}
+
+{{ lib.modal_start('createStepType', 'Select type to add', classes='modal-fullscreen-lg-down modal-xl') }}
+  <div class="row">
+  {% for name, plugin in source_plugins.items() %}
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="">
+              <p class="fw-bold mb-1">
+                {{ lib.icon('source.plugin.'+plugin.cat) }}
+                {{ plugin.title }}
+              </p>
+              <p class="text-muted mb-0">{{ plugin.descr }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
+          <a class="btn btn-link m-0 text-reset" href="{{ url('frame_source_step_create', args=[frame.id, source.id, plugin.name]) }}"
+            role="button" data-ripple-color="primary">Add {{ lib.icon('action.add', 'ms-2') }}</a>
+        </div>
+        
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{{ lib.modal_end() }}
+
+{{ lib.modal_confirm('updateSteps', 'Run step queue', 'Execute all steps in queue and refresh the item list?', url('frame_source_action', args=[frame.id, source.id]) + '?action=run', 'Yes, upate item list') }}
+
+{% endblock %}
+

@@ -1,0 +1,22 @@
+{% extends "frontend/dashboard.base.html" %}
+
+{% block content_dashboard %}
+
+<div class="pt-2">
+  {{ lib.field_text('Device', 'Raspberry Pi') }}
+  {{ lib.field_text('Geometry', '1024x786') }}
+</div>
+
+{{ lib.status_script('database') }}
+{{ lib.status_script('device_type', 'display_status') }}
+
+<script type="text/javascript">
+  function display_status(status, data) {
+    if (status) {
+      let displayElement = window.document.getElementById('spinner-display').parentElement;
+      displayElement.innerHTML = data.display.name;
+    }
+  }
+</script>
+
+{% endblock %}

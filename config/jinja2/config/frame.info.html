@@ -1,0 +1,15 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+<div class="pt-2">
+  {{ lib.field_text('Name', frame.name) }}
+  {{ lib.field_textarea('Description', frame.description) }}
+  {{ lib.field_check('Enabled', frame.enabled) }}
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.delete', 'modal': 'deleteFrame', 'type': 'danger'},
+  {'icon': 'action.edit', 'url': url('frame_edit', args=[frame.id]), 'type': 'primary'},
+]) }}
+
+{% endblock %}

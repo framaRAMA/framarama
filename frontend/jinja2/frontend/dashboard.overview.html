@@ -1,0 +1,51 @@
+{% extends "frontend/dashboard.base.html" %}
+
+{% block content_dashboard %}
+
+<div class="pt-2">
+  {% if config.mode == 'local' %}
+    {{ lib.field_text('Mode', 'Local setup') }}
+    <div id="status-database">
+      {{ lib.status_icons() }}
+      {% if config.local_db_type == 'local' %}
+        {{ lib.field_text('Database', '(use integrated database)') }}
+      {% else %}
+        {{ lib.field_text('Database', config.local_db_user + '@' + config.local_db_host + '/' + config.local_db_name) }}
+      {% endif %}
+    </div>
+  {% else %}
+    {{ lib.field_text('Mode', 'Cloud setup') }}
+    {{ lib.field_text('Server', config.cloud_server) }}
+  {% endif %}
+  <div id="status-display">
+    {{ lib.status_icons() }}
+    {% if config.cloud_display_access_key != '' %}
+      {{ lib.field_text('Display', lib.status_loading('display')) }}
+      {{ lib.field_text('Type', lib.status_loading('device-type')) }}
+      {{ lib.field_text('Geometry', lib.status_loading('device-geometry')) }}
+    {% else %}
+      {{ lib.field_text('Display', '(no key configured)') }}
+    {% endif %}
+  </div>
+</div>
+
+{{ lib.status_script('database') }}
+{{ lib.status_script('display', 'display_status') }}
+
+<script type="text/javascript">
+  function display_status(status, data) {
+    if (status) {
+      let displayElement = window.document.getElementById('spinner-display').parentElement;
+      displayElement.innerHTML = data.display.name;
+      if (!data.display.enabled) {
+        displayElement.innerHTML += ' (disabled)';
+      }
+      let deviceTypeElement = window.document.getElementById('spinner-device-type').parentElement;
+      deviceTypeElement.innerHTML = data.display.device_type_name;
+      let deviceGeometryElement = window.document.getElementById('spinner-device-geometry').parentElement;
+      deviceGeometryElement.innerHTML = data.display.device_width + 'x' + data.display.device_height;
+    }
+  }
+</script>
+
+{% endblock %}

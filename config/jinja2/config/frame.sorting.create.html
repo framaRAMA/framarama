@@ -1,0 +1,22 @@
+{% extends "config/base.frame.sorting.html" %}
+
+{% block content_frame_sorting %}
+
+<div class="pt-2">{{ lib.note('The query must return an additional rank column!', 'info') }}</div>
+
+<div>To rank by date_creation field in descending order with high importance (factor 100):</div>
+<code><pre>
+Item
+  .annotate(rank=Model.Window(expression=Function.Rank(), order_by=Model.F('date_creation').desc()))
+</pre></code>
+<div>To rank by random order with low importance (factor 1):</div>
+<code><pre>
+Item
+  .annotate(rank=Model.Window(expression=Function.Rank(), order_by=Function.Random()))
+</pre></code>
+
+{{ lib.form_start(form, csrf_input) }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, cancel=url('frame_sorting_list', args=[frame.id])) }}
+{% endblock %}
+

@@ -1,0 +1,16 @@
+{% extends "config/base.display.html" %}
+
+{% block content_display %}
+<div class="pt-2">
+  {{ lib.field_text('Name', display.name) }}
+  {{ lib.field_textarea('Description', display.description) }}
+  {{ lib.field_check('Enabled', display.enabled) }}
+  {{ lib.field_text('Frame', display.frame) }}
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.delete', 'modal': 'deleteDisplay', 'type': 'danger'},
+  {'icon': 'action.edit', 'url': url('display_edit', args=[display.id]), 'type': 'primary'},
+]) }}
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% import "config/base.library.html" as lib %}
+{{ lib.html_start() }}
+  {% if user.is_authenticated %}
+    {{ lib.html_nav(request, config, user) }}
+  {% endif %}
+  <div class="container-fluid pb-2">
+    {% block content %}
+    {% endblock %}
+  </div>
+{{ lib.html_end() }}
+

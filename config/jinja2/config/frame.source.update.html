@@ -1,0 +1,9 @@
+{% extends "config/base.frame.source.html" %}
+
+{% block content_frame_source %}
+{{ lib.form_start(form, csrf_input) }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_title='Update', submit_class="btn-primary", cancel=url('frame_source_info', args=[frame.id, source.id])) }}
+
+{% endblock %}
+

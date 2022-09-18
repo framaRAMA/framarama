@@ -1,0 +1,13 @@
+{% extends "config/base.html" %}
+
+{% block content %}
+
+  {{ lib.html_dialog_start() }}
+
+  {{ lib.form_start(form, csrf_input) }}
+  {{ lib.form_fields(form) }}
+  {{ lib.form_end(form, submit_title='Login', submit_class="btn-primary") }}
+
+  {{ lib.html_dialog_end() }}
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "frontend/base.html" %}
+
+{% if config.mode == 'local' %}
+  {% set config_url = url('index') %}
+  {% set setup_url = url('fe_setup_local') %}
+{% else %}
+  {% set config_url = 'https://' + config.cloud_server + '/config/' %}
+  {% set setup_url = url('fe_setup_cloud') %}
+{% endif %}
+
+{% block content %}
+
+<ul class="nav nav-tabs pt-2">
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
+  </li>
+  <!-- li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard_device') }}" href="{{ url('fe_dashboard_device') }}">{{ lib.icon('frontend.device') }}<span class="d-none d-lg-inline"> Device</span></a>
+  </li -->
+  <!-- li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('system') }}<span class="d-none d-lg-inline"> System</span></a>
+  </li -->
+  <li class="col">
+    <a href="{{ config_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end">{{ lib.icon('frontend.config', 'p-0 m-0') }}</a>
+    <a href="{{ setup_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
+  </li>
+</ul>
+
+{% block content_dashboard %}
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% import "config/base.library.html" as lib %}
+{{ lib.html_start() }}
+  <div class="container-fluid pb-2">
+    {{ lib.html_dialog_start() }}
+    {% block content %}
+    {% endblock %}
+    {{ lib.html_dialog_end() }}
+
+    <p class="container-fluid text-center small">Thanks for using framaRAMA - Copyright 2022</p>
+  </div>
+</div>
+{{ lib.html_end() }}
+
+

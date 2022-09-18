@@ -1,0 +1,19 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+  <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link{{ lib.nav_active(request, 'fe_setup_local') }}" data-mdb-toggle="tab" href="{{ url('fe_setup_local') }}" role="tab">
+        {{ lib.icon('setup.local') }} Local
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link{{ lib.nav_active(request, 'fe_setup_cloud') }}"  data-mdb-toggle="tab" href="{{ url('fe_setup_cloud') }}" role="tab">
+        {{ lib.icon('setup.cloud') }} Cloud
+      </a>
+    </li>
+  </ul>
+
+  {% block content_setup %}
+  {% endblock %}
+{% endblock %}

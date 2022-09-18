@@ -1,0 +1,89 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+
+<ul class="list-group list-group-light">
+{% for finishing in finishings %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <div class="position-absolute">
+        <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
+        <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
+      </div>
+      <div class="ms-5 fw-bold {% if not finishing.enabled %}text-muted{% endif %}">
+        {{ loop.index }}. {{ finishing.title }}
+        <span class="badge rounded-pill badge-success">
+          {{ lib.icon('finishing.plugin.'+finishing_plugins[finishing.plugin].cat) }}
+          {{ finishing.plugin }}
+        </span>
+        {% if finishing.image_in %}
+          <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.input') }} {{ finishing.image_in }}</span>
+        {% endif %}
+        {% if finishing.image_out %}
+          <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.output') }} {{ finishing.image_out }}</span>
+        {% endif %}
+      </div>
+      <div class="ms-5 text-muted fs-text-6">
+        <pre>{{ finishing.plugin }}</pre>
+      </div>
+    </div>
+    <div class="ms-0 pt-2 pb-2">
+      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
+        <a href="{{ url('frame_finishing_edit', args=[frame.id, finishing.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit') }}</a>
+        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteFinishing%s'|format(finishing.id) }}">{{ lib.icon('action.delete') }}</a>
+      </div>
+    </div>
+    {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
+  </li>
+{% else %}
+  <div class="col-12 pt-2">
+    {{ lib.note('No finishings defined. Click on the add button to create a new one.', 'info') }}
+  </div>
+{% endfor %}
+</ul>
+
+{{ lib.nav_actions([
+  {'icon': 'action.view', 'modal': 'showPreview', 'type': 'primary'},
+  {'icon': 'action.add', 'modal': 'createFinishing', 'type': 'success'},
+]) }}
+
+{{ lib.modal_start('createFinishing', 'Select finishing to create', classes='modal-fullscreen-lg-down modal-xl') }}
+  <div class="row">
+  {% for name, finishing_plugin in finishing_plugins.items() %}
+    {{ lib.card_item(finishing_plugin.title, finishing_plugin.descr, actions=[
+        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_finishing_create', args=[frame.id, name])}
+    ], icon=lib.icon('finishing.plugin.' + finishing_plugin.cat)) }}
+  {% endfor %}
+  </div>
+{{ lib.modal_end() }}
+
+{{ lib.modal_start('showPreview', 'Previewing finishing', classes='modal-fullscreen-lg-down modal-xl') }}
+  <div class="row">
+    <div class="col-auto">
+      The following picture shows a preview with the configured finishings
+      applied.
+    </div>
+  </div>
+  <div class="row">
+    <div class="mt-2 text-center">
+      <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
+    </div>
+    <div class="mt-2 text-center">
+      <button id="showPreviewRefresh" class="btn btn-primary btn-sm">{{ lib.icon('action.refresh', '') }}</button>
+    </div>
+  </div>
+  <script type="text/javascript">
+    const showPreviewModal = document.getElementById('showPreview');
+    const showPreviewImage = document.getElementById('showPreviewImage');
+    showPreviewModal.addEventListener('shown.bs.modal', (e) => {
+      showPreviewImage.src = 'images/preview?' + new Date().getTime();
+    })
+    const showPreviewRefresh = document.getElementById('showPreviewRefresh');
+    showPreviewRefresh.addEventListener('click', (e) => {
+      showPreviewImage.src = '/static/config/1x1-transparent.png';
+      showPreviewImage.src = 'images/preview?' + new Date().getTime();
+    });
+  </script>
+{{ lib.modal_end() }}
+
+{% endblock %}

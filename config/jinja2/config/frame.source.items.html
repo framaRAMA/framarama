@@ -1,0 +1,10 @@
+{% extends "config/base.frame.source.html" %}
+
+{% block content_frame_source %}
+
+{{ lib.list_paginator('il1', 'Item list', items, url('frame_source_images', args=[frame.id, source.id])) }}
+{{ lib.list_table(items, {'id': 'ID', 'url':'URL'}) }}
+{{ lib.list_paginator('il2', '', items, url('frame_source_images', args=[frame.id, source.id])) }}
+
+{% endblock %}
+

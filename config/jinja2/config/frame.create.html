@@ -1,0 +1,9 @@
+{% extends "config/base.html" %}
+
+{% block content %}
+{{ lib.frame_header('Create a new frame', 'Use the following form to add a new frame to your collection') }}
+{{ lib.form_start(form, csrf_input, 'Add new frame') }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_class='btn-success', cancel=url('frame_list')) }}
+{% endblock %}
+

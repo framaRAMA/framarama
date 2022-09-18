@@ -1,0 +1,7 @@
+{% extends "config/base.display.html" %}
+
+{% block content_display %}
+{{ lib.form_start(form, csrf_input) }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_title='Update', submit_class="btn-primary", cancel=url('display_time', args=[display.id])) }}
+{% endblock %}

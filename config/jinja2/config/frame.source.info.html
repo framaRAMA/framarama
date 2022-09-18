@@ -1,0 +1,16 @@
+{% extends "config/base.frame.source.html" %}
+
+{% block content_frame_source %}
+<div class="pt-2">
+  {{ lib.field_text('Name', source.name) }}
+  {{ lib.field_list('Result mapping', {'ID': source.map_item_id_ext, 'URL': source.map_item_url, 'Date creation': source.map_item_date_creation}) }}
+  {{ lib.field_pre('Meta mapping', source.map_item_meta) }}
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.delete', 'modal': 'deleteSource', 'type': 'danger'},
+  {'icon': 'action.edit', 'url': url('frame_source_edit', args=[frame.id, source.id]), 'type': 'primary'},
+]) }}
+
+{% endblock %}
+

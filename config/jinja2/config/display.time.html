@@ -1,0 +1,14 @@
+{% extends "config/base.display.html" %}
+
+{% block content_display %}
+<div class="pt-2">
+  {{ lib.field_text('On', display.time_on) }}
+  {{ lib.field_text('Off', display.time_off) }}
+  {{ lib.field_text('Change', display.time_change) }}
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.edit', 'url': url('display_time_edit', args=[display.id]), 'type': 'primary'},
+]) }}
+
+{% endblock %}

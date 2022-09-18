@@ -1,0 +1,5 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+{{ lib.form(form, csrf_input, submit_title='Update', cancel=url('frame_info', args=[frame.id])) }}
+{% endblock %}

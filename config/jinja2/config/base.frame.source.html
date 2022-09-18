@@ -1,0 +1,33 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+<ul class="nav nav-pills">
+  {% for source in sources %}
+    {% set active = lib.nav_active(request, 'frame_source', args=[frame.id, source.id]) %}
+    <li class="nav-item d-flex justify-content-between">
+      <a class="{%if active %}btn-nb-r{% endif %} nav-link nav-link{{ active }}" href="{{ url('frame_source', args=[frame.id, source.id]) }}">{{ source.name }}</a>
+      {% if active %}
+        {{ lib.modal_delete('deleteSource', 'Delete source', 'Do you really want to delete the selected source "%s" including configuration?'|format(source.name), url('frame_source_action', args=[frame.id, source.id])+'?action=delete') }}
+      {% endif %}
+    </li>
+  {% endfor %}
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_source_create', args=[frame.id]) }}" href="{{ url('frame_source_create', args=[frame.id]) }}">{{ lib.icon('action.add') }}</a>
+  </li>
+</ul>
+
+{% if not lib.nav_active(request, 'frame_source_create', args=[frame.id]) %}
+  {% for link in [
+    (lib.icon('action.view')+' Info', 'frame_source_info', [frame.id, source.id]),
+    (lib.icon('action.list')+' Queue', 'frame_source_step_list', [frame.id, source.id]),
+    (lib.icon('action.view')+' Items', 'frame_source_images', [frame.id, source.id]),
+  ] %}
+    {% set active = lib.nav_active(request, link[1], args=link[2]) %}
+    <a href="{{ url(link[1], args=link[2]) }}" class="btn btn-{% if not active %}outline-{% endif %}primary">{{ link[0] }}</a>
+  {% endfor %}
+{% endif %}
+
+{% block content_frame_source %}
+{% endblock %}
+
+{% endblock %}

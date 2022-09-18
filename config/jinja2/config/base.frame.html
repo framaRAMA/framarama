@@ -1,0 +1,27 @@
+{% extends "config/base.html" %}
+
+{% block content %}
+{{ lib.frame_header(frame.name, frame.description) }}
+
+<ul class="nav nav-tabs pt-2">
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_info', args=[frame.id]) }}" href="{{ url('frame_info', args=[frame.id]) }}">{{ lib.icon('frames.info') }}<span class="d-none d-lg-inline"> Info</span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_source_list', args=[frame.id]) }}" href="{{ url('frame_source_list', args=[frame.id]) }}">{{ lib.icon('frames.sources') }}<span class="d-none d-lg-inline"> Sources</span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_sorting_list', args=[frame.id]) }}" href="{{ url('frame_sorting_list', args=[frame.id]) }}">{{ lib.icon('frames.ordering') }}<span class="d-none d-lg-inline"> Sorting</span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_finishing_list', args=[frame.id]) }}" href="{{ url('frame_finishing_list', args=[frame.id]) }}">{{ lib.icon('frames.finishing') }}<span class="d-none d-lg-inline"> Finishing</span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
+  </li>
+</ul>
+
+{% block content_frame %}
+{% endblock %}
+
+{% endblock %}

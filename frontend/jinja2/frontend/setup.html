@@ -1,0 +1,18 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+  <div class="text-center">
+    Select an option to start enoying your memories:
+  </div>
+
+  <div class="pt-5 pb-5 row text-center">
+    <div class="col-6">
+      <h1><a href="{{ url('fe_setup_local') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.local', '') }}</a></h1>
+      <small class="text-muted">Show and configure on this device</small>
+    </div>
+    <div class="col-6">
+      <h1 class="w-100"><a href="{{ url('fe_setup_cloud') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.cloud', '') }}</a></h1>
+      <small class="text-muted">Show on this device but configure online</small>
+    </div>
+  </div>
+{% endblock %}
