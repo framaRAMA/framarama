@@ -101,6 +101,8 @@ class ApiClient(Singleton):
 
     def __init__(self):
         super().__init__()
+        self._base_url = None
+        self._display_access_key = None
         _config = Config.get().get_config()
         if _config:
             if _config.mode == 'local':
