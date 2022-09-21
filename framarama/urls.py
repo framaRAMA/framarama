@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from framarama.jobs import Scheduler
+
 
 urlpatterns = [
     path('config/', include('config.urls')),
@@ -23,7 +23,4 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('frontend/', include('frontend.urls')),
 ]
-
-scheduler = Scheduler()
-scheduler.setup()
 

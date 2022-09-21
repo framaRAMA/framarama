@@ -5,3 +5,8 @@ class FrontendConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'frontend'
 
+    def ready(self):
+        from framarama.jobs import Scheduler
+        scheduler = Scheduler()
+        scheduler.setup()
+
