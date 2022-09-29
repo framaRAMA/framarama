@@ -186,3 +186,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
 }
 
+FRAMARAMA = {
+    'DATA_PATH': './data/',
+    'ADMIN_USERNAME': 'admin',
+    'ADMIN_PASSWORD': 'testabc123',
+    'ADMIN_MAIL': 'admin@some-domain.tld',
+}
+

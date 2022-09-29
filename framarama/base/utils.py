@@ -343,7 +343,7 @@ class DefaultFrontendRenderer(BaseFrontendRenderer):
 
 
 class FilesystemFrontendRenderer(BaseFrontendRenderer):
-    FILE_PATH = '/tmp/'
+    FILE_PATH = settings.FRAMARAMA['DATA_PATH']
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
 
@@ -366,7 +366,8 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
-    CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', '/tmp/picture-background.jpg', '-f', '/tmp/picture-current.csv', '--reload', '10']
+    DATA_PATH = settings.FRAMARAMA['DATA_PATH']
+    CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', DATA_PATH + '/picture-background.jpg', '-f', DATA_PATH + '/picture-current.csv', '--reload', '10']
     CMD_IMAGICK = ['magick', 'display', '-window', 'root']
 
     def __init__(self):
@@ -382,11 +383,11 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
     def update_feh(self, display, item):
         if Filesystem.exec_running('feh') is None:
             print("start feh")
-        if not Filesystem.file_exists('/tmp/picture-current.csv'):
-            Filesystem.file_write('/tmp/picture-current.csv', '/tmp/framarama-1.image')
+        if not Filesystem.file_exists(DATA_PATH + '/picture-current.csv'):
+            Filesystem.file_write(DATA_PATH + '/picture-current.csv', DATA_PATH + '/framarama-1.image')
     
     def update_magic(self, display, item):
-        Filesystem.exec_run(self.CMD_IMAGICK + ['/tmp/framarama-1.image'])
+        Filesystem.exec_run(self.CMD_IMAGICK + [DATA_PATH + '/framarama-1.image'])
 
     def process(self, display, item):
         if self._update == None:
