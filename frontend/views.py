@@ -5,23 +5,29 @@ from django.core.files import File
 from django.core.exceptions import ValidationError
 
 from framarama.base.views import BaseView
+from framarama.base.client import ApiClient
 from framarama.base import utils
 from frontend import views
 from frontend import forms
 from frontend import models
 from config.models import Frame
 
-
 class BaseSetupView(BaseView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _context['config'] = utils.Frontend.get().get_config().get_config()
+        _frontend = utils.Frontend.get()
+        _config = _frontend.get_config()
+        _context['frontend'] = _frontend
+        _context['config'] = _config.get_config() if _config else None
         return _context
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
-        _context['config'] = utils.Frontend.get().get_config().get_config()
+        _frontend = utils.Frontend.get()
+        _config = _frontend.get_config()
+        _context['frontend'] = _frontend
+        _context['config'] = _config.get_config() if _config else None
         return _context
 
 
@@ -149,22 +155,28 @@ class DisplayStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
-            _display = utils.Frontend.get(force=True).get_display()
-            return {
-                'status': True,
-                'message': 'Successful API access',
-                'data': {
-                  'display': {
-                    'id': _display.get_id(),
-                    'name': _display.get_name(),
-                    'enabled': _display.get_enabled(),
-                    'device_type': _display.get_device_type(),
-                    'device_type_name': _display.get_device_type_name(),
-                    'device_width': _display.get_device_width(),
-                    'device_height': _display.get_device_height()
-                  }
+            if utils.Frontend.get().api_access():
+                _display = utils.Frontend.get().get_display()
+                return {
+                    'status': 'success',
+                    'message': 'Successful API access',
+                    'data': {
+                      'display': {
+                        'id': _display.get_id(),
+                        'name': _display.get_name(),
+                        'enabled': _display.get_enabled(),
+                        'device_type': _display.get_device_type(),
+                        'device_type_name': _display.get_device_type_name(),
+                        'device_width': _display.get_device_width(),
+                        'device_height': _display.get_device_height()
+                      }
+                    }
                 }
-            }
+            else:
+                return {
+                    'status': 'error',
+                    'message': 'No display configured',
+                }
         except Exception as e:
             return {
                 'status': 'error',
@@ -176,14 +188,15 @@ class BaseFrontendView(BaseSetupView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _config = _context['config']
-        if _config is None:
+        _frontend = _context['frontend']
+        if not _frontend.is_initialized():
             return {'_response': HttpResponseRedirect(reverse('fe_index'))}
         return _context
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
-        if _context['config'] is None:
+        _frontend = _context['frontend']
+        if not _frontend.is_initialized():
             return {'_response': HttpResponseRedirect(reverse('fe_index'))}
         return _context
 

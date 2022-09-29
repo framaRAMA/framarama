@@ -1,10 +1,17 @@
 import os
 import re
+import io
 import time
 import datetime
 import requests
 import jsonpickle
 import subprocess
+
+from django.conf import settings
+from django.apps import apps
+from django.core import management
+from django.db import connections
+from django.contrib.auth.models import User
 
 from frontend import models
 from framarama.base.client import ApiClient
@@ -71,9 +78,11 @@ class ApiResultItem(ApiResult):
         self._item = None
 
     def get(self, name, default=None):
-        return self._data.get(name, default)
+        return self._data.get(name, default) if self._data else None
 
     def item(self):
+        if self._data is None:
+            return None
         if self._item is None:
             self._item = self._map(self._data)
         return self._item
@@ -86,9 +95,11 @@ class ApiResultList(ApiResult):
         self._items = None
 
     def count(self):
-        return self._data.get('count', 0)
+        return self._data.get('count', 0) if self._data else None
 
     def items(self):
+        if seld._data is None:
+            return None
         if self._items is None:
             self._items = [self._map(_item) for _item in self._data['results']]
         return self._items
@@ -131,7 +142,7 @@ class ApiClient(Singleton):
 
     def get_display(self):
         _data = self._request('/displays')
-        if 'results' in _data and len(_data['results']):
+        if _data and 'results' in _data and len(_data['results']):
             return ApiResultItem(
                 _data['results'][0],
                 lambda d: config_models.Display(**{k: v for k, v in d.items() if k not in ['device_type_name', 'frame']}))
@@ -204,9 +215,59 @@ class Frontend(Singleton):
 
     def __init__(self):
         super().__init__()
+        self._client = None
+        self._initialized = False   # database setup
+        self._configured = False    # frontend config exists
+        self._api_access = False    # API acccess configured
+
+    def _mgmt_cmd(self, *args, **kwargs):
+        _out = io.StringIO()
+        management.call_command(*args, **kwargs, stdout=_out)
+        _out.seek(0)
+        yield _out.readline()
+
+    def initialize(self):
+        if not self._initialized:
+            _migrations = [_line.rsplit(' ', 1) for _line in self._mgmt_cmd('showmigrations', format="plan")]
+            _migrations = [_name.strip("\n") for _status, _name in _migrations if _status.strip() != '[X]']
+            if len(_migrations):
+                print("Applying missing migrations {}".format(_migrations))
+                management.call_command('migrate')
+            print("Migrations complete!")
+            _users = User.objects.filter(is_superuser=True).all()
+            if len(_users) == 0:
+                print("Creating admin user")
+                User.objects.create_user(
+                    username=settings.FRAMARAMA['ADMIN_USERNAME'],
+                    email=settings.FRAMARAMA['ADMIN_MAIL'],
+                    password=settings.FRAMARAMA['ADMIN_PASSWORD'],
+                    is_superuser=True)
+                _users = User.objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
+            print("Admin user is {}".format(_users[0]))
+            self._initialized = True
+        if not self._configured:
+            _table_names = connections['default'].introspection.table_names()
+            _config_table = apps.get_model('frontend', 'config')._meta.db_table
+            if _config_table in _table_names:
+                self._configured = len(models.Config.objects.all()) > 0
+        if self._configured and not self._api_access:
+            _client = ApiClient.get()
+            if _client.configured():
+                self._api_access = True
+                self._client = _client
+        return self._initialized and self._configured
+
+    def is_initialized(self):
+        return self._initialized
+
+    def is_configured(self):
+        return self._initialized and self._configured
+
+    def api_access(self):
+        return self.is_configured() and self._api_access
 
     def get_config(self):
-        return Config.get(self)
+        return Config.get(self) if self._configured else None
 
     def get_display(self):
         return Display.get(self)

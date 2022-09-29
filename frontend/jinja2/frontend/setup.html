@@ -1,18 +1,45 @@
 {% extends "frontend/base.html" %}
 
 {% block content %}
-  <div class="text-center">
-    Select an option to start enoying your memories:
-  </div>
+  {% if frontend.is_initialized() %}
+    <div class="text-center">
+      Select an option to start enoying your memories:
+    </div>
 
-  <div class="pt-5 pb-5 row text-center">
-    <div class="col-6">
-      <h1><a href="{{ url('fe_setup_local') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.local', '') }}</a></h1>
-      <small class="text-muted">Show and configure on this device</small>
+    <div class="pt-5 pb-5 row text-center">
+      <div class="col-6">
+        <h1><a href="{{ url('fe_setup_local') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.local', '') }}</a></h1>
+        <small class="text-muted">Show and configure on this device</small>
+      </div>
+      <div class="col-6">
+        <h1 class="w-100"><a href="{{ url('fe_setup_cloud') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.cloud', '') }}</a></h1>
+        <small class="text-muted">Show on this device but configure online</small>
+      </div>
     </div>
-    <div class="col-6">
-      <h1 class="w-100"><a href="{{ url('fe_setup_cloud') }}" class="bg-light border rounded-4 p-2 ps-3 pe-3">{{ lib.icon('setup.cloud', '') }}</a></h1>
-      <small class="text-muted">Show on this device but configure online</small>
+  {% else %}
+    <div id="setup" class="text-center text-muted">
+      Initializing setup ...
     </div>
-  </div>
+
+    <div class="pt-5 pb-5 text-center">
+      <div id="status-setup">{{ lib.status_icons('float-none fs-1') }}</div>
+    </div>
+    <div id="continue" class="pb-5 text-center d-none">
+      <a href="{{ url('fe_index') }}" class="btn btn-primary">Continue to setup</a>
+    </div>
+
+    {{ lib.status_script('setup', 'setup_status') }}
+
+    <script type="text/javascript">
+      function setup_status(status, data) {
+        if (status == 'success') {
+          let setupElement = window.document.getElementById('setup');
+          setupElement.innerHTML = 'Initialization completed!';
+          let continueElement = window.document.getElementById('continue');
+          continueElement.className = continueElement.className.replace('d-none', '');
+        }
+      }
+    </script>
+
+  {% endif %}
 {% endblock %}

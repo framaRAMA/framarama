@@ -1,6 +1,10 @@
 import datetime
+import subprocess
+
+from django.db import connections
 
 from framarama.base import utils
+from framarama.base.utils import ApiClient
 
 
 class Jobs():
@@ -9,23 +13,31 @@ class Jobs():
         self._display = None
         self._items = None
         self._last_update = None
-        scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
-        scheduler.add(self.next_item, 'interval', minutes=5, id='fe_next_item', name='Frontend next item')
-        scheduler.add(self.tick, 'interval', seconds=5, id='fe_tick', name='Frontend timer tick')
+        self._scheduler = scheduler
+        self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
 
-    def init(self):
+    def _setup_start(self):
+        for _job_name in ['fe_next_time', 'fe_refresh_items']:
+            if self._scheduler.get(_job_name):
+                self._scheduler.remove(_job_name)
+    
+    def _setup_completed(self):
+        if not self._scheduler.get('fe_refresh_items'):
+            self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
+        if not self._scheduler.get('fe_next_item'):
+            self._scheduler.add(self.next_item, 'interval', minutes=5, id='fe_next_item', name='Frontend next item')
         self.refresh_items()
 
     def refresh_items(self):
-        print("Refreshing items ...")
         _display = utils.Frontend.get().get_display()
         if _display:
+            print("Refreshing items ...")
             self._display = _display
             self._items = _display.get_items()
             print("Have {} items in list.".format(self._items.count()))
 
     def next_item(self):
-        if self._display.time_change_reached(self._last_update):
+        if self._display and self._display.time_change_reached(self._last_update):
             self._last_update = datetime.datetime.utcnow()
             print("Retrieve next item ...")
             _next_item = self._display.get_next_item(True)
@@ -37,7 +49,10 @@ class Jobs():
             print("Image updated ({} bytes, mime {})!".format(len(_frontend_item.data()), _frontend_item.mime()))
 
     def tick(self):
-        if not self._display:  # do initialization stuff
-            self.refresh_items()
-            self.next_item()
+        if not utils.Frontend.get().initialize() or not utils.Frontend.get().api_access():
+            self._setup_start()
+        else:
+          self._setup_completed()
+          self.refresh_items()
+          self.next_item()
 
