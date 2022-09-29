@@ -232,28 +232,37 @@
           return res.json();
         }
         return {
-          status: false,
+          status: 'error',
           message: "Status endpoint returns code " + res.status
         }
       })
       .then(function (json) {
-         statusCount_{{ name }}++;
-         const element = window.document.querySelector('#status-{{ name }}');
-         const elementTesting = element.querySelector('.status-testing');
-         const elementStatusSuccess = element.querySelector('.status-success');
-         const elementStatusError = element.querySelector('.status-error');
-         elementTesting.className = elementTesting.className + ' d-none';
-         if (json.status) {
-             elementStatusError.className = elementStatusError.className.replace('d-none', '') + ' d-none';
-             elementStatusSuccess.className = elementStatusSuccess.className.replace('d-none', '');
-             elementStatusSuccess.title = 'Test ' + statusCount_{{ name }} + ': ' + json.message;
-         } else {
-             elementStatusSuccess.className = elementStatusSuccess.className.replace('d-none', '') + ' d-none';
-             elementStatusError.className = elementStatusError.className.replace('d-none', '');
-             elementStatusError.title = 'Test ' + statusCount_{{ name }} + ': ' + json.message;
-            setTimeout(status_fetch_{{ name }}, 5000);
-         }
-         {% if callback %}{{ callback }}(json.status, json.data || {});{% endif %}
+        statusCount_{{ name }}++;
+        const element = window.document.querySelector('#status-{{ name }}');
+        const elementStatusTesting = element.querySelector('.status-testing');
+        const elementStatusSuccess = element.querySelector('.status-success');
+        const elementStatusError = element.querySelector('.status-error');
+        let showStatus = [];
+        if (json.status == 'success') {
+          showStatus = [elementStatusSuccess, elementStatusTesting, elementStatusError];
+        } else if (json.status == 'testing') {
+          showStatus = [elementStatusTesting, elementStatusSuccess, elementStatusError];
+        } else if (json.status == 'error') {
+          showStatus = [elementStatusError, elementStatusSuccess, elementStatusTesting];
+        }
+        for (let i=0; i<showStatus.length; i++) {
+           let isHidden = showStatus[i].className.indexOf('d-none') != -1;
+           if (i == 0 && isHidden) {
+             showStatus[i].className = showStatus[i].className.replace('d-none', '');
+           } if (i > 0 && !isHidden) {
+             showStatus[i].className = showStatus[i].className + ' d-none';
+           }
+        }
+        showStatus[0].title = 'Test ' + statusCount_{{ name }} + ': ' + json.message;
+        {% if callback %}{{ callback }}(json.status, json.data || {});{% endif %}
+        if (json.status != 'success') {
+          setTimeout(status_fetch_{{ name }}, 5000);
+        }
       })
       .catch(function (err) {
          setTimeout(status_fetch_{{ name }}, 5000);

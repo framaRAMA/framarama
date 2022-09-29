@@ -109,18 +109,38 @@ class BaseStatusView(BaseSetupView):
        return {'_response': JsonResponse(self._status(_context))}
  
 
+class SetupStatusView(BaseStatusView):
+
+    def _status(self, context):
+        try:
+            if utils.Frontend.get().is_initialized():
+                return {
+                    'status': 'success',
+                    'message': 'Configuration setup completed'
+                }
+            return {
+                'status': 'testing',
+                'message': 'Configuration setup not available'
+            }
+        except Exception as e:
+            return {
+               'status': 'error',
+               'message': 'Error checking setup status: ' + str(e)
+            }
+ 
+
 class DatabaseStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
             _frame = Frame.objects.all().first()
             return {
-                'status': True,
+                'status': 'success',
                 'message': 'Database access successful'
             }
         except Exception as e:
             return {
-               'status': False,
+               'status': 'error',
                'message': 'Error accessing database: ' + str(e)
             }
  
@@ -147,7 +167,7 @@ class DisplayStatusView(BaseStatusView):
             }
         except Exception as e:
             return {
-                'status': False,
+                'status': 'error',
                 'message': 'Error accessing API: ' + str(e)
             }
  

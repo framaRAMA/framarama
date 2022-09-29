@@ -110,12 +110,15 @@ class ApiClient(Singleton):
             else:
                 self._base_url = _config.cloud_server
             self._display_access_key = _config.cloud_display_access_key
-        if self._base_url == None or self._display_access_key == None:
-            raise Exception("Missing base URL or display access key")
-        self._base_url = self._base_url.rstrip('/') + '/api'
-        self._display_access_key = self._display_access_key
+            self._base_url = self._base_url.rstrip('/') + '/api'
+            self._display_access_key = self._display_access_key
+
+    def configured(self):
+        return self._base_url != None and self._display_access_key != None
 
     def _request(self, path):
+        if not self.configured():
+            raise Exception("API client not configured")
         _headers = {}
         _headers['X-Display'] = self._display_access_key
         _response = requests.get(self._base_url + path, headers=_headers)
