@@ -38,7 +38,7 @@ class Config(BaseModel):
         max_length=255,
         verbose_name='Server', help_text='Remove server URL')
     cloud_display_access_key = models.CharField(
-        max_length=64,
+        max_length=64, blank=True, null=True,
         verbose_name='Display', help_text='Access key for display')
 
 
