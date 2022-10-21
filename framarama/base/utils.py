@@ -173,17 +173,23 @@ class Filesystem:
             f.write(data)
 
     @staticmethod
-    def file_rotate(path, pattern, fmt, count, extensions=[]):
+    def file_match(path, pattern):
         _files = []
         with os.scandir(path) as it:
             _files = [entry for entry in it if entry.is_file()]
             _files = [entry for entry in _files if re.match(pattern, entry.name)]
             _files = [entry.name for entry in _files]
             _files.sort(reverse=True)
-            _files = _files[-count:]
+            _files = [(_file,) + re.match(pattern, _file).groups() for _file in _files]
+        return _files
 
-        for _i, _name in enumerate(_files):
-            (_num, _ext) = re.match(pattern, _name).groups()
+    @staticmethod
+    def file_rotate(path, pattern, fmt, count, extensions=[]):
+        _files = Filesystem.file_match(path, pattern)
+        _files = _files[-count:]
+
+        for _i, (_name, _num, _ext) in enumerate(_files):
+            #(_num, _ext) = re.match(pattern, _name).groups()
             _new_num = len(_files)-_i+1
 
             for _ext in extensions:
@@ -349,10 +355,12 @@ class FrontendDevice(Singleton):
     def __init__(self):
         super().__init__()
         self._finisher = DefaultFrontendFinisher()
+        self._renderer_filesystem = FilesystemFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
-            FilesystemFrontendRenderer(),
+            self._renderer_filesystem,
             VisualizeFrontendRenderer(),
+            WebsiteFrontendRenderer(),
         ]
 
     def finish(self, display, item, finishings):
@@ -361,6 +369,9 @@ class FrontendDevice(Singleton):
     def render(self, display, item):
         for renderer in self._renderers:
             renderer.process(display, item)
+
+    def get_files(self):
+        return self._renderer_filesystem.files()
 
 
 class FrontendItem:
@@ -436,6 +447,18 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
         with open(_files['image'], 'wb') as f:
             f.write(item.data())
+
+    def files(self):
+        _files = {}
+        for (_file, _num, _ext) in Filesystem.file_match(self.FILE_PATH, self.FILE_PATTERN):
+            _file_image = self.FILE_FORMAT.format(int(_num), 'image')
+            _json = open(self.FILE_PATH + '/' + _file, 'r').read()
+            _image = open(self.FILE_PATH + '/' + _file_image, 'rb').read()
+            _files[_file] = {
+                'json': jsonpickle.decode(_json),
+                'image': _image
+            }
+        return _files
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
