@@ -475,7 +475,8 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         with open(_files['json'], 'w') as f:
             f.write(jsonpickle.encode({
               'item': item.item(),
-              'mime': item.mime()
+              'mime': item.mime(),
+              'time': datetime.datetime.utcnow()
             }))
 
         with open(_files['image'], 'wb') as f:
