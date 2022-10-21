@@ -12,11 +12,17 @@ class Jobs():
     def __init__(self, scheduler):
         self._display = None
         self._items = None
+        self._startup = None
         self._last_update = None
         self._scheduler = scheduler
         self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
 
     def _setup_start(self):
+        if self._startup is None:
+            self._startup = datetime.datetime.utcnow()
+            _config = utils.Frontend.get().get_config()
+            _config.get_config().date_app_startup = datetime.datetime.utcnow()
+            _config.get_config().save()
         for _job_name in ['fe_next_time', 'fe_refresh_items']:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
@@ -35,6 +41,10 @@ class Jobs():
             self._display = _display
             self._items = _display.get_items()
             print("Have {} items in list.".format(self._items.count()))
+            _config = utils.Frontend.get().get_config()
+            _config.get_config().date_items_update = datetime.datetime.utcnow()
+            _config.get_config().count_items = self._items.count()
+            _config.get_config().save()
 
     def next_item(self):
         if self._display and self._display.time_change_reached(self._last_update):
@@ -46,7 +56,11 @@ class Jobs():
             _device = utils.Frontend.get().get_device()
             _frontend_item = _device.finish(self._display, _next_item, _finishings)
             _device.render(self._display, _frontend_item)
-            print("Image updated ({} bytes, mime {})!".format(len(_frontend_item.data()), _frontend_item.mime()))
+            print("Image updated ({} bytes, {}x{} pixels, mime {})!".format(
+                len(_frontend_item.data()),
+                _frontend_item.width(),
+                _frontend_item.height(),
+                _frontend_item.mime()))
 
     def tick(self):
         if not utils.Frontend.get().initialize() or not utils.Frontend.get().api_access():
