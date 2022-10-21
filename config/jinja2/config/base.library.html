@@ -99,6 +99,9 @@
     <link rel="stylesheet" href="{{ static('config/fontawesome-free-6.1.1-web/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ static('config/mdb-ui-kit-4.0.0/css/mdb.min.css') }}">
 
+    <!-- Charts.js -->
+    <script src="{{ static('config/chartsjs-3.9.1.js') }}"></script>
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ static('config/framarama.css') }}">
 
@@ -613,5 +616,24 @@
     </div>
   </div>
 </div>
+{% endmacro %}
+
+{% macro chart_doughnut(id, labels, values) %}
+  <canvas id="{{ id }}" class="ms-5 me-5"></canvas>
+  <script>
+    new Chart(document.getElementById('{{ id }}'), {
+      type: 'doughnut', data: {
+        labels: {{ labels|tojson }},
+        datasets: [{
+          backgroundColor: ['{{ color1 }}', '{{ color2 }}', '{{ color3 }}', '{{ color4 }}'],
+          data: {{ values|tojson }}
+        }]
+      }, options: {
+        circumference: 220, rotation: 250, spacing: 2,
+        plugins: { datalabels: { display: true, color: 'white' } }
+      }
+    });
+  </script>
+
 {% endmacro %}
 
