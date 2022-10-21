@@ -1,73 +1,84 @@
+{% set color1 = '#43c7ff' %}
+{% set color2 = '#ff66c4' %}
+{% set color3 = '#fcee21' %}
+{% set color4 = '#bae580' %}
+{% set icons = {
+  'action.add' : 'plus',
+  'action.delete' : 'trash',
+  'action.edit' : 'edit',
+  'action.back' : 'circle-chevron-left',
+  'action.refresh' : 'arrows-rotate',
+  'action.loading' : 'spinner',
+  'action.run' : 'play',
+  'action.list' : 'list',
+  'action.view' : 'eye',
+  'action.up' : 'angles-up',
+  'action.down' : 'angles-down',
+  'action.begin' : 'fast-backward',
+  'action.end' : 'fast-forward',
+  'action.prev' : 'backward',
+  'action.next' : 'forward',
+  'action.generate' : 'dice',
+
+  'mapped': 'arrow-right-long',
+
+  'enabled': 'square-check',
+  'disabled': 'square-xmark',
+  'error': 'exclamation-triangle',
+
+  'bullet': 'caret-right',
+
+  'setup.local': 'computer',
+  'setup.cloud': 'globe',
+
+  'frontend': 'tablet-screen-button',
+  'frontend.overview': 'columns',
+  'frontend.display': 'display',
+  'frontend.system': 'sliders',
+  'frontend.config': 'gear',
+  'frontend.device': 'display',
+
+  'dashboard' : 'columns',
+  'info': 'info-circle',
+  'display' : 'display',
+  'system': 'server',
+
+  'frame' : 'image',
+  'frames' : 'images',
+  'frames.info': 'info-circle',
+  'frames.general': 'file-lines',
+  'frames.sources': 'box',
+  'frames.ordering': 'sort',
+  'frames.finishing': 'hat-wizard',
+  'frames.settings': 'sliders',
+
+  'source.plugin.network': 'cloud-arrow-down',
+  'source.plugin.data': 'shuffle',
+  'source.instance' : 'object-group',
+  'source.input' : 'file-import',
+  'source.output' : 'file-export',
+  'source.loopout': 'maximize',
+  'source.mergein': 'down-left-and-up-right-to-center',
+
+  'sorting.plugin.custom': 'sliders',
+  'sorting.plugin.date': 'calendar-days',
+
+  'finishing.plugin.shape': 'shapes',
+  'finishing.plugin.text': 'align-left',
+  'finishing.plugin.resize': 'crop-simple',
+  'finishing.plugin.transform': 'wand-magic-sparkles',
+  'finishing.plugin.merge': 'object-group',
+  'finishing.input' : 'file-import',
+  'finishing.output' : 'file-export',
+
+  'display.info' : 'info-circle',
+  'display.device' : 'display',
+  'display.time' : 'clock',
+  'display.access' : 'key',
+}
+%}
+
 {% macro icon(type, style='me-1', raw=False) %}
-  {% set icons = {
-    'action.add' : 'plus',
-    'action.delete' : 'trash',
-    'action.edit' : 'edit',
-    'action.back' : 'circle-chevron-left',
-    'action.refresh' : 'arrows-rotate',
-    'action.loading' : 'spinner',
-    'action.run' : 'play',
-    'action.list' : 'list',
-    'action.view' : 'eye',
-    'action.up' : 'angles-up',
-    'action.down' : 'angles-down',
-    'action.begin' : 'fast-backward',
-    'action.end' : 'fast-forward',
-    'action.prev' : 'backward',
-    'action.next' : 'forward',
-    'action.generate' : 'dice',
-    
-    'mapped': 'arrow-right-long',
-    
-    'enabled': 'square-check',
-    'disabled': 'square-xmark',
-    'error': 'exclamation-triangle',
-    
-    'bullet': 'caret-right',
-
-    'setup.local': 'computer',
-    'setup.cloud': 'globe',
-    
-    'frontend': 'tablet-screen-button',
-    'frontend.overview': 'columns',
-    'frontend.config': 'gear',
-    'frontend.device': 'display',
-    
-    'dashboard' : 'columns',
-    'info': 'info-circle',
-    'display' : 'display',
-    'system': 'server',
-
-    'frame' : 'image',
-    'frames' : 'images',
-    'frames.info': 'info-circle',
-    'frames.general': 'file-lines',
-    'frames.sources': 'box',
-    'frames.ordering': 'sort',
-    'frames.finishing': 'hat-wizard',
-    'frames.settings': 'sliders',
-    
-    'source.plugin.network': 'cloud-arrow-down',
-    'source.plugin.data': 'shuffle',
-    'source.instance' : 'object-group',
-    'source.input' : 'file-import',
-    'source.output' : 'file-export',
-    'source.loopout': 'maximize',
-    'source.mergein': 'down-left-and-up-right-to-center',
-    
-    'sorting.plugin.custom': 'sliders',
-    'sorting.plugin.date': 'calendar-days',
-    
-    'finishing.plugin.shape': 'shapes',
-    'finishing.plugin.text': 'align-left',
-    'finishing.input' : 'file-import',
-    'finishing.output' : 'file-export',
-
-    'display.info' : 'info-circle',
-    'display.device' : 'display',
-    'display.time' : 'clock',
-    'display.access' : 'key',
-  } %}
   <i class="fas fa-{% if raw %}{{ type }}{% else %}{{ icons[type] }}{% endif %} {{ style }}"></i>
 {% endmacro %}
 
