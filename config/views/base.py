@@ -5,7 +5,8 @@ from django.core.paginator import Paginator
 from django.db.models import F
 
 from framarama.base.views import BaseAuthenticatedView
-from frontend.models import Config
+from framarama.base.utils import Config
+#from frontend.models import Config
 from config import forms
 from config import models
 from config import plugins
@@ -13,9 +14,11 @@ from config import plugins
 
 class BaseConfigView(BaseAuthenticatedView):
 
+    def __init__(self):
+        self._config = Config.get()
+
     def get_config(self):
-        _configs = list(Config.objects.all())
-        return _configs[0] if len(_configs) else None
+        return self._config.get_config() if self._config else None
 
     def get_frames(self):
         return models.Frame.objects.filter(user=self.request.user)
@@ -27,6 +30,7 @@ class BaseConfigView(BaseAuthenticatedView):
         _context = {}
         _context['config'] = self.get_config()
         _context['frames'] = self.get_frames()
+        _context['displays'] = self.get_displays()
         return _context
 
 
