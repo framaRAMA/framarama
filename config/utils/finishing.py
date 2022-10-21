@@ -124,9 +124,16 @@ class Processor:
             for _name_out in _images_out:
                 self._context.set_image_data(_name_out, _image_out)
 
-        return ProcessingResult(
-            _adapter.image_meta(self._context.get_image()),
-            _adapter.image_data(self._context.get_image()))
+        _image = self._context.get_image()
+        _image_data = _adapter.image_data(_image)
+        _image_meta = _adapter.image_meta(_image)
+
+        logger.info("Result: {}x{} pixels, {} bytes".format(
+            _image_meta['width'],
+            _image_meta['height'],
+            len(_image_data)))
+
+        return ProcessingResult(_image_meta, _image_data)
 
 
 class ProcessingResult:
@@ -293,7 +300,10 @@ class ImageContainer:
         self._images = []
 
     def __repr__(self):
-        return "<{}: {} images>".format(type(self).__name__, len(self._images))
+        return "<{}: {} images: {}>".format(
+            type(self).__name__,
+            len(self._images),
+            ', '.join(["{}x{}".format(_i.width, _i.height) for _i in self._images]))
 
     def add_image(self, image):
         self._images.append(image)
