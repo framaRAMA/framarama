@@ -5,7 +5,11 @@
   {{ lib.field_text('Name', display.name) }}
   {{ lib.field_textarea('Description', display.description) }}
   {{ lib.field_check('Enabled', display.enabled) }}
-  {{ lib.field_text('Frame', display.frame) }}
+  {% if display.frame %}
+    {{ lib.field_text('Frame', display.frame.name) }}
+  {% else %}
+    {{ lib.field_text('Frame', '(no frame configured)') }}
+  {% endif %}
 </div>
 
 {{ lib.nav_actions([
