@@ -375,6 +375,12 @@ class FrontendItem:
     def mime(self):
         return self._result.get_mime()
 
+    def width(self):
+        return self._result.get_width()
+
+    def height(self):
+        return self._result.get_height()
+
 
 class BaseFrontendFinisher:
 
