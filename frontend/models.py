@@ -41,4 +41,16 @@ class Config(BaseModel):
         max_length=64, blank=True, null=True,
         verbose_name='Display', help_text='Access key for display')
 
+    date_app_startup = models.DateTimeField(
+        null=True,
+        verbose_name='Startup', help_text='Startup date of the system')
+    date_items_update = models.DateTimeField(
+        null=True,
+        verbose_name='Items update', help_text='The date when the list of items was updates the last time')
+    count_items = models.IntegerField(
+        default=0,
+        verbose_name='Item count', help_text='Total amount of item currently in collection')
+    count_views = models.IntegerField(
+        default=0,
+        verbose_name='Views', help_text='Total count of images shown on display')
 
