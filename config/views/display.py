@@ -10,11 +10,6 @@ from config.forms import display as forms
 class ListDisplayView(base.BaseConfigView):
     template_name = "config/display.list.html"
 
-    def _get(self, request, *args, **kwargs):
-        _context = super()._get(request, *args, **kwargs)
-        _context['displays'] = self.get_displays()
-        return _context
-
 
 class CreateDisplayView(base.BaseConfigView):
     template_name = 'config/display.create.html'
