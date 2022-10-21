@@ -8,6 +8,8 @@ urlpatterns = [
     path('setup/cloud', views.CloudSetupView.as_view(), name='fe_setup_cloud'),
     path('dashboard/overview', views.OverviewDashboardView.as_view(), name='fe_dashboard'),
     path('dashboard/device', views.DeviceDashboardView.as_view(), name='fe_dashboard_device'),
+    path('dashboard/display', views.DisplayDashboardView.as_view(), name='fe_dashboard_display'),
+    path('dashboard/display/image/<int:nr>', views.ImageDisplayDashboardView.as_view(), name='fe_dashboard_display_item'),
 
     path('status/setup', views.SetupStatusView.as_view(), name='fe_status_setup'),
     path('status/database', views.DatabaseStatusView.as_view(), name='fe_status_database'),

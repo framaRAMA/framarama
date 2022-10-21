@@ -205,6 +205,23 @@ class OverviewDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.overview.html'
 
 
+class DisplayDashboardView(BaseFrontendView):
+    template_name = 'frontend/dashboard.display.html'
+
+    def _get(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        return _context
+
+class ImageDisplayDashboardView(BaseFrontendView):
+
+    def _get(self, request, nr, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _files = list(_frontend_device.get_files().values())
+        _file = _files[nr] if nr >= 0 and nr < len(_files) else _files[0]
+        return {'_response': HttpResponse(_file['image'], _file['json']['mime'])}
+
+
 class DeviceDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.device.html'
 

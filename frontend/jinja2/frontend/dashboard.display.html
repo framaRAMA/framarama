@@ -1,0 +1,38 @@
+{% extends "frontend/dashboard.base.html" %}
+
+{% block content_dashboard %}
+
+<div class="pt-2">
+  {{ lib.field_text('System startup', config.date_app_startup) }}
+  {{ lib.field_text('Items update', config.date_items_update) }}
+  {{ lib.field_text('Items total', config.count_items) }}
+  {{ lib.field_text('Items shown', config.count_views) }}
+</div>
+
+
+{% set files = frontend.get_device().get_files().items() %}
+{{ lib.field_text('Latest items:', ' ') }}
+<div id="carouselPictures" class="carousel slide mt-2" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    {% for _file_name, _file_data in files %}
+      <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
+    {% endfor %}
+  </div>
+  <div class="carousel-inner">
+    {% for _file_name, _file_data in files %}
+      <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+        <img src="{{ url('fe_dashboard_display_item', args=[loop.index0]) }}" class="d-block w-100"/>
+      </div>
+    {% endfor %}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+{% endblock %}
