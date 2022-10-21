@@ -372,9 +372,12 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
               _drawing.text_alignment = _align_map[text.get_alignment()]
         return _drawing
 
-    def _apply(self, image, drawing):
+    def _apply_drawing(self, image, drawing):
+        self._apply(image, lambda i: drawing(i))
+
+    def _apply(self, image, func):
         for _image in image.get_images():
-            drawing(_image)
+            func(_image)
 
     def image_open(self, url):
         _image = self._wand_image.Image(blob=requests.get(url, stream=True).raw)
@@ -412,17 +415,17 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
     def draw_line(self, image, start, end, brush):
         _drawing = self._drawing(brush=brush)
         _drawing.line((start.get_x(), start.get_y()), (end.get_x(), end.get_y()))
-        self._apply(image, _drawing)
+        self._apply_drawing(image, _drawing)
 
     def draw_rect(self, image, start, end, brush, radius=None):
         _drawing = self._drawing(brush=brush)
         _drawing.rectangle(start.get_x(), start.get_y(), end.get_x(), end.get_y(), radius=radius)
-        self._apply(image, _drawing)
+        self._apply_drawing(image, _drawing)
 
     def draw_circle(self, image, pos, size, brush):
         _drawing = self._drawing(brush=brush)
         _drawing.circle((pos.get_x(), pos.get_y()), (size.get_width(), size.get_height()))
-        self._apply(image, _drawing)
+        self._apply_drawing(image, _drawing)
 
     def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None):
         _drawing = self._drawing(text=text, brush=brush)
@@ -446,6 +449,6 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             _y2 = pos.get_y() + _padding - _metrics.descender
             self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius)
         _drawing.text(pos.get_x(), pos.get_y(), _text)
-        self._apply(image, _drawing)
+        self._apply_drawing(image, _drawing)
 
 
