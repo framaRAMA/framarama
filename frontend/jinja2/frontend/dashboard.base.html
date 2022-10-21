@@ -12,8 +12,14 @@
 
 <ul class="nav nav-tabs pt-2">
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
+    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.overview') }}<span class="d-none d-lg-inline"></span></a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard_display') }}" href="{{ url('fe_dashboard_display') }}">{{ lib.icon('frontend.display') }}<span class="d-none d-lg-inline"></span></a>
+  </li>
+  <!-- li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'fe_system') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.system') }}<span class="d-none d-lg-inline"></span></a>
+  </li -->
   <!-- li class="nav-item">
     <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard_device') }}" href="{{ url('fe_dashboard_device') }}">{{ lib.icon('frontend.device') }}<span class="d-none d-lg-inline"> Device</span></a>
   </li -->
