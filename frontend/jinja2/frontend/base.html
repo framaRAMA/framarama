@@ -6,7 +6,14 @@
     {% endblock %}
     {{ lib.html_dialog_end() }}
 
-    <p class="container-fluid text-center small">Thanks for using framaRAMA - Copyright 2022</p>
+    <p class="container-fluid text-center small">
+      Thanks for using framaRAMA - Copyright 2022
+    </p>
+    <form action="https://www.paypal.com/donate" method="post" target="_blank" class="text-center">
+      <input type="hidden" name="hosted_button_id" value="5TDSCVP5X7QFA" />
+      <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" class="opacity-50"/>
+      <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
+    </form>
   </div>
 </div>
 {{ lib.html_end() }}
