@@ -79,7 +79,7 @@ class Implementation(PluginImplementation):
             _template = Template(model.template_out)
             _output = _template.render(Context({'data': _data_out.get_as_dict().get()}))
             
-            _data_out = data.DataContainer(data=_output, data_type=data.DataType(DataType.MIME, model.mime_out))
+            _data_out = data.DataContainer(data=_output, data_type=data.DataType(data.DataType.MIME, model.mime_out))
         
         return [_data_out]
 
