@@ -221,49 +221,82 @@ class Process:
 
 
 class Frontend(Singleton):
+    INIT_PHASE_START = 0
+    INIT_PHASE_DB_DEFAULT = 1   # Check if frontend/default DB is available
+    INIT_PHASE_CONFIGURED = 2   # Frontend configuration exists
+    INIT_PHASE_DB_CONFIG = 3    # Check if config DB is available
+    INIT_PHASE_API_ACCESS = 4   # API access possible
 
     def __init__(self):
         super().__init__()
         self._client = None
+        self._init_phase = Frontend.INIT_PHASE_START
         self._initialized = False   # database setup
         self._configured = False    # frontend config exists
         self._api_access = False    # API acccess configured
 
     def _mgmt_cmd(self, *args, **kwargs):
-        _out = io.StringIO()
-        management.call_command(*args, **kwargs, stdout=_out)
-        _out.seek(0)
-        yield _out.readline()
+        _out, _err = io.StringIO(), io.StringIO()
+        management.call_command(*args, **kwargs, stdout=_out, stderr=_err)
+        return _out.getvalue().rstrip("\n").split("\n")
+
+    def _init_connections(self):
+        import importlib
+        from django.db import connections
+        from framarama import base, settings, settings_db
+        importlib.reload(settings_db)
+        importlib.reload(settings)
+        connections.close_all()
+        connections.settings = settings.DATABASES
+        for name in settings.DATABASES:
+            if hasattr(connections._connections, name):
+                delattr(connections._connections, name)
+        base.DatabaseRouter.config = None     # use new settings in database router
+
+    def _init_migrations(self, database):
+        _migrations = self._mgmt_cmd('showmigrations', '--plan', no_color=True, database=database)
+        _migrations = [_line.rsplit(' ', 1) for _line in _migrations]
+        _migrations = [_name for _status, _name in _migrations if _status.strip() != '[X]']
+        if len(_migrations):
+            print("Applying {} missing migrations to {}".format(len(_migrations), database))
+            management.call_command('migrate', database=database)
+        print("Migrations for {} complete!".format(database))
+
+    def _init_admin_user(self):
+        _users = User.objects.filter(is_superuser=True).all()
+        if len(_users) == 0:
+            print("Creating admin user")
+            User.objects.create_user(
+                username=settings.FRAMARAMA['ADMIN_USERNAME'],
+                email=settings.FRAMARAMA['ADMIN_MAIL'],
+                password=settings.FRAMARAMA['ADMIN_PASSWORD'],
+                is_superuser=True)
+            _users = User.objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
+        print("Admin user is {}".format(_users[0]))
 
     def initialize(self):
-        if not self._initialized:
-            _migrations = [_line.rsplit(' ', 1) for _line in self._mgmt_cmd('showmigrations', format="plan")]
-            _migrations = [_name.strip("\n") for _status, _name in _migrations if _status.strip() != '[X]']
-            if len(_migrations):
-                print("Applying missing migrations {}".format(_migrations))
-                management.call_command('migrate')
-            print("Migrations complete!")
-            _users = User.objects.filter(is_superuser=True).all()
-            if len(_users) == 0:
-                print("Creating admin user")
-                User.objects.create_user(
-                    username=settings.FRAMARAMA['ADMIN_USERNAME'],
-                    email=settings.FRAMARAMA['ADMIN_MAIL'],
-                    password=settings.FRAMARAMA['ADMIN_PASSWORD'],
-                    is_superuser=True)
-                _users = User.objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
-            print("Admin user is {}".format(_users[0]))
+        if self._init_phase < Frontend.INIT_PHASE_DB_DEFAULT:
+            self._init_connections()
+            self._init_migrations('default')
+            self._init_phase = Frontend.INIT_PHASE_DB_DEFAULT
             self._initialized = True
-        if not self._configured:
-            _table_names = connections['default'].introspection.table_names()
-            _config_table = apps.get_model('frontend', 'config')._meta.db_table
-            if _config_table in _table_names:
-                self._configured = len(models.Config.objects.all()) > 0
+        if self._init_phase < Frontend.INIT_PHASE_CONFIGURED:
+            #_table_names = connections['default'].introspection.table_names()
+            #_config_table = apps.get_model('frontend', 'config')._meta.db_table
+            #if _config_table in _table_names:
+            self._configured = len(models.Config.objects.all()) > 0
+            if self._configured:
+                self._init_phase = Frontend.INIT_PHASE_CONFIGURED
+        if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
+            self._init_admin_user()
+            self._init_migrations('config')
+            self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
         if self._configured and not self._api_access:
             _client = ApiClient.get()
             if _client.configured():
                 self._api_access = True
                 self._client = _client
+                self._init_phase = Frontend.INIT_PHASE_API_ACCESS
         return self._initialized and self._configured
 
     def is_initialized(self):
