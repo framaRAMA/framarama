@@ -98,7 +98,7 @@ class ApiResultList(ApiResult):
         return self._data.get('count', 0) if self._data else None
 
     def items(self):
-        if seld._data is None:
+        if self._data is None:
             return None
         if self._items is None:
             self._items = [self._map(_item) for _item in self._data['results']]
