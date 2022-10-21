@@ -1,8 +1,6 @@
 import datetime
 import subprocess
 
-from django.db import connections
-
 from framarama.base import utils
 from framarama.base.utils import ApiClient
 
