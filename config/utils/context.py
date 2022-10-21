@@ -21,6 +21,16 @@ class ResultValue:
             return None
         return int(float(self._value))
 
+    def as_float(self):
+        if self._value is None:
+            return None
+        return float(self._value)
+
+    def as_bool(self):
+        if self._value is None:
+            return None
+        return str(self._value).lower() in ['true', '1', 't', 'y', 'yes']
+
 
 class Context:
 
