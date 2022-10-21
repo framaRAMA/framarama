@@ -168,11 +168,13 @@ class Processor:
 
                 if _item_url in _existing:
                     _item = _existing[_item_url]
+                    _item.version = _item.version + 1
                     _stats_type = 'update'
                 else:
                     _item = models.Item()
                     _item.frame = _frame
                     _item.source = source
+                    _item.version = 0
                     _item.url = _item_url
                     _item.created = timezone.now()
                     _stats_type = 'create'

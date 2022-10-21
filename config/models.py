@@ -64,6 +64,9 @@ class Frame(BaseModel):
         verbose_name='Description', help_text='Provide a meaninful description.')
     enabled = models.BooleanField(
         verbose_name='Enabled')
+    version = models.IntegerField(
+        default=0,
+        verbose_name='Update version', help_text='The version number increasing on each update')
 
 
 class Source(BaseModel):
@@ -151,6 +154,9 @@ class Item(BaseModel):
 
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='items')
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='items')
+    version = models.IntegerField(
+        default=0,
+        verbose_name='Update version', help_text='The version number increasing on each update')
     id_ext = models.CharField(
         max_length=255, null=True,
         verbose_name='External ID', help_text='Contains the external reference ID if available')
