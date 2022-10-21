@@ -2,7 +2,6 @@ import re
 
 from django.db import models as Model
 from django.db.models import functions as Function
-from django.db import connections
 
 from config.plugins import SortingPluginRegistry
 
