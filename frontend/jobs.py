@@ -33,6 +33,7 @@ class Jobs():
         if not self._scheduler.get('fe_next_item'):
             self._scheduler.add(self.next_item, 'interval', minutes=5, id='fe_next_item', name='Frontend next item')
         self.refresh_items()
+        self.next_item()
 
     def refresh_items(self):
         _display = utils.Frontend.get().get_display()
@@ -65,8 +66,6 @@ class Jobs():
     def tick(self):
         if not utils.Frontend.get().initialize() or not utils.Frontend.get().api_access():
             self._setup_start()
-        else:
-          self._setup_completed()
-          self.refresh_items()
-          self.next_item()
+        elif self._display is None or self._items is None:
+            self._setup_completed()
 
