@@ -319,6 +319,21 @@ class ImageProcessingAdapter:
     def image_exif(self, image):
         raise NotImplementedException()
 
+    def image_resize(self, image, resize_x, resize_y, keep_aspect):
+        raise NotImplementedException()
+
+    def image_scale(self, image, factor):
+        raise NotImplementedException()
+
+    def image_rotate(self, image, factor):
+        raise NotImplementedException()
+
+    def image_blur(self, image, factor):
+        raise NotImplementedException()
+
+    def image_merge(self, image, alignment):
+        raise NotImplementedException()
+
     def image_clone(self, image):
         raise NotImplementedException()
 
@@ -402,6 +417,42 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         _exif = {}
         _exif.update((_k[5:].lower(), _v) for _k, _v in _meta if _k.startswith('exif:'))
         return _exif
+
+    def image_resize(self, image, resize_x, resize_y, keep_aspect):
+        def resize(i):
+            if keep_aspect:
+                _w_factor = resize_x / i.width
+                _h_factor = resize_y / i.height
+                _factor = _w_factor if _w_factor < _h_factor else _h_factor
+                i.resize(int(i.width * _factor), int(i.height * _factor))
+            else:
+                i.resize(resize_x, resize_y)
+        self._apply(image, resize)
+
+    def image_scale(self, image, factor):
+        self._apply(image, lambda i: i.resize(int(i.width*factor), int(i.height*factor)))
+
+    def image_rotate(self, image, factor):
+        self._apply(image, lambda i: i.rotate(factor))
+
+    def image_blur(self, image, factor):
+        self._apply(image, lambda i: i.resize(filter='gaussian', blur=factor))
+
+    def image_merge(self, image, alignment):
+        _first = image.get_images()[0]
+        _gravity = 'center'
+        if 'top' == alignment:
+            _gravity = 'north'
+        elif 'bottom' == alignment:
+            _gravity = 'south'
+        elif 'left' == alignment:
+            _gravity = 'west'
+        elif 'right' == alignment:
+            _gravity = 'east'
+        elif 'center' == alignment:
+            _gravity = 'center'
+        for _image in image.get_images()[1:]:
+            _first.composite(_image, gravity=_gravity)
 
     def image_clone(self, image):
         _image_container = ImageContainer()
