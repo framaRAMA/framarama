@@ -5,6 +5,12 @@
   {{ lib.field_text('Name', frame.name) }}
   {{ lib.field_textarea('Description', frame.description) }}
   {{ lib.field_check('Enabled', frame.enabled) }}
+  {% set frame_displays = displays.filter(frame=frame) %}
+  {% if frame_displays|length > 0 %}
+    {{ lib.field_list('Displays', frame_displays|map(attribute='name')) }}
+  {% else %}
+    {{ lib.field_text('Displays', '(no displays assigned)') }}
+  {% endif %}
 </div>
 
 {{ lib.nav_actions([
