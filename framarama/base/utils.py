@@ -193,22 +193,25 @@ class Filesystem:
         
         return {_ext: path + fmt.format(1, _ext) for _ext in extensions}
 
+
+class Process:
+
     @staticmethod
     def exec_run(args):
         _result = subprocess.run(args, capture_output=True, shell=True)
         if _result.returncode == 0:
             return _result.stdout
         else:
-            print("Error: {}{}".format(_result.stdout, _result.stderr))
+            print("Error running {}: {}{}".format(args, _result.stdout, _result.stderr))
         return None
 
     @staticmethod
     def exec_search(executable):
-        return Filesystem.exec_run(["which", executable])
+        return Process.exec_run(["which", executable, '||', 'exit', '0'])
 
     @staticmethod
     def exec_running(executable):
-        return Filesystem.exec_run(['pidof', executable])
+        return Process.exec_run(['pidof', executable])
 
 
 class Frontend(Singleton):
@@ -446,18 +449,18 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
     def discover(self):
         _cmds = ['feh', 'magick']
         for _cmd in _cmds:
-            _path = Filesystem.exec_search(_cmd)
+            _path = Process.exec_search(_cmd)
             if _path:
                 self._update = getattr(self, 'update_' + _cmd)
 
     def update_feh(self, display, item):
-        if Filesystem.exec_running('feh') is None:
+        if Process.exec_running('feh') is None:
             print("start feh")
         if not Filesystem.file_exists(DATA_PATH + '/picture-current.csv'):
             Filesystem.file_write(DATA_PATH + '/picture-current.csv', DATA_PATH + '/framarama-1.image')
     
     def update_magic(self, display, item):
-        Filesystem.exec_run(self.CMD_IMAGICK + [DATA_PATH + '/framarama-1.image'])
+        Process.exec_run(self.CMD_IMAGICK + [DATA_PATH + '/framarama-1.image'])
 
     def process(self, display, item):
         if self._update == None:
