@@ -60,6 +60,9 @@ class Jobs():
                 _frontend_item.width(),
                 _frontend_item.height(),
                 _frontend_item.mime()))
+            _config = utils.Frontend.get().get_config()
+            _config.get_config().count_views = _config.get_config().count_views + 1
+            _config.get_config().save()
 
     def tick(self):
         if not utils.Frontend.get().initialize() or not utils.Frontend.get().api_access():
