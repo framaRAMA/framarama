@@ -68,20 +68,34 @@
     <div class="mt-2 text-center">
       <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
     </div>
+    <div class="btn-group mt-2 text-center col-12 col-md-8" role="group" aria-label="Preview sizes">
+      <button id="prev-size1" type="button" class="btn btn-primary" size="1024,768">1024x768</button>
+      <button id="prev-size2" type="button" class="btn btn-primary" size="1200,600">1200x600</button>
+      <button id="prev-size3" type="button" class="btn btn-primary" size="600,1200">600x1200</button>
+    </div>
     <div class="mt-2 text-center">
       <button id="showPreviewRefresh" class="btn btn-primary btn-sm">{{ lib.icon('action.refresh', '') }}</button>
     </div>
   </div>
   <script type="text/javascript">
+    const showPreviewSizes = ['prev-size1', 'prev-size2', 'prev-size3'];
     const showPreviewModal = document.getElementById('showPreview');
     const showPreviewImage = document.getElementById('showPreviewImage');
-    showPreviewModal.addEventListener('shown.bs.modal', (e) => {
-      showPreviewImage.src = 'images/preview?' + new Date().getTime();
-    })
-    const showPreviewRefresh = document.getElementById('showPreviewRefresh');
-    showPreviewRefresh.addEventListener('click', (e) => {
+    function refreshPreview(e) {
+      const showPreviewSize = document.getElementById(showPreviewSizes[0]);
+      showPreviewSizes.forEach(id => {
+        const previewSizeElement = document.getElementById(id);
+        if (previewSizeElement.className.indexOf('active') != -1) {
+          showPreviewSize = previewSizeElement;
+        }
+      });
+      const previewGeo = showPreviewSize.getAttribute('size').split(',');
       showPreviewImage.src = '/static/config/1x1-transparent.png';
-      showPreviewImage.src = 'images/preview?' + new Date().getTime();
+      showPreviewImage.src = 'images/preview?w=' + previewGeo[0] + '&h=' + previewGeo[1] + '&ts=' + new Date().getTime();
+    }
+    showPreviewModal.addEventListener('shown.bs.modal', refreshPreview);
+    showPreviewSizes.concat('showPreviewRefresh').forEach(id => {
+      document.getElementById(id).addEventListener('click', refreshPreview);
     });
   </script>
 {{ lib.modal_end() }}

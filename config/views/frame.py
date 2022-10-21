@@ -406,7 +406,9 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
         _paginator = Paginator(_frame.items.order_by('?').all(), 1)
         _page = _paginator.get_page(0)
         _item = _page.object_list[0] if len(_page.object_list) else None
-        _display = models.Display(**{'name': 'Preivew display', 'description': 'Display for preparing previews', 'enabled': True})
+        _width = request.GET['w'] if 'w' in request.GET else 1024
+        _height = request.GET['h'] if 'h' in request.GET else 768
+        _display = models.Display(**{'name': 'Preivew display', 'description': 'Display for preparing previews', 'enabled': True, 'device_width': int(_width), 'device_height': int(_height)})
         if _item:
             _processor = finishing.Processor(finishing.Context(
                 _display,
@@ -415,8 +417,7 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 _frame.finishings.all(),
                 finishing.WandImageProcessingAdapter()))
             _result = _processor.process()
+
         return {'_response': HttpResponse(_result.get_data(), _result.get_mime())}
-
-
 
 
