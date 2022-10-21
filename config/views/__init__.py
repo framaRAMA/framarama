@@ -12,6 +12,17 @@ class LoginView(auth_views.LoginView):
 class IndexView(base.BaseConfigView):
     template_name = "config/index.html"
 
+    def _get(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
+        _dashboards = ['frames_chart', 'displays_chart']
+        #if self._config.is_local_mode():
+        #    _dashboards.append('system_info')
+        #    _dashboards.append('software_info')
+        #else:
+        #    _dashboards.append('')
+        _context['dashboards'] = _dashboards
+        return _context
+
 
 class LogoutView(auth_views.LogoutView):
     pass

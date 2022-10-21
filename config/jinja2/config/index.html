@@ -3,6 +3,55 @@
 {% block content %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
 
+  {% if 'frames_chart' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">
+            Frames {% if frames|length %}({{ frames|length }}){% endif %}
+          </h6>
+          {% if frames|length %}
+            {% set frames_enabled = frames|selectattr("enabled", "true")|list|length %}
+            {% set frames_disabled = frames|selectattr("enabled", "false")|list|length %}
+            {{ lib.chart_doughnut('frames-chart', [
+              'Enabled (%d)'|format(frames_enabled),
+              'Disabled (%d)'|format(frames_disabled)
+            ],  [frames_enabled, frames_disabled]) }}
+            <a href="{{ url('frame_list') }}" class="btn btn-primary btn-xs">List</a>
+          {% else %}
+            Create a new frame and associate some media files to it.<br/>
+            <a href="{{ url('frame_create') }}" class="btn btn-primary btn-xs m-5">Add</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if 'displays_chart' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-body text-center">
+          <h6 class="card-subtitle mb-2 text-muted">
+            Displays {% if displays|length %}({{ displays|length }}){% endif %}
+          </h6>
+          {% if displays|length %}
+            {% set displays_enabled = displays|selectattr("enabled", "true")|list|length %}
+            {% set displays_disabled = displays|selectattr("enabled", "false")|list|length %}
+            {{ lib.chart_doughnut('displays-chart', [
+              'Enabled (%d)'|format(displays_enabled),
+              'Disabled (%d)'|format(displays_disabled)
+            ],  [displays_enabled, displays_disabled]) }}
+            <a href="{{ url('display_list') }}" class="btn btn-primary btn-xs">List</a>
+          {% else %}
+            To be able to show the media files of a frame create a display
+            and assign a frame to it.<br/>
+            <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs m-5">Add</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <div class="col">
     <div class="card mt-2">
       <div class="card-header bg-info text-white">{{ lib.icon('display') }} Display</div>
@@ -67,35 +116,40 @@
     </div>
   </div>
 
-  <div class="col">
-    <div class="card mt-2">
-      <div class="card-header bg-info text-white">{{ lib.icon('system') }} System</div>
-      <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
-        <ul class="card-text">
-          <li><strong>54</strong> days running</li>
-          <li><strong>0.8</strong> load, <strong>49.6°C</strong> CPU</li>
-          <li><strong>72%</strong> disk usage, <strong>386</strong>/500 MB</li>
-          <li><strong>26%</strong> memory usage, <strong>86</strong>/512 MB</li>
-        </ul>
+  {% if 'system_info' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-header bg-info text-white">{{ lib.icon('system') }} System</div>
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
+          <ul class="card-text">
+            <li><strong>54</strong> days running</li>
+            <li><strong>0.8</strong> load, <strong>49.6°C</strong> CPU</li>
+            <li><strong>72%</strong> disk usage, <strong>386</strong>/500 MB</li>
+            <li><strong>26%</strong> memory usage, <strong>86</strong>/512 MB</li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 
-  <div class="col">
-    <div class="card mt-2">
-      <div class="card-header">{{ lib.icon('info') }} Status</div>
-      <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted">System information</h6>
-        <ul class="card-text">
-          <li>Software Version: 1.342.123 (update available)</li>
-          <li>Environment: local (configure cloud setup)</li>
-          <li>Messages: 5 (see list)</li>
-          <li></li>
-        </ul>
+  {% if 'software_info' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-header">{{ lib.icon('info') }} Status</div>
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">System information</h6>
+          <ul class="card-text">
+            <li>Software Version: 1.342.123 (update available)</li>
+            <li>Environment:
+            {% if config %}{{ config.mode }}{% else %}cloud{% endif %} setup</li>
+            <li>Messages: 5 (see list)</li>
+            <li></li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 
 </div>
 {% endblock %}
