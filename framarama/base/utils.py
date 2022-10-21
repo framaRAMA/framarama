@@ -60,6 +60,9 @@ class Config(Singleton):
     def get_config(self):
         return self._config
 
+    def is_local_mode(self):
+        return self._config.mode == 'local'
+
 
 class ApiResult:
 
