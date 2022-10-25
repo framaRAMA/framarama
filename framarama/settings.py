@@ -125,12 +125,29 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
 }
-if path.exists(BASE_DIR / 'framarama' / 'settings_db.py'):
-  from framarama import settings_db
-  DATABASES.update(settings_db.dbs)
 DATABASE_ROUTERS = [
     'framarama.base.DatabaseRouter'
 ]
+def configure_databases(reload=True):
+    if path.exists(BASE_DIR / 'framarama' / 'settings_db.py'):
+        from django.db import connections
+        from framarama import settings_db
+        if reload:
+            import importlib
+            from framarama import base
+            #return settings_db
+            importlib.reload(settings_db)
+            DATABASES.update(settings_db.dbs)
+            connections.close_all()
+            connections.settings = DATABASES
+            for name in DATABASES:
+                if hasattr(connections._connections, name):
+                    delattr(connections._connections, name)
+            base.DatabaseRouter.config = None     # use new settings in database router
+        else:
+            DATABASES.update(settings_db.dbs)
+
+configure_databases(False)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

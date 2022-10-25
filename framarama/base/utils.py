@@ -244,17 +244,8 @@ class Frontend(Singleton):
         return _out.getvalue().rstrip("\n").split("\n")
 
     def _init_connections(self):
-        import importlib
-        from django.db import connections
-        from framarama import base, settings, settings_db
-        importlib.reload(settings_db)
-        importlib.reload(settings)
-        connections.close_all()
-        connections.settings = settings.DATABASES
-        for name in settings.DATABASES:
-            if hasattr(connections._connections, name):
-                delattr(connections._connections, name)
-        base.DatabaseRouter.config = None     # use new settings in database router
+        from framarama import settings
+        settings_db = settings.configure_databases()
 
     def _init_migrations(self, database):
         _migrations = self._mgmt_cmd('showmigrations', '--plan', no_color=True, database=database)
