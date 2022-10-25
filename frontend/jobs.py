@@ -1,10 +1,14 @@
 import datetime
 import subprocess
+import logging
 
 from django.utils import timezone
 
 from framarama.base import utils
 from framarama.base.utils import ApiClient
+
+
+logger = logging.getLogger(__name__)
 
 
 class Jobs():

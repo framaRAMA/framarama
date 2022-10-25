@@ -1,7 +1,13 @@
+import logging
+
 from django.db import connection
+from django.db import connections
 
 from framarama.base import utils
 from frontend import models
+
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseRouter:
@@ -23,6 +29,12 @@ class DatabaseRouter:
     }
     config = None
 
+    def _dump(self, cls, route):
+        params = connections[route].get_connection_params()
+        params = {name: value for name, value in params.items() if name in ['database', 'host', 'user']}
+        cls = cls if type(cls) == type else type(cls)
+        logger.debug("DB for \"{}\" routed to \"{}\" {}".format(cls.__name__, route, params));
+
     def _init(self):
         if DatabaseRouter.config is None:
             if 'frontend_config' not in connection.introspection.table_names():
@@ -34,8 +46,10 @@ class DatabaseRouter:
 
     def _route(self, model):
         if model == models.Config:
+            self._dump(model, 'default')
             return 'default'
         if not self._init():
+            self._dump(model, 'default')
             return 'default'
         _config = DatabaseRouter.config
         if _config.mode == 'local' and _config.local_db_type == 'local':
@@ -43,6 +57,7 @@ class DatabaseRouter:
         else:
             _routing = DatabaseRouter.routing['remote']
         _app_label = model._meta.app_label
+        self._dump(model, _routing[_app_label] if _app_label in _routing else None)
         return _routing[_app_label] if _app_label in _routing else None
 
     def db_for_read(self, model, **hints):

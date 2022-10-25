@@ -6,6 +6,7 @@ import datetime
 import requests
 import jsonpickle
 import subprocess
+import logging
 
 from django.conf import settings
 from django.apps import apps
@@ -17,6 +18,9 @@ from frontend import models
 from framarama.base.client import ApiClient
 from config import models as config_models
 from config.utils import finishing
+
+
+logger = logging.getLogger(__name__)
 
 
 class Singleton:
@@ -211,7 +215,7 @@ class Process:
         if _result.returncode == 0:
             return _result.stdout
         else:
-            print("Error running {}: {}{}".format(args, _result.stdout, _result.stderr))
+            logger.error("Error running {}: {}{}".format(args, _result.stdout, _result.stderr))
         return None
 
     @staticmethod
@@ -252,21 +256,21 @@ class Frontend(Singleton):
         _migrations = [_line.rsplit(' ', 1) for _line in _migrations]
         _migrations = [_name for _status, _name in _migrations if _status.strip() != '[X]']
         if len(_migrations):
-            print("Applying {} missing migrations to {}".format(len(_migrations), database))
+            logger.info("Applying {} missing migrations to {}".format(len(_migrations), database))
             management.call_command('migrate', database=database)
-        print("Migrations for {} complete!".format(database))
+        logger.info("Migrations for {} complete!".format(database))
 
     def _init_admin_user(self):
         _users = User.objects.filter(is_superuser=True).all()
         if len(_users) == 0:
-            print("Creating admin user")
+            logger.info("Creating admin user")
             User.objects.create_user(
                 username=settings.FRAMARAMA['ADMIN_USERNAME'],
                 email=settings.FRAMARAMA['ADMIN_MAIL'],
                 password=settings.FRAMARAMA['ADMIN_PASSWORD'],
                 is_superuser=True)
             _users = User.objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
-        print("Admin user is {}".format(_users[0]))
+        logger.info("Admin user is {}".format(_users[0]))
 
     def initialize(self):
         if self._init_phase < Frontend.INIT_PHASE_DB_DEFAULT:
