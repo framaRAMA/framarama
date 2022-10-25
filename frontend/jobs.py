@@ -1,6 +1,8 @@
 import datetime
 import subprocess
 
+from django.utils import timezone
+
 from framarama.base import utils
 from framarama.base.utils import ApiClient
 
@@ -17,9 +19,9 @@ class Jobs():
 
     def _setup_start(self):
         if self._startup is None:
-            self._startup = datetime.datetime.utcnow()
+            self._startup = timezone.now()
             _config = utils.Frontend.get().get_config()
-            _config.get_config().date_app_startup = datetime.datetime.utcnow()
+            _config.get_config().date_app_startup = timezone.now()
             _config.get_config().save()
         for _job_name in ['fe_next_time', 'fe_refresh_items']:
             if self._scheduler.get(_job_name):
@@ -41,13 +43,13 @@ class Jobs():
             self._items = _display.get_items()
             print("Have {} items in list.".format(self._items.count()))
             _config = utils.Frontend.get().get_config()
-            _config.get_config().date_items_update = datetime.datetime.utcnow()
+            _config.get_config().date_items_update = timezone.now()
             _config.get_config().count_items = self._items.count()
             _config.get_config().save()
 
     def next_item(self):
         if self._display and self._display.time_change_reached(self._last_update):
-            self._last_update = datetime.datetime.utcnow()
+            self._last_update = timezone.now()
             print("Retrieve next item ...")
             _next_item = self._display.get_next_item(True)
             print("Next item is {}".format(_next_item))
