@@ -241,6 +241,7 @@ class Frontend(Singleton):
         self._init_phase = Frontend.INIT_PHASE_START
         self._initialized = False   # database setup
         self._configured = False    # frontend config exists
+        self._db_access = False     # DB access for config
         self._api_access = False    # API acccess configured
 
     def _mgmt_cmd(self, *args, **kwargs):
@@ -290,6 +291,7 @@ class Frontend(Singleton):
             self._init_admin_user()
             self._init_migrations('config')
             self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
+            self._db_access = True
         if self._configured and not self._api_access:
             _client = ApiClient.get()
             if _client.configured():
@@ -303,6 +305,9 @@ class Frontend(Singleton):
 
     def is_configured(self):
         return self._initialized and self._configured
+
+    def db_access(self):
+        return self._db_access
 
     def api_access(self):
         return self.is_configured() and self._api_access
@@ -524,4 +529,5 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
         if self._update == None:
             return
         self._update(display, item)
+
 
