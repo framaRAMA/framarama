@@ -139,11 +139,16 @@ class DatabaseStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
-            _frame = Frame.objects.all().first()
-            return {
-                'status': 'success',
-                'message': 'Database access successful'
-            }
+            if utils.Frontend.get().db_access():
+                return {
+                    'status': 'success',
+                    'message': 'Database access successful'
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': 'No database access possible'
+                }
         except Exception as e:
             return {
                'status': 'error',
