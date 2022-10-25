@@ -11,6 +11,7 @@ import logging
 from django.conf import settings
 from django.apps import apps
 from django.core import management
+from django.utils import timezone
 from django.db import connections
 from django.contrib.auth.models import User
 
@@ -361,7 +362,7 @@ class Display(Singleton):
         return _time_change
 
     def time_change_reached(self, last_update):
-        _now = datetime.datetime.utcnow()
+        _now = timezone.now()
         _time_change = self.get_time_change()
         return last_update is None or _now - _time_change > last_update
 
