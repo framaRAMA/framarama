@@ -109,7 +109,7 @@ class Source(BaseModel):
 
 
 class SourceStep(PluginModel):
-    STR_FIELDS = PluginModel.STR_FIELDS + ["title", "instance", "plugin", "data_in", "mime_in", "merge_in", "data_out", "mime_out", "loop_out"]
+    STR_FIELDS = PluginModel.STR_FIELDS + ["title", "instance", "data_in", "mime_in", "merge_in", "data_out", "mime_out", "loop_out"]
 
     CAT_NETWORK = 'network'
     CAT_DATA = 'data'
