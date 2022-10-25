@@ -100,8 +100,14 @@ LOGGING = {
     },
     'loggers': {
         'django.db.backends': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'framarama': {
             'level': 'DEBUG',
             'handlers': ['console'],
+            'propagate': False,
         },
     },
     'root': {
