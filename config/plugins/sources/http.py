@@ -134,7 +134,7 @@ class Implementation(PluginImplementation):
 
             logger.debug(_mime_type)
             logger.debug(_response.content)
-            return [data.DataContainer(_response.content, data_type=data.DataType(data.DataType.MIME, _mime_type), conv=NoopDataConverter())]
+            return [data.DataContainer(_response.content, data_type=data.DataType(data.DataType.MIME, _mime_type), conv=data.NoopDataConverter())]
         else:
             logger.error("Request returned non-success status code: {}".format(_response))
 
