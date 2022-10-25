@@ -39,7 +39,7 @@ class DatabaseRouter:
         if DatabaseRouter.config is None:
             if 'frontend_config' not in connection.introspection.table_names():
                 return False
-            DatabaseRouter.config = utils.Config().get_config()
+            DatabaseRouter.config = utils.Config().get().get_config()
             if not DatabaseRouter.config:
                 return False
         return True
