@@ -291,7 +291,13 @@ class Frontend(Singleton):
             #_table_names = connections['default'].introspection.table_names()
             #_config_table = apps.get_model('frontend', 'config')._meta.db_table
             #if _config_table in _table_names:
-            self._configured = len(models.Config.objects.all()) > 0
+            _configs = list(models.Config.objects.all())
+            if len(_configs) == 0:
+                logger.info("Creating default configuration")
+                _config = models.Config()
+                _config.save()
+                _configs.append(_config)
+            self._configured = _configs[0].mode != None
             if self._configured:
                 self._init_phase = Frontend.INIT_PHASE_CONFIGURED
         if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
@@ -320,7 +326,7 @@ class Frontend(Singleton):
         return self.is_configured() and self._api_access
 
     def get_config(self):
-        return Config.get(self) if self._configured else None
+        return Config.get(self)
 
     def get_display(self):
         return Display.get(self)
