@@ -6,6 +6,7 @@ import datetime
 import requests
 import jsonpickle
 import subprocess
+import threading
 import logging
 
 from django.conf import settings
@@ -27,6 +28,8 @@ logger = logging.getLogger(__name__)
 class Singleton:
     singletons = {}
     stamps = {}
+    lock = threading.Lock()
+    locks = {}
 
     def __init__(self):
         self._ts = Singleton._stamp()
@@ -46,12 +49,16 @@ class Singleton:
     @classmethod
     def get(cls, dependend=None, force=False):
         _cls_name = cls.__name__
-        if force or (dependend and dependend._ts > Singleton.stamps.get(_cls_name, 0)):
-            Singleton.singletons.pop(_cls_name, None)
-            Singleton.stamps.pop(_cls_name, None)
-        if _cls_name not in Singleton.singletons:
-            Singleton.singletons[_cls_name] = cls()
-            Singleton.stamps[_cls_name] = Singleton._stamp()
+        with Singleton.lock:
+            if _cls_name not in Singleton.locks:
+                Singleton.locks[_cls_name] = threading.Lock()
+        with Singleton.locks[_cls_name]:
+            if force or (dependend and dependend._ts > Singleton.stamps.get(_cls_name, 0)):
+                Singleton.singletons.pop(_cls_name, None)
+                Singleton.stamps.pop(_cls_name, None)
+            if _cls_name not in Singleton.singletons:
+                Singleton.singletons[_cls_name] = cls()
+                Singleton.stamps[_cls_name] = Singleton._stamp()
         return Singleton.singletons[_cls_name]
 
 
