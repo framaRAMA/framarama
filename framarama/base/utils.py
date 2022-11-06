@@ -526,6 +526,8 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
+    IMG_CURRENT = DATA_PATH + '/framarama-00001.image'
+
     CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', DATA_PATH + '/picture-background.jpg', '-f', DATA_PATH + '/picture-current.csv', '--reload', '10']
     CMD_IMAGICK = ['magick', 'display', '-window', 'root']
 
@@ -535,18 +537,30 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
     def discover(self):
         _cmds = ['feh', 'magick']
         for _cmd in _cmds:
-            _path = Process.exec_search(_cmd)
-            if _path:
+            if Process.exec_search(_cmd):
                 self._update = getattr(self, 'update_' + _cmd)
+                break
 
     def update_feh(self, display, item):
+        _background = VisualizeFrontendRenderer.DATA_PATH + '/framarama-background.jpg'
+        _file_list = VisualizeFrontendRenderer.DATA_PATH + '/framarama-current.csv'
         if Process.exec_running('feh') is None:
-            print("start feh")
-        if not Filesystem.file_exists(DATA_PATH + '/picture-current.csv'):
-            Filesystem.file_write(DATA_PATH + '/picture-current.csv', DATA_PATH + '/framarama-1.image')
+            Process.exec_bg([
+                'feh',
+                '--fullscreen',
+                '--auto-zoom',
+                '--stretch',
+                '--auto-rotate',
+                '--scale-down',
+                '-bg-fill', _background,
+                '-f', _file_list,
+                '--reload', '10'
+            ])
+        if not Filesystem.file_exists(_file_list) or Filesystem.file_size(_file_list) == 0:
+            Filesystem.file_write(_file_list, VisualizeFrontendRenderer.IMG_CURRENT.encode())
     
     def update_magic(self, display, item):
-        Process.exec_run(self.CMD_IMAGICK + [DATA_PATH + '/framarama-1.image'])
+        Process.exec_run(self.CMD_IMAGICK + [VisualizeFrontendRenderer.IMG_CURRENT])
 
     def process(self, display, item):
         if self._update == None:
