@@ -240,7 +240,7 @@ class Process:
 
     @staticmethod
     def exec_search(executable):
-        return Process.exec_run(["which", executable, '||', 'exit', '0'])
+        return Process.exec_run(["which", executable])
 
     @staticmethod
     def exec_running(executable):
