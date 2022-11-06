@@ -42,10 +42,10 @@ class Jobs():
     def refresh_items(self):
         _display = utils.Frontend.get().get_display()
         if _display:
-            print("Refreshing items ...")
+            logger.info("Refreshing items ...")
             self._display = _display
             self._items = _display.get_items()
-            print("Have {} items in list.".format(self._items.count()))
+            logger.info("Have {} items in list.".format(self._items.count()))
             _config = utils.Frontend.get().get_config()
             _config.get_config().date_items_update = timezone.now()
             _config.get_config().count_items = self._items.count()
