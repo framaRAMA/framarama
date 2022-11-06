@@ -199,6 +199,14 @@ class Filesystem:
         return _files
 
     @staticmethod
+    def file_exists(filename):
+        return os.path.exists(filename)
+
+    @staticmethod
+    def file_size(filename):
+        return os.path.getsize(filename)
+
+    @staticmethod
     def file_rotate(path, pattern, fmt, count, extensions=[]):
         _files = Filesystem.file_match(path, pattern)
         _files = _files[-count:]
