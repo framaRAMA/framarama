@@ -35,7 +35,7 @@ class Jobs():
         if not self._scheduler.get('fe_refresh_items'):
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
         if not self._scheduler.get('fe_next_item'):
-            self._scheduler.add(self.next_item, 'interval', minutes=5, id='fe_next_item', name='Frontend next item')
+            self._scheduler.add(self.next_item, 'interval', minutes=1, id='fe_next_item', name='Frontend next item')
         self.refresh_items()
         self.next_item()
 
