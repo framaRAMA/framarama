@@ -53,22 +53,27 @@ class Jobs():
 
     def next_item(self):
         if self._display and self._display.time_change_reached(self._last_update):
-            self._last_update = timezone.now()
-            print("Retrieve next item ...")
-            _next_item = self._display.get_next_item(True)
-            print("Next item is {}".format(_next_item))
-            _finishings = self._display.get_finishings()
-            _device = utils.Frontend.get().get_device()
-            _frontend_item = _device.finish(self._display, _next_item, _finishings)
-            _device.render(self._display, _frontend_item)
-            print("Image updated ({} bytes, {}x{} pixels, mime {})!".format(
-                len(_frontend_item.data()),
-                _frontend_item.width(),
-                _frontend_item.height(),
-                _frontend_item.mime()))
-            _config = utils.Frontend.get().get_config()
-            _config.get_config().count_views = _config.get_config().count_views + 1
-            _config.get_config().save()
+            _last_update = self._last_update
+            try:
+                self._last_update = timezone.now()
+                logger.info("Retrieve next item ...")
+                _next_item = self._display.get_next_item(True)
+                logger.info("Next item is {}".format(_next_item))
+                _finishings = self._display.get_finishings()
+                _device = utils.Frontend.get().get_device()
+                _frontend_item = _device.finish(self._display, _next_item, _finishings)
+                _device.render(self._display, _frontend_item)
+                logger.info("Image updated ({} bytes, {}x{} pixels, mime {})!".format(
+                    len(_frontend_item.data()),
+                    _frontend_item.width(),
+                    _frontend_item.height(),
+                    _frontend_item.mime()))
+                _config = utils.Frontend.get().get_config()
+                _config.get_config().count_views = _config.get_config().count_views + 1
+                _config.get_config().save()
+            except Exception as e:
+                self._last_update = _last_update
+                raise
 
     def tick(self):
         if not utils.Frontend.get().initialize() or not utils.Frontend.get().api_access():
