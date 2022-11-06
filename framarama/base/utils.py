@@ -235,6 +235,10 @@ class Process:
         return None
 
     @staticmethod
+    def exec_bg(args):
+        return subprocess.Popen(args)
+
+    @staticmethod
     def exec_search(executable):
         return Process.exec_run(["which", executable, '||', 'exit', '0'])
 
