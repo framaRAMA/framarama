@@ -55,10 +55,17 @@ class Jobs():
     def next_item(self):
         if self._display is None:
             return
-        if self._display.time_on_reached(timezone.now()):
-            logger.info("Switch display on at {}".format(self._display.get_time_on()))
-        if self._display.time_off_reached(timezone.now()):
-            logger.info("Switch display off at {}".format(self._display.get_time_off()))
+        _device = frontend.Frontend.get().get_device()
+        _time_on_reached = self._display.time_on_reached(timezone.now())
+        _time_off_reached = self._display.time_off_reached(timezone.now())
+        if _time_on_reached or _time_off_reached:
+            _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+            if _time_on_reached and not _display_on:
+                logger.info("Switch display on at {}".format(self._display.get_time_on()))
+                _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+            if _time_off_reached and _display_on:
+                logger.info("Switch display off at {}".format(self._display.get_time_off()))
+                _device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
         if self._display.time_change_reached(self._last_update):
             _last_update = self._last_update
             try:
@@ -67,7 +74,6 @@ class Jobs():
                 _next_item = self._display.get_next_item(True)
                 logger.info("Next item is {}".format(_next_item))
                 _finishings = self._display.get_finishings()
-                _device = frontend.Frontend.get().get_device()
                 _frontend_item = _device.finish(self._display, _next_item, _finishings)
                 _device.render(self._display, _frontend_item)
                 logger.info("Image updated ({} bytes, {}x{} pixels, mime {})!".format(
