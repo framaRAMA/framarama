@@ -167,7 +167,7 @@ class Display(Singleton):
         _time_on = self._time_delta(self.get_time_on())
         if _time_on:
             _midnight = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            return _midnight + _time_on > time
+            return _midnight + _time_on < time
         return False
 
     def get_time_off(self):
@@ -177,7 +177,7 @@ class Display(Singleton):
         _time_off = self._time_delta(self.get_time_off())
         if _time_off:
             _midnight = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            return _midnight + _time_off > time
+            return _midnight + _time_off < time
         return False
 
     def get_time_change(self):
@@ -186,7 +186,7 @@ class Display(Singleton):
     def time_change_reached(self, last_update):
         _now = timezone.now()
         _time_change = self.get_time_change()
-        return last_update is None or _now - _time_change > last_update
+        return last_update is None or last_update + _time_change < _now
 
     def get_items(self):
         if self._items == None:
