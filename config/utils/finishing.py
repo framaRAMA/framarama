@@ -50,7 +50,15 @@ class Context:
     
     def set_image_data(self, image_name, image):
         self._image_data[image_name] = image
-    
+
+    def get_image_names(self):
+        return self._image_data.keys()
+
+    def remove_image(self, image_name):
+        _image = self._image_data[image_name]
+        del self._image_data[image_name]
+        return _image
+
     def set_resolver(self, name, resolver):
         self._context.set_resolver(name, resolver)
 
@@ -132,6 +140,12 @@ class Processor:
             _image_meta['width'],
             _image_meta['height'],
             len(_image_data)))
+
+        _image_names = list(self._context.get_image_names())
+        for _image_name in _image_names:
+            _image_container = self._context.remove_image(_image_name)
+            for _image in _image_container.get_images():
+                _adapter.image_close(_image)
 
         return ProcessingResult(_image_meta, _image_data)
 
@@ -471,7 +485,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         return _image_container
     
     def image_close(self, image):
-        pass
+        image.destroy()
 
     def draw_line(self, image, start, end, brush):
         _drawing = self._drawing(brush=brush)
