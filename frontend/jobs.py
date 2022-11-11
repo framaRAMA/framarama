@@ -56,9 +56,9 @@ class Jobs():
         if self._display is None:
             return
         if self._display.time_on_reached(timezone.now()):
-            logger.info("Switch display on")
+            logger.info("Switch display on at {}".format(self._display.get_time_on()))
         if self._display.time_off_reached(timezone.now()):
-            logger.info("Switch display off")
+            logger.info("Switch display off at {}".format(self._display.get_time_off()))
         if self._display.time_change_reached(self._last_update):
             _last_update = self._last_update
             try:
