@@ -215,6 +215,7 @@ class FrontendDevice(Singleton):
             self._renderer_filesystem,
             VisualizeFrontendRenderer(),
         ]
+        self._capabilities = None
 
     def finish(self, display, item, finishings):
         return self._finisher.process(display, item, finishings)
@@ -226,6 +227,47 @@ class FrontendDevice(Singleton):
     def get_files(self):
         return self._renderer_filesystem.files()
 
+    def get_capabilities(self):
+        if self._capabilities is None:
+            self._capabilities = {
+                FrontendCapability.DISPLAY_ON: FrontendCapability.noop,
+                FrontendCapability.DISPLAY_OFF: FrontendCapability.noop,
+                FrontendCapability.DISPLAY_STATUS: FrontendCapability.return_true,
+            }
+            if Process.exec_search('vcgencmd'):  # Raspberry PIs
+                self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
+                self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.vcgencmd_display_off
+                self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.vcgencmd_display_status
+        return self._capabilities
+
+    def run_capability(self, capability, *args, **kwargs):
+        _capabilities = self.get_capabilities()
+        if capability in _capabilities:
+            return _capabilities[capability](self, *args, **kwargs)
+
+
+class FrontendCapability:
+    DISPLAY_OFF = 'display.off'
+    DISPLAY_ON = 'display.on'
+    DISPLAY_STATUS = 'display.status'
+
+    def noop(device, *args, **kwargs):
+        return
+
+    def return_false(device, *args, **kwargs):
+        return False
+
+    def return_true(device, *args, **kwargs):
+        return True
+
+    def vcgencmd_display_on(device, *args, **kwargs):
+        Process.exec_run(['vcgencmd', 'display_power', '1'])
+
+    def vcgencmd_display_off(device, *args, **kwargs):
+        Process.exec_run(['vcgencmd', 'display_power', '0'])
+
+    def vcgencmd_display_status(device, *args, **kwargs):
+        return Process.exec_run(['vcgencmd', 'display_power']) == '1'
 
 class FrontendItem:
 
