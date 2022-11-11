@@ -5,8 +5,7 @@ from django.core.files import File
 from django.core.exceptions import ValidationError
 
 from framarama.base.views import BaseView
-from framarama.base.client import ApiClient
-from framarama.base import utils
+from framarama.base import frontend
 from frontend import views
 from frontend import forms
 from frontend import models
@@ -16,7 +15,7 @@ class BaseSetupView(BaseView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _frontend = utils.Frontend.get()
+        _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
         _context['frontend'] = _frontend
         _context['config'] = _config.get_config() if _config else None
@@ -24,7 +23,7 @@ class BaseSetupView(BaseView):
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
-        _frontend = utils.Frontend.get()
+        _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
         _context['frontend'] = _frontend
         _context['config'] = _config.get_config() if _config else None
@@ -74,7 +73,7 @@ class LocalSetupView(BaseSetupView):
         _form = forms.LocalSetupForm(request.POST, instance=_config)
         if _form.is_valid():
             _config = _form.save()
-            utils.Singleton.clear()
+            frontend.Singleton.clear()
             if _config.mode == 'local' and _config.local_db_type == 'mysql':
                 try:
                     self._update_config(vars(_config))
@@ -102,7 +101,7 @@ class CloudSetupView(BaseSetupView):
         _form = forms.CloudSetupForm(request.POST, instance=_config)
         if _form.is_valid():
             _form.save()
-            utils.Singleton.clear()
+            frontend.Singleton.clear()
             return {'_response': HttpResponseRedirect(reverse('fe_dashboard'))}
         _context['form'] = _form
         return _context
@@ -119,7 +118,7 @@ class SetupStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
-            if utils.Frontend.get().is_initialized():
+            if frontend.Frontend.get().is_initialized():
                 return {
                     'status': 'success',
                     'message': 'Configuration setup completed'
@@ -139,7 +138,7 @@ class DatabaseStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
-            if utils.Frontend.get().db_access():
+            if frontend.Frontend.get().db_access():
                 return {
                     'status': 'success',
                     'message': 'Database access successful'
@@ -160,8 +159,8 @@ class DisplayStatusView(BaseStatusView):
 
     def _status(self, context):
         try:
-            if utils.Frontend.get().api_access():
-                _display = utils.Frontend.get().get_display()
+            if frontend.Frontend.get().api_access():
+                _display = frontend.Frontend.get().get_display()
                 return {
                     'status': 'success',
                     'message': 'Successful API access',
