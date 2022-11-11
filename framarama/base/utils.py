@@ -194,7 +194,7 @@ class Filesystem:
             _files = [entry for entry in it if entry.is_file()]
             _files = [entry for entry in _files if re.match(pattern, entry.name)]
             _files = [entry.name for entry in _files]
-            _files.sort(reverse=True)
+            _files.sort(reverse=False)
             _files = [(_file,) + re.match(pattern, _file).groups() for _file in _files]
         return _files
 
@@ -209,6 +209,7 @@ class Filesystem:
     @staticmethod
     def file_rotate(path, pattern, fmt, count, extensions=[]):
         _files = Filesystem.file_match(path, pattern)
+        _files.reverse()
         _files = _files[-count:]
 
         for _i, (_name, _num, _ext) in enumerate(_files):
