@@ -358,6 +358,12 @@ class Display(Singleton):
         self._next = None
         self._finishings = None
 
+    def _time_delta(self, time_str):
+        if time_str is None:
+            return None
+        _time = datetime.time.fromisoformat(time_str)
+        return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
+
     def display(self):
         return self._data.item()
 
@@ -388,9 +394,7 @@ class Display(Singleton):
         return self._data.item().device_height
 
     def get_time_change(self):
-        _time = datetime.time.fromisoformat(self._data.get('time_change', '00:05:00'))
-        _time_change = datetime.timedelta(hours=_time.hour, minutes=_time.minute)
-        return _time_change
+        return self._time_delta(self._data.get('time_change', '00:05:00'))
 
     def time_change_reached(self, last_update):
         _now = timezone.now()
