@@ -233,11 +233,20 @@ class FrontendDevice(Singleton):
                 FrontendCapability.DISPLAY_ON: FrontendCapability.noop,
                 FrontendCapability.DISPLAY_OFF: FrontendCapability.noop,
                 FrontendCapability.DISPLAY_STATUS: FrontendCapability.return_true,
+                FrontendCapability.MEM_TOTAL: FrontendCapability.return_none,
+                FrontendCapability.MEM_FREE: FrontendCapability.return_none,
+                FrontendCapability.SYS_UPTIME: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
                 self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.vcgencmd_display_off
                 self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.vcgencmd_display_status
+            if Process.exec_search('grep') and Filesystem.file_exists('/proc/meminfo'):
+                self._capabilities[FrontendCapability.MEM_TOTAL] = FrontendCapability.grep_meminfo_total
+                self._capabilities[FrontendCapability.MEM_FREE] = FrontendCapability.grep_meminfo_free
+            if Process.exec_search('grep') and Filesystem.file_exists('/proc/uptime'):
+                self._capabilities[FrontendCapability.SYS_UPTIME] = FrontendCapability.grep_uptime
+
         return self._capabilities
 
     def run_capability(self, capability, *args, **kwargs):
@@ -250,6 +259,9 @@ class FrontendCapability:
     DISPLAY_OFF = 'display.off'
     DISPLAY_ON = 'display.on'
     DISPLAY_STATUS = 'display.status'
+    MEM_TOTAL = 'memory.total'
+    MEM_FREE = 'memory.free'
+    SYS_UPTIME = 'system.uptime'
 
     def noop(device, *args, **kwargs):
         return
@@ -260,6 +272,9 @@ class FrontendCapability:
     def return_true(device, *args, **kwargs):
         return True
 
+    def return_none(device, *args, **kwargs):
+        return None
+
     def vcgencmd_display_on(device, *args, **kwargs):
         Process.exec_run(['vcgencmd', 'display_power', '1'])
 
@@ -268,6 +283,19 @@ class FrontendCapability:
 
     def vcgencmd_display_status(device, *args, **kwargs):
         return Process.exec_run(['vcgencmd', 'display_power']) == '1'
+
+    def grep_meminfo_total(device, *args, **kwargs):
+        _info = Process.exec_run(['grep', '^MemTotal:', '/proc/meminfo'])
+        return int(_info.split()[-2]) if _info else None
+
+    def grep_meminfo_free(device, *args, **kwargs):
+        _info = Process.exec_run(['grep', '^MemFree:', '/proc/meminfo'])
+        return int(_info.split()[-2]) if _info else None
+
+    def grep_uptime(device, *args, **kwargs):
+        _info = Filesystem.file_read('/proc/uptime')
+        return float(_info.split(b'.')[0]) if _info else None
+
 
 class FrontendItem:
 
