@@ -65,6 +65,12 @@ class Config(Singleton):
 class Filesystem:
 
     @staticmethod
+    def file_read(filename):
+        with open(filename, 'rb') as f:
+            buf = f.read()
+        return buf
+
+    @staticmethod
     def file_write(filename, data):
         with open(filename, 'wb') as f:
             f.write(data)
