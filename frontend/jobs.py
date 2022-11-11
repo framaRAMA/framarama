@@ -52,7 +52,13 @@ class Jobs():
             _config.get_config().save()
 
     def next_item(self):
-        if self._display and self._display.time_change_reached(self._last_update):
+        if self._display is None:
+            return
+        if self._display.time_on_reached(timezone.now()):
+            logger.info("Switch display on")
+        if self._display.time_off_reached(timezone.now()):
+            logger.info("Switch display off")
+        if self._display.time_change_reached(self._last_update):
             _last_update = self._last_update
             try:
                 self._last_update = timezone.now()
