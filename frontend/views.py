@@ -229,4 +229,18 @@ class ImageDisplayDashboardView(BaseFrontendView):
 class DeviceDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.device.html'
 
+    def _get(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
+        _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
+        _context['mem'] = {
+          'total': _mem_total,
+          'free': _mem_free,
+          'usage': int((_mem_total - _mem_free) / _mem_total * 100)
+        }
+        _context['sys'] = {
+          'uptime' : _frontend_device.run_capability(frontend.FrontendCapability.SYS_UPTIME),
+        }
+        return _context
 
