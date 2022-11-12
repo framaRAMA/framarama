@@ -236,16 +236,21 @@ class FrontendDevice(Singleton):
                 FrontendCapability.MEM_TOTAL: FrontendCapability.return_none,
                 FrontendCapability.MEM_FREE: FrontendCapability.return_none,
                 FrontendCapability.SYS_UPTIME: FrontendCapability.return_none,
+                FrontendCapability.DISK_DATA_FREE: FrontendCapability.return_none,
+                FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
                 self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.vcgencmd_display_off
                 self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.vcgencmd_display_status
-            if Process.exec_search('grep') and Filesystem.file_exists('/proc/meminfo'):
-                self._capabilities[FrontendCapability.MEM_TOTAL] = FrontendCapability.grep_meminfo_total
-                self._capabilities[FrontendCapability.MEM_FREE] = FrontendCapability.grep_meminfo_free
-            if Process.exec_search('grep') and Filesystem.file_exists('/proc/uptime'):
-                self._capabilities[FrontendCapability.SYS_UPTIME] = FrontendCapability.grep_uptime
+            if Filesystem.file_exists('/proc/meminfo'):
+                self._capabilities[FrontendCapability.MEM_TOTAL] = FrontendCapability.read_meminfo_total
+                self._capabilities[FrontendCapability.MEM_FREE] = FrontendCapability.read_meminfo_free
+            if Filesystem.file_exists('/proc/uptime'):
+                self._capabilities[FrontendCapability.SYS_UPTIME] = FrontendCapability.read_uptime
+            if Process.exec_search('df'):
+                self._capabilities[FrontendCapability.DISK_DATA_FREE] = FrontendCapability.df_data
+                self._capabilities[FrontendCapability.DISK_TMP_FREE] = FrontendCapability.df_tmp
 
         return self._capabilities
 
@@ -261,6 +266,8 @@ class FrontendCapability:
     DISPLAY_STATUS = 'display.status'
     MEM_TOTAL = 'memory.total'
     MEM_FREE = 'memory.free'
+    DISK_DATA_FREE = 'disk.data.free'
+    DISK_TMP_FREE = 'disk.tmp.free'
     SYS_UPTIME = 'system.uptime'
 
     def noop(device, *args, **kwargs):
@@ -284,17 +291,37 @@ class FrontendCapability:
     def vcgencmd_display_status(device, *args, **kwargs):
         return Process.exec_run(['vcgencmd', 'display_power']) == '1'
 
-    def grep_meminfo_total(device, *args, **kwargs):
-        _info = Process.exec_run(['grep', '^MemTotal:', '/proc/meminfo'])
-        return int(_info.split()[-2]) if _info else None
+    def _read_meminfo(fields=None):
+        _lines = Filesystem.file_read('/proc/meminfo')
+        _lines = [_line for _line in _lines.split(b'\n') if _line] if _lines else []
+        _lines = [_line.split() for _line in _lines]
+        _info = {_line[0].decode().strip(':'): _line[1].decode() for _line in _lines}
+        if fields:
+            return tuple([_info.get(_field) for _field in fields])
+        else:
+            return _info
 
-    def grep_meminfo_free(device, *args, **kwargs):
-        _info = Process.exec_run(['grep', '^MemFree:', '/proc/meminfo'])
-        return int(_info.split()[-2]) if _info else None
+    def read_meminfo_total(device, *args, **kwargs):
+        _mem_total, = FrontendCapability._read_meminfo(['MemTotal'])
+        return int(_mem_total) if _mem_total else None
 
-    def grep_uptime(device, *args, **kwargs):
+    def read_meminfo_free(device, *args, **kwargs):
+        _mem_free, _mem_cached = FrontendCapability._read_meminfo(['MemFree', 'Cached'])
+        return int(_mem_free) + int(_mem_cached) if _mem_free else None
+
+    def read_uptime(device, *args, **kwargs):
         _info = Filesystem.file_read('/proc/uptime')
         return float(_info.split(b'.')[0]) if _info else None
+
+    def _df(partition):
+        _info = Process.exec_run(['df', '-k', partition])
+        return int(_info.split(b'\n')[-2].split()[-3]) if _info else None
+
+    def df_data(device, *args, **kwargs):
+        return FrontendCapability._df(settings.FRAMARAMA['DATA_PATH'])
+
+    def df_tmp(device, *args, **kwargs):
+        return FrontendCapability._df('/tmp')
 
 
 class FrontendItem:
