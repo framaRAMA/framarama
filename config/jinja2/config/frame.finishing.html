@@ -68,13 +68,11 @@
     <div class="mt-2 text-center">
       <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
     </div>
-    <div class="btn-group mt-2 text-center col-12 col-md-8" role="group" aria-label="Preview sizes">
-      <button id="prev-size1" type="button" class="btn btn-primary" size="1024,768">1024x768</button>
-      <button id="prev-size2" type="button" class="btn btn-primary" size="1200,600">1200x600</button>
-      <button id="prev-size3" type="button" class="btn btn-primary" size="600,1200">600x1200</button>
-    </div>
-    <div class="mt-2 text-center">
-      <button id="showPreviewRefresh" class="btn btn-primary btn-sm">{{ lib.icon('action.refresh', '') }}</button>
+
+    <div class="btn-group mt-2 p-0 text-center" role="group">
+      <button id="prev-size1" type="button" class="btn btn-primary text-lowercase active" size="1024,768">1024x768</button>
+      <button id="prev-size2" type="button" class="btn btn-primary text-lowercase" size="1200,600">1200x600</button>
+      <button id="prev-size3" type="button" class="btn btn-primary text-lowercase" size="600,1200">600x1200</button>
     </div>
   </div>
   <script type="text/javascript">
@@ -82,10 +80,19 @@
     const showPreviewModal = document.getElementById('showPreview');
     const showPreviewImage = document.getElementById('showPreviewImage');
     function refreshPreview(e) {
-      const showPreviewSize = document.getElementById(showPreviewSizes[0]);
+      let clickedSize = (e.type == 'click') ? e.target.id : undefined;
+      let showPreviewSize = document.getElementById(showPreviewSizes[0]);
       showPreviewSizes.forEach(id => {
         const previewSizeElement = document.getElementById(id);
-        if (previewSizeElement.className.indexOf('active') != -1) {
+        if (clickedSize != undefined) {
+          if (previewSizeElement.id == clickedSize) {
+            if (previewSizeElement.className.indexOf('active') == -1) {
+              previewSizeElement.className += ' active';
+            }
+          } else {
+            previewSizeElement.className = previewSizeElement.className.replace(/\s*active/, '');
+          }
+        } else if (previewSizeElement.className.indexOf('active') != -1) {
           showPreviewSize = previewSizeElement;
         }
       });
@@ -94,7 +101,7 @@
       showPreviewImage.src = 'images/preview?w=' + previewGeo[0] + '&h=' + previewGeo[1] + '&ts=' + new Date().getTime();
     }
     showPreviewModal.addEventListener('shown.bs.modal', refreshPreview);
-    showPreviewSizes.concat('showPreviewRefresh').forEach(id => {
+    showPreviewSizes.forEach(id => {
       document.getElementById(id).addEventListener('click', refreshPreview);
     });
   </script>
