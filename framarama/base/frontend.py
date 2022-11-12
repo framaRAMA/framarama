@@ -208,7 +208,6 @@ class FrontendDevice(Singleton):
 
     def __init__(self):
         super().__init__()
-        self._finisher = DefaultFrontendFinisher()
         self._renderer_filesystem = FilesystemFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
@@ -218,7 +217,23 @@ class FrontendDevice(Singleton):
         self._capabilities = None
 
     def finish(self, display, item, finishings):
-        return self._finisher.process(display, item, finishings)
+        _mem_total = self.run_capability(FrontendCapability.MEM_TOTAL)
+        _mem_free = self.run_capability(FrontendCapability.MEM_FREE)
+        _mem_max = round(1024 * _mem_free * 0.8)
+        logger.info("Restricting memory usage to {:.0f} MB".format(_mem_max/1024/1024))
+        _disk_free_tmp = self.run_capability(FrontendCapability.DISK_TMP_FREE)
+        _disk_free_tmp_max = round(1024 * _disk_free_tmp * 0.8)
+        logger.info("Restricting disk usage to {:.0f} MB".format(_disk_free_tmp_max/1024/1024))
+        _adapter = finishing.WandImageProcessingAdapter()
+        _adapter._wand_resource.limits['memory'] = _mem_max
+        _adapter._wand_resource.limits['disk'] = _disk_free_tmp_max
+        _processor = finishing.Processor(finishing.Context(
+            display.display(),
+            display.frame(),
+            item,
+            finishings.items(),
+            _adapter))
+        return FrontendItem(item, _processor.process())
 
     def render(self, display, item):
         for renderer in self._renderers:
@@ -344,24 +359,6 @@ class FrontendItem:
 
     def height(self):
         return self._result.get_height()
-
-
-class BaseFrontendFinisher:
-
-    def process(self, display, item, finishings):
-      pass
-
-
-class DefaultFrontendFinisher(BaseFrontendFinisher):
-
-    def process(self, display, item, finishings):
-        _processor = finishing.Processor(finishing.Context(
-            display.display(),
-            display.frame(),
-            item,
-            finishings.items(),
-            finishing.WandImageProcessingAdapter()))
-        return FrontendItem(item, _processor.process())
 
 
 class BaseFrontendRenderer:

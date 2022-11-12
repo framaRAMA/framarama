@@ -380,6 +380,7 @@ class ImageProcessingAdapter:
 class WandImageProcessingAdapter(ImageProcessingAdapter):
 
     def __init__(self):
+        self._wand_resource = importlib.import_module('wand.resource')
         self._wand_image = importlib.import_module('wand.image')
         self._wand_drawing = importlib.import_module('wand.drawing')
         self._wand_color = importlib.import_module('wand.color')
