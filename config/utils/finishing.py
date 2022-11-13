@@ -515,7 +515,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
             if text.get_alignment() == Text.ALIGN_LEFT:
                 _xoffset = 0
-            elif text.get_alignment() == Text.ALIGN_RIGHT:#
+            elif text.get_alignment() == Text.ALIGN_RIGHT:
                 _xoffset = -_metrics.text_width
             elif text.get_alignment() == Text.ALIGN_CENTER:
                 _xoffset = int(-_metrics.text_width/2)
