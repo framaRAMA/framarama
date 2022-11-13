@@ -517,7 +517,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
                 _xoffset = int(-_metrics.text_width/2)
             if border_brush.get_stroke_width() == 0:
                 border_brush = Brush(
-                    border_brush.get_fill_color(), 0,
+                    None, 0,
                     border_brush.get_fill_color())
             _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
             _y1 = pos.get_y() - _padding - _metrics.text_height - _metrics.descender
