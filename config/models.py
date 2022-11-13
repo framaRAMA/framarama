@@ -254,7 +254,7 @@ class Finishing(PluginModel):
         verbose_name='Background color', help_text='The background color (fill) to use in HEX (RGB)')
     color_alpha = models.IntegerField(
         blank=True, null=True,
-        verbose_name='Transparency', help_text='The alpha value (transparency) between 0 and 100')
+        verbose_name='Transparency', help_text='The alpha value between 0 (transparent) and 100 (no transparency)')
     enabled = models.BooleanField(
         verbose_name='Enabled')
 

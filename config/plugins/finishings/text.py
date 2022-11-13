@@ -71,7 +71,7 @@ class TextModel(Finishing):
         verbose_name='Border radius', help_text='Use rounded corners when drawing border')
     border_alpha = models.IntegerField(
         blank=True, null=True,
-        verbose_name='Border transparency', help_text='The border alpha value (transparency) between 0 and 100')
+        verbose_name='Border transparency', help_text='The border alpha value between 0 (transparent) and 100 (no transparency)')
     border_padding = models.IntegerField(
         blank=True, null=True,
         verbose_name='Border padding', help_text='Spacing between text and border')
