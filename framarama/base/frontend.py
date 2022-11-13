@@ -304,7 +304,7 @@ class FrontendCapability:
         Process.exec_run(['vcgencmd', 'display_power', '0'])
 
     def vcgencmd_display_status(device, *args, **kwargs):
-        return Process.exec_run(['vcgencmd', 'display_power']) == '1'
+        return Process.exec_run(['vcgencmd', 'display_power']) == b'display_power=1\n'
 
     def _read_meminfo(fields=None):
         _lines = Filesystem.file_read('/proc/meminfo')

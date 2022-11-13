@@ -60,12 +60,14 @@ class Jobs():
         _time_off_reached = self._display.time_off_reached(timezone.now())
         if _time_on_reached or _time_off_reached:
             _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
-            if _time_on_reached and not _display_on:
-                logger.info("Switch display on at {}".format(self._display.get_time_on()))
-                _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
-            if _time_off_reached and _display_on:
-                logger.info("Switch display off at {}".format(self._display.get_time_off()))
-                _device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+            if _time_off_reached:
+                if _display_on:
+                    logger.info("Switch display off at {}".format(self._display.get_time_off()))
+                    _device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+            elif _time_on_reached:
+                if not _display_on:
+                    logger.info("Switch display on at {}".format(self._display.get_time_on()))
+                    _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
         if self._display.time_change_reached(self._last_update):
             _last_update = self._last_update
             try:
