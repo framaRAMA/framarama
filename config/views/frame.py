@@ -410,14 +410,15 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
         _height = request.GET['h'] if 'h' in request.GET else 768
         _display = models.Display(**{'name': 'Preivew display', 'description': 'Display for preparing previews', 'enabled': True, 'device_width': int(_width), 'device_height': int(_height)})
         if _item:
-            _processor = finishing.Processor(finishing.Context(
+            _context = finishing.Context(
                 _display,
                 _frame,
                 _item,
                 _frame.finishings.all(),
-                finishing.WandImageProcessingAdapter()))
-            _result = _processor.process()
-
-        return {'_response': HttpResponse(_result.get_data(), _result.get_mime())}
+                finishing.WandImageProcessingAdapter())
+            with _context:
+                _result = finishing.Processor(_context).process()
+                return {'_response': HttpResponse(_result.get_data(), _result.get_mime())}
+        return {'_response': HttpResponse('', 'text/plain')}
 
 

@@ -23,7 +23,13 @@ class Context:
         self._image_data = {}
         self._adapter = adapter
         self._context = context.Context()
-    
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
     def get_display(self):
         return self._display
     
@@ -51,14 +57,6 @@ class Context:
     def set_image_data(self, image_name, image):
         self._image_data[image_name] = image
 
-    def get_image_names(self):
-        return self._image_data.keys()
-
-    def remove_image(self, image_name):
-        _image = self._image_data[image_name]
-        del self._image_data[image_name]
-        return _image
-
     def set_resolver(self, name, resolver):
         self._context.set_resolver(name, resolver)
 
@@ -67,6 +65,14 @@ class Context:
 
     def evaluate_model(self, model):
         return self._context.evaluate_model(model)
+
+    def close(self):
+        _names = list(self._image_data.keys())
+        for _name in _names:
+            _images = self._image_data[_name].get_images()
+            for _image in _images:
+                self._adapter.image_close(_image)
+            del self._image_data[_name]
 
 
 class Processor:
@@ -140,12 +146,6 @@ class Processor:
             _image_meta['width'],
             _image_meta['height'],
             len(_image_data)))
-
-        _image_names = list(self._context.get_image_names())
-        for _image_name in _image_names:
-            _image_container = self._context.remove_image(_image_name)
-            for _image in _image_container.get_images():
-                _adapter.image_close(_image)
 
         return ProcessingResult(_image_meta, _image_data)
 

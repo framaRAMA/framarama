@@ -227,13 +227,15 @@ class FrontendDevice(Singleton):
         _adapter = finishing.WandImageProcessingAdapter()
         _adapter._wand_resource.limits['memory'] = _mem_max
         _adapter._wand_resource.limits['disk'] = _disk_free_tmp_max
-        _processor = finishing.Processor(finishing.Context(
+        _context = finishing.Context(
             display.display(),
             display.frame(),
             item,
             finishings.items(),
-            _adapter))
-        return FrontendItem(item, _processor.process())
+            _adapter)
+        with _context:
+            _result = finishing.Processor(_context).process()
+            return FrontendItem(item, _result)
 
     def render(self, display, item):
         for renderer in self._renderers:
