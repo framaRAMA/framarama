@@ -403,6 +403,10 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
           if brush.get_fill_color():
               _drawing.fill_color = self._color(brush.get_fill_color())
         if text:
+          _drawing.stroke_color = self._wand_color.Color('none')
+          _drawing.stroke_width = 0
+          if brush.get_stroke_color():
+              _drawing.fill_color = self._color(brush.get_stroke_color())
           if text.get_font():
               _drawing.font_familiy = text.get_font()
           if text.get_size():
