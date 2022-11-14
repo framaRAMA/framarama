@@ -332,7 +332,7 @@ class FrontendCapability:
 
     def _df(partition):
         _info = Process.exec_run(['df', '-k', partition])
-        return int(_info.split(b'\n')[-2].split()[-3]) if _info else None
+        return int(_info.split()[-3]) if _info else None
 
     def df_data(device, *args, **kwargs):
         return FrontendCapability._df(settings.FRAMARAMA['DATA_PATH'])
