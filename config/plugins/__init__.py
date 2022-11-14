@@ -44,7 +44,8 @@ class Plugin:
         _values = instance.get_field_values()
         _plugin_config = _values.pop(Plugin._plugin_config_field)
         if _plugin_config:
-            _values.update(_plugin_config)
+            _fields = [_field.name for _field in self.impl.Model._meta.fields]
+            _values.update({_n: _v for _n, _v in _plugin_config.items() if _n in _fields})
         _model = self.impl.Model(**_values)
         _model._base = instance
         return _model
