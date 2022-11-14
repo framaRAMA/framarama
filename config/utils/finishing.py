@@ -278,10 +278,11 @@ class Text:
     ALIGN_RIGHT = 'right'
     ALIGN_CENTER = 'center'
 
-    def __init__(self, text:str, font:str=None, size:int=None, alignment:str=None, border:int=None, border_radius:int=None):
+    def __init__(self, text:str, font:str=None, size:int=None, weight:int=None, alignment:str=None, border:int=None, border_radius:int=None):
         self._text = text
         self._font = font
         self._size = size
+        self._weight = weight
         self._alignment = alignment
         self._border = border
         self._border_radius = border_radius
@@ -297,6 +298,9 @@ class Text:
 
     def get_size(self):
         return self._size
+
+    def get_weight(self):
+        return self._weight
 
     def get_alignment(self):
         return self._alignment
@@ -409,6 +413,8 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
               _drawing.fill_color = self._color(brush.get_stroke_color())
           if text.get_font():
               _drawing.font_familiy = text.get_font()
+          if text.get_weight():
+              _drawing.font_weight = text.get_weight()
           if text.get_size():
               _drawing.font_size = text.get_size()
           if text.get_alignment():

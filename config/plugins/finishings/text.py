@@ -20,6 +20,7 @@ TEXT_ALIGNMENTS = [
 
 FIELDS = [
     'font',
+    'weight',
     'text',
     'size',
     'alignment',
@@ -33,6 +34,7 @@ FIELDS = [
 WIDGETS = {
     'text': base.charFieldWidget(),
     'font': base.charFieldWidget(),
+    'weight': base.charFieldWidget(),
     'size': base.charFieldWidget(),
     'alignment': base.selectFieldWidget(choices=TEXT_ALIGNMENTS),
     'start_x': base.charFieldWidget(),
@@ -51,6 +53,9 @@ class TextModel(Finishing):
     font = models.CharField(
         max_length=64,
         verbose_name='Font', help_text='Font name to use (e.g. Arial, Helvetica, Courier)')
+    weight = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Font weight', help_text='Front weight (e.g. 400 for normal, 700 for bold, 900 for bolder)')
     size = models.CharField(
         max_length=64,
         verbose_name='Size', help_text='Font size')
@@ -113,6 +118,7 @@ class Implementation(PluginImplementation):
         _font = model.font.as_str()
         _text = model.text.as_str()
         _size = model.size.as_int()
+        _weight = model.weight.as_int()
         _alignment = model.alignment.as_str()
         _border = model.border.as_int()
         _border_radius = model.border_radius.as_int()
@@ -130,7 +136,7 @@ class Implementation(PluginImplementation):
             stroke_color=finishing.Color(_color_stroke, _border_alpha),
             stroke_width=_border,
             fill_color=_fill_color)
-        _text = finishing.Text(_text, font=_font, size=_size, alignment=_alignment)
+        _text = finishing.Text(_text, font=_font, size=_size, weight=_weight, alignment=_alignment)
         _adapter.draw_text(image, _pos, _text, _brush, border_brush=_brush_border, border_radius=_border_radius, border_padding=_border_padding)
         return image
 
