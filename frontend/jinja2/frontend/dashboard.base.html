@@ -12,19 +12,19 @@
 
 <ul class="nav nav-tabs pt-2">
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.overview') }}<span class="d-none d-lg-inline"></span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.overview') }}<span class="d-none d-lg-inline"></span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard_display') }}" href="{{ url('fe_dashboard_display') }}">{{ lib.icon('frontend.display') }}<span class="d-none d-lg-inline"></span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_dashboard_display') }}" href="{{ url('fe_dashboard_display') }}">{{ lib.icon('frontend.display') }}<span class="d-none d-lg-inline"></span></a>
   </li>
   <!-- li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_system') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.system') }}<span class="d-none d-lg-inline"></span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_system') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('frontend.system') }}<span class="d-none d-lg-inline"></span></a>
   </li -->
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard_device') }}" href="{{ url('fe_dashboard_device') }}">{{ lib.icon('frontend.device') }}<span class="d-none d-lg-inline"></span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_dashboard_device') }}" href="{{ url('fe_dashboard_device') }}">{{ lib.icon('frontend.device') }}<span class="d-none d-lg-inline"></span></a>
   </li>
   <!-- li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('system') }}<span class="d-none d-lg-inline"> System</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_dashboard') }}" href="{{ url('fe_dashboard') }}">{{ lib.icon('system') }}<span class="d-none d-lg-inline"> System</span></a>
   </li -->
   <li class="col">
     <a href="{{ config_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end">{{ lib.icon('frontend.config', 'p-0 m-0') }}</a>
