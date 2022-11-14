@@ -40,26 +40,24 @@ class Plugin:
                 return _cls
         return None
 
-    def get_model(self, identifier):
-        return self.impl.Model.objects.filter(pk=identifier).get()
-
-    def load_model(self, identifier):
-        _instance = self._base_model.objects.filter(pk=identifier).get()
-        _values = {_field.name:getattr(_instance, _field.name) for _field in _instance._meta.fields}
+    def create_model(self, instance):
+        _values = instance.get_field_values()
         _plugin_config = _values.pop(Plugin._plugin_config_field)
         if _plugin_config:
             _values.update(_plugin_config)
         _model = self.impl.Model(**_values)
-        _model._base = _instance
+        _model._base = instance
         return _model
 
+    def load_model(self, identifier):
+        return self.create_model(self._base_model.objects.filter(pk=identifier).get())
+
     def save_model(self, model):
-        _model_fields = [_field.name for _field in self.impl.Model._meta.get_fields(include_parents=False)]
-        _model_fields = [_name for _name in _model_fields if not _name.endswith('_ptr')]
-        _base_fields = [_field.name for _field in model._meta.get_fields() if not _field.name in _model_fields]
-        _base_fields = [_name for _name in _base_fields if not _name.endswith('_ptr')]
-        _values = {_name:getattr(model, _name) for _name in _base_fields}
-        _values[Plugin._plugin_config_field] = {_name:getattr(model, _name) for _name in _model_fields}
+        _values = model.get_field_values()
+        _values[Plugin._plugin_config_field] = {}
+        _model_fields = [_field.name for _field in model.get_fields()]
+        for _name in [_name for _name in _values.keys() if _name in _model_fields]:
+            _values[Plugin._plugin_config_field][_name] = _values.pop(_name)
         if model.id:
             _instance = self._base_model.objects.filter(pk=model.id).get()
             for _name, _value in _values.items():
