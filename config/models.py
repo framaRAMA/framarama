@@ -4,7 +4,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from framarama.base.models import BaseModel, PluginModel
-from config import plugins 
 
 
 MIME_CHOICES = [
@@ -303,9 +302,4 @@ class Display(BaseModel):
         max_length=64, blank=True, null=True,
         verbose_name='Key', help_text='A secret access token to access data for display.')
 
-
-# Import plugins to setup models with "makemigrations" command
-plugins.SourcePluginRegistry.all()
-plugins.SortingPluginRegistry.all()
-plugins.FinishingPluginRegistry.all()
 
