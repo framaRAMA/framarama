@@ -113,6 +113,7 @@
         }
       });
       const previewGeo = showPreviewSize.getAttribute('size').split(',');
+      cssAdd(previewImageMessage, 'd-none');
       cssRemove(previewImageSpinner, 'd-none');
       showPreviewImage.src = showPreviewImageDefault;
       showPreviewImage.src = 'images/preview?w=' + previewGeo[0] + '&h=' + previewGeo[1] + '&ts=' + new Date().getTime();
