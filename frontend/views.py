@@ -239,8 +239,15 @@ class DeviceDashboardView(BaseFrontendView):
           'free': _mem_free,
           'usage': int((_mem_total - _mem_free) / _mem_total * 100)
         }
+        _uptime = _frontend_device.run_capability(frontend.FrontendCapability.SYS_UPTIME)
         _context['sys'] = {
-          'uptime' : _frontend_device.run_capability(frontend.FrontendCapability.SYS_UPTIME),
+          'uptime' : {
+            'total': _uptime,
+            'seconds': int(_uptime % 60),
+            'minutes': int(_uptime % 3600 / 60),
+            'hours': int(_uptime % 86400 / 3600),
+            'days': int(_uptime / 86400),
+          }
         }
         _context['cpu'] = {
           'load': _frontend_device.run_capability(frontend.FrontendCapability.CPU_LOAD),
