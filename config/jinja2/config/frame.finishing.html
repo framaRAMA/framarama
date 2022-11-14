@@ -70,11 +70,13 @@
   </div>
   <div class="row">
     <div class="mt-2 text-center">
-      <div class="position-relative w-100 h-100" id="spinner">
-        <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
-        <div class="position-absolute fa-spinner fa-spin text-light top-50 start-50" role="status">
-          <img src="{{ static('config/logo.svg') }}" class="w-10 h-10"/>
+      <div class="position-relative w-100 h-100">
+        <div id="previewImageSpinner" class="position-absolute top-50 start-50 translate-middle d-none" role="status">
+          <img src="{{ static('config/logo.svg') }}" class="w-25 h-25 fa-spin"/>
         </div>
+        <div id="previewImageMessage" class="position-absolute top-50 start-50 translate-middle d-none text-white" role="status">Image preview generation failed. Try again later.
+        </div>
+        <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-dark col-12 col-md-8 bg-black">
       </div>
     </div>
 
@@ -90,6 +92,9 @@
     const showPreviewSizes = ['prev-size1', 'prev-size2', 'prev-size3'];
     const showPreviewModal = document.getElementById('showPreview');
     const showPreviewImage = document.getElementById('showPreviewImage');
+    const showPreviewImageDefault = showPreviewImage.src;
+    const previewImageSpinner = document.getElementById('previewImageSpinner');
+    const previewImageMessage = document.getElementById('previewImageMessage');
     function refreshPreview(e) {
       let clickedSize = (e.type == 'click') ? e.target.id : undefined;
       let showPreviewSize = document.getElementById(showPreviewSizes[0]);
@@ -108,13 +113,23 @@
         }
       });
       const previewGeo = showPreviewSize.getAttribute('size').split(',');
-      showPreviewImage.src = '/static/config/1x1-transparent.png';
+      cssRemove(previewImageSpinner, 'd-none');
+      showPreviewImage.src = showPreviewImageDefault;
       showPreviewImage.src = 'images/preview?w=' + previewGeo[0] + '&h=' + previewGeo[1] + '&ts=' + new Date().getTime();
     }
     showPreviewModal.addEventListener('shown.bs.modal', refreshPreview);
     showPreviewSizes.forEach(id => {
       document.getElementById(id).addEventListener('click', refreshPreview);
     });
+    showPreviewImage.onload = function() {
+      if (showPreviewImage.complete) {
+        cssAdd(previewImageSpinner, 'd-none')
+      }
+    };
+    showPreviewImage.onerror = function() {
+      showPreviewImage.src = showPreviewImageDefault;
+      cssRemove(previewImageMessage, 'd-none');
+    };
   </script>
 {{ lib.modal_end() }}
 
