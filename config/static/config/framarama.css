@@ -54,6 +54,11 @@
   font-size: 0.55rem;
 }
 
+/** Add style for extra small font **/
+.smaller {
+  font-size: 0.6rem;
+}
+
 /** Remove left or right round borders (for concatenated elements with button) */
 /*.btn.btn-nb-l, .nav-link.btn-nb-l {
   margin-left: 0px;

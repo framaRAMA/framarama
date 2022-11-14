@@ -325,7 +325,11 @@ class ListFinishingFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _context['finishings'] = list(_frame.finishings.all())
+        _finishings = []
+        for _finishing in list(_frame.finishings.all()):
+            _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
+            _finishings.append(_plugin.create_model(_finishing))
+        _context['finishings'] = _finishings
         _context['finishing_plugins'] = plugins.FinishingPluginRegistry.all()
         return _context
 

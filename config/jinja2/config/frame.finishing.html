@@ -14,7 +14,7 @@
         {{ loop.index }}. {{ finishing.title }}
         <span class="badge rounded-pill badge-success">
           {{ lib.icon('finishing.plugin.'+finishing_plugins[finishing.plugin].cat) }}
-          {{ finishing.plugin }}
+          {{ finishing.plugin_config }}
         </span>
         {% if finishing.image_in %}
           <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.input') }} {{ finishing.image_in }}</span>
@@ -23,8 +23,12 @@
           <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.output') }} {{ finishing.image_out }}</span>
         {% endif %}
       </div>
-      <div class="ms-5 text-muted fs-text-6">
-        <pre>{{ finishing.plugin }}</pre>
+      <div class="ms-5 text-muted smaller font-monospace">
+        {% for field_name, field_value in finishing.get_field_values().items() %}
+          {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+            <strong>{{ finishing.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
+          {% endif %}
+        {% endfor %}
       </div>
     </div>
     <div class="ms-0 pt-2 pb-2">
@@ -66,7 +70,12 @@
   </div>
   <div class="row">
     <div class="mt-2 text-center">
-      <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
+      <div class="position-relative w-100 h-100" id="spinner">
+        <img id="showPreviewImage" src="{{ static('config/1x1-transparent.png') }}" class="border border-primary col-12 col-md-8">
+        <div class="position-absolute fa-spinner fa-spin text-light top-50 start-50" role="status">
+          <img src="{{ static('config/logo.svg') }}" class="w-10 h-10"/>
+        </div>
+      </div>
     </div>
 
     <div class="btn-group mt-2 p-0 text-center" role="group">
