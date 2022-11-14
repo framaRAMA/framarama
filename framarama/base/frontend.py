@@ -253,6 +253,8 @@ class FrontendDevice(Singleton):
                 FrontendCapability.MEM_TOTAL: FrontendCapability.return_none,
                 FrontendCapability.MEM_FREE: FrontendCapability.return_none,
                 FrontendCapability.SYS_UPTIME: FrontendCapability.return_none,
+                FrontendCapability.CPU_TEMP: FrontendCapability.return_none,
+                FrontendCapability.CPU_LOAD: FrontendCapability.return_none,
                 FrontendCapability.DISK_DATA_FREE: FrontendCapability.return_none,
                 FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
             }
@@ -265,6 +267,10 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.MEM_FREE] = FrontendCapability.read_meminfo_free
             if Filesystem.file_exists('/proc/uptime'):
                 self._capabilities[FrontendCapability.SYS_UPTIME] = FrontendCapability.read_uptime
+            if Process.exec_search('uptime'):
+                self._capabilities[FrontendCapability.CPU_LOAD] = FrontendCapability.uptime_loadavg
+            if Filesystem.file_exists('/sys/class/thermal/thermal_zone0/temp'):
+                self._capabilities[FrontendCapability.CPU_TEMP] = FrontendCapability.read_thermal
             if Process.exec_search('df'):
                 self._capabilities[FrontendCapability.DISK_DATA_FREE] = FrontendCapability.df_data
                 self._capabilities[FrontendCapability.DISK_TMP_FREE] = FrontendCapability.df_tmp
@@ -286,6 +292,8 @@ class FrontendCapability:
     DISK_DATA_FREE = 'disk.data.free'
     DISK_TMP_FREE = 'disk.tmp.free'
     SYS_UPTIME = 'system.uptime'
+    CPU_LOAD = 'cpu.load'
+    CPU_TEMP = 'cpu.temp'
 
     def noop(device, *args, **kwargs):
         return
@@ -339,6 +347,15 @@ class FrontendCapability:
 
     def df_tmp(device, *args, **kwargs):
         return FrontendCapability._df('/tmp')
+
+    def uptime_loadavg(device, *args, **kwargs):
+        _info = Process.exec_run(['uptime'])
+        print(_info)
+        return float(_info.split()[-3].rstrip(b',')) if _info else None
+
+    def read_thermal(device, *args, **kwargs):
+        _info = Filesystem.file_read('/sys/class/thermal/thermal_zone0/temp')
+        return int(float(_info)/1000) if _info else None
 
 
 class FrontendItem:

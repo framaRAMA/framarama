@@ -242,5 +242,9 @@ class DeviceDashboardView(BaseFrontendView):
         _context['sys'] = {
           'uptime' : _frontend_device.run_capability(frontend.FrontendCapability.SYS_UPTIME),
         }
+        _context['cpu'] = {
+          'load': _frontend_device.run_capability(frontend.FrontendCapability.CPU_LOAD),
+          'temp': _frontend_device.run_capability(frontend.FrontendCapability.CPU_TEMP),
+        }
         return _context
 

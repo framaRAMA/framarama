@@ -5,6 +5,7 @@
 <div class="pt-2">
   {{ lib.field_text('Uptime', '%d minutes'|format(sys['uptime']/60)) }}
   {{ lib.field_text('Memory usage', '%d%% of %d MB (%d MB free)'|format(mem['usage'], mem['total']/1024, mem['free']/1024)) }}
+  {{ lib.field_text('CPU', '%.2f load, %d°C'|format(cpu['load'], cpu['temp'])) }}
 </div>
 
 {% endblock %}
