@@ -32,3 +32,22 @@ class PluginModel(BaseModel):
     class Meta:
         abstract = True
 
+    def get_field(self, name):
+        _fields = [_field for _field in self.get_fields(True) if _field.name == name]
+        return _fields.pop(0) if _fields else None
+
+    def get_fields(self, base=False, model=True):
+        if base and model:
+            _fields = self._meta.fields
+        elif model:
+            _fields = self._meta.get_fields(include_parents=False)
+        else:
+            _model = [_field.name for _field in self._meta.get_fields(include_parents=False)]
+            _all = self._meta.fields
+            _fields = [_field for _field in _all if _field.name not in _model]
+        _fields = [_field for _field in _fields if not _field.name.endswith('_ptr')]
+        return _fields
+
+    def get_field_values(self):
+        return {_field.name:getattr(self, _field.name) for _field in self.get_fields(True)}
+
