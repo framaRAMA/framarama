@@ -4,9 +4,8 @@
 
 <div class="pt-2">
   {{ lib.field_text('System startup', config.date_app_startup) }}
+  {{ lib.field_text('Items', '%d shown, total %d items'|format(config.count_views, config.count_items)) }}
   {{ lib.field_text('Items update', config.date_items_update) }}
-  {{ lib.field_text('Items total', config.count_items) }}
-  {{ lib.field_text('Items shown', config.count_views) }}
 </div>
 
 
