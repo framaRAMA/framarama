@@ -2,6 +2,7 @@ import datetime
 import subprocess
 import logging
 
+from django.conf import settings
 from django.utils import timezone
 
 from framarama.base import utils
@@ -20,7 +21,8 @@ class Jobs():
         self._startup = None
         self._last_update = None
         self._scheduler = scheduler
-        self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
+        if 'frontend' in settings.FRAMARAMA['MODES']:
+            self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
 
     def _setup_start(self):
         if self._startup is None:

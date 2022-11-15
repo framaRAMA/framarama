@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +9,7 @@ class BaseView(TemplateView):
 
     def _handle(self, callback, request, *args, **kwargs):
         _context = {}
+        _context['MODES'] = settings.FRAMARAMA['MODES']
         _context.update(callback(request, *args, **kwargs))
         if '_response' in _context:
            return _context['_response']

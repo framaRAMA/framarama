@@ -216,6 +216,10 @@ REST_FRAMEWORK = {
 }
 
 FRAMARAMA = {
+    'MODES': [
+        'server',
+        'frontend'
+    ],
     'DATA_PATH': './data/',
     'ADMIN_USERNAME': 'admin',
     'ADMIN_PASSWORD': 'testabc123',

@@ -143,7 +143,7 @@
               {{ icon('display') }} Displays
             </a>
           </li>
-          {% if config != None %}
+          {% if config != None and 'frontend' in MODES %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url('fe_dashboard') }}">
               {{ icon('frontend') }} Frontend
