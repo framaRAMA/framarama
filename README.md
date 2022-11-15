@@ -183,4 +183,5 @@ in the server application.
 # Other
 
 * https://editsvgcode.com/ - SVN Editor online with preview
+* https://favicon.io/favicon-converter/ - favicon generator online
 
