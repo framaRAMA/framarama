@@ -430,6 +430,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
+    COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
     IMG_CURRENT = DATA_PATH + '/framarama-00001.image'
 
     CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', DATA_PATH + '/picture-background.jpg', '-f', DATA_PATH + '/picture-current.csv', '--reload', '10']
@@ -446,7 +447,7 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 break
 
     def update_feh(self, display, item):
-        _background = VisualizeFrontendRenderer.DATA_PATH + '/framarama-background.jpg'
+        _background = VisualizeFrontendRenderer.COMMON_PATH + '/background.png'
         _file_list = VisualizeFrontendRenderer.DATA_PATH + '/framarama-current.csv'
         if Process.exec_running('feh') is None:
             Process.exec_bg([
