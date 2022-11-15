@@ -36,7 +36,7 @@ class Config(BaseModel):
         verbose_name='Database password', help_text='The password for the database user')
     cloud_server = models.CharField(
         max_length=255,
-        verbose_name='Server', help_text='Remove server URL')
+        verbose_name='Server', help_text='Remote server URL')
     cloud_display_access_key = models.CharField(
         max_length=64, blank=True, null=True,
         verbose_name='Display', help_text='Access key for display')
