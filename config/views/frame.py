@@ -240,7 +240,11 @@ class ListSortingFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _context['sortings'] = list(_frame.sortings.all())
+        _sortings = []
+        for _sorting in list(_frame.sortings.all()):
+            _plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
+            _sortings.append(_plugin.create_model(_sorting))
+        _context['sortings'] = _sortings
         _context['sorting_plugins'] = plugins.SortingPluginRegistry.all()
         
         _page = request.GET.get('page')

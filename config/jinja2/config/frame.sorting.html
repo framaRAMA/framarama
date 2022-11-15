@@ -22,12 +22,16 @@
           Weight {{ sorting.weight }}
         </span>
       </div>
-      <div class="text-muted fs-text-6">
+      <div class="text-muted smaller font-monospace">
         {% if sorting.code_template %}
           Template:
           {{ templates[sorting.code_template]['title'] }} - {{ templates[sorting.code_template]['desc'] }}
         {% else %}
-          <pre>{{ sorting.code }}</pre>
+          {% for field_name, field_value in sorting.get_field_values().items() %}
+            {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+              <strong>{{ sorting.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
+            {% endif %}
+          {% endfor %}
         {% endif %}
       </div>
     </div>
