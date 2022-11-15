@@ -52,10 +52,12 @@ class Config(Singleton):
 
     def __init__(self):
         super().__init__()
-        _configs = list(models.Config.objects.all())
-        self._config = _configs[0] if len(_configs) else None
+        self._config = None
 
     def get_config(self):
+        if self._config is None:
+            _configs = list(models.Config.objects.all())
+            self._config = _configs[0] if len(_configs) else None
         return self._config
 
     def is_local_mode(self):

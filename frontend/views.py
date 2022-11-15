@@ -18,7 +18,7 @@ class BaseSetupView(BaseView):
         _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
         _context['frontend'] = _frontend
-        _context['config'] = _config.get_config() if _config else None
+        _context['config'] = _config.get_config() if _frontend.is_initialized() else None
         return _context
 
     def _post(self, request, *args, **kwargs):
@@ -26,7 +26,7 @@ class BaseSetupView(BaseView):
         _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
         _context['frontend'] = _frontend
-        _context['config'] = _config.get_config() if _config else None
+        _context['config'] = _config.get_config() if _frontend.is_initialized() else None
         return _context
 
 
