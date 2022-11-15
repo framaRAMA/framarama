@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" version="1.1" xml:space="preserve">
+ <desc>Created with Fabric.js 3.6.6</desc>
+ <defs>
+  <radialGradient cx="0.5" cy="0.5" id="svg_111" r="0.5" spreadMethod="pad">
+   <stop id="jq_stop_4290" offset="0" stop-color="#b1b1b1"/>
+   <stop id="jq_stop_7611" offset="1" stop-color="#4e4e4e"/>
+  </radialGradient>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <rect fill="rgba(78, 78, 78, 1)" height="100%" id="svg_1" transform="matrix(1, 0, 0, 1, 0, 0)" width="100%" x="0" y="0"/>
+  <ellipse cx="960" cy="505.83" fill="url(#svg_111)" id="svg_106" rx="936.67" ry="485.83" stroke="#4e4e4e" />
+  <g id="svg_2" transform="matrix(1, 0, 0, 1, 924, 434)">
+   <g id="svg_3">
+    <g id="svg_4" transform="matrix(1, 0, 0, 1, -54, -29)">
+     <rect fill="rgb(67,199,255)" fill-rule="nonzero" height="50" id="svg_5" rx="2" ry="2" stroke="rgb(41,171,226)" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="6" width="100" x="-13" y="-25"/>
+    </g>
+    <g id="svg_6" transform="matrix(1, 0, 0, 1, 27, -54)">
+     <rect fill="rgb(255,102,196)" fill-rule="nonzero" height="100" id="svg_7" rx="2" ry="2" stroke="rgb(196,30,132)" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="6" width="50" x="12" y="-50"/>
+    </g>
+    <g id="svg_8" transform="matrix(1, 0, 0, 1, 52, 27)">
+     <rect fill="rgb(252,238,33)" fill-rule="nonzero" height="50" id="svg_9" rx="2" ry="2" stroke="rgb(223,213,58)" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="6" width="100" x="-13" y="-25"/>
+    </g>
+    <g id="svg_10" transform="matrix(1, 0, 0, 1, -29, 52)">
+     <rect fill="rgb(186,229,128)" fill-rule="nonzero" height="100" id="svg_11" rx="2" ry="2" stroke="rgb(140,198,63)" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="6" width="50" x="12" y="-50"/>
+    </g>
+   </g>
+  </g>
+  <g id="svg_12" transform="matrix(1, 0, 0, 1, 923, 605.66)">
+   <text fill="rgb(255,255,255)" fill-rule="nonzero" font-family="&#x27;Open Sans&#x27;, sans-serif" font-size="42" font-style="normal" font-weight="normal" id="svg_13" stroke-dashoffset="0" stroke-miterlimit="4" x="45.14" xml:space="preserve" y="0">
+    <tspan fill="rgb(255,255,255)" font-family="&#x27;Helvetica&#x27;, sans-serif" font-size="41px" font-style="normal" font-weight="bold" id="svg_14" x="-80.36" y="12.88">framaRAMA</tspan>
+   </text>
+  </g>
+ </g>
+</svg>
