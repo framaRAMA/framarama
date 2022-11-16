@@ -26,11 +26,11 @@ class DisplaySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame']
 
     def get_enabled(self, obj):
-        return obj.enabled and obj.frame.enabled
+        return obj.enabled and (obj.frame is None or obj.frame.enabled)
 
     def get_device_type_name(self, obj):
         choice = [value for value in models.DEVICE_CHOICES if value[0] == obj.device_type]
-        return choice[0][1]
+        return choice[0][1] if choice else None
 
 
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
