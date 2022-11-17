@@ -247,7 +247,7 @@ class Finishing(PluginModel):
         verbose_name='Image output', help_text='Name to output modified image (empty for default)')
     color_stroke = models.CharField(
         max_length=16,
-        verbose_name='Foreground color', help_text='The forrground color (lines, text) to use in HEX (RGB)')
+        verbose_name='Foreground color', help_text='The foreground color (lines, text) to use in HEX (RGB)')
     color_fill = models.CharField(
         max_length=16, blank=True, null=True,
         verbose_name='Background color', help_text='The background color (fill) to use in HEX (RGB)')
