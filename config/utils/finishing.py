@@ -5,6 +5,7 @@ import importlib
 
 from django.core.paginator import Paginator
 
+from config import models
 from config.plugins import FinishingPluginRegistry
 from config.utils import context
 
@@ -81,11 +82,40 @@ class Processor:
         self._context = context
         self._instances = {}
 
+    def get_default_finishings(self, frame):
+        _lines = [
+            ('#43c7ff', 9, '#43c7ff', 0.040),
+            ('#ff66c4', 6, '#ff66c4', 0.057),
+            ('#fcee21', 4, '#fcee21', 0.069),
+            ('#bae580', 3, '#bae580', 0.077),
+        ]
+        _finishings = []
+        for _line in _lines:
+            _model = {
+                'frame': frame, 'enabled': True,
+                'color_stroke': _line[0], 'stroke_width': _line[1], 'color_alpha': 60,
+                'color_fill': _line[2], 'plugin': 'shape'
+            }
+            _model_config = {
+                'shape': 'line',
+                'size_x': "{20+image['height']*" + str(_line[3]) + "}",
+                'size_y': "-{20+image['height']*" + str(_line[3]) + "}",
+            }
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': "-10",
+                'start_y': "{10+image['height']*" + str(_line[3]) + "}",
+            }}))
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': "{-10+image['width']-image['height']*" + str(_line[3]) + "}",
+                'start_y': "{10+image['height']}",
+            }}))
+        return _finishings
+
     def get_plugin(self, plugin_name):
         return FinishingPluginRegistry.get(plugin_name)
 
     def get_model(self, finishing):
-        return self.get_plugin(finishing.plugin).load_model(finishing.id)
+        return self.get_plugin(finishing.plugin).create_model(finishing)
 
     def process(self):
         _item = self._context.get_item()
@@ -99,7 +129,7 @@ class Processor:
             return None
         _adapter = self._context.get_adapter()
         self._context.set_image(_adapter.image_open(_item.url))
-        for _finishing in self._context.get_finishings():
+        for _finishing in list(self._context.get_finishings()) + self.get_default_finishings(_frame):
             if not _finishing.enabled:
                 continue
             logger.info("Processing finishing {}".format(_finishing))
