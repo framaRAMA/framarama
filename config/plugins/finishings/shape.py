@@ -89,12 +89,13 @@ class Implementation(PluginImplementation):
     def run(self, model, image, ctx):
         _adapter = ctx.get_adapter()
         _shape = model.shape.as_str()
-        _color_alpha = model.color_alpha.as_str()
+        _color_alpha = model.color_alpha.as_int()
         _color_stroke = finishing.Color(model.color_stroke.as_str(), _color_alpha)
         _color_fill = finishing.Color(model.color_fill.as_str(), _color_alpha)
+        _stroke_width = model.stroke_width.as_int()
         _start = finishing.Position(model.start_x.as_int(), model.start_y.as_int())
         _size = finishing.Size(model.size_x.as_int(), model.size_y.as_int())
-        _brush = finishing.Brush(stroke_color=_color_stroke, fill_color=_color_fill)
+        _brush = finishing.Brush(stroke_color=_color_stroke, stroke_width=_stroke_width, fill_color=_color_fill)
         if _shape == 'line':
             _adapter.draw_line(image, _start, _start + _size, _brush)
         elif _shape == 'rectangle':

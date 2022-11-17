@@ -115,6 +115,7 @@ class Implementation(PluginImplementation):
         _color_stroke = model.color_stroke.as_str()
         _color_fill = model.color_fill.as_str()
         _color_alpha = model.color_alpha.as_int()
+        _stroke_width = model.stroke_width.as_int()
         _font = model.font.as_str()
         _text = model.text.as_str()
         _size = model.size.as_int()
@@ -127,7 +128,8 @@ class Implementation(PluginImplementation):
         
         _pos = finishing.Position(_start_x, _start_y)
         _brush = finishing.Brush(
-            stroke_color=finishing.Color(_color_stroke, _color_alpha))
+            stroke_color=finishing.Color(_color_stroke, _color_alpha),
+            stroke_width=_stroke_width)
         if _color_fill:
             _fill_color = finishing.Color(_color_fill, _border_alpha)
         else:

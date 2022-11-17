@@ -126,7 +126,7 @@ class UpdateSortingForm(BasePluginForm):
 class CreateFinishingForm(BasePluginForm):
     class Meta:
         model = models.Finishing
-        fields = ['title', 'image_in', 'image_out', 'color_stroke', 'color_fill', 'color_alpha', 'enabled']
+        fields = ['title', 'image_in', 'image_out', 'color_stroke', 'color_fill', 'color_alpha', 'stroke_width', 'enabled']
         widgets = {
             'title': base.charFieldWidget(),
             'image_in': base.charFieldWidget(),
@@ -134,6 +134,7 @@ class CreateFinishingForm(BasePluginForm):
             'color_stroke': base.charFieldWidget(),
             'color_fill': base.charFieldWidget(),
             'color_alpha': base.charFieldWidget(),
+            'stroke_width': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
     def field_groups(self):
@@ -148,7 +149,7 @@ class CreateFinishingForm(BasePluginForm):
 class UpdateFinishingForm(BasePluginForm):
     class Meta:
         model = models.Finishing
-        fields = ['title', 'image_in', 'image_out', 'color_stroke', 'color_fill', 'color_alpha', 'enabled']
+        fields = ['title', 'image_in', 'image_out', 'color_stroke', 'color_fill', 'color_alpha', 'stroke_width', 'enabled']
         widgets = {
             'title': base.charFieldWidget(),
             'image_in': base.charFieldWidget(),
@@ -156,6 +157,7 @@ class UpdateFinishingForm(BasePluginForm):
             'color_stroke': base.charFieldWidget(),
             'color_fill': base.charFieldWidget(),
             'color_alpha': base.charFieldWidget(),
+            'stroke_width': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
     def field_groups(self):

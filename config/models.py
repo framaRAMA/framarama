@@ -254,6 +254,9 @@ class Finishing(PluginModel):
     color_alpha = models.IntegerField(
         blank=True, null=True,
         verbose_name='Transparency', help_text='The alpha value between 0 (transparent) and 100 (no transparency)')
+    stroke_width = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Line width', help_text='The width to use when drawing lines')
     enabled = models.BooleanField(
         verbose_name='Enabled')
 
