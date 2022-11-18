@@ -49,5 +49,5 @@ class PluginModel(BaseModel):
         return _fields
 
     def get_field_values(self):
-        return {_field.name:getattr(self, _field.name) for _field in self.get_fields(True)}
+        return {_field.name:getattr(self, _field.name, None) for _field in self.get_fields(True)}
 
