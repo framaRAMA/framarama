@@ -64,7 +64,6 @@ class ApiClient(Singleton):
                 self._base_url = _config.cloud_server
             self._display_access_key = _config.cloud_display_access_key
             self._base_url = self._base_url.rstrip('/') + '/api'
-            self._display_access_key = self._display_access_key
 
     def configured(self):
         return self._base_url != None and self._display_access_key != None
