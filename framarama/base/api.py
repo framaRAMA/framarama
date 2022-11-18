@@ -72,6 +72,7 @@ class ApiClient(Singleton):
         if not self.configured():
             raise Exception("API client not configured")
         _headers = {}
+        _headers['Connection'] = 'close'
         _headers['X-Display'] = self._display_access_key
         _response = requests.get(self._base_url + path, headers=_headers)
         _response.raise_for_status()
