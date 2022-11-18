@@ -92,8 +92,8 @@ class Processor:
         _offset = "image['height']*0.1"
         _finishings = []
         for _line in _lines:
-            _size = "image['height']*{}".format(_line[2])
-            _width = "{{image['width']*{}}}".format(_line[1])
+            _size = f"image['height']*{_line[2]}"
+            _width = f"{{image['width']*{_line[1]}}}"
             _model = {
                 'frame': frame, 'enabled': True,
                 'color_stroke': _line[0], 'stroke_width': _width, 'color_alpha': 60,
@@ -101,16 +101,16 @@ class Processor:
             }
             _model_config = {
                 'shape': 'line',
-                'size_x': "{{{}+{}}}".format(_offset, _size),
-                'size_y': "-{{{}+{}}}".format(_offset, _size),
+                'size_x': f"{{{_offset}+{_size}}}",
+                'size_y': f"-{{{_offset}+{_size}}}",
             }
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': "-{{{}/2}}".format(_offset),
-                'start_y': "{{{}/2+{}}}".format(_offset, _size),
+                'start_x': f"-{{{_offset}/2}}",
+                'start_y': f"{{{_offset}/2+{_size}}}",
             }}))
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': "{{-{}/2+image['width']-{}}}".format(_offset, _size),
-                'start_y': "{{{}/2+image['height']}}".format(_offset),
+                'start_x': f"{{-{_offset}/2+image['width']-{_size}}}",
+                'start_y': f"{{{_offset}/2+image['height']}}",
             }}))
         return _finishings
 
