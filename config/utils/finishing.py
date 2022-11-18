@@ -83,31 +83,34 @@ class Processor:
         self._instances = {}
 
     def get_default_finishings(self, frame):
-        _lines = [
-            ('#43c7ff', 9, '#43c7ff', 0.040),
-            ('#ff66c4', 6, '#ff66c4', 0.057),
-            ('#fcee21', 4, '#fcee21', 0.069),
-            ('#bae580', 3, '#bae580', 0.077),
+        _lines = [  # stroke color, stroke width, offset
+            ('#43c7ff', 0.010, 0.045),   # blue
+            ('#ff66c4', 0.008, 0.063),   # pink
+            ('#fcee21', 0.006, 0.077),   # yellow
+            ('#bae580', 0.004, 0.088),   # green
         ]
+        _offset = "image['height']*0.1"
         _finishings = []
         for _line in _lines:
+            _size = "image['height']*{}".format(_line[2])
+            _width = "{{image['width']*{}}}".format(_line[1])
             _model = {
                 'frame': frame, 'enabled': True,
-                'color_stroke': _line[0], 'stroke_width': _line[1], 'color_alpha': 60,
-                'color_fill': _line[2], 'plugin': 'shape'
+                'color_stroke': _line[0], 'stroke_width': _width, 'color_alpha': 60,
+                'color_fill': _line[0], 'plugin': 'shape'
             }
             _model_config = {
                 'shape': 'line',
-                'size_x': "{20+image['height']*" + str(_line[3]) + "}",
-                'size_y': "-{20+image['height']*" + str(_line[3]) + "}",
+                'size_x': "{{{}+{}}}".format(_offset, _size),
+                'size_y': "-{{{}+{}}}".format(_offset, _size),
             }
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': "-10",
-                'start_y': "{10+image['height']*" + str(_line[3]) + "}",
+                'start_x': "-{{{}/2}}".format(_offset),
+                'start_y': "{{{}/2+{}}}".format(_offset, _size),
             }}))
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': "{-10+image['width']-image['height']*" + str(_line[3]) + "}",
-                'start_y': "{10+image['height']}",
+                'start_x': "{{-{}/2+image['width']-{}}}".format(_offset, _size),
+                'start_y': "{{{}/2+image['height']}}".format(_offset),
             }}))
         return _finishings
 
