@@ -25,8 +25,10 @@ class TokenAuthentication(authentication.BaseAuthentication):
         try:
             display = models.Display.objects.get(access_key=token)
             user = display.user
-            #user = ApiUser.objects.get(pk=display.user.id)
-            #user.set_display(display)
+            user.qs_displays = models.Display.objects.filter(pk=display.id)
+            user.qs_frames = models.Frame.objects.filter(display=display)
+            user.qs_items = models.Item.objects.filter(frame__display=display)
+            user.qs_finishings = models.Finishing.objects.filter(frame__display=display)
         except models.Display.DoesNotExist:
             raise exceptions.AuthenticationFailed('No such user')
 
