@@ -1,6 +1,7 @@
 import io
 import datetime
 import jsonpickle
+import ipaddress
 import logging
 
 from django.conf import settings
@@ -257,6 +258,7 @@ class FrontendDevice(Singleton):
                 FrontendCapability.CPU_LOAD: FrontendCapability.return_none,
                 FrontendCapability.DISK_DATA_FREE: FrontendCapability.return_none,
                 FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
+                FrontendCapability.NET_CONFIG: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
@@ -274,6 +276,8 @@ class FrontendDevice(Singleton):
             if Process.exec_search('df'):
                 self._capabilities[FrontendCapability.DISK_DATA_FREE] = FrontendCapability.df_data
                 self._capabilities[FrontendCapability.DISK_TMP_FREE] = FrontendCapability.df_tmp
+            if Process.exec_search('ip'):
+                self._capabilities[FrontendCapability.NET_CONFIG] = FrontendCapability.ip_netcfg
 
         return self._capabilities
 
@@ -294,6 +298,7 @@ class FrontendCapability:
     SYS_UPTIME = 'system.uptime'
     CPU_LOAD = 'cpu.load'
     CPU_TEMP = 'cpu.temp'
+    NET_CONFIG = 'network.config'
 
     def noop(device, *args, **kwargs):
         return
@@ -356,6 +361,39 @@ class FrontendCapability:
     def read_thermal(device, *args, **kwargs):
         _info = Filesystem.file_read('/sys/class/thermal/thermal_zone0/temp')
         return int(float(_info)/1000) if _info else None
+
+    def ip_netcfg(device, *args, **kwargs):
+        _info = Process.exec_run(['ip', 'route'])
+        _info = [_line.decode() for _line in _info.split(b'\n') if _line.startswith(b'default via')] if _info else []
+        _info = [_line.split() for _line in _info][0] if _info else None
+        _gateway = _info[2] if _info else None
+        _dhcp = _info[6] == 'dhcp' if _info else None
+        _device = _info[4] if _info else None
+
+        _info = Process.exec_run(['ip', 'a', 'show', 'dev', _device]) if _device else ''
+        _info = [_line.decode().split() for _line in _info.split(b'\n')] if _info else []
+        _mac = None
+        _ipv4 = []
+        _ipv6 = []
+        for _line in [_line for _line in _info if _line]:
+            if _line[0].startswith('link'):
+                _mac = _line[1]
+            elif _line[0] == 'inet':
+                _ipv4.append(_line[1])
+            elif _line[0] == 'inet6':
+                _ipv6.append(_line[1])
+        _gw_ip = ipaddress.ip_address(_gateway) if _gateway else None
+        _ip = [_ip.split('/')[0] for _ip in _ipv4 + _ipv6 if _gw_ip in ipaddress.ip_network(_ip, strict=False)]
+
+        return {
+            'gateway': _gateway,
+            'device': _device,
+            'mac': _mac,
+            'ip': _ip,
+            'ipv4': _ipv4,
+            'ipv6': _ipv6,
+            'mode': 'DHCP' if _dhcp else 'static'
+        }
 
 
 class FrontendItem:
