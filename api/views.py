@@ -85,7 +85,7 @@ class FrameItemViewSet(BaseNestedViewSet):
     serializer_class = ItemSerializer
     
     def get_queryset(self):
-        return self.request.user.qs_frames.filter(user=self.request.user)
+        return self.request.user.qs_items.filter(frame__user=self.request.user)
 
 
 class DisplayViewSet(BaseNestedViewSet):
@@ -110,7 +110,7 @@ class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
     serializer_class = RankedItemSerializer
 
     def get_queryset(self, *args, **kwargs):
-        _frames = self.request.user.qs_frames.filter(user=self.request.user)
+        _frames = self.request.user.qs_items.filter(user=self.request.user)
         if len(_frames) == 0:
             raise NotFound()
         _processor = sorting.Processor(sorting.Context(_frames[0], first_ranked=random.randint(0, 4527000)))
@@ -122,7 +122,7 @@ class FinishingDisplayViewSet(BaseNestedViewSet):
     serializer_class = FinishingSerializer
     
     def get_queryset(self):
-        return self.request.user.finishings.filter(frame__user=self.request.user)
+        return self.request.user.qs_finishings.filter(frame__user=self.request.user)
 
 
 
