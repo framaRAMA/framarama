@@ -76,26 +76,23 @@ class BaseNestedViewSet(mixins.NestedViewSetMixin, BaseViewSet):
 
 class FrameViewSet(BaseNestedViewSet):
     serializer_class = FrameSerializer
-    queryset = models.Frame.objects.all()
     
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        return self.request.user.qs_frames.filter(user=self.request.user)
 
 
 class FrameItemViewSet(BaseNestedViewSet):
     serializer_class = ItemSerializer
-    queryset = models.Item.objects.all()
     
     def get_queryset(self):
-        return super().get_queryset().filter(frame__user=self.request.user)
+        return self.request.user.qs_frames.filter(user=self.request.user)
 
 
 class DisplayViewSet(BaseNestedViewSet):
     serializer_class = DisplaySerializer
-    queryset = models.Display.objects.all()
     
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        return self.request.user.qs_displays.filter(user=self.request.user)
 
     @decorators.action(detail='frame', methods=['get'])
     def frame(self, *args, **kwargs):
@@ -104,18 +101,16 @@ class DisplayViewSet(BaseNestedViewSet):
 
 class ItemDisplayViewSet(BaseNestedViewSet):
     serializer_class = ItemSerializer
-    queryset = models.Item.objects.all()
     
     def get_queryset(self):
-        return super().get_queryset().filter(frame__user=self.request.user)
+        return self.request.user.qs_items.filter(frame__user=self.request.user)
 
 
 class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
     serializer_class = RankedItemSerializer
-    queryset = models.Frame.objects.all()
 
     def get_queryset(self, *args, **kwargs):
-        _frames = super().get_queryset().filter(user=self.request.user)
+        _frames = self.request.user.qs_frames.filter(user=self.request.user)
         if len(_frames) == 0:
             raise NotFound()
         _processor = sorting.Processor(sorting.Context(_frames[0], first_ranked=random.randint(0, 4527000)))
@@ -125,10 +120,9 @@ class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
 
 class FinishingDisplayViewSet(BaseNestedViewSet):
     serializer_class = FinishingSerializer
-    queryset = models.Finishing.objects.all()
     
     def get_queryset(self):
-        return super().get_queryset().filter(frame__user=self.request.user)
+        return self.request.user.finishings.filter(frame__user=self.request.user)
 
 
 
