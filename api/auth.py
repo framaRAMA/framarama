@@ -30,4 +30,4 @@ class TokenAuthentication(authentication.BaseAuthentication):
         except models.Display.DoesNotExist:
             raise exceptions.AuthenticationFailed('No such user')
 
-        return (user, None)
+        return (user, token)
