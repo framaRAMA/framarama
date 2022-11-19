@@ -110,7 +110,7 @@ class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
     serializer_class = RankedItemSerializer
 
     def get_queryset(self, *args, **kwargs):
-        _frames = self.request.user.qs_items.filter(user=self.request.user)
+        _frames = self.request.user.qs_frames.filter(user=self.request.user)
         if len(_frames) == 0:
             raise NotFound()
         _processor = sorting.Processor(sorting.Context(_frames[0], first_ranked=random.randint(0, 4527000)))
