@@ -3,7 +3,6 @@ import random
 from django.shortcuts import render
 from rest_framework import generics, viewsets, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
-from rest_framework_extensions import mixins
 
 from config import models
 from config.utils import sorting
@@ -67,50 +66,73 @@ class BaseDetailView(generics.RetrieveAPIView):
 
 
 class BaseViewSet(BaseListView, viewsets.ModelViewSet):
-    pass
+    
+    def qs(self):
+        if not hasattr(self, '_qs'):
+            _user = self.request._user
+            self._qs = type('', (object,), {
+              'frames': (
+                  _user.qs_frames if hasattr(_user, 'qs_frames') else
+                  models.Frame.objects).filter(user=_user),
+              'items': (
+                  _user.qs_items if hasattr(_user, 'qs_items') else
+                  models.Item.objects).filter(frame__user=_user),
+              'displays': (
+                  _user.qs_displays if hasattr(_user, 'qs_displays') else
+                  models.Display.objects).filter(user=_user),
+              'finishings': (
+                  _user.qs_finishings if hasattr(_user, 'qs_finishings') else
+                  models.Finishing.objects).filter(frame__user=_user),
+            })
+        return self._qs
 
 
-class BaseNestedViewSet(mixins.NestedViewSetMixin, BaseViewSet):
-    pass
-
-
-class FrameViewSet(BaseNestedViewSet):
+class FrameViewSet(BaseViewSet):
     serializer_class = FrameSerializer
     
     def get_queryset(self):
-        return self.request.user.qs_frames.filter(user=self.request.user)
+        _pk = self.kwargs.get('pk', None)
+        if _pk:
+            return self.qs().frames.filter(pk=_pk)
+        return self.qs().frames
 
 
-class FrameItemViewSet(BaseNestedViewSet):
+class FrameItemViewSet(BaseViewSet):
     serializer_class = ItemSerializer
     
     def get_queryset(self):
-        return self.request.user.qs_items.filter(frame__user=self.request.user)
+        _frame_id = self.kwargs.get('frame_id')
+        return self.qs().items.filter(frame__id=_frame_id)
 
 
-class DisplayViewSet(BaseNestedViewSet):
+class DisplayViewSet(BaseViewSet):
     serializer_class = DisplaySerializer
     
     def get_queryset(self):
-        return self.request.user.qs_displays.filter(user=self.request.user)
+        _pk = self.kwargs.get('pk', None)
+        if _pk:
+            return self.qs().displays.filter(pk=_pk)
+        return self.qs().displays
 
-    @decorators.action(detail='frame', methods=['get'])
+    @decorators.action(detail='frame/detail', methods=['get'])
     def frame(self, *args, **kwargs):
         return response.Response(FrameSerializer(self.get_object().frame).data)
 
 
-class ItemDisplayViewSet(BaseNestedViewSet):
+class ItemDisplayViewSet(BaseViewSet):
     serializer_class = ItemSerializer
     
     def get_queryset(self):
-        return self.request.user.qs_items.filter(frame__user=self.request.user)
+        _display_id = self.kwargs.get('display_id')
+        return self.qs().items.filter(frame__display__id=_display_id)
 
 
-class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
+class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
     serializer_class = RankedItemSerializer
 
     def get_queryset(self, *args, **kwargs):
-        _frames = self.request.user.qs_frames.filter(user=self.request.user)
+        _display_id = self.kwargs.get('display_id')
+        _frames = self.qs().frames.filter(display__id=_display_id)
         if len(_frames) == 0:
             raise NotFound()
         _processor = sorting.Processor(sorting.Context(_frames[0], first_ranked=random.randint(0, 4527000)))
@@ -118,11 +140,12 @@ class NextItemDisplayViewSet(BaseNestedViewSet):  # BaseDetailView
         return _result['items']
 
 
-class FinishingDisplayViewSet(BaseNestedViewSet):
+class FinishingDisplayViewSet(BaseViewSet):
     serializer_class = FinishingSerializer
     
     def get_queryset(self):
-        return self.request.user.qs_finishings.filter(frame__user=self.request.user)
+        _display_id = self.kwargs.get('display_id')
+        return self.qs().finishings.filter(frame__display__id=_display_id)
 
 
 

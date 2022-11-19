@@ -1,27 +1,19 @@
 from django.urls import path, include
-from rest_framework_extensions import routers
+from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
 from api import views
 
 
-router = routers.ExtendedDefaultRouter(trailing_slash=False)
+router = routers.DefaultRouter(trailing_slash=False)
 
-# frames
-router_frames = router.register(
-  r'frames', views.FrameViewSet, basename='frame')
-router_frames.register(
-  r'items', views.FrameItemViewSet, basename='frame_item', parents_query_lookups=['frame'])
+router.register('frames', views.FrameViewSet, 'frame')
+router.register('frames/(?P<frame_id>[0-9]+)/items', views.FrameItemViewSet, 'frame_item')
 
-# displays
-router_display = router.register(
-  r'displays', views.DisplayViewSet, basename='display')
-router_display.register(
-  r'items/all', views.ItemDisplayViewSet, basename='display_item_all', parents_query_lookups=['frame__display'])
-router_display.register(
-  r'items/next', views.NextItemDisplayViewSet, basename='display_item_next', parents_query_lookups=['display'])
-router_display.register(
-  r'finishings', views.FinishingDisplayViewSet, basename='display_finishing', parents_query_lookups=['frame__display'])
+router.register('displays', views.DisplayViewSet, 'display')
+router.register('displays/(?P<display_id>[0-9]+)/items/all', views.ItemDisplayViewSet, 'display_item_all')
+router.register('displays/(?P<display_id>[0-9]+)/items/next', views.NextItemDisplayViewSet, 'display_item_next')
+router.register('displays/(?P<display_id>[0-9]+)/finishings', views.FinishingDisplayViewSet, 'display_item_next')
 
 urlpatterns = [
     path('', include(router.urls)),
