@@ -253,5 +253,8 @@ class DeviceDashboardView(BaseFrontendView):
           'load': _frontend_device.run_capability(frontend.FrontendCapability.CPU_LOAD),
           'temp': _frontend_device.run_capability(frontend.FrontendCapability.CPU_TEMP),
         }
+        _context['network'] = {
+          'config': _frontend_device.run_capability(frontend.FrontendCapability.NET_CONFIG),
+        }
         return _context
 
