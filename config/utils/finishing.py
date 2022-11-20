@@ -85,31 +85,34 @@ class Processor:
     def get_default_finishings(self, frame):
         _lines = [  # stroke color, stroke width, offset
             ('#43c7ff', 0.010, 0.045),   # blue
-            ('#ff66c4', 0.008, 0.063),   # pink
-            ('#fcee21', 0.006, 0.077),   # yellow
-            ('#bae580', 0.004, 0.088),   # green
+            ('#ff66c4', 0.009, 0.063),   # pink
+            ('#fcee21', 0.007, 0.077),   # yellow
+            ('#bae580', 0.005, 0.088),   # green
         ]
-        _offset = "image['height']*0.1"
+        _shift = 10
+        _scale = 2
+        _shift = f"image['width']*0.01*{_shift}"
+        _offset = f"image['height']*0.01+{_shift}"
         _finishings = []
-        for _line in _lines:
-            _size = f"image['height']*{_line[2]}"
-            _width = f"{{image['width']*{_line[1]}}}"
+        for _color, _width, _pos in _lines:
+            _size = f"image['height']*{_pos}*{_scale}"
+            _width = f"{{image['width']*{_width}*{_scale}}}"
             _model = {
                 'frame': frame, 'enabled': True,
-                'color_stroke': _line[0], 'stroke_width': _width, 'color_alpha': 60,
-                'color_fill': _line[0], 'plugin': 'shape'
+                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
+                'color_fill': _color, 'plugin': 'shape'
             }
             _model_config = {
                 'shape': 'line',
-                'size_x': f"{{{_offset}+{_size}}}",
-                'size_y': f"-{{{_offset}+{_size}}}",
+                'size_x': f"{{{_offset}+{_size}+{_shift}}}",
+                'size_y': f"-{{{_offset}+{_size}+{_shift}}}",
             }
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
                 'start_x': f"-{{{_offset}/2}}",
                 'start_y': f"{{{_offset}/2+{_size}}}",
             }}))
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"{{-{_offset}/2+image['width']-{_size}}}",
+                'start_x': f"{{-{_offset}/2+image['width']-{_size}-{_shift}}}",
                 'start_y': f"{{{_offset}/2+image['height']}}",
             }}))
         return _finishings
