@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from framarama.base import forms as base
 from frontend import models
 
-class LocalSetupForm(base.BaseModelForm):
+class LocalModeSetupForm(base.BaseModelForm):
     class Meta:
         model = models.Config
         fields = ['mode', 'local_db_type', 'local_db_host', 'local_db_name', 'local_db_user', 'local_db_pass', 'cloud_display_access_key']
@@ -30,7 +30,7 @@ class LocalSetupForm(base.BaseModelForm):
                 self.add_error('local_db_pass', ValidationError('Provide password for connection'))
 
 
-class CloudSetupForm(base.BaseModelForm):
+class CloudModeSetupForm(base.BaseModelForm):
     class Meta:
         model = models.Config
         fields = ['mode', 'cloud_server', 'cloud_display_access_key']

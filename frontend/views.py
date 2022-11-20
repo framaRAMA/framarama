@@ -64,13 +64,13 @@ class LocalModeSetupView(BaseSetupView):
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         _config = _context['config']
-        _context['form'] = forms.LocalSetupForm(initial={'mode':'local'}, instance=_config)
+        _context['form'] = forms.LocalModeSetupForm(initial={'mode':'local'}, instance=_config)
         return _context
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _config = _context['config']
-        _form = forms.LocalSetupForm(request.POST, instance=_config)
+        _form = forms.LocalModeSetupForm(request.POST, instance=_config)
         if _form.is_valid():
             _config = _form.save()
             frontend.Singleton.clear()
@@ -92,13 +92,13 @@ class CloudModeSetupView(BaseSetupView):
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         _config = _context['config']
-        _context['form'] = forms.CloudSetupForm(initial={'mode':'cloud'}, instance=_config)
+        _context['form'] = forms.CloudModeSetupForm(initial={'mode':'cloud'}, instance=_config)
         return _context
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _config = _context['config']
-        _form = forms.CloudSetupForm(request.POST, instance=_config)
+        _form = forms.CloudModeSetupForm(request.POST, instance=_config)
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
