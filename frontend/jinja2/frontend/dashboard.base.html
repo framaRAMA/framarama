@@ -6,7 +6,7 @@
   {% endif %}
   {% set setup_url = url('fe_setup_local') %}
 {% else %}
-  {% set config_url = 'https://' + config.cloud_server + '/config/' %}
+  {% set config_url = config.cloud_server + '/config/' %}
   {% set setup_url = url('fe_setup_cloud') %}
 {% endif %}
 
