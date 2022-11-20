@@ -36,7 +36,7 @@ class SetupView(BaseSetupView):
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         if _context['config'] and 'edit' not in request.GET:
-            return {'_response': HttpResponseRedirect(reverse('fe_dashboard'))}
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
         return _context
 
 
@@ -77,11 +77,11 @@ class LocalSetupView(BaseSetupView):
             if _config.mode == 'local' and _config.local_db_type == 'mysql':
                 try:
                     self._update_config(vars(_config))
-                    return {'_response': HttpResponseRedirect(reverse('fe_dashboard'))}
+                    _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
                 except Exception as e:
                     _form.add_error('__all__', ValidationError('Error saving settings (' + str(e) +')'))
             else:
-                return {'_response': HttpResponseRedirect(reverse('fe_dashboard'))}
+                _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
         _context['form'] = _form
         return _context
 
@@ -102,7 +102,7 @@ class CloudSetupView(BaseSetupView):
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
-            return {'_response': HttpResponseRedirect(reverse('fe_dashboard'))}
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
         _context['form'] = _form
         return _context
 
@@ -111,7 +111,8 @@ class BaseStatusView(BaseSetupView):
 
     def _get(self, request, *args, **kwargs):
        _context = super()._get(request, *args, **kwargs)
-       return {'_response': JsonResponse(self._status(_context))}
+       _context['_response'] = JsonResponse(self._status(_context))
+       return _context
  
 
 class SetupStatusView(BaseStatusView):
@@ -194,14 +195,14 @@ class BaseFrontendView(BaseSetupView):
         _context = super()._get(request, *args, **kwargs)
         _frontend = _context['frontend']
         if not _frontend.is_initialized():
-            return {'_response': HttpResponseRedirect(reverse('fe_index'))}
+            _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend = _context['frontend']
         if not _frontend.is_initialized():
-            return {'_response': HttpResponseRedirect(reverse('fe_index'))}
+            _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
 
 
@@ -223,7 +224,8 @@ class ImageDisplayDashboardView(BaseFrontendView):
         _frontend_device = _context['frontend'].get_device()
         _files = list(_frontend_device.get_files().values())
         _file = _files[nr] if nr >= 0 and nr < len(_files) else _files[0]
-        return {'_response': HttpResponse(_file['image'], _file['json']['mime'])}
+        _context['_response'] = HttpResponse(_file['image'], _file['json']['mime'])
+        return _context
 
 
 class DeviceDashboardView(BaseFrontendView):
