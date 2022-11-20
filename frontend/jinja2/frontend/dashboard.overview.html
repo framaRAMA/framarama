@@ -41,9 +41,13 @@
         displayElement.innerHTML += ' (disabled)';
       }
       let deviceTypeElement = window.document.getElementById('spinner-device-type').parentElement;
-      deviceTypeElement.innerHTML = data.display.device_type_name;
+      deviceTypeElement.innerHTML = data.display.device_type_name
+        ? data.display.device_type_name
+        : '(not configured)';
       let deviceGeometryElement = window.document.getElementById('spinner-device-geometry').parentElement;
-      deviceGeometryElement.innerHTML = data.display.device_width + 'x' + data.display.device_height;
+      deviceGeometryElement.innerHTML = (data.display.device_width && data.display.device_height)
+        ? data.display.device_width + 'x' + data.display.device_height
+        : '(not configured)';
     }
   }
 </script>
