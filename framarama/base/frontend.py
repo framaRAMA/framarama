@@ -368,7 +368,7 @@ class FrontendCapability:
         _info = [_line.split() for _line in _info][0] if _info else None
         _gateway = _info[2] if _info and len(_info) > 1 else None
         _device = _info[4] if _info and len(_info) > 3 else None
-        _dhcp = _info[6] == 'dhcp' and len(_info) > 5 if _info else None
+        _dhcp = _info[6] == 'dhcp' if _info and len(_info) > 5 else None
 
         _info = Process.exec_run(['ip', 'a', 'show', 'dev', _device]) if _device else ''
         _info = [_line.decode().split() for _line in _info.split(b'\n')] if _info else []
