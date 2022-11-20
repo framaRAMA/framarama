@@ -4,10 +4,10 @@
   {% if 'server' in MODES %}
     {% set config_url = url('index') %}
   {% endif %}
-  {% set setup_url = url('fe_setup_local') %}
+  {% set setup_url = url('fe_setup_mode_local') %}
 {% else %}
   {% set config_url = config.cloud_server + '/config/' %}
-  {% set setup_url = url('fe_setup_cloud') %}
+  {% set setup_url = url('fe_setup_mode_cloud') %}
 {% endif %}
 
 {% block content %}

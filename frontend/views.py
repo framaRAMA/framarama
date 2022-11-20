@@ -40,8 +40,8 @@ class SetupView(BaseSetupView):
         return _context
 
 
-class LocalSetupView(BaseSetupView):
-    template_name = 'frontend/setup.local.html'
+class LocalModeSetupView(BaseSetupView):
+    template_name = 'frontend/setup.mode.local.html'
 
     def _update_config(self, config):
         _vars = config
@@ -86,8 +86,8 @@ class LocalSetupView(BaseSetupView):
         return _context
 
 
-class CloudSetupView(BaseSetupView):
-    template_name = 'frontend/setup.cloud.html'
+class CloudModeSetupView(BaseSetupView):
+    template_name = 'frontend/setup.mode.cloud.html'
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
