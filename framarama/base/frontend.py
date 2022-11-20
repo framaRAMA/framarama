@@ -355,7 +355,6 @@ class FrontendCapability:
 
     def uptime_loadavg(device, *args, **kwargs):
         _info = Process.exec_run(['uptime'])
-        print(_info)
         return float(_info.split()[-3].rstrip(b',')) if _info else None
 
     def read_thermal(device, *args, **kwargs):
