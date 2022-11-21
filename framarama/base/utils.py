@@ -100,10 +100,10 @@ class Filesystem:
     def file_rotate(path, pattern, fmt, count, extensions=[]):
         _files = Filesystem.file_match(path, pattern)
         _files.reverse()
+        _leftovers = _files[0:-count]
         _files = _files[-count:]
 
         for _i, (_name, _num, _ext) in enumerate(_files):
-            #(_num, _ext) = re.match(pattern, _name).groups()
             _new_num = len(_files)-_i+1
 
             for _ext in extensions:
@@ -111,6 +111,11 @@ class Filesystem:
                 _new_name = path + fmt.format(_new_num, _ext)
                 os.rename(_old_name, _new_name)
         
+        for _i, (_name, _num, _ext) in enumerate(_leftovers):
+            for _ext in extensions:
+                _current_name = path + fmt.format(int(_num), _ext)
+                os.unlink(_current_name)
+
         return {_ext: path + fmt.format(1, _ext) for _ext in extensions}
 
 
