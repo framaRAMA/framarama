@@ -30,9 +30,14 @@
   </li -->
   <li class="col">
     {% if config_url %}
-      <a href="{{ config_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end">{{ lib.icon('frontend.config', 'p-0 m-0') }}</a>
+      <a href="{{ config_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Open configuration">{{ lib.icon('frontend.config', 'p-0 m-0') }}</a>
     {% endif %}
-    <a href="{{ setup_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
+    {% if lib.nav_active(request, 'fe_dashboard') %}
+      <a href="{{ setup_url }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Mode settings">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
+    {% endif %}
+    {% if lib.nav_active(request, 'fe_dashboard_display') %}
+      <a href="{{ url('fe_setup_display') }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Display settings">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
+    {% endif %}
   </li>
 </ul>
 

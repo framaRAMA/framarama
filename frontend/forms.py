@@ -40,3 +40,17 @@ class CloudModeSetupForm(base.BaseModelForm):
             'cloud_display_access_key': base.charFieldWidget(),
         }
 
+
+class DisplaySetupForm(base.BaseModelForm):
+    class Meta:
+        model = models.Config
+        fields = ['count_items_keep', 'watermark_type', 'watermark_shift', 'watermark_scale']
+
+        widgets = {
+            'count_items_keep': base.charFieldWidget(),
+            'watermark_type': base.selectFieldWidget(choices=models.WATERMARKTYPE_CHOICES),
+            'watermark_shift': base.charFieldWidget(),
+            'watermark_scale': base.charFieldWidget(),
+        }
+
+

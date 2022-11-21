@@ -107,6 +107,27 @@ class CloudModeSetupView(BaseSetupView):
         return _context
 
 
+class DisplaySetupView(BaseSetupView):
+    template_name = 'frontend/setup.display.html'
+
+    def _get(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
+        _config = _context['config']
+        _context['form'] = forms.DisplaySetupForm(instance=_config)
+        return _context
+
+    def _post(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _config = _context['config']
+        _form = forms.DisplaySetupForm(request.POST, instance=_config)
+        if _form.is_valid():
+            _form.save()
+            frontend.Singleton.clear()
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+        _context['form'] = _form
+        return _context
+
+
 class BaseStatusView(BaseSetupView):
 
     def _get(self, request, *args, **kwargs):

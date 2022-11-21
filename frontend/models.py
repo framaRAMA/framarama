@@ -11,7 +11,12 @@ DBTYPE_CHOICES = [
   ('local', 'Integrated database (no database config required)'),
   ('mysql', 'MySQL/MariaDB server')
 ]
-
+WATERMARKTYPE_CHOICES = [
+  ('none', 'Do not watermark items'),
+  ('ribbon', 'Show ribbon at the corners'),
+  ('hbars', 'Draw horizontal bars (top & botton)'),
+  ('vbars', 'Draw vertical bars (left & right)'),
+]
 
 class Config(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS
@@ -53,4 +58,17 @@ class Config(BaseModel):
     count_views = models.IntegerField(
         default=0,
         verbose_name='Views', help_text='Total count of images shown on display')
+    count_items_keep = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Keep items', help_text='Amount of item to keep and show preview in frontend (default 6)')
+
+    watermark_type = models.CharField(
+        max_length=32,default='ribbon', choices=WATERMARKTYPE_CHOICES,
+        verbose_name='Watermark type', help_text='Amount of item to keep and show preview in frontend')
+    watermark_shift = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Watermark shift', help_text='Amount to move water mark away from borders (default 10)')
+    watermark_scale = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Watermark scale', help_text='Make watermark larger or smaller (default 2)')
 

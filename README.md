@@ -1,5 +1,9 @@
 # framaRAMA
 
+This project can be used to manage photo frames. It provides a configuration
+area to setup multiple frames which can then displayed on different devices
+remotely.
+
 ## Frontend
 
 * based on templates using Django with Jinja2 templates
@@ -15,7 +19,16 @@
 git clone https://some.repo/framarama.git
 ```
 
-#### Dependency setup
+#### Dependency setup server
+
+Packages:
+```
+apt-get install python3 python3-venv python3-dev
+apt-get install libmariadb3 fonts-liberation fonts-urw-base35 gsfonts fonts-freefont-ttf fonts-freefont-otf
+```
+(check fonts using `identify -list font` to know which fonts are supported)
+
+Python via pip:
 ```
 python3 -m venv venv
 . ./venv/bin/activate
@@ -46,6 +59,55 @@ finishing:
 ```
 pip install Wand
 pip install requests
+```
+
+#### Dependency setup frontend
+
+All the thing which are required for the server part are mostly also required
+by the frontend part. So first install all server requirements listed above.
+
+Addtional packages needs to be installed:
+```
+apt-get install network-manager plymouth plymouth-themes plymouth-x11 openbox feh
+```
+
+For auto startup:
+```
+cat > /lib/systemd/system/framarama.service <<EOF
+[Unit]
+Description=Start framaRAMA
+DefaultDependencies=no
+After=local-fs.target
+After=systemd-tmpfiles-setup.service
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=$USER
+Group=$GROUP
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/startx $HOME/framarama/start.sh -- -nocursor
+Environment="HOME=/tmp"
+StandardOutput=journal
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=sysinit.target
+EOF
+systemctl reload-daemon
+systemctl unmask framarama.service
+systemctl enable framarama.service
+```
+
+For boot screen:
+```
+systemctl unmask plymouth-start.service
+systemctl enable plymouth-start.service
+cat > /etc/plymouth/plymouthd.conf <<EOM
+[Daemon]
+Theme=framarama
+EOM;
 ```
 
 #### Database setup
@@ -182,6 +244,7 @@ in the server application.
 
 # Other
 
-* https://editsvgcode.com/ - SVN Editor online with preview
+* https://editsvgcode.com/ - SVG Editor online with preview
+* https://svgedit.netlify.app/editor/ - another open source SVG Editor online
 * https://favicon.io/favicon-converter/ - favicon generator online
 
