@@ -235,7 +235,10 @@ class FrontendDevice(Singleton):
             finishings.items(),
             _adapter)
         with _context:
-            _result = finishing.Processor(_context).process()
+            _config = Frontend.get().get_config().get_config()
+            _processor = finishing.Processor(_context)
+            _processor.set_watermark(_config.watermark_type, _config.watermark_scale, _config.watermark_scale)
+            _result = _processor.process()
             return FrontendItem(item, _result)
 
     def render(self, display, item):

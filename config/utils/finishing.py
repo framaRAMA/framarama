@@ -81,22 +81,32 @@ class Processor:
     def __init__(self, context):
         self._context = context
         self._instances = {}
+        self._watermark = []
+        self.set_watermark('ribbon', None, None)
 
-    def get_default_finishings(self, frame):
+    def set_watermark(self, style, shift, scale):
         _lines = [  # stroke color, stroke width, offset
             ('#43c7ff', 0.010, 0.045),   # blue
             ('#ff66c4', 0.009, 0.063),   # pink
             ('#fcee21', 0.007, 0.077),   # yellow
             ('#bae580', 0.005, 0.088),   # green
         ]
-        _shift = 10
-        _scale = 2
-        _shift = f"image['width']*0.01*{_shift}"
+        _scale = scale if scale else 2
+        _shift = shift if shift else 10
+        if style == 'ribbon':
+            self._watermark = self._watermark_ribbon(self._context.get_frame(), _lines, _shift, _scale)
+        elif style == 'hbars':
+            self._watermark = self._watermark_hbars(self._context.get_frame(), _lines, _shift, _scale)
+        elif style == 'vbars':
+            self._watermark = self._watermark_vbars(self._context.get_frame(), _lines, _shift, _scale)
+
+    def _watermark_ribbon(self, frame, lines, shift, scale):
+        _shift = f"image['width']*0.01*{shift}"
         _offset = f"image['height']*0.01+{_shift}"
         _finishings = []
-        for _color, _width, _pos in _lines:
-            _size = f"image['height']*{_pos}*{_scale}"
-            _width = f"{{image['width']*{_width}*{_scale}}}"
+        for _color, _width, _pos in lines:
+            _size = f"image['height']*{_pos}*{scale}"
+            _width = f"{{image['width']*{_width}*{scale}}}"
             _model = {
                 'frame': frame, 'enabled': True,
                 'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
@@ -114,6 +124,58 @@ class Processor:
             _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
                 'start_x': f"{{-{_offset}/2+image['width']-{_size}-{_shift}}}",
                 'start_y': f"{{{_offset}/2+image['height']}}",
+            }}))
+        return _finishings
+
+    def _watermark_hbars(self, frame, lines, shift, scale):
+        _shift = f"image['height']*0.001*{shift}"
+        _finishings = []
+        for _color, _width, _pos in lines:
+            _size = f"image['height']*{_pos}*0.8*{scale}"
+            _width = f"{{image['width']*{_width}*{scale}}}"
+            _model = {
+                'frame': frame, 'enabled': True,
+                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
+                'color_fill': _color, 'plugin': 'shape'
+            }
+            _model_config = {
+                'shape': 'line',
+                'size_x': f"{{image['width']}}",
+                'size_y': 0,
+            }
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': f"0",
+                'start_y': f"{{{_size}+{_shift}}}",
+            }}))
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': f"0",
+                'start_y': f"{{image['height']-{_size}-{_shift}}}",
+            }}))
+        return _finishings
+
+    def _watermark_vbars(self, frame, lines, shift, scale):
+        _shift = f"image['height']*0.001*{shift}"
+        _finishings = []
+        for _color, _width, _pos in lines:
+            _size = f"image['height']*{_pos}*0.8*{scale}"
+            _width = f"{{image['width']*{_width}*{scale}}}"
+            _model = {
+                'frame': frame, 'enabled': True,
+                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
+                'color_fill': _color, 'plugin': 'shape'
+            }
+            _model_config = {
+                'shape': 'line',
+                'size_x': 0,
+                'size_y': f"{{image['height']}}",
+            }
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': f"{{{_size}+{_shift}}}",
+                'start_y': f"0",
+            }}))
+            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
+                'start_x': f"{{image['width']-{_size}-{_shift}}}",
+                'start_y': f"0",
             }}))
         return _finishings
 
@@ -135,7 +197,7 @@ class Processor:
             return None
         _adapter = self._context.get_adapter()
         self._context.set_image(_adapter.image_open(_item.url))
-        for _finishing in list(self._context.get_finishings()) + self.get_default_finishings(_frame):
+        for _finishing in list(self._context.get_finishings()) + self._watermark:
             if not _finishing.enabled:
                 continue
             logger.info("Processing finishing {}".format(_finishing))
