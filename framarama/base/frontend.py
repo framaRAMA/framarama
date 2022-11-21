@@ -438,11 +438,12 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
 
     def process(self, display, item):
+        _config = Frontend.get().get_config().get_config()
         _files = Filesystem.file_rotate(
             self.FILE_PATH,
             self.FILE_PATTERN,
             self.FILE_FORMAT,
-            5,
+            _config.count_items_keep if _config.count_items_keep else 6,
             ['json', 'image'])
 
         with open(_files['json'], 'w') as f:
