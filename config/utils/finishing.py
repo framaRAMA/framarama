@@ -597,42 +597,42 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         image.destroy()
 
     def draw_line(self, image, start, end, brush):
-        _drawing = self._drawing(brush=brush)
-        _drawing.line((start.get_x(), start.get_y()), (end.get_x(), end.get_y()))
-        self._apply_drawing(image, _drawing)
+        with self._drawing(brush=brush) as _drawing:
+            _drawing.line((start.get_x(), start.get_y()), (end.get_x(), end.get_y()))
+            self._apply_drawing(image, _drawing)
 
     def draw_rect(self, image, start, end, brush, radius=None):
-        _drawing = self._drawing(brush=brush)
-        _drawing.rectangle(start.get_x(), start.get_y(), end.get_x(), end.get_y(), radius=radius)
-        self._apply_drawing(image, _drawing)
+        with self._drawing(brush=brush) as _drawing:
+            _drawing.rectangle(start.get_x(), start.get_y(), end.get_x(), end.get_y(), radius=radius)
+            self._apply_drawing(image, _drawing)
 
     def draw_circle(self, image, pos, size, brush):
-        _drawing = self._drawing(brush=brush)
-        _drawing.circle((pos.get_x(), pos.get_y()), (size.get_width(), size.get_height()))
-        self._apply_drawing(image, _drawing)
+        with self._drawing(brush=brush) as _drawing:
+          _drawing.circle((pos.get_x(), pos.get_y()), (size.get_width(), size.get_height()))
+          self._apply_drawing(image, _drawing)
 
     def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None):
-        _drawing = self._drawing(text=text, brush=brush)
-        _text = text.get_text()
-        if border_brush and border_brush.get_stroke_width() is not None:
-            _padding = int(border_padding) if border_padding else 0
-            _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
-            if text.get_alignment() == Text.ALIGN_LEFT:
-                _xoffset = 0
-            elif text.get_alignment() == Text.ALIGN_RIGHT:
-                _xoffset = -_metrics.text_width
-            elif text.get_alignment() == Text.ALIGN_CENTER:
-                _xoffset = int(-_metrics.text_width/2)
-            if border_brush.get_stroke_width() == 0:
-                border_brush = Brush(
-                    None, 0,
-                    border_brush.get_fill_color())
-            _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
-            _y1 = pos.get_y() - _padding - _metrics.text_height - _metrics.descender
-            _x2 = pos.get_x() + _padding + _metrics.text_width + _xoffset - _metrics.descender
-            _y2 = pos.get_y() + _padding - _metrics.descender
-            self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius)
-        _drawing.text(pos.get_x(), pos.get_y(), _text)
-        self._apply_drawing(image, _drawing)
+        with self._drawing(text=text, brush=brush) as _drawing:
+            _text = text.get_text()
+            if border_brush and border_brush.get_stroke_width() is not None:
+                _padding = int(border_padding) if border_padding else 0
+                _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
+                if text.get_alignment() == Text.ALIGN_LEFT:
+                    _xoffset = 0
+                elif text.get_alignment() == Text.ALIGN_RIGHT:
+                    _xoffset = -_metrics.text_width
+                elif text.get_alignment() == Text.ALIGN_CENTER:
+                    _xoffset = int(-_metrics.text_width/2)
+                if border_brush.get_stroke_width() == 0:
+                    border_brush = Brush(
+                        None, 0,
+                        border_brush.get_fill_color())
+                _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
+                _y1 = pos.get_y() - _padding - _metrics.text_height - _metrics.descender
+                _x2 = pos.get_x() + _padding + _metrics.text_width + _xoffset - _metrics.descender
+                _y2 = pos.get_y() + _padding - _metrics.descender
+                self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius)
+            _drawing.text(pos.get_x(), pos.get_y(), _text)
+            self._apply_drawing(image, _drawing)
 
 
