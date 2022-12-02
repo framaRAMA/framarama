@@ -87,9 +87,9 @@ class Processor:
     def set_watermark(self, style, shift, scale):
         _lines = [  # stroke color, stroke width, offset
             ('#43c7ff', 0.010, 0.045),   # blue
-            ('#ff66c4', 0.009, 0.063),   # pink
-            ('#fcee21', 0.007, 0.077),   # yellow
-            ('#bae580', 0.005, 0.088),   # green
+            ('#ff66c4', 0.009, 0.064),   # pink
+            ('#fcee21', 0.007, 0.079),   # yellow
+            ('#bae580', 0.005, 0.091),   # green
         ]
         _scale = scale if scale else 2
         _shift = shift if shift else 10
