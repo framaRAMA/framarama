@@ -410,6 +410,9 @@ class FrontendItem:
     def data(self):
         return self._result.get_data()
 
+    def preview(self):
+        return self._result.get_preview()
+
     def mime(self):
         return self._result.get_mime()
 
@@ -444,7 +447,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
             self.FILE_PATTERN,
             self.FILE_FORMAT,
             _config.count_items_keep if _config.count_items_keep else 6,
-            ['json', 'image'])
+            ['json', 'image', 'preview'])
 
         with open(_files['json'], 'w') as f:
             f.write(jsonpickle.encode({
@@ -456,15 +459,21 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         with open(_files['image'], 'wb') as f:
             f.write(item.data())
 
+        with open(_files['preview'], 'wb') as f:
+            f.write(item.preview())
+
     def files(self):
         _files = {}
         for (_file, _num, _ext) in Filesystem.file_match(self.FILE_PATH, self.FILE_PATTERN):
             _file_image = self.FILE_FORMAT.format(int(_num), 'image')
+            _file_preview = self.FILE_FORMAT.format(int(_num), 'preview')
             _json = open(self.FILE_PATH + '/' + _file, 'r').read()
             _image = open(self.FILE_PATH + '/' + _file_image, 'rb').read()
+            _preview = open(self.FILE_PATH + '/' + _file_preview, 'rb').read()
             _files[_file] = {
                 'json': jsonpickle.decode(_json),
-                'image': _image
+                'image': _image,
+                'preview': _preview
             }
         return _files
 

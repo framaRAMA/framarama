@@ -240,22 +240,29 @@ class Processor:
         _image_data = _adapter.image_data(_image)
         _image_meta = _adapter.image_meta(_image)
 
+        _adapter.image_resize(_image, 640, 480, True)
+        _image_preview = _adapter.image_data(_image)
+
         logger.info("Result: {}x{} pixels, {} bytes".format(
             _image_meta['width'],
             _image_meta['height'],
             len(_image_data)))
 
-        return ProcessingResult(_image_meta, _image_data)
+        return ProcessingResult(_image_meta, _image_data, _image_preview)
 
 
 class ProcessingResult:
 
-    def __init__(self, meta, image_data):
+    def __init__(self, meta, image_data, image_preview):
         self._image_data = image_data
+        self._image_preview = image_preview
         self._meta = meta
 
     def get_data(self):
         return self._image_data
+
+    def get_preview(self):
+        return self._image_preview
 
     def get_width(self):
         return self._meta['width']
