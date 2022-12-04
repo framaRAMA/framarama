@@ -275,6 +275,10 @@ class DeviceDashboardView(BaseFrontendView):
             'days': int(_uptime / 86400),
           }
         }
+        _context['disk'] = {
+          'datafree': _frontend_device.run_capability(frontend.FrontendCapability.DISK_DATA_FREE),
+          'tmpfree': _frontend_device.run_capability(frontend.FrontendCapability.DISK_TMP_FREE),
+        }
         _context['cpu'] = {
           'load': _frontend_device.run_capability(frontend.FrontendCapability.CPU_LOAD),
           'temp': _frontend_device.run_capability(frontend.FrontendCapability.CPU_TEMP),
