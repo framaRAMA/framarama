@@ -245,7 +245,10 @@ class ImageDisplayDashboardView(BaseFrontendView):
         _frontend_device = _context['frontend'].get_device()
         _files = list(_frontend_device.get_files().values())
         _file = _files[nr] if nr >= 0 and nr < len(_files) else _files[0]
-        _context['_response'] = HttpResponse(_file['image'], _file['json']['mime'])
+        if self.request.GET.get('type') == 'preview':
+            _context['_response'] = HttpResponse(_file['preview'], _file['json']['mime'])
+        else:
+            _context['_response'] = HttpResponse(_file['image'], _file['json']['mime'])
         return _context
 
 
