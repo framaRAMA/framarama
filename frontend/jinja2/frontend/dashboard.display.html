@@ -36,4 +36,8 @@
   (no items processes so far)
 {% endif %}
 
+<div class="pt-4 text-center">
+  <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if display.status %}primary{% else %}gray{% endif %} btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
+</div>
+
 {% endblock %}

@@ -236,6 +236,16 @@ class DisplayDashboardView(BaseFrontendView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _context['files'] = _frontend_device.get_files().items()
+        if self.request.GET.get('display.toggle'):
+          if _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS):
+              _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+          else:
+              _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+        _context['display'] = {
+            'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+        }
         return _context
 
 class ImageDisplayDashboardView(BaseFrontendView):
