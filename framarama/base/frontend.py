@@ -262,6 +262,9 @@ class FrontendDevice(Singleton):
                 FrontendCapability.DISK_DATA_FREE: FrontendCapability.return_none,
                 FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
                 FrontendCapability.NET_CONFIG: FrontendCapability.return_none,
+                FrontendCapability.APP_LOG: FrontendCapability.return_none,
+                FrontendCapability.APP_RESTART: FrontendCapability.return_none,
+                FrontendCapability.APP_SHUTDOWN: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
@@ -281,6 +284,11 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.DISK_TMP_FREE] = FrontendCapability.df_tmp
             if Process.exec_search('ip'):
                 self._capabilities[FrontendCapability.NET_CONFIG] = FrontendCapability.ip_netcfg
+            if Process.exec_run(['sudo', '-n', 'systemctl', 'show', 'framarama']):
+                self._capabilities[FrontendCapability.APP_LOG] = FrontendCapability.app_log_systemd
+                self._capabilities[FrontendCapability.APP_RESTART] = FrontendCapability.app_restart_systemd
+            if Process.exec_search('shutdown'):
+                self._capabilities[FrontendCapability.APP_SHUTDOWN] = FrontendCapability.app_shutdown
 
         return self._capabilities
 
@@ -302,6 +310,9 @@ class FrontendCapability:
     CPU_LOAD = 'cpu.load'
     CPU_TEMP = 'cpu.temp'
     NET_CONFIG = 'network.config'
+    APP_LOG = 'app.log'
+    APP_RESTART = 'app.restart'
+    APP_SHUTDOWN = 'app.shutdown'
 
     def noop(device, *args, **kwargs):
         return
@@ -396,6 +407,15 @@ class FrontendCapability:
             'ipv6': _ipv6,
             'mode': 'DHCP' if _dhcp else 'static'
         }
+
+    def app_log_systemd(device, *args, **kwargs):
+        return Process.exec_run(['sudo', '-n', 'systemctl', 'status', '-n', '100', 'framarama'])
+
+    def app_restart_systemd(device, *args, **kwargs):
+        return Process.exec_run(['sudo', '-n', 'systemctl', 'restart', 'framarama'])
+
+    def app_shutdown(device, *args, **kwargs):
+        return Process.exec_run(['sudo', 'shutdown', '-h', 'now'])
 
 
 class FrontendItem:

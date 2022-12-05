@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.core.files import File
 from django.core.exceptions import ValidationError
 
+from framarama.base.utils import Process
 from framarama.base.views import BaseView
 from framarama.base import frontend
 from frontend import views
@@ -238,7 +239,8 @@ class DisplayDashboardView(BaseFrontendView):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
         _context['files'] = _frontend_device.get_files().items()
-        if self.request.GET.get('action') == 'display.toggle':
+        _action = self.request.GET.get('action')
+        if _action == 'display.toggle':
           if _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS):
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
           else:
@@ -268,6 +270,14 @@ class DeviceDashboardView(BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
+        _action = self.request.GET.get('action')
+        if _action == 'device.log':
+            _lines = _frontend_device.run_capability(frontend.FrontendCapability.APP_LOG)
+            _context['log'] = _lines
+        elif _action == 'device.restart':
+            _frontend_device.run_capability(frontend.FrontendCapability.APP_RESTART)
+        elif _action == 'device.shutdown':
+            _frontend_device.run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
         _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
         _context['mem'] = {
