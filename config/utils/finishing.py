@@ -535,7 +535,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             func(_image)
 
     def image_open(self, url):
-        _image = self._wand_image.Image(blob=requests.get(url, timeout=30, stream=True).raw)
+        _image = self._wand_image.Image(blob=requests.get(url, timeout=(15, 30), stream=True).raw)
         _image.auto_orient()
         _image_container = ImageContainer()
         _image_container.add_image(_image)
