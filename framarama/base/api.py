@@ -74,7 +74,7 @@ class ApiClient(Singleton):
         _headers = {}
         _headers['Connection'] = 'close'
         _headers['X-Display'] = self._display_access_key
-        _response = requests.get(self._base_url + path, headers=_headers)
+        _response = requests.get(self._base_url + path, timeout=(15, 30), headers=_headers)
         _response.raise_for_status()
         return _response.json()
 
