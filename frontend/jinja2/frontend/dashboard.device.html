@@ -11,9 +11,9 @@
 </div>
 
 <div class="pt-4 text-center">
-  <a href="{{ url('fe_dashboard_device') }}?action=device.log" class="btn btn-white btn-floating btn-lg" title="Show log">{{ lib.icon('action.log') }}</a>
-  <a href="{{ url('fe_dashboard_device') }}?action=device.restart" class="btn btn-white btn-floating btn-lg" title="Restart application">{{ lib.icon('action.restart') }}</a>
-  <a href="{{ url('fe_dashboard_device') }}?action=device.shutdown" class="btn btn-white btn-floating btn-lg" title="Shutdown device">{{ lib.icon('action.shutdown') }}</a>
+  <a href="{{ url('fe_dashboard_device') }}?action=device.log" class="btn btn-outline-primary btn-outline btn-floating btn-lg" title="Show log">{{ lib.icon('action.log') }}</a>
+  <a href="{{ url('fe_dashboard_device') }}?action=device.restart" class="ms-2 btn btn-outline-secondary btn-floating btn-lg" title="Restart application">{{ lib.icon('action.restart') }}</a>
+  <a href="{{ url('fe_dashboard_device') }}?action=device.shutdown" class="ms-2 btn btn-outline-danger btn-floating btn-lg" title="Shutdown device">{{ lib.icon('action.shutdown') }}</a>
 </div>
 
 {% if log %}
