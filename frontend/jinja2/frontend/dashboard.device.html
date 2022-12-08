@@ -17,8 +17,9 @@
 </div>
 
 {% if log %}
+  <h6 class="pt-5">Application Log</h6>
   <div class="pt-2">
-    <pre class=".pre-scrollable">{{ log }}</pre>
+    <pre class="p-2 .pre-scrollable border rounded border-primary smaller">{{ log.decode() }}</pre>
   </div>
 {% endif %}
 
