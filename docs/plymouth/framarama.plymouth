@@ -1,0 +1,10 @@
+[Plymouth Theme]
+Name=framaRAMA
+Description=framaRAMA backround theme
+ModuleName=script
+
+[script]
+ImageDir=/data/framarama/docs/plymouth/theme/
+ScriptFile=/data/framarama/docs/plymouth/theme/framarama.script
+
+

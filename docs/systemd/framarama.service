@@ -1,0 +1,21 @@
+[Unit]
+Description=Start framaRAMA
+DefaultDependencies=no
+After=local-fs.target
+After=systemd-tmpfiles-setup.service
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=framarama
+Group=
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/startx /data/framarama/docs/systemd/start.sh -- -nocursor
+Environment="HOME=/tmp"
+StandardOutput=journal
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=sysinit.target
+
