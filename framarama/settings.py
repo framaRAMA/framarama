@@ -106,7 +106,7 @@ LOGGING = {
             'propagate': False,
         },
         'framarama': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False,
         },
