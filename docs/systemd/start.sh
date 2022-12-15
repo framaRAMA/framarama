@@ -1,11 +1,11 @@
 
 # Change to application dir, activate venv and start application
-cd "$(dirname $(realpath $0))"
+cd "$(realpath "$(dirname $(realpath $0))/../..")"
 
 # Start window manager
 openbox-session &
 
-. ./venv/bin/activate
+. ../venv/bin/activate
 while [ "1" = "1" ] ; do
 
   # Set startup background
