@@ -517,7 +517,6 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 break
 
     def update_feh(self, display, item):
-        _background = VisualizeFrontendRenderer.COMMON_PATH + '/background.png'
         _file_list = VisualizeFrontendRenderer.DATA_PATH + '/framarama-current.csv'
         if Process.exec_running('feh') is None:
             Process.exec_bg([
@@ -527,7 +526,7 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 '--stretch',
                 '--auto-rotate',
                 '--scale-down',
-                '-bg-fill', _background,
+                '-bg-trans',
                 '-f', _file_list,
                 '--reload', '10'
             ])
