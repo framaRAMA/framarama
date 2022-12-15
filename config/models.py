@@ -85,7 +85,7 @@ class Source(BaseModel):
         max_length=32, blank=True,
         verbose_name='Date', help_text='Which field to map to item\'s creation date')
     map_item_meta = models.TextField(
-        default="",
+        default="", blank=True,
         verbose_name='Additional fields', help_text='When more fields should be mapped add them line by line (format: "&lt;target-name&gt;=&lt;source-name&gt;\\n")')
     update_count = models.IntegerField(
         default=0,
