@@ -3,8 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.core.files import File
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
-from framarama.base.utils import Process
 from framarama.base.views import BaseView
 from framarama.base import frontend
 from frontend import views
@@ -216,6 +216,7 @@ class BaseFrontendView(BaseSetupView):
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         _frontend = _context['frontend']
+        _context['now'] = timezone.now()
         if not _frontend.is_initialized():
             _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
@@ -223,6 +224,7 @@ class BaseFrontendView(BaseSetupView):
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend = _context['frontend']
+        _context['now'] = timezone.now()
         if not _frontend.is_initialized():
             _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
