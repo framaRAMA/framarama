@@ -1,0 +1,13 @@
+{% extends "frontend/base.setup.html" %}
+
+{% block content_setup %}
+<div class="tab-content" id="ex1-content">
+  <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel" aria-labelledby="ex1-tab-1">
+    {{ lib.note('Configure system settings', 'info') }}
+
+    {{ lib.form_start(form, csrf_input) }}
+    {{ lib.form_fields(form) }}
+    {{ lib.form_end(form, submit_title='Apply', cancel_title='Back', cancel=url('fe_dashboard_device')) }}
+  </div>
+</div>
+{% endblock %}

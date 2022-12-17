@@ -1,0 +1,16 @@
+{% extends "frontend/system.base.html" %}
+
+{% block content_system %}
+
+<div class="pt-4">
+When connecting an USB keyboard the following key combination can
+be used to control the device.
+</div>
+
+<h6 class="pt-4 border-bottom">Key strokes</h6>
+{{ lib.field_text('CRTL-A', 'Switch Access Point and Client mode') }}
+{{ lib.field_text('CRTL-S', 'Shutdown device') }}
+{{ lib.field_text('CRTL-R', 'Restart device') }}
+
+{% endblock %}
+

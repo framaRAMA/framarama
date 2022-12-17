@@ -11,6 +11,9 @@ urlpatterns = [
     path('dashboard/device', views.DeviceDashboardView.as_view(), name='fe_dashboard_device'),
     path('dashboard/display', views.DisplayDashboardView.as_view(), name='fe_dashboard_display'),
     path('dashboard/display/image/<int:nr>', views.ImageDisplayDashboardView.as_view(), name='fe_dashboard_display_item'),
+    path('system/help', views.HelpSystemView.as_view(), name='fe_system_help'),
+    path('system/usb', views.UsbSystemView.as_view(), name='fe_system_usb'),
+    path('system/label', views.LabelSystemView.as_view(), name='fe_system_label'),
 
     path('status/setup', views.SetupStatusView.as_view(), name='fe_status_setup'),
     path('status/database', views.DatabaseStatusView.as_view(), name='fe_status_database'),

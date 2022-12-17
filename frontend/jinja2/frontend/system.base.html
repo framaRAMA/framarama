@@ -1,0 +1,25 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+
+<div class="pt-2">
+The device is running framaRAMA - show memories the smart way.
+More details at <a href="https://framarama.org/">https://framarama.org/</a>.
+</div>
+
+<ul class="nav nav-tabs pt-2">
+  <li class="nav-item">
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_system_help') }}" href="{{ url('fe_system_help') }}">{{ lib.icon('frontend.system.help') }}<span class="d-none d-lg-inline"></span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link p-3{{ lib.nav_active(request, 'fe_system_usb') }}" href="{{ url('fe_system_usb') }}">{{ lib.icon('frontend.system.usb') }}<span class="d-none d-lg-inline"></span></a>
+  </li>
+  <li class="col">
+    <a href="{{ url('fe_dashboard') }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Show frontend">{{ lib.icon('frontend', 'p-0 m-0') }}</a>
+  </li>
+</ul>
+
+{% block content_system %}
+{% endblock %}
+
+{% endblock %}

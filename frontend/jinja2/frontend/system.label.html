@@ -1,0 +1,24 @@
+{% extends "frontend/system.base.html" %}
+
+{% block content %}
+
+<div class="pt-2">
+The device is running framaRAMA - show memories the smart way.
+More details at <a href="https://framarama.org/">https://framarama.org/</a>.
+</div>
+
+<div class="pt-4">
+Power up the device by using a supply which delivers 12V with min.
+2.5A (30W).
+</div>
+
+<div class="pt-4">
+Controlling the device using a keyboard on the USB connector:
+</div>
+{{ lib.field_text('CRTL-A', 'Switch Access Point and Client mode') }}
+{{ lib.field_text('CRTL-R', 'Reboot device') }}
+{{ lib.field_text('CRTL-S', 'Shutdown device') }}
+{{ lib.field_text('CRTL-C', 'Switch to console setup') }}
+{{ lib.field_text('CRTL-D', 'Switch to display mode') }}
+
+{% endblock %}

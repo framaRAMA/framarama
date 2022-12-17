@@ -319,3 +319,16 @@ class DeviceDashboardView(BaseFrontendView):
         }
         return _context
 
+
+class HelpSystemView(BaseFrontendView):
+    template_name = 'frontend/system.help.html'
+
+
+class UsbSystemView(BaseFrontendView):
+    template_name = 'frontend/system.usb.html'
+
+
+class LabelSystemView(BaseFrontendView):
+    template_name = 'frontend/system.label.html'
+
+
