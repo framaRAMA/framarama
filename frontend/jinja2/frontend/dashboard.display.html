@@ -4,6 +4,9 @@
 
 <div class="pt-2">
   {{ lib.field_text('System startup', config.date_app_startup) }}
+  {% if display.size %}
+    {{ lib.field_text('Display size', '%dx%d'|format(display.size[0], display.size[1])) }}
+  {% endif %}
   {{ lib.field_text('Items', '%d shown, total %d items'|format(config.count_views, config.count_items)) }}
   {{ lib.field_text('Items update', config.date_items_update) }}
 </div>

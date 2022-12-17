@@ -246,7 +246,8 @@ class DisplayDashboardView(BaseFrontendView):
           else:
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
         _context['display'] = {
-            'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+            'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
+            'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
         }
         return _context
 

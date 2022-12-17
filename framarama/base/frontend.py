@@ -254,6 +254,7 @@ class FrontendDevice(Singleton):
                 FrontendCapability.DISPLAY_ON: FrontendCapability.noop,
                 FrontendCapability.DISPLAY_OFF: FrontendCapability.noop,
                 FrontendCapability.DISPLAY_STATUS: FrontendCapability.return_true,
+                FrontendCapability.DISPLAY_SIZE: FrontendCapability.return_none,
                 FrontendCapability.MEM_TOTAL: FrontendCapability.return_none,
                 FrontendCapability.MEM_FREE: FrontendCapability.return_none,
                 FrontendCapability.SYS_UPTIME: FrontendCapability.return_none,
@@ -270,6 +271,8 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
                 self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.vcgencmd_display_off
                 self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.vcgencmd_display_status
+            if Process.exec_search('xrandr'):
+                self._capabilities[FrontendCapability.DISPLAY_SIZE] = FrontendCapability.xrandr_display_size
             if Filesystem.file_exists('/proc/meminfo'):
                 self._capabilities[FrontendCapability.MEM_TOTAL] = FrontendCapability.read_meminfo_total
                 self._capabilities[FrontendCapability.MEM_FREE] = FrontendCapability.read_meminfo_free
@@ -302,6 +305,7 @@ class FrontendCapability:
     DISPLAY_OFF = 'display.off'
     DISPLAY_ON = 'display.on'
     DISPLAY_STATUS = 'display.status'
+    DISPLAY_SIZE = 'display.size'
     MEM_TOTAL = 'memory.total'
     MEM_FREE = 'memory.free'
     DISK_DATA_FREE = 'disk.data.free'
@@ -334,6 +338,16 @@ class FrontendCapability:
 
     def vcgencmd_display_status(device, *args, **kwargs):
         return Process.exec_run(['vcgencmd', 'display_power']) == b'display_power=1\n'
+
+    def xrandr_display_size(device, *args, **kwargs):
+        _xrandr = Process.exec_run(['xrandr'])
+        if _xrandr:
+            # Screen 0: minimum 320 x 200, current 1920 x 1080, maximum 16384 x 16384
+            for _resolution in _xrandr.split(b'\n')[0].split(b','):
+                if b'current' in _resolution:
+                    _values = _resolution.strip().split(b' ')
+                    return (int(_values[1]), int(_values[3]))
+        return None
 
     def _read_meminfo(fields=None):
         _lines = Filesystem.file_read('/proc/meminfo')
