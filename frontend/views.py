@@ -231,6 +231,14 @@ class BaseFrontendView(BaseSetupView):
 class OverviewDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.overview.html'
 
+    def _get(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _context['app'] = {
+            'revision': _frontend_device.run_capability(frontend.FrontendCapability.APP_REVISION),
+        }
+        return _context
+
 
 class DisplayDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.display.html'

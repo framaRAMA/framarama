@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.core import management
-from django.utils import timezone
+from django.utils import timezone, dateparse
 from django.contrib.auth.models import User
 
 from frontend import models
@@ -266,6 +266,7 @@ class FrontendDevice(Singleton):
                 FrontendCapability.APP_LOG: FrontendCapability.return_none,
                 FrontendCapability.APP_RESTART: FrontendCapability.return_none,
                 FrontendCapability.APP_SHUTDOWN: FrontendCapability.return_none,
+                FrontendCapability.APP_REVISION: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
@@ -292,6 +293,8 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.APP_RESTART] = FrontendCapability.app_restart_systemd
             if Process.exec_search('shutdown'):
                 self._capabilities[FrontendCapability.APP_SHUTDOWN] = FrontendCapability.app_shutdown
+            if Process.exec_search('git'):
+                self._capabilities[FrontendCapability.APP_REVISION] = FrontendCapability.app_revision
 
         return self._capabilities
 
@@ -317,6 +320,7 @@ class FrontendCapability:
     APP_LOG = 'app.log'
     APP_RESTART = 'app.restart'
     APP_SHUTDOWN = 'app.shutdown'
+    APP_REVISION = 'app.revision'
 
     def noop(device, *args, **kwargs):
         return
@@ -430,6 +434,14 @@ class FrontendCapability:
 
     def app_shutdown(device, *args, **kwargs):
         return Process.exec_run(['sudo', 'shutdown', '-h', 'now'])
+
+    def app_revision(device, *args, **kwargs):
+        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %ai %s'])
+        # de4a83b 2022-12-17T11:14:06+01:00 Implement frontend capability to retrieve display size (using xrandr)
+        if _log:
+            _values = _log.split(b' ')
+            return {'hash': _values[0].decode(), 'date': dateparse.parse_datetime(_values[1].decode()), 'comment': _values[2].decode()}
+        return None
 
 
 class FrontendItem:

@@ -27,6 +27,9 @@
       {{ lib.field_text('Display', '(no key configured)') }}
     {% endif %}
   </div>
+  {% if app.revision %}
+      {{ lib.field_text('Version', '%s (%s)'|format(app.revision.date, app.revision.hash)) }}
+  {% endif %}
 </div>
 
 {{ lib.status_script('database') }}
