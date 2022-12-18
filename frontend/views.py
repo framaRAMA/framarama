@@ -18,6 +18,7 @@ class BaseSetupView(BaseView):
         _context = super()._get(request, *args, **kwargs)
         _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
+        _context['now'] = timezone.now()
         _context['frontend'] = _frontend
         _context['config'] = _config.get_config() if _frontend.is_configured() else None
         return _context
@@ -26,6 +27,7 @@ class BaseSetupView(BaseView):
         _context = super()._post(request, *args, **kwargs)
         _frontend = frontend.Frontend.get()
         _config = _frontend.get_config()
+        _context['now'] = timezone.now()
         _context['frontend'] = _frontend
         _context['config'] = _config.get_config() if _frontend.is_configured() else None
         return _context
@@ -216,7 +218,6 @@ class BaseFrontendView(BaseSetupView):
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         _frontend = _context['frontend']
-        _context['now'] = timezone.now()
         if not _frontend.is_initialized():
             _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
@@ -224,7 +225,6 @@ class BaseFrontendView(BaseSetupView):
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend = _context['frontend']
-        _context['now'] = timezone.now()
         if not _frontend.is_initialized():
             _context['_response'] = HttpResponseRedirect(reverse('fe_index'))
         return _context
