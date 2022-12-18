@@ -6,7 +6,7 @@ cd "$(realpath "$(dirname $(realpath $0))/../..")"
 openbox-session &
 
 # Disable energy features to avoid black screens
-[ `which xset` ] && xset -dpms
+[ `which xset` ] && ( xset -dpms ; xset s off )
 
 . ../venv/bin/activate
 while [ "1" = "1" ] ; do
