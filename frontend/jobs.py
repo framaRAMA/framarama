@@ -57,20 +57,25 @@ class Jobs():
     def next_item(self):
         if self._display is None:
             return
+        _now = timezone.now()
         _device = frontend.Frontend.get().get_device()
-        _time_on_reached = self._display.time_on_reached(timezone.now())
-        _time_off_reached = self._display.time_off_reached(timezone.now())
+        _time_on_reached = self._display.time_on_reached(_now)
+        _time_off_reached = self._display.time_off_reached(_now)
+        _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
         if _time_on_reached or _time_off_reached:
-            _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
             if _time_off_reached:
                 if _display_on:
                     logger.info("Switch display off at {}".format(self._display.get_time_off()))
                     _device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+                    _display_on = False
             elif _time_on_reached:
                 if not _display_on:
                     logger.info("Switch display on at {}".format(self._display.get_time_on()))
                     _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
-        if self._display.time_change_reached(self._last_update):
+                    _display_on = True
+        if not _display_on:
+            logger.info("Skipping next item, display is off.")
+        elif self._display.time_change_reached(self._last_update):
             _last_update = self._last_update
             try:
                 self._last_update = timezone.now()
