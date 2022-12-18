@@ -182,7 +182,8 @@ class Display(Singleton):
         return False
 
     def get_time_change(self):
-        return self._time_delta(self._data.get('time_change', '00:05:00'))
+        _time_change = self._data.get('time_change')
+        return self._time_delta(_time_change if _time_change else '00:05:00')
 
     def time_change_reached(self, last_update):
         _now = timezone.now()
