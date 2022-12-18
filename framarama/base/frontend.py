@@ -273,6 +273,10 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
                 self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.vcgencmd_display_off
                 self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.vcgencmd_display_status
+            elif Process.exec_search('xrandr'):
+                self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.xrandr_display_on
+                self._capabilities[FrontendCapability.DISPLAY_OFF] = FrontendCapability.xrandr_display_off
+                self._capabilities[FrontendCapability.DISPLAY_STATUS] = FrontendCapability.xrandr_display_status
             if Process.exec_search('xrandr'):
                 self._capabilities[FrontendCapability.DISPLAY_SIZE] = FrontendCapability.xrandr_display_size
             if Filesystem.file_exists('/proc/meminfo'):
@@ -343,6 +347,36 @@ class FrontendCapability:
 
     def vcgencmd_display_status(device, *args, **kwargs):
         return Process.exec_run(['vcgencmd', 'display_power']) == b'display_power=1\n'
+
+    def _xrandr_display_name():
+        _name = None
+        _status = True
+        _xrandr = Process.exec_run(['xrandr'])
+        if _xrandr:
+            _lines = _xrandr.split(b'\n')
+            # HDMI-1 connected primary 1280x800+0+0 (normal left inverted right x axis y axis) 337mm x 270mm
+            _connected = [_line for _line in _lines if b'connected' in _line]
+            if len(_connected):
+                _name = _connected[0].split(b' ')[0]
+            #    1280x800      59.81*+
+            _size = [_line for _line in _lines if b'x' in _line and b'.' in _line]
+            if len(_size):
+                _status = len([_line for _line in _size if b'*' in _line]) > 0
+        return (_name, _status)
+
+    def xrandr_display_on(device, *args, **kwargs):
+        (_name, _status) = FrontendCapability._xrandr_display_name()
+        if _name:
+            Process.exec_run(['xrandr', '--output', _name, '--auto'])
+
+    def xrandr_display_off(device, *args, **kwargs):
+        (_name, _status) = FrontendCapability._xrandr_display_name()
+        if _name:
+            Process.exec_run(['xrandr', '--output', _name, '--off'])
+
+    def xrandr_display_status(device, *args, **kwargs):
+        (_name, _status) = FrontendCapability._xrandr_display_name()
+        return _status
 
     def xrandr_display_size(device, *args, **kwargs):
         _xrandr = Process.exec_run(['xrandr'])
