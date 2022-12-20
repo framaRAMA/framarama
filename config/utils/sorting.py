@@ -1,4 +1,5 @@
 import re
+import random
 
 from django.db import models as Model
 from django.db.models import functions as Function
@@ -8,16 +9,16 @@ from config.plugins import SortingPluginRegistry
 
 class Context:
 
-    def __init__(self, frame, first_ranked=None):
+    def __init__(self, frame, random_item=False):
         self._frame = frame
-        self._first_ranked = first_ranked
+        self._random_item = random_item
         self._data = {'Item': self._frame.items.order_by(), 'Model': Model, 'Function': Function}
     
     def get_frame(self):
         return self._frame
 
-    def get_first_ranked(self):
-        return self._first_ranked
+    def get_random_item(self):
+        return self._random_item
     
     def get_data(self):
         return self._data
@@ -76,15 +77,17 @@ Item = models.Item.objects
 
         _items = self._context.get_frame().items
         try:
+            _query = (
+                "SELECT i.*, rank FROM config_item i, ("
+                "  SELECT id, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.id"
+                ") AS result WHERE result.id=i.id" )
             _where = ""
             _limit = ""
-            if self._context.get_first_ranked():
-                _where = " AND result.rank < " + str(self._context.get_first_ranked())
+            if self._context.get_random_item():
+                _rank_max = _items.raw(_query + _where + " ORDER BY result.rank DESC LIMIT 1")[0].rank
+                _where = " AND result.rank < " + str(random.randint(0, _rank_max))
                 _limit = " LIMIT 1"
-            _items = _items.raw(
-                "SELECT i.*, rank FROM config_item i, ("\
-                "  SELECT id, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.id"\
-                ") AS result WHERE result.id=i.id " + _where + " ORDER BY result.rank DESC" + _limit)
+            _items = _items.raw(_query + _where + " ORDER BY result.rank DESC" + _limit)
         except Exception as e:
             _items = _items.order_by('id').annotate(rank=Model.F('id'))
             _result['errors']['list'] = e

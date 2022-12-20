@@ -1,4 +1,3 @@
-import random
 
 from django.shortcuts import render
 from rest_framework import generics, viewsets, permissions, serializers, decorators, response
@@ -135,7 +134,7 @@ class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
         _frames = self.qs().frames.filter(display__id=_display_id)
         if len(_frames) == 0:
             raise NotFound()
-        _processor = sorting.Processor(sorting.Context(_frames[0], first_ranked=random.randint(0, 4527000)))
+        _processor = sorting.Processor(sorting.Context(_frames[0], random_item=True))
         _result = _processor.process()
         return _result['items']
 
