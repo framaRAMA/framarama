@@ -43,6 +43,7 @@ from django.db import models as Model
 from config import models
 Item = models.Item.objects
         '''
+        _result = {'errors':{}}
         _queries = []
         _data = self._context.get_data()
         for _sorting in self._context.get_frame().sortings.all():
@@ -58,7 +59,7 @@ Item = models.Item.objects
                 _code = _code + ".values('id', 'rank')"
                 _queries.append(eval(_code, _data))
             except Exception as e:
-                _context['errors']['sorting{}'.format(_sorting.id)] = e
+                _result['errors']['sorting{}'.format(_sorting.id)] = e
 
         if len(_queries) == 0:
             _query = _data['Item'].order_by('id').annotate(rank=Model.F('id'))
@@ -73,7 +74,6 @@ Item = models.Item.objects
         (_query_stmt, _query_params) = _query.query.get_compiler('config').as_sql()
         _query_sql = _query_stmt % _query_params
 
-        _result = {}
         _items = self._context.get_frame().items
         try:
             _where = ""
@@ -87,7 +87,7 @@ Item = models.Item.objects
                 ") AS result WHERE result.id=i.id " + _where + " ORDER BY result.rank DESC" + _limit)
         except Exception as e:
             _items = _items.order_by('id').annotate(rank=Model.F('id'))
-            _context['errors']['list'] = e
+            _result['errors']['list'] = e
 
         _result['items'] = _items
 
