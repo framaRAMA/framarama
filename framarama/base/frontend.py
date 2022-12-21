@@ -1,4 +1,8 @@
+import os
 import io
+import time
+import fcntl
+import threading
 import datetime
 import jsonpickle
 import ipaddress
@@ -210,6 +214,7 @@ class FrontendDevice(Singleton):
 
     def __init__(self):
         super().__init__()
+        self._monitor = FrontendMonitoring()
         self._renderer_filesystem = FilesystemFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
@@ -217,6 +222,9 @@ class FrontendDevice(Singleton):
             VisualizeFrontendRenderer(),
         ]
         self._capabilities = None
+
+    def monitor(self):
+        return self._monitor
 
     def finish(self, display, item, finishings):
         _mem_total = self.run_capability(FrontendCapability.MEM_TOTAL)
@@ -307,6 +315,74 @@ class FrontendDevice(Singleton):
         _capabilities = self.get_capabilities()
         if capability in _capabilities:
             return _capabilities[capability](self, *args, **kwargs)
+
+
+class FrontendMonitoring(threading.Thread):
+
+    def __init__(self):
+        super().__init__()
+        self._xinput = None
+        self._running = False
+        self._key_events = []
+
+    def _verify_running(self):
+        _pid = Process.exec_running('xinput')
+        if _pid != None and self._xinput is None:
+            Process.terminate(_pid)
+        elif _pid is None and self._xinput != None:
+            self._xinput.wait()
+        elif self._xinput != None:
+            return
+        self._keymap = [_line.split() for _line in Process.exec_run(['xmodmap', '-pke']).split(b'\n')]
+        self._keymap = {_map[1].decode(): _map[3].decode() for _map in self._keymap if len(_map)>3}
+        self._xinput = Process.exec_bg(['xinput', 'test-xi2', '--root'], text=True, bufsize=1)
+        self._xinput_keys = []
+        fcntl.fcntl(self._xinput.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
+
+    def register_key_event(self, keys, method):
+        self._key_events.append([set(keys), method])
+
+    def start(self):
+        self._running = True
+        self._verify_running()
+        super().start()
+
+    def stop(self):
+        self._running = False
+        if self._xinput:
+            self._xinput.terminate()
+            try:
+                self._xinput.wait(timeout=2)
+            except:
+                self._xinput.kill()
+        super().stop()
+
+    def run(self):
+        _type = 'UNKNOWN'
+        while self._running:
+            time.sleep(0.01)
+            for _parts in [_line.split() for _line in self._xinput.stdout.readlines()]:
+                if len(_parts) == 0:
+                    continue
+                if _parts[0] == 'EVENT':
+                    if _parts[3] in ['(KeyPress)', '(KeyRelease)']:
+                        _type = _parts[3][1:-1]
+                    else:
+                        _type = 'UNKNOWN'
+                elif _type == 'UNKNOWN':
+                    pass
+                elif _parts[0] != 'detail:':
+                    pass
+                elif _parts[1] in self._keymap:
+                    _key = self._keymap[_parts[1]]
+                    logger.info("Key event {} {} = {}".format(_type, _parts[1], _key))
+                    if _type == 'KeyPress':
+                        self._xinput_keys.append(_key)
+                    elif _type == 'KeyRelease':
+                        self._xinput_keys.remove(_key)
+                    _current = set(self._xinput_keys)
+                    for _keys, _method in [_event for _event in self._key_events if _event[0] == _current]:
+                        _method()
 
 
 class FrontendCapability:
