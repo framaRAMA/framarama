@@ -524,7 +524,7 @@
           {% endfor %}
         </tr>
       {% endfor %}
-      {% if items.paginator.count == 0 %}
+      {% if ('paginator' in items and items.paginator.count == 0) or (items|length == 0) %}
         <tr><td colspan="{{ columns|length }}">No items in this list</td></tr>
       {% endif %}
     </tbody>
