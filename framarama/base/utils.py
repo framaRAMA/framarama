@@ -3,6 +3,7 @@ import re
 import time
 import subprocess
 import threading
+import signal
 import logging
 
 from frontend import models
@@ -141,5 +142,16 @@ class Process:
     @staticmethod
     def exec_running(executable):
         return Process.exec_run(['pidof', executable])
+
+    @staticmethod
+    def terminate(pid, timeout=5):
+        os.kill(pid, signal.SIGTERM)
+        while timeout > 0:
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except OSError:
+                return True
+            timeout = timeout - 1
+        return False
 
 
