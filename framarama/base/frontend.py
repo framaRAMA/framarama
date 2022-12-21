@@ -378,7 +378,7 @@ class FrontendMonitoring(threading.Thread):
                     logger.info("Key event {} {} = {}".format(_type, _parts[1], _key))
                     if _type == 'KeyPress':
                         self._xinput_keys.append(_key)
-                    elif _type == 'KeyRelease':
+                    elif _type == 'KeyRelease' and _key in self._xinput_keys:
                         self._xinput_keys.remove(_key)
                     _current = set(self._xinput_keys)
                     for _keys, _method in [_event for _event in self._key_events if _event[0] == _current]:
