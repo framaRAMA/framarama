@@ -21,10 +21,18 @@ class Jobs():
         self._startup = None
         self._last_update = None
         self._scheduler = scheduler
+        self._monitor = None
         if 'frontend' in settings.FRAMARAMA['MODES']:
             self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
+            self._monitor = frontend.Frontend.get().get_device().monitor()
+            self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
+            self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
+            self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
+            self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
 
     def _setup_start(self):
+        if self._monitor:
+            self._monitor.stop()
         if self._startup is None:
             self._startup = timezone.now()
             _config = frontend.Frontend.get().get_config()
@@ -35,12 +43,22 @@ class Jobs():
                 self._scheduler.remove(_job_name)
     
     def _setup_completed(self):
+        if self._monitor:
+            self._monitor.start()
         if not self._scheduler.get('fe_refresh_items'):
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
         if not self._scheduler.get('fe_next_item'):
             self._scheduler.add(self.next_item, 'interval', minutes=1, id='fe_next_item', name='Frontend next item')
         self.refresh_items()
         self.next_item()
+
+    def key_restart(self):
+        logger.info("Restart application!")
+        frontend.Frontend.get().get_device().run_capability(frontend.FrontendCapability.APP_RESTART)
+
+    def key_shutdown(self):
+        logger.info("Shutdown device!")
+        frontend.Frontend.get().get_device().run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
 
     def refresh_items(self):
         _display = frontend.Frontend.get().get_display()
