@@ -132,8 +132,8 @@ class Process:
         return None
 
     @staticmethod
-    def exec_bg(args):
-        return subprocess.Popen(args)
+    def exec_bg(args, **kwargs):
+        return subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, **kwargs)
 
     @staticmethod
     def exec_search(executable):
