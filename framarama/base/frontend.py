@@ -215,6 +215,7 @@ class FrontendDevice(Singleton):
     def __init__(self):
         super().__init__()
         self._monitor = FrontendMonitoring()
+        self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None}
         self._renderer_filesystem = FilesystemFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
@@ -257,6 +258,47 @@ class FrontendDevice(Singleton):
     def get_files(self):
         return self._renderer_filesystem.files()
 
+    def network_connect(self, name):
+        self.run_capability(FrontendCapability.NET_PROFILE_CONNECT, name=name)
+        self._network['started'] = None
+        self._network['connected'] = None
+        self._network['previous'] = self._network['profile']
+        self._network['profile'] = name
+
+    def network_status(self, name):
+        self._network_status
+
+    def network_ap_toggle(self):
+        self._run_capability(FrontendCapability.NET_TOGGLE_AP)
+
+    def network_verify(self):
+        if self._network['connected']:
+            return True
+        if self._network['started'] is None:
+            self._network['started'] = timezone.now()
+            logger.info("Checking network connectivity ...")
+        _wifi_list = self.run_capability(FrontendCapability.NET_WIFI_LIST)
+        _wifi_list = [_network for _network in _wifi_list if _wifi_list[_network]['active']]
+        if len(_wifi_list) == 0:
+            if timezone.now() - self._network['started'] > datetime.timedelta(seconds=30):
+                _previous = self._network['previous']
+                if _previous is None:
+                    logger.info("Not connected within 30 seconds and no previous network available - starting access point")
+                    self.network_ap_toggle()
+                    self._network['connected'] = timezone.now()
+                else:
+                    logger.info("Not connected within 30 seconds - try to connect previous network {}".format(_previous))
+                    self._network['profile'] = None
+                    self.network_connect(_previous)
+            else:
+                logger.info("Not connected!")
+        else:
+            self._network['connected'] = timezone.now()
+            self._network['profile'] = _wifi_list[0]
+            logger.info("Connected to {}".format(self._network['profile']))
+            return True
+        return False
+
     def get_capabilities(self):
         if self._capabilities is None:
             self._capabilities = {
@@ -272,6 +314,11 @@ class FrontendDevice(Singleton):
                 FrontendCapability.DISK_DATA_FREE: FrontendCapability.return_none,
                 FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
                 FrontendCapability.NET_CONFIG: FrontendCapability.return_none,
+                FrontendCapability.NET_TOGGLE_AP: FrontendCapability.return_none,
+                FrontendCapability.NET_WIFI_LIST: FrontendCapability.return_list,
+                FrontendCapability.NET_PROFILE_LIST: FrontendCapability.return_list,
+                FrontendCapability.NET_PROFILE_SAVE: FrontendCapability.return_none,
+                FrontendCapability.NET_PROFILE_DELETE: FrontendCapability.return_none,
                 FrontendCapability.APP_LOG: FrontendCapability.return_none,
                 FrontendCapability.APP_RESTART: FrontendCapability.return_none,
                 FrontendCapability.APP_SHUTDOWN: FrontendCapability.return_none,
@@ -301,6 +348,13 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.DISK_TMP_FREE] = FrontendCapability.df_tmp
             if Process.exec_search('ip'):
                 self._capabilities[FrontendCapability.NET_CONFIG] = FrontendCapability.ip_netcfg
+            if Process.exec_search('nmcli'):
+                self._capabilities[FrontendCapability.NET_TOGGLE_AP] = FrontendCapability.nmcli_toggle_ap
+                self._capabilities[FrontendCapability.NET_WIFI_LIST] = FrontendCapability.nmcli_wifi_list
+                self._capabilities[FrontendCapability.NET_PROFILE_LIST] = FrontendCapability.nmcli_profile_list
+                self._capabilities[FrontendCapability.NET_PROFILE_SAVE] = FrontendCapability.nmcli_profile_save
+                self._capabilities[FrontendCapability.NET_PROFILE_DELETE] = FrontendCapability.nmcli_profile_delete
+                self._capabilities[FrontendCapability.NET_PROFILE_CONNECT] = FrontendCapability.nmcli_profile_connect
             if Process.exec_run(['sudo', '-n', 'systemctl', 'show', 'framarama']):
                 self._capabilities[FrontendCapability.APP_LOG] = FrontendCapability.app_log_systemd
                 self._capabilities[FrontendCapability.APP_RESTART] = FrontendCapability.app_restart_systemd
@@ -398,6 +452,12 @@ class FrontendCapability:
     CPU_LOAD = 'cpu.load'
     CPU_TEMP = 'cpu.temp'
     NET_CONFIG = 'network.config'
+    NET_TOGGLE_AP = 'network.toggle.ap'
+    NET_WIFI_LIST = 'network.wifi.list'
+    NET_PROFILE_LIST = 'network.profile.list'
+    NET_PROFILE_SAVE = 'network.profile.save'
+    NET_PROFILE_DELETE = 'network.profile.delete'
+    NET_PROFILE_CONNECT = 'network.profile.connect'
     APP_LOG = 'app.log'
     APP_RESTART = 'app.restart'
     APP_SHUTDOWN = 'app.shutdown'
@@ -414,6 +474,9 @@ class FrontendCapability:
 
     def return_none(device, *args, **kwargs):
         return None
+
+    def return_list(device, *args, **kwargs):
+        return []
 
     def vcgencmd_display_on(device, *args, **kwargs):
         Process.exec_run(['vcgencmd', 'display_power', '1'])
@@ -536,6 +599,109 @@ class FrontendCapability:
             'ipv6': _ipv6,
             'mode': 'DHCP' if _dhcp else 'static'
         }
+
+    def nmcli_profile_list(device, *args, **kwargs):
+        _profiles = {}
+        # NAME       UUID                                  TYPE  DEVICE
+        # NetName1   93dba0ab-4cd6-4c0f-b790-2c5689f8686b  wifi  wlan0
+        # NetName2   909c4d81-4211-4810-9f98-32f74f43906a  wifi  --
+        _profile_list = Process.exec_run(['nmcli', 'connection', 'show'])
+        if _profile_list:
+            _profile_list = _profile_list.decode().split('\n')
+            _columns = _profile_list.pop(0).lower().split()
+            for _parts in [_line.split() for _line in _profile_list]:
+                if len(_parts) == 0:
+                    continue
+                _i = 0
+                _profile = {}
+                for _column in _columns:
+                    _profile[_column] = _parts[_i]
+                    _i = _i + 1
+                _profiles[_profile['name']] = _profile
+        return _profiles
+
+    def nmcli_profile_save(device, name, password, *args, **kwargs):
+        if name is None or name == '' or password is None or password == '':
+            return
+        _profiles = FrontendCapability.nmcli_profile_list(device, *args, **kwargs)
+        _args = ['sudo', 'nmcli', 'connection']
+        if name in _profiles:
+            _args.extend(['modify', name])
+            _args.extend(['802-11-wireless-security.psk', password])
+            logger.info("Updating network {}".format(name))
+        else:
+            _args.extend(['add'])
+            _args.extend(['connection.id', name])
+            _args.extend(['connection.type', '802-11-wireless'])
+            _args.extend(['connection.autoconnect', '1'])
+            _args.extend(['802-11-wireless.ssid', name])
+            _args.extend(['802-11-wireless-security.key-mgmt', 'wpa-psk'])
+            _args.extend(['802-11-wireless-security.psk', password])
+            logger.info("Adding network {}".format(name))
+        Process.exec_run(_args)
+
+    def nmcli_profile_delete(device, name, *args, **kwargs):
+        if name is None or name == '':
+            return
+        _profiles = FrontendCapability.nmcli_profile_list(device, *args, **kwargs)
+        if name not in _profiles:
+            return
+        _wifi_list = FrontendCapability.nmcli_wifi_list(device, *args, **kwargs)
+        if name not in _wifi_list:
+            return
+        if _wifi_list[name]['active']:
+            return
+        logger.info("Deleting network {}".format(name))
+        Process.exec_run(['sudo', 'nmcli', 'connection', 'delete', name])
+
+    def nmcli_profile_connect(device, name, *args, **kwargs):
+        if name is None or name == '':
+            return
+        _profiles = FrontendCapability.nmcli_profile_list(device, *args, **kwargs)
+        if name not in _profiles:
+            return
+        _wifi_list = FrontendCapability.nmcli_wifi_list(device, *args, **kwargs)
+        if name not in _wifi_list:
+            return
+        logger.info("Connecting network {}".format(name))
+        Process.exec_run(['sudo', 'nmcli', 'connection', 'up', name])
+
+    def nmcli_wifi_list(device, *args, **kwargs):
+        _networks = {}
+        # IN-USE  BSSID              SSID          MODE   CHAN  RATE        SIGNAL  BARS  SECURITY
+        # *       XX:XX:XX:XX:XX:XX  NetworkName   Infra  6     130 Mbit/s  46      ▂▄__  WPA1 WPA2
+        _wifi_list = Process.exec_run(['sudo', 'nmcli', 'device', 'wifi', 'list'])
+        if _wifi_list:
+            _wifi_list = _wifi_list.decode().split('\n')
+            _columns = _wifi_list.pop(0).lower().split()
+            for _parts in [_line.split() for _line in _wifi_list]:
+                if len(_parts) == 0:
+                    continue
+                _network = {'active': _parts[0] == '*'}
+                if _network['active']:
+                    _parts.pop(0)
+                _i = 0
+                for _column in _columns:
+                    if 'use' in _column:  # skip in-use column, already checked
+                        continue
+                    elif 'rate' in _column:
+                        _network[_column] = _parts[_i] + ' ' + _parts[_i+1]
+                        _i = _i + 1
+                    else:
+                        _network[_column] = _parts[_i]
+                    _i = _i + 1
+                _networks[_network['ssid']] = _network
+        return _networks
+
+    def nmcli_toggle_ap(device, *args, **kwargs):
+        _networks = FrontendCapability.nmcli_wifi_list(device, *args, **kwargs)
+        _networks = [_networks[_name] for _name in _networks if _networks[_name]['active']]
+        if len(_networks) and _networks[0]['ssid'] != 'framaRAMA':
+            logger.info("Activating Access Point.")
+            Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama'])
+        else:
+            logger.info("Deactivating Access Point.")
+            Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'delete', 'framarama'])
 
     def app_log_systemd(device, *args, **kwargs):
         return Process.exec_run(['sudo', '-n', 'systemctl', 'status', '-n', '100', 'framarama'])
