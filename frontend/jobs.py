@@ -29,6 +29,8 @@ class Jobs():
             self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
             self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
             self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
+            self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
+            self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
 
     def _setup_start(self):
         if self._monitor:
@@ -59,6 +61,10 @@ class Jobs():
     def key_shutdown(self):
         logger.info("Shutdown device!")
         frontend.Frontend.get().get_device().run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
+
+    def key_network_toggle(self):
+        logger.info("Toggle network mode!")
+        frontend.Frontend.get().get_device().network_ap_toggle()
 
     def refresh_items(self):
         _display = frontend.Frontend.get().get_display()
