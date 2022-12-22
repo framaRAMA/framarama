@@ -282,6 +282,23 @@ class DeviceDashboardView(BaseFrontendView):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
         _action = self.request.GET.get('action')
+        if _action == 'wifi.save':
+            _name = self.request.GET.get('name')
+            _pass = self.request.GET.get('password')
+            _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_SAVE, name=_name, password=_pass)
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            return _context
+        elif _action == 'wifi.delete':
+            _name = self.request.GET.get('name')
+            _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_DELETE, name=_name)
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            return _context
+        elif _action == 'wifi.connect':
+            _name = self.request.GET.get('name')
+            _frontend_device.network_connect(_name)
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            return _context
+        _wifi = None
         if _action == 'device.log':
             _lines = _frontend_device.run_capability(frontend.FrontendCapability.APP_LOG)
             _context['log'] = _lines
@@ -289,6 +306,15 @@ class DeviceDashboardView(BaseFrontendView):
             _frontend_device.run_capability(frontend.FrontendCapability.APP_RESTART)
         elif _action == 'device.shutdown':
             _frontend_device.run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
+        elif _action == 'wifi.list':
+            _profiles = _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_LIST)
+            _networks = _frontend_device.run_capability(frontend.FrontendCapability.NET_WIFI_LIST)
+            _networks.update({_name: {'ssid': _name, 'active': False} for _name in _profiles if _name not in _networks})
+            _networks = [_networks[_name] | {'profile':_name in _profiles} for _name in _networks]
+            _wifi = {
+              'networks': _networks,
+              'profiles': _profiles
+            }
         _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
         _context['mem'] = {
@@ -316,6 +342,7 @@ class DeviceDashboardView(BaseFrontendView):
         }
         _context['network'] = {
           'config': _frontend_device.run_capability(frontend.FrontendCapability.NET_CONFIG),
+          'wifi': _wifi
         }
         return _context
 

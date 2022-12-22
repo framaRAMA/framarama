@@ -11,7 +11,8 @@
 </div>
 
 <div class="pt-4 text-center">
-  <a href="{{ url('fe_dashboard_device') }}?action=device.log" class="btn btn-outline-primary btn-outline btn-floating btn-lg" title="Show log">{{ lib.icon('action.log') }}</a>
+  <a href="{{ url('fe_dashboard_device') }}?action=wifi.list" class="btn btn-outline-primary btn-outline btn-floating btn-lg" title="Setup wifi">{{ lib.icon('frontend.wifi') }}</a>
+  <a href="{{ url('fe_dashboard_device') }}?action=device.log" class="ms-2 btn btn-outline-primary btn-outline btn-floating btn-lg" title="Show log">{{ lib.icon('action.log') }}</a>
   <a href="{{ url('fe_dashboard_device') }}?action=device.restart" class="ms-2 btn btn-outline-secondary btn-floating btn-lg" title="Restart application">{{ lib.icon('action.restart') }}</a>
   <a href="{{ url('fe_dashboard_device') }}?action=device.shutdown" class="ms-2 btn btn-outline-danger btn-floating btn-lg" title="Shutdown device">{{ lib.icon('action.shutdown') }}</a>
 </div>
@@ -21,6 +22,87 @@
   <div class="pt-2">
     <pre class="p-2 .pre-scrollable border rounded border-primary smaller">{{ log.decode() }}</pre>
   </div>
+{% endif %}
+
+{% if network['wifi'] %}
+  <h6 class="pt-5">Wireless networks</h6>
+  {% set wifi = [] %}
+  {% set button = '<button class="btn btn-sm btn-xs btn-outline-%s float-end ms-1 ps-2 pe-1" data-bs-toggle="modal" data-bs-target="#%s" onclick="%s(this)" title="%s" net-name="%s" net-profile="%s">%s</a>' %}
+  {% for w in network['wifi']['networks'] %}
+    {% set actions = namespace(btn = '') %}
+    {% for btn in [
+      {'btn': 'primary', 'type': 'connect', 'title': 'Connect',        'ico': 'action.run',    'show': w['signal'] != '' and w['active'] == false},
+      {'btn': 'success', 'type': 'setup',   'title': 'Edit profile',   'ico': 'action.edit',   'show': w['profle'] != ''},
+      {'btn': 'success', 'type': 'setup',   'title': 'Add profile',    'ico': 'action.add',    'show': w['profile'] == ''},
+      {'btn': 'danger',  'type': 'delete',  'title': 'Delete profile', 'ico': 'action.delete', 'show': w['profile'] != '' and w['active'] == false},
+    ] %}
+      {% if btn['show'] %}
+        {% set actions.btn = actions.btn + button|format(
+          btn['btn'],
+          btn['type'] + 'Wifi', btn['type'] + 'WifiInitialize',
+          btn['title'],
+          w['ssid'], w['profile'],
+          lib.icon(btn['ico'])
+        )|safe %}
+      {% endif %}
+    {% endfor %}
+    {% set tmp = wifi.append({
+      'state': lib.icon('frontend.wifi', 'text-success') if w['active'] else
+               lib.icon('frontend.wifi', 'text-black') if w['profile'] else
+               lib.icon('frontend.wifi', 'text-muted') if w['signal'] else
+               lib.icon('frontend.wifi', 'text-light'),
+      'ssid': w['ssid'],
+      'rate': w['rate'],
+      'signal': w['bars'] + ' (' + w['signal'] + ')' if 'bars' in w and 'signal' in w else '',
+      'action': actions.btn
+    }) %}
+  {% endfor %}
+  {{ lib.list_table(wifi, columns={'state':'', 'ssid': 'Name', 'rate': 'Rate', 'signal': 'Signal', 'action':''}) }}
+
+  {{ lib.modal_start('setupWifi', 'Configure network') }}
+    <div class="row">
+      <div class="col-auto">
+        <div class="mb-3 form-floating ">
+          <input type="text" name="name" value="" class="form-control" maxlength="255" required="" id="id_name">
+          <label for="id_name" class="form-label">Name</label>
+          <div id="helpid_name" class="form-text">The network name (SSID).</div>
+        </div>
+        <div class="mb-3 form-floating ">
+          <input type="text" name="password" value="" class="form-control" maxlength="255" required="" id="id_password">
+          <label for="id_password" class="form-label">Password (at least 8 characters)</label>
+          <div id="helpid_name" class="form-text">The password to connect (specify for new network or to change, leave empty to keep existing).</div>
+        </div>
+      </div>
+    </div>
+    <script language="javascript">
+      function setupWifiInitialize(button) {
+          const nameField = document.getElementById('id_name');
+          const passField = document.getElementById('id_password');
+          const saveButton = document.querySelector('a[href="#setupWifiSave"]');
+          nameField.value = button.getAttribute('net-name');
+          nameField.setAttribute('disabled', nameField.value != "" ? 'disabled' : '');
+          passField.value = "";
+          saveButton.onclick = function () {
+              window.document.location.href = '{{ url('fe_dashboard_device') }}?action=wifi.save&name=' + nameField.value + '&password=' + passField.value;
+          };
+      }
+      function deleteWifiInitialize(button) {
+          const name = button.getAttribute('net-name');
+          const submit = document.querySelector('div#deleteWifi a');
+          submit.href = '{{ url('fe_dashboard_device') }}?action=wifi.delete&name=' + name;
+      }
+      function connectWifiInitialize(button) {
+          const name = button.getAttribute('net-name');
+          const submit = document.querySelector('div#connectWifi a');
+          submit.href = '{{ url('fe_dashboard_device') }}?action=wifi.connect&name=' + name;
+      }
+    </script>
+  {{ lib.modal_end(submit="#setupWifiSave", submit_class='btn-primary', submit_title="Save", cancel_title='Close') }}
+
+  {{ lib.modal_delete('deleteWifi', 'Remove network', 'Do you want to remove the network profile configuration?', '#') }}
+
+  {{ lib.modal_confirm('connectWifi', 'Connect network', 'Do you want to connect to the network?', '#', submit_title='Connect') }}
+
 {% endif %}
 
 {% endblock %}
