@@ -704,9 +704,8 @@ class FrontendCapability:
         return _networks
 
     def nmcli_toggle_ap(device, *args, **kwargs):
-        _networks = FrontendCapability.nmcli_wifi_list(device, *args, **kwargs)
-        _networks = [_networks[_name] for _name in _networks if _networks[_name]['active']]
-        if len(_networks) and _networks[0]['ssid'] != 'framaRAMA':
+        _profiles = FrontendCapability.nmcli_profile_list(device, *args, **kwargs)
+        if not FrontendCapability.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
             Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama'])
         else:
