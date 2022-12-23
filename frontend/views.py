@@ -310,6 +310,8 @@ class DeviceDashboardView(BaseFrontendView):
             _profiles = _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_LIST)
             _ap_active = frontend.FrontendCapability.nmcli_ap_active(_profiles)
             _networks = _frontend_device.run_capability(frontend.FrontendCapability.NET_WIFI_LIST)
+            if 'framarama' in _profiles:
+                del _profiles['framarama']
             _networks.update({_name: {'ssid': _name, 'active': False} for _name in _profiles if _name not in _networks})
             _networks = [_networks[_name] | {'profile':_name if _name in _profiles else ''} for _name in _networks]
             _wifi = {

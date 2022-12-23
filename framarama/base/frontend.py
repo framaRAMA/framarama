@@ -700,7 +700,8 @@ class FrontendCapability:
                     else:
                         _network[_column] = _parts[_i]
                     _i = _i + 1
-                _networks[_network['ssid']] = _network
+                if _network['ssid'] != 'framaRAMA':
+                    _networks[_network['ssid']] = _network
         return _networks
 
     def nmcli_toggle_ap(device, *args, **kwargs):
