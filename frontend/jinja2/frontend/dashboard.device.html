@@ -60,7 +60,7 @@
   {{ lib.list_table(wifi, columns={'state':'', 'ssid': 'Name', 'rate': 'Rate', 'signal': 'Signal', 'action':''}) }}
 
   <div class="pt-4 text-center">
-    <a href="#" data-bs-toggle="modal" data-bs-target="#wifiApToggle" class="btn btn-{% if not wifi['ap'] %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle Access Point mode">{{ lib.icon('frontend.ap') }}</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#wifiApToggle" class="btn btn-{% if not network['wifi']['ap'] %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle Access Point mode">{{ lib.icon('frontend.ap') }}</a>
   </div>
 
   {{ lib.modal_start('setupWifi', 'Configure network') }}
