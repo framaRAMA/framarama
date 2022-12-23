@@ -602,10 +602,10 @@ class FrontendCapability:
 
     def nmcli_profile_list(device, *args, **kwargs):
         _profiles = {}
-        # NAME       UUID                                  TYPE  DEVICE
-        # NetName1   93dba0ab-4cd6-4c0f-b790-2c5689f8686b  wifi  wlan0
-        # NetName2   909c4d81-4211-4810-9f98-32f74f43906a  wifi  --
-        _profile_list = Process.exec_run(['nmcli', 'connection', 'show'])
+        # NAME       UUID                                  TYPE  DEVICE  ACTIVE
+        # NetName1   93dba0ab-4cd6-4c0f-b790-2c5689f8686b  wifi  wlan0   yes
+        # NetName2   909c4d81-4211-4810-9f98-32f74f43906a  wifi  --      no
+        _profile_list = Process.exec_run(['nmcli', '--fields', 'NAME,UUID,TYPE,DEVICE,ACTIVE', 'connection', 'show'])
         if _profile_list:
             _profile_list = _profile_list.decode().split('\n')
             _columns = _profile_list.pop(0).lower().split()
@@ -615,7 +615,10 @@ class FrontendCapability:
                 _i = 0
                 _profile = {}
                 for _column in _columns:
-                    _profile[_column] = _parts[_i]
+                    _value = _parts[_i]
+                    if _column == 'active':
+                        _value = True if _value == 'yes' else False
+                    _profile[_column] = _value
                     _i = _i + 1
                 _profiles[_profile['name']] = _profile
         return _profiles
