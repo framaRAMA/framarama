@@ -269,7 +269,7 @@ class FrontendDevice(Singleton):
         self._network_status
 
     def network_ap_toggle(self):
-        self._run_capability(FrontendCapability.NET_TOGGLE_AP)
+        self.run_capability(FrontendCapability.NET_TOGGLE_AP)
 
     def network_verify(self):
         if self._network['connected']:
