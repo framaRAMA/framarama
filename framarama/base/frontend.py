@@ -647,9 +647,7 @@ class FrontendCapability:
         if name not in _profiles:
             return
         _wifi_list = FrontendCapability.nmcli_wifi_list(device, *args, **kwargs)
-        if name not in _wifi_list:
-            return
-        if _wifi_list[name]['active']:
+        if name in _wifi_list and _wifi_list[name]['active']:
             return
         logger.info("Deleting network {}".format(name))
         Process.exec_run(['sudo', 'nmcli', 'connection', 'delete', name])
