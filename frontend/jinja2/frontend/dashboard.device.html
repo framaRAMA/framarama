@@ -60,7 +60,7 @@
   {{ lib.list_table(wifi, columns={'state':'', 'ssid': 'Name', 'rate': 'Rate', 'signal': 'Signal', 'action':''}) }}
 
   <div class="pt-4 text-center">
-    <a href="#" data-bs-toggle="modal" data-bs-target="#wifiAp" class="btn btn-{% if not wifi['ap'] %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle Access Point mode">{{ lib.icon('frontend.ap') }}</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#wifiApToggle" class="btn btn-{% if not wifi['ap'] %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle Access Point mode">{{ lib.icon('frontend.ap') }}</a>
   </div>
 
   {{ lib.modal_start('setupWifi', 'Configure network') }}
@@ -111,7 +111,7 @@
 
   {{ lib.modal_confirm('devShutdown', 'Shutdown device', 'Do you want to shutdown the device?', url('fe_dashboard_device') + '?action=device.shutdown', submit_title='Shutdown') }}
 
-  {{ lib.modal_confirm('wifiToggle', 'Toggle AP', 'Do you want to toggle Access Point mode?', url('fe_dashboard_device') + '?action=wifi.ap', submit_title='Toggle') }}
+  {{ lib.modal_confirm('wifiApToggle', 'Toggle AP', 'Do you want to toggle Access Point mode?', url('fe_dashboard_device') + '?action=wifi.ap', submit_title='Toggle') }}
 
 {% endif %}
 
