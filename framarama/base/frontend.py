@@ -274,12 +274,17 @@ class FrontendDevice(Singleton):
     def network_verify(self):
         if self._network['connected']:
             return True
+        _profile_list = self.run_capability(FrontendCapability.NET_PROFILE_LIST)
+        _ap_active = FrontendCapability.nmcli_ap_active(_profile_list)
         if self._network['started'] is None:
             self._network['started'] = timezone.now()
             logger.info("Checking network connectivity ...")
-        _wifi_list = self.run_capability(FrontendCapability.NET_WIFI_LIST)
-        _wifi_list = [_network for _network in _wifi_list if _wifi_list[_network]['active']]
-        if len(_wifi_list) == 0:
+            if _ap_active:
+                logger.info("Access Point active!")
+        if _ap_active:
+            return False
+        _profile_list = [_name for _name in _profile_list if _profile_list[_name]['active']]
+        if len(_profile_list) == 0:
             if timezone.now() - self._network['started'] > datetime.timedelta(seconds=30):
                 _previous = self._network['previous']
                 if _previous is None:
@@ -292,9 +297,13 @@ class FrontendDevice(Singleton):
                     self.network_connect(_previous)
             else:
                 logger.info("Not connected!")
+        elif _ap_active:
+            self._network['connected'] = timezone.now()
+            self._network['profile'] = _profile_list[0]
+            logger.info("Access point active!")
         else:
             self._network['connected'] = timezone.now()
-            self._network['profile'] = _wifi_list[0]
+            self._network['profile'] = _profile_list[0]
             logger.info("Connected to {}".format(self._network['profile']))
             return True
         return False
