@@ -707,7 +707,10 @@ class FrontendCapability:
         _profiles = FrontendCapability.nmcli_profile_list(device, *args, **kwargs)
         if not FrontendCapability.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
-            Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama'])
+            if 'framarama' not in _profiles:
+                Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama', 'band', 'bg'])
+            else:
+                Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'up', 'framarama'])
         else:
             logger.info("Deactivating Access Point.")
             Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'delete', 'framarama'])
