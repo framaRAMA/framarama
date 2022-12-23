@@ -31,10 +31,9 @@ class Jobs():
             self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
             self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
             self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
+            self._monitor.start()
 
     def _setup_start(self):
-        if self._monitor:
-            self._monitor.stop()
         if self._startup is None:
             self._startup = timezone.now()
             _config = frontend.Frontend.get().get_config()
@@ -45,8 +44,6 @@ class Jobs():
                 self._scheduler.remove(_job_name)
     
     def _setup_completed(self):
-        if self._monitor:
-            self._monitor.start()
         if not self._scheduler.get('fe_refresh_items'):
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
         if not self._scheduler.get('fe_next_item'):
