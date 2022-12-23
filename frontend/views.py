@@ -308,13 +308,19 @@ class DeviceDashboardView(BaseFrontendView):
             _frontend_device.run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
         elif _action == 'wifi.list':
             _profiles = _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_LIST)
+            _ap_active = frontend.FrontendCapability.nmcli_ap_active(_profiles)
             _networks = _frontend_device.run_capability(frontend.FrontendCapability.NET_WIFI_LIST)
             _networks.update({_name: {'ssid': _name, 'active': False} for _name in _profiles if _name not in _networks})
             _networks = [_networks[_name] | {'profile':_name if _name in _profiles else ''} for _name in _networks]
             _wifi = {
               'networks': _networks,
-              'profiles': _profiles
+              'profiles': _profiles,
+              'ap': _ap_active
             }
+        elif _action == 'wifi.ap':
+            _frontend_device.network_ap_toggle()
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            return _context
         _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
         _context['mem'] = {

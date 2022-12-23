@@ -623,6 +623,9 @@ class FrontendCapability:
                 _profiles[_profile['name']] = _profile
         return _profiles
 
+    def nmcli_ap_active(profiles):
+        return 'framarama' in profiles and profiles['framarama']['active']
+
     def nmcli_profile_save(device, name, password, *args, **kwargs):
         if name is None or name == '' or password is None or password == '':
             return
