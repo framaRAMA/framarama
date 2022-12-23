@@ -31,8 +31,8 @@
   {% for w in network['wifi']['networks'] %}
     {% set actions = namespace(btn = '') %}
     {% for btn in [
-      {'btn': 'primary', 'type': 'connect', 'title': 'Connect',        'ico': 'action.run',    'show': w['signal'] != '' and w['active'] == false},
-      {'btn': 'success', 'type': 'setup',   'title': 'Edit profile',   'ico': 'action.edit',   'show': w['profle'] != ''},
+      {'btn': 'primary', 'type': 'connect', 'title': 'Connect',        'ico': 'action.run',    'show': w['profile'] != '' and w['signal'] != '' and w['active'] == false},
+      {'btn': 'success', 'type': 'setup',   'title': 'Edit profile',   'ico': 'action.edit',   'show': w['profile'] != ''},
       {'btn': 'success', 'type': 'setup',   'title': 'Add profile',    'ico': 'action.add',    'show': w['profile'] == ''},
       {'btn': 'danger',  'type': 'delete',  'title': 'Delete profile', 'ico': 'action.delete', 'show': w['profile'] != '' and w['active'] == false},
     ] %}
