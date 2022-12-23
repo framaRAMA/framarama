@@ -120,10 +120,11 @@ class Jobs():
 
     def tick(self):
         _frontend = frontend.Frontend.get()
-        if not _frontend.get_device().network_verify():
-            return
+        _network = _frontend.get_device().network_verify()
         if not _frontend.initialize() or not _frontend.api_access():
             self._setup_start()
-        elif self._display is None or self._items is None:
+        elif _network and (self._display is None or self._items is None):
             self._setup_completed()
+        elif not _network:
+            self._setup_start()
 
