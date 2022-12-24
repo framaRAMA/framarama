@@ -266,8 +266,8 @@ class FrontendDevice(Singleton):
         self._network['profile'] = name
         self._network['networks'] = None
 
-    def network_status(self, name):
-        self._network
+    def network_status(self):
+        return self._network
 
     def network_ap_toggle(self):
         self.run_capability(FrontendCapability.NET_TOGGLE_AP)
@@ -281,7 +281,8 @@ class FrontendDevice(Singleton):
             self._network['started'] = timezone.now()
             logger.info("Checking network connectivity ...")
             if _ap_active:
-                logger.info("Access Point active!")
+                logger.info("Access Point active - disabling first!")
+                self.network_ap_toggle()
         if _ap_active:
             return False
         _profile_list = [_name for _name in _profile_list if _profile_list[_name]['active']]
@@ -290,12 +291,13 @@ class FrontendDevice(Singleton):
                 _previous = self._network['previous']
                 if _previous is None:
                     logger.info("Not connected within 30 seconds and no previous network available - starting access point")
-                    self._network['networks'] = _frontend_device.run_capability(frontend.FrontendCapability.NET_WIFI_LIST)
+                    self._network['networks'] = self.run_capability(FrontendCapability.NET_WIFI_LIST)
                     self.network_ap_toggle()
                     self._network['connected'] = timezone.now()
                 else:
                     logger.info("Not connected within 30 seconds - try to connect previous network {}".format(_previous))
                     self._network['profile'] = None
+                    self._network['previous'] = None
                     self.network_connect(_previous)
             else:
                 logger.info("Not connected!")
