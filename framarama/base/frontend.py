@@ -215,7 +215,7 @@ class FrontendDevice(Singleton):
     def __init__(self):
         super().__init__()
         self._monitor = FrontendMonitoring()
-        self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None}
+        self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None, 'networks': None}
         self._renderer_filesystem = FilesystemFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
@@ -264,9 +264,10 @@ class FrontendDevice(Singleton):
         self._network['connected'] = None
         self._network['previous'] = self._network['profile']
         self._network['profile'] = name
+        self._network['networks'] = None
 
     def network_status(self, name):
-        self._network_status
+        self._network
 
     def network_ap_toggle(self):
         self.run_capability(FrontendCapability.NET_TOGGLE_AP)
@@ -289,6 +290,7 @@ class FrontendDevice(Singleton):
                 _previous = self._network['previous']
                 if _previous is None:
                     logger.info("Not connected within 30 seconds and no previous network available - starting access point")
+                    self._network['networks'] = _frontend_device.run_capability(frontend.FrontendCapability.NET_WIFI_LIST)
                     self.network_ap_toggle()
                     self._network['connected'] = timezone.now()
                 else:
@@ -680,7 +682,7 @@ class FrontendCapability:
         _networks = {}
         # IN-USE  BSSID              SSID          MODE   CHAN  RATE        SIGNAL  BARS  SECURITY
         # *       XX:XX:XX:XX:XX:XX  NetworkName   Infra  6     130 Mbit/s  46      ▂▄__  WPA1 WPA2
-        _wifi_list = Process.exec_run(['sudo', 'nmcli', 'device', 'wifi', 'list'])
+        _wifi_list = Process.exec_run(['sudo', 'nmcli', 'device', 'wifi', 'list', '--rescan', 'yes'])
         if _wifi_list:
             _wifi_list = _wifi_list.decode().split('\n')
             _columns = _wifi_list.pop(0).lower().split()
