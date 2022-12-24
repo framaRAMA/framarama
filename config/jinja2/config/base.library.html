@@ -323,7 +323,7 @@
       {% if action['url'] %}
         <a href="{{ action['url'] }}" class="{{ classes }}">{{ icon(action['icon'], '') }}</a>
       {% elif action['modal'] %}
-        <button class="{{ classes }}"data-bs-toggle="modal" data-bs-target="#{{ action['modal'] }}">{{ icon(action['icon'], '') }}</button>
+        <button class="{{ classes }}" data-bs-toggle="modal" data-bs-target="#{{ action['modal'] }}">{{ icon(action['icon'], '') }}</button>
       {% endif %}
     {% endfor %}
   </div>
