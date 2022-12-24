@@ -13,8 +13,8 @@
 <div class="pt-4 text-center">
   <a href="{{ url('fe_dashboard_device') }}?action=wifi.list" class="btn btn-outline-primary btn-outline btn-floating btn-lg" title="Setup wifi">{{ lib.icon('frontend.wifi') }}</a>
   <a href="{{ url('fe_dashboard_device') }}?action=device.log" class="ms-2 btn btn-outline-primary btn-outline btn-floating btn-lg" title="Show log">{{ lib.icon('action.log') }}</a>
-  <button href="#" data-bs-toggle="modal" data-bs-target="#appRestart" class="ms-2 btn btn-outline-secondary btn-floating btn-lg" title="Restart application">{{ lib.icon('action.restart') }}</button>
-  <button href="#" data-bs-toggle="modal" data-bs-target="#devShutdown" class="ms-2 btn btn-outline-danger btn-floating btn-lg" title="Shutdown device">{{ lib.icon('action.shutdown') }}</button>
+  <button data-bs-toggle="modal" data-bs-target="#appRestart" class="ms-2 btn btn-outline-secondary btn-floating btn-lg" title="Restart application">{{ lib.icon('action.restart') }}</button>
+  <button data-bs-toggle="modal" data-bs-target="#devShutdown" class="ms-2 btn btn-outline-danger btn-floating btn-lg" title="Shutdown device">{{ lib.icon('action.shutdown') }}</button>
 </div>
 
 {% if log %}
@@ -107,12 +107,12 @@
 
   {{ lib.modal_confirm('connectWifi', 'Connect network', 'Do you want to connect to the network?', '#', submit_title='Connect') }}
 
-  {{ lib.modal_confirm('appRestart', 'Restart application', 'Do you want to restart the application?', url('fe_dashboard_device') + '?action=device.restart', submit_title='Restart') }}
-
-  {{ lib.modal_confirm('devShutdown', 'Shutdown device', 'Do you want to shutdown the device?', url('fe_dashboard_device') + '?action=device.shutdown', submit_title='Shutdown') }}
-
   {{ lib.modal_confirm('wifiApToggle', 'Toggle AP', 'Do you want to toggle Access Point mode?', url('fe_dashboard_device') + '?action=wifi.ap', submit_title='Toggle') }}
 
 {% endif %}
+
+{{ lib.modal_confirm('appRestart', 'Restart application', 'Do you want to restart the application?', url('fe_dashboard_device') + '?action=device.restart', submit_title='Restart') }}
+
+{{ lib.modal_confirm('devShutdown', 'Shutdown device', 'Do you want to shutdown the device?', url('fe_dashboard_device') + '?action=device.shutdown', submit_title='Shutdown') }}
 
 {% endblock %}
