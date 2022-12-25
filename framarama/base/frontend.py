@@ -391,6 +391,10 @@ class FrontendMonitoring(threading.Thread):
         self._xinput = None
         self._running = False
         self._key_events = []
+        if Process.exec_search('xinput') and Process.exec_search('xmodmap'):
+            self._xinput = True
+        else:
+            logger.warning("Not monitoring for keyboard events (xinput/xmodmap is missing)")
 
     def _verify_running(self):
         _pid = Process.exec_running('xinput')
@@ -410,6 +414,8 @@ class FrontendMonitoring(threading.Thread):
         self._key_events.append([set(keys), method])
 
     def start(self):
+        if self._xinput == None:
+            return
         self._running = True
         self._verify_running()
         super().start()
