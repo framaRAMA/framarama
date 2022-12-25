@@ -21,10 +21,10 @@ class BaseConfigView(BaseAuthenticatedView):
         return self._config.get_config() if self._config else None
 
     def get_frames(self):
-        return models.Frame.objects.filter(user=self.request.user)
+        return self.qs().frames
 
     def get_displays(self):
-        return models.Display.objects.filter(user=self.request.user)
+        return self.qs().displays
 
     def _get(self, request):
         _context = {}
@@ -108,7 +108,7 @@ class BaseDisplayConfigView(BaseConfigView):
 
     def _get(self, request, display_id, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _context['display'] = models.Display.objects.get(id=display_id)
+        _context['display'] = self.qs().displays.get(id=display_id)
         return _context
 
 

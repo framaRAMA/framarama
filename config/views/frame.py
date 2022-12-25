@@ -180,7 +180,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
     template_name = 'config/frame.source.step.update.html'
     
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = models.SourceStep.objects.filter(pk=step_id).get()
+        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _plugin = _context['plugin']
         _source_step = _plugin.load_model(step_id)
@@ -190,7 +190,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         return _context
 
     def _post(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = models.SourceStep.objects.filter(pk=step_id).get()
+        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
@@ -209,7 +209,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 class ActionStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = models.SourceStep.objects.filter(pk=step_id).get()
+        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
@@ -226,7 +226,7 @@ class ItemsSourceFrameView(base.BaseSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
-        _source = models.Source.objects.filter(pk=source_id).get()
+        _source = self.qs().sources.filter(pk=source_id).get()
         _page = request.GET.get('page')
         _page_size = request.GET.get('page_size', 20)
         _items = _source.items.all().order_by('created')
@@ -289,7 +289,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
 
     def _get(self, request, frame_id, sorting_id, *args, **kwargs):
         _context = super()._get(request, frame_id, sorting_id, *args, **kwargs)
-        _sorting = models.Sorting.objects.filter(pk=sorting_id).get()
+        _sorting = self.qs().sourtings.filter(pk=sorting_id).get()
         _sorting_plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
         _sorting= _sorting_plugin.load_model(sorting_id)
         _form = _sorting_plugin.get_update_form(instance=_sorting)
@@ -299,7 +299,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
     def _post(self, request, frame_id, sorting_id, *args, **kwargs):
         _context = super()._get(request, frame_id, sorting_id, *args, **kwargs)
         _frame = _context['frame']
-        _sorting = models.Sorting.objects.filter(pk=sorting_id).get()
+        _sorting = self.qs().sourtings.filter(pk=sorting_id).get()
         _sorting_plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
         _sorting= _sorting_plugin.load_model(sorting_id)
         _form = _sorting_plugin.get_update_form(request.POST, instance=_sorting)
@@ -370,7 +370,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
 
     def _get(self, request, frame_id, finishing_id, *args, **kwargs):
         _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
-        _finishing = models.Finishing.objects.filter(pk=finishing_id).get()
+        _finishing = self.qs().finishings.filter(pk=finishing_id).get()
         _finishing_plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
         _finishing= _finishing_plugin.load_model(finishing_id)
         _form = _finishing_plugin.get_update_form(instance=_finishing)
