@@ -328,7 +328,7 @@ class FrontendDevice(Singleton):
                 FrontendCapability.DISK_TMP_FREE: FrontendCapability.return_none,
                 FrontendCapability.NET_CONFIG: FrontendCapability.return_none,
                 FrontendCapability.NET_TOGGLE_AP: FrontendCapability.return_none,
-                FrontendCapability.NET_WIFI_LIST: FrontendCapability.return_list,
+                FrontendCapability.NET_WIFI_LIST: FrontendCapability.return_dict,
                 FrontendCapability.NET_PROFILE_LIST: FrontendCapability.return_list,
                 FrontendCapability.NET_PROFILE_SAVE: FrontendCapability.return_none,
                 FrontendCapability.NET_PROFILE_DELETE: FrontendCapability.return_none,
@@ -490,6 +490,9 @@ class FrontendCapability:
 
     def return_list(device, *args, **kwargs):
         return []
+
+    def return_dict(device, *args, **kwargs):
+        return {}
 
     def vcgencmd_display_on(device, *args, **kwargs):
         Process.exec_run(['vcgencmd', 'display_power', '1'])
