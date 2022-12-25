@@ -300,7 +300,13 @@ class FrontendDevice(Singleton):
                     self._network['previous'] = None
                     self.network_connect(_previous)
             else:
-                logger.info("Not connected!")
+                _ip = self.run_capability(FrontendCapability.NET_CONFIG)
+                if _ip['ip']:
+                    self._network['connected'] = timezone.now()
+                    self._network['profile'] = '(automatic)'
+                    logger.info("Network already available ({})".format(_ip['ip']))
+                else:
+                    logger.info("Not connected!")
         elif _ap_active:
             self._network['connected'] = timezone.now()
             self._network['profile'] = _profile_list[0]
