@@ -39,7 +39,7 @@ class BaseQuerySetMixin:
 
     def qs(self):
         if not hasattr(self, '_qs'):
-            _user = self.request._user
+            _user = self.request._user if hasattr(self.request, '_user') else self.request.user
             self._qs = type('', (object,), {
               'frames': (
                   _user.qs_frames if hasattr(_user, 'qs_frames') else
