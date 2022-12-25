@@ -179,7 +179,7 @@ class Processor:
                     _item.created = timezone.now()
                     _stats_type = 'create'
 
-                _item.id = _item_id
+                _item.id_ext = _item_id
                 _item.date_creation = _item_date_creation
                 _item.updated = timezone.now()
                 _item.save()
