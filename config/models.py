@@ -176,6 +176,7 @@ class Item(BaseModel):
 class RankedItem(Item):
     STR_FIELDS = BaseModel.STR_FIELDS + ["rank"]
 
+    item_ptr = models.OneToOneField(Item, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
     rank = models.IntegerField(
         verbose_name='Rank', help_text='Calculated rank for this item')
 
