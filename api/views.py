@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import generics, viewsets, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 
+from framarama.base.views import BaseQuerySetMixin
 from config import models
 from config.utils import sorting
 from api import auth
@@ -64,27 +65,8 @@ class BaseDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class BaseViewSet(BaseListView, viewsets.ModelViewSet):
-    
-    def qs(self):
-        if not hasattr(self, '_qs'):
-            _user = self.request._user
-            self._qs = type('', (object,), {
-              'frames': (
-                  _user.qs_frames if hasattr(_user, 'qs_frames') else
-                  models.Frame.objects).filter(user=_user),
-              'items': (
-                  _user.qs_items if hasattr(_user, 'qs_items') else
-                  models.Item.objects).filter(frame__user=_user),
-              'displays': (
-                  _user.qs_displays if hasattr(_user, 'qs_displays') else
-                  models.Display.objects).filter(user=_user),
-              'finishings': (
-                  _user.qs_finishings if hasattr(_user, 'qs_finishings') else
-                  models.Finishing.objects).filter(frame__user=_user),
-            })
-        return self._qs
-
+class BaseViewSet(BaseListView, BaseQuerySetMixin, viewsets.ModelViewSet):
+    pass
 
 class FrameViewSet(BaseViewSet):
     serializer_class = FrameSerializer

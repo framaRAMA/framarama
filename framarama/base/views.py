@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from config import models
+
 
 class BaseView(TemplateView):
 
@@ -33,7 +35,29 @@ class BaseView(TemplateView):
         return self._handle(self._post, request, *args, **kwargs)
 
 
-class BaseAuthenticatedView(LoginRequiredMixin, BaseView):
+class BaseQuerySetMixin:
+
+    def qs(self):
+        if not hasattr(self, '_qs'):
+            _user = self.request._user
+            self._qs = type('', (object,), {
+              'frames': (
+                  _user.qs_frames if hasattr(_user, 'qs_frames') else
+                  models.Frame.objects).filter(user=_user),
+              'items': (
+                  _user.qs_items if hasattr(_user, 'qs_items') else
+                  models.Item.objects).filter(frame__user=_user),
+              'displays': (
+                  _user.qs_displays if hasattr(_user, 'qs_displays') else
+                  models.Display.objects).filter(user=_user),
+              'finishings': (
+                  _user.qs_finishings if hasattr(_user, 'qs_finishings') else
+                  models.Finishing.objects).filter(frame__user=_user),
+            })
+        return self._qs
+
+
+class BaseAuthenticatedView(LoginRequiredMixin, BaseView, BaseQuerySetMixin):
     pass
 
 
