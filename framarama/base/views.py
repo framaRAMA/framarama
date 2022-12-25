@@ -44,6 +44,15 @@ class BaseQuerySetMixin:
               'frames': (
                   _user.qs_frames if hasattr(_user, 'qs_frames') else
                   models.Frame.objects).filter(user=_user),
+              'sources': (
+                  _user.qs_sources if hasattr(_user, 'qs_sources') else
+                  models.Source.objects).filter(frame__user=_user),
+              'sourcesteps': (
+                  _user.qs_sourcesteps if hasattr(_user, 'qs_source_steps') else
+                  models.SourceStep.objects).filter(source__frame__user=_user),
+              'sortings': (
+                  _user.qs_sortings if hasattr(_user, 'qs_sortings') else
+                  models.Sorting.objects).filter(frame__user=_user),
               'items': (
                   _user.qs_items if hasattr(_user, 'qs_items') else
                   models.Item.objects).filter(frame__user=_user),
