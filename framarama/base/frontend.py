@@ -410,7 +410,7 @@ class FrontendMonitoring(threading.Thread):
             Process.terminate(_pid)
         elif _pid is None and self._xinput != True:
             self._xinput.wait()
-        elif self._xinput != None:
+        elif self._xinput != True:
             return
         self._keymap = [_line.split() for _line in Process.exec_run(['xmodmap', '-pke']).split(b'\n')]
         self._keymap = {_map[1].decode(): _map[3].decode() for _map in self._keymap if len(_map)>3}
