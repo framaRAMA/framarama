@@ -406,9 +406,9 @@ class FrontendMonitoring(threading.Thread):
         if self._xinput == None:
             return
         _pid = Process.exec_running('xinput')
-        if _pid != None and self._xinput is None:
+        if _pid != None and self._xinput is True:
             Process.terminate(_pid)
-        elif _pid is None and self._xinput != None:
+        elif _pid is None and self._xinput != True:
             self._xinput.wait()
         elif self._xinput != None:
             return
