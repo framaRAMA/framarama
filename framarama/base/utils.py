@@ -141,7 +141,8 @@ class Process:
 
     @staticmethod
     def exec_running(executable):
-        return Process.exec_run(['pidof', executable])
+        _pid = Process.exec_run(['pidof', executable])
+        return int(_pid) if _pid else None
 
     @staticmethod
     def terminate(pid, timeout=5):
