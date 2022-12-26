@@ -403,6 +403,8 @@ class FrontendMonitoring(threading.Thread):
             logger.warning("Not monitoring for keyboard events (xinput/xmodmap is missing)")
 
     def _verify_running(self):
+        if self._xinput == None:
+            return
         _pid = Process.exec_running('xinput')
         if _pid != None and self._xinput is None:
             Process.terminate(_pid)
