@@ -194,8 +194,8 @@ class Display(Singleton):
         _time_change = self.get_time_change()
         return last_update is None or last_update + _time_change < _now
 
-    def get_items(self):
-        if self._items == None:
+    def get_items(self, refresh=True):
+        if self._items is None or refresh:
             self._items = self._client.get_items_list(self.get_id())
         return self._items
 
