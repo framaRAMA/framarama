@@ -157,7 +157,7 @@ class Frontend(Singleton):
             },
             'network': {
                 'profile': _network_status['profile'],
-                'connected': int(_network_status['connected'].timestamp()*1000) if _network_status['connected'] else None,
+                'connected': _network_status['connected'] if _network_status['connected'] else None,
                 'address': {
                     'ip': _network_config['ip'] if _network_config else None,
                     'gateway': _network_config['gateway'] if _network_config else None,
@@ -171,7 +171,7 @@ class Frontend(Singleton):
             'items': {
                 'total': _config.count_items,
                 'shown': _config.count_views,
-                'updated': int(_config.date_items_update.timestamp()*1000) if _config.date_items_update else None,
+                'updated': _config.date_items_update.timestamp() if _config.date_items_update else None,
                 'latest': _latest_items,
             }
         }

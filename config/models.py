@@ -335,7 +335,7 @@ class DisplayStatus(BaseModel):
     network_profile = models.CharField(
         max_length=32, blank=True, null=True,
         verbose_name='Network profile', help_text='The name of the network profile currently in use')
-    network_connected = models.IntegerField(
+    network_connected = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Network connected', help_text='Time when the network connection was established')
     network_address_ip = models.CharField(
@@ -359,7 +359,7 @@ class DisplayStatus(BaseModel):
     items_shown = models.IntegerField(
         blank=True, null=True,
         verbose_name='Items shown', help_text='Total amount of items shown')
-    items_updated = models.IntegerField(
+    items_updated = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Items updated', help_text='Time of the last item list update')
     items_latest = models.CharField(
