@@ -308,7 +308,7 @@ class Display(BaseModel):
 
 
 class DisplayStatus(BaseModel):
-    STR_FIELDS = BaseModel.STR_FIELDS + ["name"]
+    STR_FIELDS = BaseModel.STR_FIELDS + ["uptime", "memory_free", "cpu_load", "cpu_temp", "disk_data_free", "disk_tmp_free", "screen_on", "items_total"]
 
     display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='status')
     uptime = models.IntegerField(
