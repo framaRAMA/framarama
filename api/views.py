@@ -1,7 +1,10 @@
+import io
 
 from django.shortcuts import render
 from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
 
 from framarama.base.views import BaseQuerySetMixin
 from config import models
@@ -33,6 +36,8 @@ class DisplaySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
+    _json_renderer = JSONRenderer()
+    _json_parser = JSONParser()
 
     class Meta:
         model = models.DisplayStatus
@@ -53,7 +58,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             if type(_value) == dict:
                 _result.update(self._json_to_model(_value, _name + '_'))
             elif type(_value) == list:
-                _result[prefix + _name] = ', '.join(_value)
+                _result[prefix + _name] = DisplayStatusSerializer._json_renderer.render(_value).decode()
             else:
                 _result[prefix + _name] = _value
         return _result
@@ -66,6 +71,8 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             if '_' in _suffix:
                 _key = _suffix.split('_')[0]
                 _result[_key] = self._model_to_json(data, prefix + _key + '_')
+            elif type(_value) == str and len(_value) > 0 and _value[0] in ['[', '{', '"']:
+                _result[_suffix] = DisplayStatusSerializer._json_parser.parse(io.BytesIO(_value.encode()))
             else:
                 _result[_suffix] = _value
         return _result
