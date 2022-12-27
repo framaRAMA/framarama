@@ -307,3 +307,66 @@ class Display(BaseModel):
         verbose_name='Key', help_text='A secret access token to access data for display.')
 
 
+class DisplayStatus(BaseModel):
+    STR_FIELDS = BaseModel.STR_FIELDS + ["name"]
+
+    display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='status')
+    uptime = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Update', help_text='The uptime of the device in milli seconds')
+    memory_used = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Memory used', help_text='Amount of memory currently in use')
+    memory_free = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Memory available', help_text='Amount of memory currently available')
+    cpu_load = models.FloatField(
+        blank=True, null=True,
+        verbose_name='CPU load', help_text='Current load of CPU')
+    cpu_temp = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='CPU temperature', help_text='Current temperature of CPU')
+    disk_data_free = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Disk DATA free', help_text='Available amount of space in data partition')
+    disk_tmp_free = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Disk TMP free', help_text='Available amount of space in temporary partition')
+    network_profile = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Network profile', help_text='The name of the network profile currently in use')
+    network_connected = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Network connected', help_text='Time when the network connection was established')
+    network_address_ip = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Network device IP', help_text='The network address of device')
+    network_address_gateway = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Network gateway IP', help_text='The network address of gateway')
+    screen_on = models.BooleanField(
+        blank=True, null=True,
+        verbose_name='Screen status', help_text='Status of screen (1 is on, 0 is off)')
+    screen_width = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Screen width', help_text='The actual width of screen in pixels')
+    screen_height = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Screen height', help_text='The actual height of screen in pixels')
+    items_total = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Items total', help_text='Total amount of items currently in use')
+    items_shown = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Items shown', help_text='Total amount of items shown')
+    items_updated = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Items updated', help_text='Time of the last item list update')
+    items_latest = models.CharField(
+        max_length=255, blank=True, null=True,
+        verbose_name='Latest items', help_text='List of last items shown')
+
+    class Meta:
+        db_table = 'config_display_status'
+        ordering = ['-created']
+
