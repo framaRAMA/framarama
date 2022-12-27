@@ -59,8 +59,6 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
 
     def _model_to_json(self, data, prefix=''):
         _result = {}
-        #for _name in [_field.name for _field in data._meta.fields if _field.name.startswith(prefix)]:
-        #    _value = getattr(data, _name)
         for _name in [_name for _name in data if _name.startswith(prefix)]:
             _value = data[_name]
             _suffix = _name[len(prefix):]
@@ -83,7 +81,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         _status = models.DisplayStatus(**validated_data)
-        #_status.save()
+        _status.save()
         return _status
 
 
