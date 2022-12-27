@@ -52,11 +52,18 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             'items_total', 'items_shown', 'items_updated', 'items_latest'
         ]
 
-    def _json_to_model(self, data, prefix=''):
+    def _json_to_model(self, data, fields, prefix=''):
         _result = {}
         for _name, _value in data.items():
             if type(_value) == dict:
-                _result.update(self._json_to_model(_value, _name + '_'))
+                _not_mapped = {}
+                for _result_name, _result_value in self._json_to_model(_value, fields, _name + '_').items():
+                    if _result_name in fields:
+                        _result[_result_name] = _result_value
+                    else:
+                        _not_mapped[_result_name[len(prefix)+1:]] = _result_value
+                if len(_not_mapped):
+                    _result[prefix + _name] = DisplayStatusSerializer._json_renderer.render(_not_mapped).decode()
             elif type(_value) == list:
                 _result[prefix + _name] = DisplayStatusSerializer._json_renderer.render(_value).decode()
             else:
@@ -83,7 +90,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
         return _result
 
     def to_internal_value(self, data):
-        _result = self._json_to_model(data)
+        _result = self._json_to_model(data, [_name for _name in self.Meta.fields])
         _result = super().to_internal_value(_result)
         return _result
 
