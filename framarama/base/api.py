@@ -104,9 +104,9 @@ class ApiClient(Singleton):
             self._request('/displays/{}/items/all'.format(display_id)),
             lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
 
-    def get_items_next(self, display_id):
+    def get_items_next(self, display_id, hit=False):
         _result = ApiResultList(
-            self._request('/displays/{}/items/next'.format(display_id)),
+            self._request('/displays/{}/items/next?hit={}'.format(display_id, int(hit))),
             lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
         return _result.get(0) if _result.count() > 0 else None
 
@@ -115,5 +115,7 @@ class ApiClient(Singleton):
             self._request('/displays/{}/finishings'.format(display_id)),
             lambda d: config_models.Finishing(**d))
 
+    def submit_status(self, display_id, status):
+        return self._request('/displays/{}/status'.format(display_id), ApiClient.METHOD_POST, status)
 
 
