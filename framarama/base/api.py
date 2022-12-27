@@ -51,6 +51,8 @@ class ApiResultList(ApiResult):
 
 
 class ApiClient(Singleton):
+    METHOD_GET = 'GET'
+    METHOD_POST = 'POST'
 
     def __init__(self):
         super().__init__()
@@ -68,13 +70,20 @@ class ApiClient(Singleton):
     def configured(self):
         return self._base_url != None and self._display_access_key != None
 
-    def _request(self, path):
+    def _request(self, path, method=METHOD_GET, data=None):
         if not self.configured():
             raise Exception("API client not configured")
         _headers = {}
         _headers['Connection'] = 'close'
         _headers['X-Display'] = self._display_access_key
-        _response = requests.get(self._base_url + path, timeout=(15, 30), headers=_headers)
+        _headers['User-Agent'] = 'framaRAMA'
+        if method == ApiClient.METHOD_GET:
+            _response = requests.get(self._base_url + path, timeout=(15, 30), headers=_headers)
+        elif method == ApiClient.METHOD_POST:
+            _headers['Content-Type'] = 'application/json; charset=utf-8'
+            _response = requests.post(self._base_url + path, timeout=(15, 30), headers=_headers, json=data)
+        else:
+            raise Exception("Can not handle HTTP method {}".format(method))
         _response.raise_for_status()
         return _response.json()
 
