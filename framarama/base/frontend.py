@@ -119,6 +119,50 @@ class Frontend(Singleton):
     def get_device(self):
         return FrontendDevice.get(self)
 
+    def submit_status(self):
+        _config = self.get_config().get_config()
+        _display = self.get_display()
+        _device = self.get_device()
+        _uptime = _device.run_capability(FrontendCapability.SYS_UPTIME)
+        _mem_total = _device.run_capability(FrontendCapability.MEM_TOTAL)
+        _mem_free = _device.run_capability(FrontendCapability.MEM_FREE)
+        _cpu_load = _device.run_capability(FrontendCapability.CPU_LOAD)
+        _cpu_temp = _device.run_capability(FrontendCapability.CPU_TEMP)
+        _disk_data_free = _device.run_capability(FrontendCapability.DISK_DATA_FREE)
+        _disk_tmp_free = _device.run_capability(FrontendCapability.DISK_TMP_FREE)
+        _display_size = _device.run_capability(FrontendCapability.DISPLAY_SIZE)
+        _network_config = _device.run_capability(FrontendCapability.NET_CONFIG)
+        _network_status = _device.network_status()
+        _files = _device.get_files()
+        _latest_items = [{'id':_files[_name]['json']['item'].id} for _name in _files]
+        _data = {
+            'uptime': _uptime,
+            'memory_used': _mem_total - _mem_free if _mem_total and _mem_free else None,
+            'memory_free': _mem_free if _mem_free else None,
+            'cpu_load': _cpu_load,
+            'cpu_temp': _cpu_temp,
+            'disk_data_used': None,
+            'disk_data_free': _disk_data_free,
+            'tmp_used': None,
+            'tmp_free': _disk_tmp_free,
+            'network_profile': _network_status['profile'],
+            'network_connected': int(_network_status['connected'].timestamp()*1000) if _network_status['connected'] else None,
+            'network_address_ip': _network_config['ip'] if _network_config else None,
+            'netwokr_gateway': _network_config['gateway'] if _network_config else None,
+            'screen_on': _device.run_capability(FrontendCapability.DISPLAY_STATUS),
+            'screen_width': _display_size[0] if _display_size else None,
+            'screen_height': _display_size[1] if _display_size else None,
+            'items_total': _config.count_items,
+            'items_shown': _config.count_views,
+            'items_updated': int(_config.date_items_update.timestamp()*1000) if _config.date_items_update else None,
+            'items_latest': _latest_items,
+        }
+        logger.info("Submitting status information: {}".format(_data))
+        try:
+            self._client.submit_status(_display.get_id(), _data)
+        except Exception as e:
+            logger.warning("Could not submit status information: {}".format(e))
+
 
 class Display(Singleton):
 
