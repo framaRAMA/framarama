@@ -65,8 +65,9 @@ class BaseDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class BaseViewSet(BaseListView, BaseQuerySetMixin, viewsets.ModelViewSet):
+class BaseViewSet(BaseListView, BaseQuerySetMixin, viewsets.ReadOnlyModelViewSet):
     pass
+
 
 class FrameViewSet(BaseViewSet):
     serializer_class = FrameSerializer
