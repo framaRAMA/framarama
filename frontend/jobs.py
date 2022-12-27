@@ -39,7 +39,7 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = timezone.now()
             _config.get_config().save()
-        for _job_name in ['fe_next_time', 'fe_refresh_items']:
+        for _job_name in ['fe_next_time', 'fe_refresh_items', 'fe_submit_status']:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
     
@@ -48,6 +48,8 @@ class Jobs():
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
         if not self._scheduler.get('fe_next_item'):
             self._scheduler.add(self.next_item, 'interval', minutes=1, id='fe_next_item', name='Frontend next item')
+        if not self._scheduler.get('fe_submit_status'):
+            self._scheduler.add(self.submit_status, 'interval', minutes=5, id='fe_submit_status', name='Frontend status submission')
         self.refresh_items()
         self.next_item()
 
@@ -117,6 +119,9 @@ class Jobs():
             except Exception as e:
                 self._last_update = _last_update
                 raise
+
+    def submit_status(self):
+        frontend.Frontend.get().submit_status()
 
     def tick(self):
         _frontend = frontend.Frontend.get()
