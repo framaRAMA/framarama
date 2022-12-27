@@ -135,7 +135,10 @@ class Frontend(Singleton):
         _network_config = _device.run_capability(FrontendCapability.NET_CONFIG)
         _network_status = _device.network_status()
         _files = _device.get_files()
-        _latest_items = [{'id':_files[_name]['json']['item'].id} for _name in _files]
+        _latest_items = [{
+            'id': _files[_name]['json']['item'].id,
+            'time': _dt_json(_files[_name]['json']['time'])
+        } for _name in _files]
         _data = {
             'uptime': _uptime,
             'memory': {
