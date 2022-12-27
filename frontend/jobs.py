@@ -70,7 +70,7 @@ class Jobs():
         if _display:
             logger.info("Refreshing items ...")
             self._display = _display
-            self._items = _display.get_items()
+            self._items = _display.get_items(True)
             logger.info("Have {} items in list.".format(self._items.count()))
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_items_update = timezone.now()
@@ -105,7 +105,7 @@ class Jobs():
                 logger.info("Retrieve next item ...")
                 _next_item = self._display.get_next_item(True)
                 logger.info("Next item is {}".format(_next_item))
-                _finishings = self._display.get_finishings()
+                _finishings = self._display.get_finishings(True)
                 _frontend_item = _device.finish(self._display, _next_item, _finishings)
                 _device.render(self._display, _frontend_item)
                 logger.info("Image updated ({} bytes, {}x{} pixels, mime {})!".format(

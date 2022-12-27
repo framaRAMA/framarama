@@ -238,17 +238,17 @@ class Display(Singleton):
         _time_change = self.get_time_change()
         return last_update is None or last_update + _time_change < _now
 
-    def get_items(self, refresh=True):
+    def get_items(self, refresh=False):
         if self._items is None or refresh:
             self._items = self._client.get_items_list(self.get_id())
         return self._items
 
-    def get_next_item(self, refresh=True):
+    def get_next_item(self, refresh=False):
         if self._next is None or refresh:
             self._next = self._client.get_items_next(self.get_id())
         return self._next
 
-    def get_finishings(self, refresh=True):
+    def get_finishings(self, refresh=False):
         if self._finishings is None or refresh:
             self._finishings = self._client.get_finishings(self.get_id())
         return self._finishings
