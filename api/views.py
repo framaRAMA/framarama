@@ -1,6 +1,6 @@
 
 from django.shortcuts import render
-from rest_framework import generics, viewsets, permissions, serializers, decorators, response
+from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 
 from framarama.base.views import BaseQuerySetMixin
@@ -30,6 +30,61 @@ class DisplaySerializer(serializers.HyperlinkedModelSerializer):
     def get_device_type_name(self, obj):
         choice = [value for value in models.DEVICE_CHOICES if value[0] == obj.device_type]
         return choice[0][1] if choice else None
+
+
+class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.DisplayStatus
+        fields = [
+            'uptime',
+            'memory_used', 'memory_free',
+            'cpu_load', 'cpu_temp',
+            'disk_data_free', 'disk_tmp_free',
+            'network_profile', 'network_connected', 'network_address_ip', 'network_address_gateway',
+            'screen_on', 'screen_width', 'screen_height',
+            'items_total', 'items_shown', 'items_updated', 'items_latest'
+        ]
+
+    def _json_to_model(self, data, prefix=''):
+        _result = {}
+        for _name, _value in data.items():
+            if type(_value) == dict:
+                _result.update(self._json_to_model(_value, _name + '_'))
+            elif type(_value) == list:
+                _result[prefix + _name] = ', '.join(_value)
+            else:
+                _result[prefix + _name] = _value
+        return _result
+
+    def _model_to_json(self, data, prefix=''):
+        _result = {}
+        #for _name in [_field.name for _field in data._meta.fields if _field.name.startswith(prefix)]:
+        #    _value = getattr(data, _name)
+        for _name in [_name for _name in data if _name.startswith(prefix)]:
+            _value = data[_name]
+            _suffix = _name[len(prefix):]
+            if '_' in _suffix:
+                _key = _suffix.split('_')[0]
+                _result[_key] = self._model_to_json(data, prefix + _key + '_')
+            else:
+                _result[_suffix] = _value
+        return _result
+
+    def to_representation(self, instance):
+        _result = super().to_representation(instance)
+        _result = self._model_to_json(_result)
+        return _result
+
+    def to_internal_value(self, data):
+        _result = self._json_to_model(data)
+        _result = super().to_internal_value(_result)
+        return _result
+
+    def create(self, validated_data):
+        _status = models.DisplayStatus(**validated_data)
+        #_status.save()
+        return _status
 
 
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
@@ -99,6 +154,21 @@ class DisplayViewSet(BaseViewSet):
     @decorators.action(detail='frame/detail', methods=['get'])
     def frame(self, *args, **kwargs):
         return response.Response(FrameSerializer(self.get_object().frame).data)
+
+
+class StatusDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
+    serializer_class = DisplayStatusSerializer
+
+    def get_queryset(self):
+        _display_id = self.kwargs.get('display_id')
+        return self.qs().displaystatus.filter(display_id=_display_id)
+
+    def perform_create(self, serializer):
+        _display_id = self.kwargs.get('display_id')
+        _displays = list(self.qs().displays.filter(pk=_display_id))
+        if len(_displays) == 0:
+            raise NotFound()
+        serializer.save(display=_displays[0])
 
 
 class ItemDisplayViewSet(BaseViewSet):
