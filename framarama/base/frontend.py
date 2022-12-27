@@ -120,6 +120,7 @@ class Frontend(Singleton):
         return FrontendDevice.get(self)
 
     def submit_status(self):
+        _dt_json = lambda dt: dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z' if dt and dt.tzinfo else dt.isoformat() + 'Z' if dt else None
         _config = self.get_config().get_config()
         _display = self.get_display()
         _device = self.get_device()
@@ -157,7 +158,7 @@ class Frontend(Singleton):
             },
             'network': {
                 'profile': _network_status['profile'],
-                'connected': _network_status['connected'] if _network_status['connected'] else None,
+                'connected': _dt_json(_network_status['connected']) if _network_status['connected'] else None,
                 'address': {
                     'ip': _network_config['ip'] if _network_config else None,
                     'gateway': _network_config['gateway'] if _network_config else None,
@@ -171,7 +172,7 @@ class Frontend(Singleton):
             'items': {
                 'total': _config.count_items,
                 'shown': _config.count_views,
-                'updated': _config.date_items_update.timestamp() if _config.date_items_update else None,
+                'updated': _dt_json(_config.date_items_update) if _config.date_items_update else None,
                 'latest': _latest_items,
             }
         }
