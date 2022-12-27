@@ -37,6 +37,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.DisplayStatus
         fields = [
+            'id',
             'uptime',
             'memory_used', 'memory_free',
             'cpu_load', 'cpu_temp',
