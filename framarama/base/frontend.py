@@ -813,7 +813,7 @@ class FrontendCapability:
         return Process.exec_run(['sudo', 'shutdown', '-h', 'now'])
 
     def app_revision(device, *args, **kwargs):
-        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %ai %s'])
+        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %s'])
         # de4a83b 2022-12-17T11:14:06+01:00 Implement frontend capability to retrieve display size (using xrandr)
         if _log:
             _values = _log.split(b' ')
