@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class Jobs():
+    FE_INIT = 'fe_init'
+    FE_NEXT_TIME = 'fe_next_time'
+    FE_REFRESH_ITEM = 'fe_refresh_items'
+    FE_SUBMIT_STATUS = 'fe_submit_status'
 
     def __init__(self, scheduler):
         self._display = None
@@ -23,7 +27,7 @@ class Jobs():
         self._scheduler = scheduler
         self._monitor = None
         if 'frontend' in settings.FRAMARAMA['MODES']:
-            self._scheduler.add(self.tick, 'interval', seconds=5, id='fe_init', name='Frontend timer')
+            self._scheduler.add(self.tick, 'interval', seconds=5, id=Jobs.FE_INIT, name='Frontend timer')
             self._monitor = frontend.Frontend.get().get_device().monitor()
             self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
             self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
@@ -39,17 +43,17 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = timezone.now()
             _config.get_config().save()
-        for _job_name in ['fe_next_item', 'fe_refresh_items', 'fe_submit_status']:
+        for _job_name in [Jobs.FE_NEXT_TIME, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
     
     def _setup_completed(self):
-        if not self._scheduler.get('fe_refresh_items'):
-            self._scheduler.add(self.refresh_items, 'interval', minutes=15, id='fe_refresh_items', name='Frontend refresh items')
-        if not self._scheduler.get('fe_next_item'):
-            self._scheduler.add(self.next_item, 'interval', minutes=1, id='fe_next_item', name='Frontend next item')
-        if not self._scheduler.get('fe_submit_status'):
-            self._scheduler.add(self.submit_status, 'interval', minutes=5, id='fe_submit_status', name='Frontend status submission')
+        if not self._scheduler.get(Jobs.FE_REFRESH_ITEM):
+            self._scheduler.add(self.refresh_items, 'interval', minutes=15, id=Jobs.FE_REFRESH_ITEM, name='Frontend refresh items')
+        if not self._scheduler.get(Jobs.FE_NEXT_TIME):
+            self._scheduler.add(self.next_item, 'interval', minutes=1, id=Jobs.FE_NEXT_TIME, name='Frontend next item')
+        if not self._scheduler.get(Jobs.FE_SUBMIT_STATUS):
+            self._scheduler.add(self.submit_status, 'interval', minutes=5, id=Jobs.FE_SUBMIT_STATUS, name='Frontend status submission')
         self.refresh_items()
         self.next_item()
 
