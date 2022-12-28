@@ -1,6 +1,7 @@
 import io
 
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
@@ -50,7 +51,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             'disk_data_free', 'disk_tmp_free',
             'network_profile', 'network_connected', 'network_address_ip', 'network_address_gateway',
             'screen_on', 'screen_width', 'screen_height',
-            'items_total', 'items_shown', 'items_updated', 'items_latest'
+            'items_total', 'items_shown', 'items_updated'
         ]
 
     def to_representation(self, instance):
@@ -171,7 +172,24 @@ class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
             raise NotFound()
         _processor = sorting.Processor(sorting.Context(_frames[0], random_item=True))
         _result = _processor.process()
-        return _result['items']
+        _items = list(_result['items'])
+        if self.request.query_params.get('hit', '0') == '1' and len(_items) > 0:
+            _item = _items[0]
+            _display = self.qs().displays.filter(pk=_display_id).get()
+            _display_items = list(self.qs().displayitems.filter(item__id=_item.id))
+            if len(_display_items):
+                _display_item = _display_items[0]
+            else:
+                _display_item = models.DisplayItem(
+                    display=_display,
+                    item=_item,
+                    date_first_seen=timezone.now(),
+                    count_hit=0,
+                )
+            _display_item.date_last_seen = timezone.now()
+            _display_item.count_hit = _display_item.count_hit + 1
+            _display_item.save()
+        return _items
 
 
 class FinishingDisplayViewSet(BaseViewSet):

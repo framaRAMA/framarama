@@ -62,6 +62,9 @@ class BaseQuerySetMixin:
               'displaystatus': (
                   _user.qs_displaystatus if hasattr(_user, 'qs_displaystatus') else
                   models.DisplayStatus.objects).filter(display__user=_user),
+              'displayitems': (
+                  _user.qs_displayitems if hasattr(_user, 'qs_displayitems') else
+                  models.DisplayItem.objects).filter(display__user=_user),
               'finishings': (
                   _user.qs_finishings if hasattr(_user, 'qs_finishings') else
                   models.Finishing.objects).filter(frame__user=_user),

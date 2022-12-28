@@ -362,11 +362,28 @@ class DisplayStatus(BaseModel):
     items_updated = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Items updated', help_text='Time of the last item list update')
-    items_latest = models.CharField(
-        max_length=255, blank=True, null=True,
-        verbose_name='Latest items', help_text='List of last items shown')
 
     class Meta:
         db_table = 'config_display_status'
+        ordering = ['-created']
+
+
+class DisplayItem(BaseModel):
+    STR_FIELDS = BaseModel.STR_FIELDS + ["uptime", "memory_free", "cpu_load", "cpu_temp", "disk_data_free", "disk_tmp_free", "screen_on", "items_total"]
+
+    display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='item')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='display')
+    date_first_seen = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='First seen', help_text='Date when the item was first shown on display')
+    date_last_seen = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='Last seen', help_text='Date when the item was last shown on the display')
+    count_hit = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Hits', help_text='Amount of hits for this item')
+
+    class Meta:
+        db_table = 'config_display_item'
         ordering = ['-created']
 
