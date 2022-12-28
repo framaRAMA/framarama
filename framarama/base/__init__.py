@@ -30,6 +30,8 @@ class DatabaseRouter:
     config = None
 
     def _dump(self, cls, route):
+        if route is None:
+            return
         params = connections[route].get_connection_params()
         params = {name: value for name, value in params.items() if name in ['database', 'host', 'user']}
         cls = cls if type(cls) == type else type(cls)
@@ -57,8 +59,9 @@ class DatabaseRouter:
         else:
             _routing = DatabaseRouter.routing['remote']
         _app_label = model._meta.app_label
-        self._dump(model, _routing[_app_label] if _app_label in _routing else None)
-        return _routing[_app_label] if _app_label in _routing else None
+        _route = _routing[_app_label] if _app_label in _routing else None
+        self._dump(model, _route)
+        return _route
 
     def db_for_read(self, model, **hints):
         return self._route(model)
