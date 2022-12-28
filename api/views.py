@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
+from framarama.base import utils
 from framarama.base.views import BaseQuerySetMixin
 from config import models
 from config.utils import sorting
@@ -52,45 +53,13 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             'items_total', 'items_shown', 'items_updated', 'items_latest'
         ]
 
-    def _json_to_model(self, data, fields, prefix=''):
-        _result = {}
-        for _name, _value in data.items():
-            if type(_value) == dict:
-                _not_mapped = {}
-                for _result_name, _result_value in self._json_to_model(_value, fields, _name + '_').items():
-                    if _result_name in fields:
-                        _result[_result_name] = _result_value
-                    else:
-                        _not_mapped[_result_name[len(prefix)+1:]] = _result_value
-                if len(_not_mapped):
-                    _result[prefix + _name] = DisplayStatusSerializer._json_renderer.render(_not_mapped).decode()
-            elif type(_value) == list:
-                _result[prefix + _name] = DisplayStatusSerializer._json_renderer.render(_value).decode()
-            else:
-                _result[prefix + _name] = _value
-        return _result
-
-    def _model_to_json(self, data, prefix=''):
-        _result = {}
-        for _name in [_name for _name in data if _name.startswith(prefix)]:
-            _value = data[_name]
-            _suffix = _name[len(prefix):]
-            if '_' in _suffix:
-                _key = _suffix.split('_')[0]
-                _result[_key] = self._model_to_json(data, prefix + _key + '_')
-            elif type(_value) == str and len(_value) > 0 and _value[0] in ['[', '{', '"']:
-                _result[_suffix] = DisplayStatusSerializer._json_parser.parse(io.BytesIO(_value.encode()))
-            else:
-                _result[_suffix] = _value
-        return _result
-
     def to_representation(self, instance):
         _result = super().to_representation(instance)
-        _result = self._model_to_json(_result)
+        _result = utils.Json.from_object_dict(_result)
         return _result
 
     def to_internal_value(self, data):
-        _result = self._json_to_model(data, [_name for _name in self.Meta.fields])
+        _result = utils.Json.to_object_dict(data, [_name for _name in self.Meta.fields])
         _result = super().to_internal_value(_result)
         return _result
 

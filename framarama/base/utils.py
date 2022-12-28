@@ -5,6 +5,7 @@ import subprocess
 import threading
 import signal
 import logging
+import json
 
 from frontend import models
 
@@ -155,4 +156,41 @@ class Process:
             timeout = timeout - 1
         return False
 
+
+class Json:
+
+
+    @staticmethod
+    def to_object_dict(data, fields, prefix=''):
+        _result = {}
+        for _name, _value in data.items():
+            if type(_value) == dict:
+                _not_mapped = {}
+                for _result_name, _result_value in Json.to_object_dict(_value, fields, prefix + _name + '_').items():
+                    if _result_name in fields:
+                        _result[_result_name] = _result_value
+                    else:
+                        _not_mapped[_result_name[len(prefix)+1:]] = _result_value
+                if len(_not_mapped):
+                    _result[prefix + _name] = json.dumps(_not_mapped)
+            elif type(_value) == list:
+                _result[prefix + _name] = json.dumps(_value)
+            else:
+                _result[prefix + _name] = _value
+        return _result
+
+    @staticmethod
+    def from_object_dict(data, prefix=''):
+        _result = {}
+        for _name in [_name for _name in data if _name.startswith(prefix)]:
+            _value = data[_name]
+            _suffix = _name[len(prefix):]
+            if '_' in _suffix:
+                _key = _suffix.split('_')[0]
+                _result[_key] = Json.from_object_dict(data, prefix + _key + '_')
+            elif type(_value) == str and len(_value) > 0 and _value[0] in ['[', '{', '"']:
+                _result[_suffix] = json.loads(_value)
+            else:
+                _result[_suffix] = _value
+        return _result
 
