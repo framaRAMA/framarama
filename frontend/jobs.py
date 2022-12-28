@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class Jobs():
     FE_INIT = 'fe_init'
-    FE_NEXT_TIME = 'fe_next_time'
+    FE_NEXT_ITEM = 'fe_next_item'
     FE_REFRESH_ITEM = 'fe_refresh_items'
     FE_SUBMIT_STATUS = 'fe_submit_status'
 
@@ -43,15 +43,15 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = timezone.now()
             _config.get_config().save()
-        for _job_name in [Jobs.FE_NEXT_TIME, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
+        for _job_name in [Jobs.FE_NEXT_ITEM, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
     
     def _setup_completed(self):
         if not self._scheduler.get(Jobs.FE_REFRESH_ITEM):
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id=Jobs.FE_REFRESH_ITEM, name='Frontend refresh items')
-        if not self._scheduler.get(Jobs.FE_NEXT_TIME):
-            self._scheduler.add(self.next_item, 'interval', minutes=1, id=Jobs.FE_NEXT_TIME, name='Frontend next item')
+        if not self._scheduler.get(Jobs.FE_NEXT_ITEM):
+            self._scheduler.add(self.next_item, 'interval', minutes=1, id=Jobs.FE_NEXT_ITEM, name='Frontend next item')
         if not self._scheduler.get(Jobs.FE_SUBMIT_STATUS):
             self._scheduler.add(self.submit_status, 'interval', minutes=5, id=Jobs.FE_SUBMIT_STATUS, name='Frontend status submission')
         self.refresh_items()
