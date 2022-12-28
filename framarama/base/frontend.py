@@ -265,9 +265,9 @@ class Display(Singleton):
             self._items = self._client.get_items_list(self.get_id())
         return self._items
 
-    def get_next_item(self, refresh=False):
+    def get_next_item(self, refresh=False, hit=True):
         if self._next is None or refresh:
-            self._next = self._client.get_items_next(self.get_id())
+            self._next = self._client.get_items_next(self.get_id(), hit)
         return self._next
 
     def get_finishings(self, refresh=False):
