@@ -39,7 +39,7 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = timezone.now()
             _config.get_config().save()
-        for _job_name in ['fe_next_time', 'fe_refresh_items', 'fe_submit_status']:
+        for _job_name in ['fe_next_item', 'fe_refresh_items', 'fe_submit_status']:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
     
