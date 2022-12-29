@@ -14,12 +14,13 @@ More details at <a href="https://framarama.org/">https://framarama.org/</a>.
   <li class="nav-item">
     <a class="nav-link p-3{{ lib.nav_active(request, 'fe_system_usb') }}" href="{{ url('fe_system_usb') }}">{{ lib.icon('frontend.system.usb') }}<span class="d-none d-lg-inline"></span></a>
   </li>
-  <li class="col">
-    <a href="{{ url('fe_dashboard') }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Show frontend">{{ lib.icon('frontend', 'p-0 m-0') }}</a>
-  </li>
 </ul>
 
 {% block content_system %}
 {% endblock %}
+
+<div class="pt-4 text-center">
+  <a href="{{ url('fe_dashboard') }}" class="btn btn-outline-primary btn-floating btn-lg" title="Back to dashboard">{{ lib.icon('action.back') }}</a>
+</div>
 
 {% endblock %}
