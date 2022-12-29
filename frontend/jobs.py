@@ -81,7 +81,7 @@ class Jobs():
             _config.get_config().count_items = self._items.count()
             _config.get_config().save()
 
-    def next_item(self):
+    def next_item(self, force=False):
         if self._display is None:
             return
         _now = timezone.now()
@@ -100,9 +100,9 @@ class Jobs():
                     logger.info("Switch display on at {}".format(self._display.get_time_on()))
                     _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
                     _display_on = True
-        if not _display_on:
+        if not _display_on and not force:
             logger.info("Skipping next item, display is off.")
-        elif self._display.time_change_reached(self._last_update):
+        elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
             try:
                 self._last_update = timezone.now()

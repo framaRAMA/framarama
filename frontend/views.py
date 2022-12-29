@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
@@ -10,6 +11,7 @@ from framarama.base import frontend
 from frontend import views
 from frontend import forms
 from frontend import models
+from frontend import jobs
 from config.models import Frame
 
 class BaseSetupView(BaseView):
@@ -255,6 +257,9 @@ class DisplayDashboardView(BaseFrontendView):
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
           else:
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+        elif _action == 'display.refresh':
+            _scheduler = apps.get_app_config('frontend').get_scheduler()
+            _scheduler.trigger(jobs.Jobs.FE_NEXT_ITEM, force=True)
         _context['display'] = {
             'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
             'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
