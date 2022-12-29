@@ -20,6 +20,10 @@ class Scheduler:
     def remove(self, name):
         self._scheduler.remove_job(name)
 
+    def trigger(self, name, *func_args, **func_kwargs):
+        _job = self.get(name)
+        self._scheduler.add_job(_job.func, args=func_args, kwargs=func_kwargs)
+
     def get(self, name):
         return self._scheduler.get_job(name)
 
