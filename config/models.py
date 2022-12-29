@@ -311,13 +311,13 @@ class DisplayStatus(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["uptime", "memory_free", "cpu_load", "cpu_temp", "disk_data_free", "disk_tmp_free", "screen_on", "items_total"]
 
     display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='status')
-    uptime = models.IntegerField(
+    uptime = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Update', help_text='The uptime of the device in milli seconds')
-    memory_used = models.IntegerField(
+    memory_used = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Memory used', help_text='Amount of memory currently in use')
-    memory_free = models.IntegerField(
+    memory_free = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Memory available', help_text='Amount of memory currently available')
     cpu_load = models.FloatField(
@@ -326,10 +326,10 @@ class DisplayStatus(BaseModel):
     cpu_temp = models.IntegerField(
         blank=True, null=True,
         verbose_name='CPU temperature', help_text='Current temperature of CPU')
-    disk_data_free = models.IntegerField(
+    disk_data_free = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Disk DATA free', help_text='Available amount of space in data partition')
-    disk_tmp_free = models.IntegerField(
+    disk_tmp_free = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Disk TMP free', help_text='Available amount of space in temporary partition')
     network_profile = models.CharField(
