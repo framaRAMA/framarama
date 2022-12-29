@@ -28,7 +28,7 @@
     {% endif %}
   </div>
   {% if app.revision %}
-      {{ lib.field_text('Version', '%s (%s)'|format(app.revision.date, app.revision.hash)) }}
+      {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.date, app.revision.hash, app.revision.branch)) }}
   {% endif %}
 </div>
 

@@ -134,6 +134,7 @@ class Frontend(Singleton):
         _display_size = _device.run_capability(FrontendCapability.DISPLAY_SIZE)
         _network_config = _device.run_capability(FrontendCapability.NET_CONFIG)
         _network_status = _device.network_status()
+        _app_revision = _device.run_capability(FrontendCapability.APP_REVISION)
         _files = _device.get_files()
         _latest_items = [{
             'id': _files[_name]['json']['item'].id,
@@ -177,7 +178,12 @@ class Frontend(Singleton):
                 'shown': _config.count_views,
                 'updated': _dt_json(_config.date_items_update) if _config.date_items_update else None,
                 'latest': _latest_items,
-            }
+            },
+            'app': {
+                'date': _dt_json(_app_revision['date']) if _app_revision else None,
+                'hash': _app_revision['hash'] if _app_revision else None,
+                'branch': _app_revision['branch'] if _app_revision else None,
+            },
         }
         logger.info("Submitting status information: {}".format(_data))
         try:
@@ -817,7 +823,14 @@ class FrontendCapability:
         # de4a83b 2022-12-17T11:14:06+01:00 Implement frontend capability to retrieve display size (using xrandr)
         if _log:
             _values = _log.split(b' ')
-            return {'hash': _values[0].decode(), 'date': dateparse.parse_datetime(_values[1].decode()), 'comment': _values[2].decode()}
+            _branch = Process.exec_run(['git', 'branch', '--show-current'])
+            _rev = {
+                'hash': _values[0].decode(),
+                'date': dateparse.parse_datetime(_values[1].decode()),
+                'comment': _values[2].decode(),
+                'branch': _branch.decode().strip() if _branch else None
+            }
+            return _rev
         return None
 
 

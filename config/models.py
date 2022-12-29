@@ -362,6 +362,15 @@ class DisplayStatus(BaseModel):
     items_updated = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Items updated', help_text='Time of the last item list update')
+    app_date = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='Application date', help_text='Date of current version in use')
+    app_hash = models.CharField(
+        max_length=48, blank=True, null=True,
+        verbose_name='Application hash', help_text='Commit hash of current version in use')
+    app_branch = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Application branch', help_text='Branch of current version in use')
 
     class Meta:
         db_table = 'config_display_status'
