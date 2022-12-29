@@ -885,18 +885,15 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
             _config.count_items_keep if _config.count_items_keep else 6,
             ['json', 'image', 'preview'])
 
-        with open(_files['json'], 'w') as f:
-            f.write(jsonpickle.encode({
-              'item': item.item(),
-              'mime': item.mime(),
-              'time': datetime.datetime.utcnow()
-            }))
+        _json = jsonpickle.encode({
+          'item': item.item(),
+          'mime': item.mime(),
+          'time': datetime.datetime.utcnow()
+        })
 
-        with open(_files['image'], 'wb') as f:
-            f.write(item.data())
-
-        with open(_files['preview'], 'wb') as f:
-            f.write(item.preview())
+        Filesystem.file_write(_files['json'], _json.encode())
+        Filesystem.file_write(_files['image'], item.data())
+        Filesystem.file_write(_files['preview'], item.preview())
 
     def files(self):
         _files = {}
