@@ -126,6 +126,8 @@ class Jobs():
                 raise
 
     def submit_status(self):
+        if self._display is None:
+            return
         frontend.Frontend.get().submit_status()
 
     def tick(self):
