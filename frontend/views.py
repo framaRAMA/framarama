@@ -250,6 +250,7 @@ class DisplayDashboardView(BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
+        _scheduler = apps.get_app_config('frontend').get_scheduler()
         _context['files'] = _frontend_device.get_files().items()
         _action = self.request.GET.get('action')
         if _action == 'display.toggle':
@@ -258,11 +259,11 @@ class DisplayDashboardView(BaseFrontendView):
           else:
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
         elif _action == 'display.refresh':
-            _scheduler = apps.get_app_config('frontend').get_scheduler()
             _scheduler.trigger(jobs.Jobs.FE_NEXT_ITEM, force=True)
         _context['display'] = {
             'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
             'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
+            'refresh': _scheduler.running(jobs.Jobs.FE_NEXT_ITEM, True),
         }
         return _context
 

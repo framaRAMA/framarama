@@ -55,7 +55,8 @@ class Jobs():
         if not self._scheduler.get(Jobs.FE_SUBMIT_STATUS):
             self._scheduler.add(self.submit_status, 'interval', minutes=5, id=Jobs.FE_SUBMIT_STATUS, name='Frontend status submission')
         self.refresh_items()
-        self.next_item()
+        self._scheduler.trigger(Jobs.FE_NEXT_ITEM)
+        self._scheduler.trigger(Jobs.FE_SUBMIT_STATUS)
 
     def key_restart(self):
         logger.info("Restart application!")

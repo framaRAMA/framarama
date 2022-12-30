@@ -40,7 +40,7 @@
 {% endif %}
 
 <div class="pt-4 text-center">
-  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-outline-primary btn-floating btn-lg" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
   <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if not display.status %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
 </div>
 
