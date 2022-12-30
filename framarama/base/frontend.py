@@ -824,11 +824,17 @@ class FrontendCapability:
         if _log:
             _values = _log.split(b' ')
             _branch = Process.exec_run(['git', 'branch', '--show-current'])
+            _branch.decode().strip() if _branch else None
+            _remotes = Process.exec_run(['git', 'remote', '-v'])
+            _remotes = [_line.split() for _line in _remotes.decode().split('\n') if len(_line)] if _remotes else []
+            _remotes = {_parts[0]: _parts[1] for _parts in _remotes if _parts[-1] == '(fetch)'}
+            # origin	https://user@host/path/to/repo/framarama.git (fetch)
             _rev = {
                 'hash': _values[0].decode(),
                 'date': dateparse.parse_datetime(_values[1].decode()),
                 'comment': _values[2].decode(),
-                'branch': _branch.decode().strip() if _branch else None
+                'branch': _branch,
+                'remotes': _remotes,
             }
             return _rev
         return None
