@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import shutil
 import subprocess
 import threading
 import signal
@@ -78,6 +79,10 @@ class Filesystem:
     def file_write(filename, data):
         with open(filename, 'wb') as f:
             f.write(data)
+
+    @staticmethod
+    def file_copy(source, target):
+        shutil.copyfile(source, target)
 
     @staticmethod
     def file_match(path, pattern):
