@@ -875,6 +875,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
     FILE_PATH = settings.FRAMARAMA['DATA_PATH']
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
+    FILE_CURRENT = 'framarama-current.image'
 
     def process(self, display, item):
         _config = Frontend.get().get_config().get_config()
@@ -894,6 +895,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         Filesystem.file_write(_files['json'], _json.encode())
         Filesystem.file_write(_files['image'], item.data())
         Filesystem.file_write(_files['preview'], item.preview())
+        Filesystem.file_copy(_files['image'], self.FILE_PATH + '/' + self.FILE_CURRENT)
 
     def files(self):
         _files = {}
@@ -914,7 +916,8 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
     COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
-    IMG_CURRENT = DATA_PATH + '/framarama-00001.image'
+    IMG_CURRENT = DATA_PATH + '/framarama-current.image'
+    FILE_LIST = DATA_PATH + '/framarama-current.csv'
 
     CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', DATA_PATH + '/picture-background.jpg', '-f', DATA_PATH + '/picture-current.csv', '--reload', '10']
     CMD_IMAGICK = ['magick', 'display', '-window', 'root']
@@ -930,7 +933,7 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 break
 
     def update_feh(self, display, item):
-        _file_list = VisualizeFrontendRenderer.DATA_PATH + '/framarama-current.csv'
+        _file_list = VisualizeFrontendRenderer.FILE_LIST
         if Process.exec_running('feh') is None:
             Process.exec_bg([
                 'feh',
@@ -941,7 +944,7 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 '--scale-down',
                 '-bg-trans',
                 '-f', _file_list,
-                '--reload', '10'
+                '--reload', '2'
             ])
         if not Filesystem.file_exists(_file_list) or Filesystem.file_size(_file_list) == 0:
             Filesystem.file_write(_file_list, VisualizeFrontendRenderer.IMG_CURRENT.encode())
