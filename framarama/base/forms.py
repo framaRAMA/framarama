@@ -25,6 +25,10 @@ def timeFieldWidget(*args, **kwargs):
     return forms.TimeInput(attrs={'class':'form-control'}, *args, **kwargs)
 
 
+def passwordFieldWidget(*args, **kwargs):
+    return forms.PasswordInput(attrs={'class':'form-control'}, *args, **kwargs)
+
+
 def generatedKeyCharFieldWidget(length=32, *args, **kwargs):
     class GenerateKeyTextInput(forms.TextInput):
         pass
