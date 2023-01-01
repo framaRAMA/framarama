@@ -1,0 +1,2 @@
+framarama ALL=(root) NOPASSWD: /usr/bin/nmcli, /usr/bin/systemctl show framarama, /usr/bin/systemctl status -n [[\:digit\:]]* framarama, /usr/bin/systemctl stop framarama, /usr/bin/systemctl start framarama, /usr/bin/systemctl restart framarama, /usr/bin/journalctl -u framarama, /usr/sbin/shutdown -h now
+
