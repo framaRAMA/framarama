@@ -18,6 +18,8 @@ class Jobs():
     FE_NEXT_ITEM = 'fe_next_item'
     FE_REFRESH_ITEM = 'fe_refresh_items'
     FE_SUBMIT_STATUS = 'fe_submit_status'
+    FE_APP_CHECK = 'fe_app_check'
+    FE_APP_UPDATE = 'fe_app_update'
 
     def __init__(self, scheduler):
         self._display = None

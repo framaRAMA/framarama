@@ -1,0 +1,29 @@
+{% extends "frontend/dashboard.base.html" %}
+
+{% block content_dashboard %}
+
+<div class="pt-2">
+  {{ lib.field_text('Current Version', '%s (%s, %s)'|format(app.revision.branch, app.revision.hash, app.revision.date)) }}
+  {{ lib.field_text('Available Versions', app.revision.revisions[0:8]|join(', ')) }}
+</div>
+
+<div class="pt-4 text-center">
+  <a data-bs-toggle="modal" data-bs-target="#appCheck" class="btn btn-{% if not check and not update %}outline-{% endif %}primary btn-floating btn-lg{% if check or update %} disabled{% endif %}" title="Check for updates">{{ lib.icon('action.refresh') }}</a>
+  <a data-bs-toggle="modal" data-bs-target="#appUpdate" class="btn btn-{% if not check and not update %}outline-{% endif %}primary btn-floating btn-lg{% if check or update %} disabled{% endif %}" title="Update to revision">{{ lib.icon('action.update') }}</a>
+</div>
+
+{{ lib.modal_start('appCheck', 'Check for updates') }}
+  <strong>Do you want to start the check for updates to find new versoins?</strong>
+  {{ lib.form_start(form_check, csrf_input) }}
+  {{ lib.form_fields(form_check) }}
+  {{ lib.form_end(form_check, submit_title='Check', cancel_title='Close', cancel=url('fe_dashboard_software')) }}
+{{ lib.modal_end(submit=None, cancel_title=None) }}
+
+{{ lib.modal_start('appUpdate', 'Update') }}
+  <strong>Do you want to start an update to a given version?</strong>
+  {{ lib.form_start(form_update, csrf_input) }}
+  {{ lib.form_fields(form_update) }}
+  {{ lib.form_end(form_update, submit_title='Update', cancel_title='Close', cancel=url('fe_dashboard_software')) }}
+{{ lib.modal_end(submit=None, cancel_title=None) }}
+
+{% endblock %}

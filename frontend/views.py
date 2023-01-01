@@ -238,14 +238,6 @@ class BaseFrontendView(BaseSetupView):
 class OverviewDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.overview.html'
 
-    def _get(self, request, *args, **kwargs):
-        _context = super()._get(request, *args, **kwargs)
-        _frontend_device = _context['frontend'].get_device()
-        _context['app'] = {
-            'revision': _frontend_device.run_capability(frontend.FrontendCapability.APP_REVISION),
-        }
-        return _context
-
 
 class DisplayDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.display.html'
@@ -364,6 +356,63 @@ class DeviceDashboardView(BaseFrontendView):
           'config': _frontend_device.run_capability(frontend.FrontendCapability.NET_CONFIG),
           'wifi': _wifi
         }
+        return _context
+
+class SoftwareDashboardView(BaseFrontendView):
+    template_name = 'frontend/dashboard.software.html'
+
+    REMOTE_NAME = 'origin'
+
+    def _get(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _revisions = _frontend_device.run_capability(frontend.FrontendCapability.APP_REVISION)
+        _scheduler = self.get_scheduler()
+        _remotes = _revisions['remotes'] if _revisions else {}
+        _form_check = forms.SoftwareDashboardCheckForm(initial={
+            'url': _remotes[SoftwareDashboardView.REMOTE_NAME],
+            'remotes': _remotes,
+            'username': '',
+            'password': '',
+        })
+        _form_update = forms.SoftwareDashboardUpdateForm()
+        _form_update.fields['revision'].widget.choices = [(_rev, _rev) for _rev in _revisions['revisions']]
+        _context.update({
+            'app': { 'revision': _revisions },
+            'form_check': _form_check,
+            'check': _scheduler.running(jobs.Jobs.FE_APP_CHECK),
+            'form_update': _form_update,
+            'update': _scheduler.running(jobs.Jobs.FE_APP_UPDATE),
+        })
+        return _context
+
+    def _post(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _frontend_device = _context['frontend'].get_device()
+        _revisions = _frontend_device.run_capability(frontend.FrontendCapability.APP_REVISION)
+        _scheduler = self.get_scheduler()
+        _form_check = forms.SoftwareDashboardCheckForm(request.POST)
+        if _form_check.is_valid():
+            _scheduler.add(lambda: _frontend_device.run_capability(
+                frontend.FrontendCapability.APP_CHECK,
+                SoftwareDashboardView.REMOTE_NAME,
+                url=_form_check.cleaned_data['url'],
+                username=_form_check.cleaned_data['username'],
+                password=_form_check.cleaned_data['password']), id=jobs.Jobs.FE_APP_CHECK)
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_software'))
+        _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
+        if _form_update.is_valid():
+            _scheduler.add(lambda: _frontend_device.run_capability(
+                frontend.FrontendCapability.APP_UPDATE,
+                revision=_form_update.cleaned_data['revision']), id=jobs.Jobs.FE_APP_UPDATE)
+            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_software'))
+        _context.update({
+            'app': { 'revision': _revisions },
+            'form_check': _form_check,
+            'check': _scheduler.running(jobs.Jobs.FE_APP_CHECK),
+            'form_update': _form_update,
+            'update': _scheduler.running(jobs.Jobs.FE_APP_UPDATE),
+        })
         return _context
 
 

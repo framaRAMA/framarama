@@ -20,6 +20,7 @@
   'action.next' : 'forward',
   'action.generate' : 'dice',
   'action.log' : 'file-text',
+  'action.update' : 'download',
   'action.restart' : 'arrow-rotate-right',
   'action.shutdown' : 'power-off',
 
@@ -43,6 +44,7 @@
   'frontend.device': 'server',
   'frontend.system.help': 'info-circle',
   'frontend.system.usb': 'keyboard',
+  'frontend.software': 'floppy-disk',
   'frontend.wifi': 'wifi',
   'frontend.ap': 'tower-cell',
 
@@ -572,12 +574,14 @@
 
 {% macro modal_end(submit=None, submit_title='Yes', submit_class='btn-primary', cancel_title='Close', cancel_args=[]) %}
         </div>
-        <div class="modal-footer">
-          {% if submit %}
-            <a href="{{ submit }}" class="btn {{ submit_class }}">{{ submit_title }}</a>
-          {% endif %}
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ cancel_title }}</button>
-        </div>
+        {% if submit or cancel_title %}
+          <div class="modal-footer">
+            {% if submit %}
+              <a href="{{ submit }}" class="btn {{ submit_class }}">{{ submit_title }}</a>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ cancel_title }}</button>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
+from django import forms
 
 from framarama.base import forms as base
 from frontend import models
+
 
 class LocalModeSetupForm(base.BaseModelForm):
     class Meta:
@@ -53,4 +55,17 @@ class DisplaySetupForm(base.BaseModelForm):
             'watermark_scale': base.charFieldWidget(),
         }
 
+
+class SoftwareDashboardCheckForm(base.BaseForm):
+    url = forms.CharField(widget=base.charFieldWidget(),
+        label='Remote URL', help_text='The remote address to fetch updates from')
+    username = forms.CharField(widget=base.charFieldWidget(),
+        label='Username', help_text='Username to access remote URL')
+    password = forms.CharField(widget=base.passwordFieldWidget(),
+        label='Password', help_text='Passwort to access remote URL')
+
+
+class SoftwareDashboardUpdateForm(base.BaseForm):
+    revision = forms.CharField(widget=base.selectFieldWidget(choices=[]),
+        label='Revsion', help_text='Update to the selected revision')
 

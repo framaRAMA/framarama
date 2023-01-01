@@ -1,11 +1,13 @@
 import os
 import io
+import re
 import time
 import fcntl
 import threading
 import datetime
 import jsonpickle
 import ipaddress
+import urllib
 import logging
 
 from django.conf import settings
@@ -414,6 +416,8 @@ class FrontendDevice(Singleton):
                 FrontendCapability.APP_RESTART: FrontendCapability.return_none,
                 FrontendCapability.APP_SHUTDOWN: FrontendCapability.return_none,
                 FrontendCapability.APP_REVISION: FrontendCapability.return_none,
+                FrontendCapability.APP_CHECK: FrontendCapability.return_none,
+                FrontendCapability.APP_UPDATE: FrontendCapability.return_none,
             }
             if Process.exec_search('vcgencmd'):  # Raspberry PIs
                 self._capabilities[FrontendCapability.DISPLAY_ON] = FrontendCapability.vcgencmd_display_on
@@ -453,6 +457,8 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.APP_SHUTDOWN] = FrontendCapability.app_shutdown
             if Process.exec_search('git'):
                 self._capabilities[FrontendCapability.APP_REVISION] = FrontendCapability.app_revision
+                self._capabilities[FrontendCapability.APP_CHECK] = FrontendCapability.app_check
+                self._capabilities[FrontendCapability.APP_UPDATE] = FrontendCapability.app_update
 
         return self._capabilities
 
@@ -561,6 +567,8 @@ class FrontendCapability:
     APP_RESTART = 'app.restart'
     APP_SHUTDOWN = 'app.shutdown'
     APP_REVISION = 'app.revision'
+    APP_CHECK = 'app.check'
+    APP_UPDATE = 'app.update'
 
     def noop(device, *args, **kwargs):
         return
@@ -818,26 +826,84 @@ class FrontendCapability:
     def app_shutdown(device, *args, **kwargs):
         return Process.exec_run(['sudo', 'shutdown', '-h', 'now'])
 
+    def _git_remotes():
+        _remotes = Process.exec_run(['git', 'remote', '-v'])
+        _remotes = [_line.split() for _line in _remotes.decode().split('\n') if len(_line)] if _remotes else []
+        _remotes = {_parts[0]: _parts[1] for _parts in _remotes if _parts[-1] == '(fetch)'}
+        return _remotes
+
+    def _git_revisions():
+        _revisions = []
+        _out = Process.exec_run(['git', 'branch', '-r'])
+        if _out:
+            _out = [_line.strip() for _line in _out.decode().split('\n')]
+            _revisions.extend(_out)
+        _out = Process.exec_run(['git', 'tag', '-l'])
+        if _out:
+            _out = [_line for _line in _out.decode().split('\n')]
+            _revisions.extend(_out)
+        return [_rev for _rev in _revisions if len(_rev)]
+
     def app_revision(device, *args, **kwargs):
         _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %s'])
         # de4a83b 2022-12-17T11:14:06+01:00 Implement frontend capability to retrieve display size (using xrandr)
         if _log:
-            _values = _log.split(b' ')
+            _values = _log.decode().split(' ')
             _branch = Process.exec_run(['git', 'branch', '--show-current'])
-            _branch.decode().strip() if _branch else None
-            _remotes = Process.exec_run(['git', 'remote', '-v'])
-            _remotes = [_line.split() for _line in _remotes.decode().split('\n') if len(_line)] if _remotes else []
-            _remotes = {_parts[0]: _parts[1] for _parts in _remotes if _parts[-1] == '(fetch)'}
-            # origin	https://user@host/path/to/repo/framarama.git (fetch)
+            _branch = _branch.decode().strip() if _branch else None
             _rev = {
-                'hash': _values[0].decode(),
-                'date': dateparse.parse_datetime(_values[1].decode()),
-                'comment': _values[2].decode(),
+                'hash': _values[0],
+                'date': dateparse.parse_datetime(_values[1]),
+                'comment': _values[2],
                 'branch': _branch,
-                'remotes': _remotes,
+                'remotes': FrontendCapability._git_remotes(),
+                'revisions': FrontendCapability._git_revisions(),
             }
             return _rev
         return None
+
+    def app_check(device, remote, url, username, password, *args, **kwargs):
+        _url = re.sub(r'^(.*://)([^@]+@)?(.*)', '\\1' + re.escape(username) + '@\\3', url)
+        logger.info("Check version update from {} using {} ...".format(remote, _url))
+        _remotes = FrontendCapability._git_remotes()
+        if remote in _remotes:
+            logger.info("Update remote {} to {}".format(remote, _url))
+            _remote_update = Process.exec_run(['git', 'remote', 'set-url', remote, _url])
+        else:
+            logger.info("Adding remote {} to {}".format(name, _url))
+            _remote_update = Process.exec_run(['git', 'remote', 'add', name, _url])
+        if _remote_update is None:
+            logger.error("Can not setup remote {} with {}".format(name, _url))
+            return
+        _fetch = Process.exec_run(['git', 'fetch', remote], env={
+            'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
+            'GIT_PASSWORD': password,
+        })
+        if _fetch is None:
+            logger.error("Can not fetch updates!")
+        else:
+            logger.info("Updates fetched!")
+        Process.exec_run(['git', 'remote', 'set-url', remote, url])
+
+    def app_update(device, revision, *args, **kwargs):
+        logger.info("Check version update ...")
+        _revisions = FrontendCapability._git_revisions()
+        if revision not in _revisions:
+            logger.error("Can not update to non-existant revision {}".format(revision))
+            return
+        _stash = Process.exec_run(['git', 'stash'])
+        if _stash is None:
+            logger.error("Can not stash changes!")
+            return
+        logger.info("Changes stashed!")
+        _pull = Process.exec_run(['git', 'checkout', revision])
+        if _pull is None:
+            logger.error("Can checkout revision!")
+        else:
+            logger.info("Revision checked out!")
+        _pop = Process.exec_run(['git', 'stash', 'pop'])
+        if _pop is None:
+            logger.error("Can pop stash again!")
 
 
 class FrontendItem:
