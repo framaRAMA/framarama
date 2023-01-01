@@ -62,7 +62,7 @@ class SoftwareDashboardCheckForm(base.BaseForm):
     username = forms.CharField(widget=base.charFieldWidget(),
         label='Username', help_text='Username to access remote URL')
     password = forms.CharField(widget=base.passwordFieldWidget(),
-        label='Password', help_text='Passwort to access remote URL')
+        label='Password', help_text='Password to access remote URL')
 
 
 class SoftwareDashboardUpdateForm(base.BaseForm):
