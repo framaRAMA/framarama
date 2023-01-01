@@ -129,8 +129,8 @@ class Filesystem:
 class Process:
 
     @staticmethod
-    def exec_run(args, silent=False):
-        _result = subprocess.run(args, capture_output=True)
+    def exec_run(args, silent=False, env=None):
+        _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
             return _result.stdout
         elif not silent:
