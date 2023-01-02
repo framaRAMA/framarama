@@ -949,6 +949,9 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
     FILE_CURRENT = 'framarama-current.image'
 
+    def _file(self, file_name):
+        return self.FILE_PATH + '/' + file_name
+
     def process(self, display, item):
         _config = Frontend.get().get_config().get_config()
         _files = Filesystem.file_rotate(
@@ -972,15 +975,15 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
     def files(self):
         _files = {}
         for (_file, _num, _ext) in Filesystem.file_match(self.FILE_PATH, self.FILE_PATTERN):
-            _file_image = self.FILE_FORMAT.format(int(_num), 'image')
-            _file_preview = self.FILE_FORMAT.format(int(_num), 'preview')
-            _json = open(self.FILE_PATH + '/' + _file, 'r').read()
-            _image = open(self.FILE_PATH + '/' + _file_image, 'rb').read()
-            _preview = open(self.FILE_PATH + '/' + _file_preview, 'rb').read()
+            _file_json = self._file(_file)
+            _file_image = self._file(self.FILE_FORMAT.format(int(_num), 'image'))
+            _file_preview = self._file(self.FILE_FORMAT.format(int(_num), 'preview'))
             _files[_file] = {
-                'json': jsonpickle.decode(_json),
-                'image': _image,
-                'preview': _preview
+                'json': jsonpickle.decode(Filesystem.file_read(_file_json)),
+                'image': Filesystem.file_read(_file_image),
+                'image_file': _file_image,
+                'preview': Filesystem.file_read(_file_preview),
+                'preview_file': _file_preview,
             }
         return _files
 
