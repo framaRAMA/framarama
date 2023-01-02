@@ -22,7 +22,7 @@
     <div class="carousel-inner">
       {% for _file_name, _file_data in files %}
         <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
-          <img src="{{ url('fe_dashboard_display_item', args=[loop.index0]) }}?type=preview" class="d-block w-100" loading="lazy"/>
+          <img src="{{ url('fe_dashboard_display_item', args=[loop.index0]) }}?type=preview" item="{{ loop.index0 }}" class="d-block w-100" loading="lazy"/>
         </div>
       {% endfor %}
     </div>
@@ -40,8 +40,17 @@
 {% endif %}
 
 <div class="pt-4 text-center">
-  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
+  <a href="#" onclick="setItem()" class="btn btn-{% if not display.refresh and not display.set %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set %} disabled{% endif %}" title="Switch to shown item">{{ lib.icon('frontend.display.set') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh and not display.set %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
   <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if not display.status %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
 </div>
+
+<script type="text/javascript">
+  function setItem() {
+    const caruselItem = document.querySelector('.carousel-item.active img');
+    const url = '{{ url('fe_dashboard_display') }}?action=display.set&item=' + caruselItem.getAttribute('item');
+    window.location.href = url;
+  }
+</script>
 
 {% endblock %}

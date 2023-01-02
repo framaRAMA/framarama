@@ -14,6 +14,7 @@ from frontend import models
 from frontend import jobs
 from config.models import Frame
 
+
 class BaseSetupView(BaseView):
 
     def _get(self, request, *args, **kwargs):
@@ -255,12 +256,16 @@ class DisplayDashboardView(BaseFrontendView):
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
         elif _action == 'display.refresh':
             _scheduler.trigger(jobs.Jobs.FE_NEXT_ITEM, force=True)
+        elif _action == 'display.set':
+            _scheduler.add(lambda: _frontend_device.activate(item=self.request.GET['item']), id=jobs.Jobs.FE_ACTIVATE_ITEM)
         _context['display'] = {
             'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
             'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
             'refresh': _scheduler.running(jobs.Jobs.FE_NEXT_ITEM, True),
+            'set': _scheduler.running(jobs.Jobs.FE_ACTIVATE_ITEM),
         }
         return _context
+
 
 class ImageDisplayDashboardView(BaseFrontendView):
 
@@ -357,6 +362,7 @@ class DeviceDashboardView(BaseFrontendView):
           'wifi': _wifi
         }
         return _context
+
 
 class SoftwareDashboardView(BaseFrontendView):
     template_name = 'frontend/dashboard.software.html'

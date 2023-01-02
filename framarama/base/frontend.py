@@ -329,6 +329,9 @@ class FrontendDevice(Singleton):
         for renderer in self._renderers:
             renderer.process(display, item)
 
+    def activate(self, item):
+        self._renderer_filesystem.activate(item)
+
     def get_files(self):
         return self._renderer_filesystem.files()
 
@@ -970,7 +973,13 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         Filesystem.file_write(_files['json'], _json.encode())
         Filesystem.file_write(_files['image'], item.data())
         Filesystem.file_write(_files['preview'], item.preview())
-        Filesystem.file_copy(_files['image'], self.FILE_PATH + '/' + self.FILE_CURRENT)
+        self.activate(0)
+
+    def activate(self, item):
+        _item = int(item)
+        _files = list(self.files().values())
+        if _item >=0 and _item < len(_files):
+            Filesystem.file_copy(_files[_item]['image_file'], self.FILE_PATH + '/' + self.FILE_CURRENT)
 
     def files(self):
         _files = {}

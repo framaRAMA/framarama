@@ -17,6 +17,7 @@ class Jobs():
     FE_INIT = 'fe_init'
     FE_NEXT_ITEM = 'fe_next_item'
     FE_REFRESH_ITEM = 'fe_refresh_items'
+    FE_ACTIVATE_ITEM = 'fe_activate_item'
     FE_SUBMIT_STATUS = 'fe_submit_status'
     FE_APP_CHECK = 'fe_app_check'
     FE_APP_UPDATE = 'fe_app_update'
