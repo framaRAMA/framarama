@@ -376,7 +376,7 @@ class SoftwareDashboardView(BaseFrontendView):
             'password': '',
         })
         _form_update = forms.SoftwareDashboardUpdateForm()
-        _form_update.fields['revision'].widget.choices = [(_rev, _rev) for _rev in _revisions['revisions']]
+        _form_update.fields['revision'].widget.choices = [(_rev, _rev.replace(SoftwareDashboardView.REMOTE_NAME + '/', '')) for _rev in _revisions['revisions']]
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
