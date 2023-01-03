@@ -24,7 +24,7 @@ git clone https://some.repo/framarama.git
 Packages:
 ```
 apt-get install python3 python3-venv python3-dev
-apt-get install libmariadb3 fonts-liberation fonts-urw-base35 gsfonts fonts-freefont-ttf fonts-freefont-otf
+apt-get install libmariadb3 fonts-liberation fonts-urw-base35 gsfonts gsfonts-other fonts-freefont-ttf fonts-freefont-otf
 ```
 (check fonts using `identify -list font` to know which fonts are supported)
 
@@ -68,7 +68,7 @@ by the frontend part. So first install all server requirements listed above.
 
 Addtional packages needs to be installed:
 ```
-apt-get install network-manager plymouth plymouth-themes plymouth-x11 openbox feh
+apt-get install network-manager dnsmasq-base plymouth plymouth-themes plymouth-x11 xserver-xorg xrandr|x11-server-utils xinit openbox feh imagemagick xinput
 ```
 
 For auto startup:
@@ -108,7 +108,13 @@ cat > /etc/plymouth/plymouthd.conf <<EOM
 [Daemon]
 Theme=framarama
 EOM;
+ln -s $HOME/framarama/plymouth-theme /usr/share/plymouth/themes/framarama
 ```
+
+Add the following to the kernal parameters:
+* splash - tell plymouth to actually show/use the splash
+* quiet - to hide all boot messages in text console
+* vt.global_cursor_default=0 - to disable blinking cursor
 
 #### Database setup
 
@@ -209,7 +215,7 @@ daphne framarama.asgi:application -b 0.0.0.0
 Edit `config/models.py` and update schema:
 ```
 python3 manage.py makemigrations
-python3 manage.py migrate
+python3 manage.py migrate config
 ```
 
 ## Architecture
