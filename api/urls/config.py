@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
-from api import views
+from api.views import config as views
 
 
 router = routers.DefaultRouter(trailing_slash=False)
