@@ -24,7 +24,7 @@ urlpatterns = []
 if 'server' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('config/', include('config.urls')))
     urlpatterns.append(path('admin/', admin.site.urls))
-    urlpatterns.append(path('api/', include('api.urls')))
+    urlpatterns.append(path('api/', include('api.urls.config')))
 
 if 'frontend' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('frontend/', include('frontend.urls')))

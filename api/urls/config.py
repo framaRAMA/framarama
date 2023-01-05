@@ -23,7 +23,7 @@ urlpatterns = [
         title="Your Project",
         description="API for all things …",
         version="1.0.0",
-        urlconf='api.urls'
+        urlconf='api.urls.config'
     ), name='openapi-schema'),
 ]
 
