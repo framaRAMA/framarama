@@ -1,6 +1,6 @@
-from django.apps import AppConfig
+
+from framarama import apps
 
 
-class ApiConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
+class ApiConfig(apps.BaseAppConfig):
     name = 'api'
