@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views.generic import RedirectView
 from django.core.paginator import Paginator
 
+from config import jobs
 from config import models
 from config import plugins
 from config.forms import frame as forms
@@ -112,8 +113,9 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
         if _action == 'delete':
             _source.delete()
         elif _action == 'run':
-            _frame_processor = source.Processor(source.Context(_frame))
-            _frame_processor.process()
+            _job_id = jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
+            _scheduler = self.get_scheduler()
+            _scheduler.trigger(jobs.Jobs.CFG_SOURCE_UPDATE, frame=_frame, source=_source)
         return {'_response': HttpResponseRedirect(reverse('frame_source_step_list', args=[_frame.id, _source.id]))}
 
 
