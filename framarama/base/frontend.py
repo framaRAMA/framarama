@@ -265,7 +265,7 @@ class Display(Singleton):
 
     def get_time_change(self):
         return DateTime.delta(
-            self._data.get('time_change', '00:05:00'))
+            self._data.get('time_change', settings.FRAMARAMA['FRONTEND_ITEM_UPDATE_INTERVAL']))
 
     def time_change_reached(self, last_update):
         _now = DateTime.now()

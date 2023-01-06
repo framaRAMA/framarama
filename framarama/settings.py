@@ -225,6 +225,7 @@ FRAMARAMA = {
     'ADMIN_USERNAME': 'admin',
     'ADMIN_PASSWORD': 'testabc123',
     'ADMIN_MAIL': 'admin@some-domain.tld',
+    'FRONTEND_ITEM_UPDATE_INTERVAL': '00:05:00',
     'CONFIG_SOURCE_UPDATE_INTERVAL': '00:05:00',
 }
 
