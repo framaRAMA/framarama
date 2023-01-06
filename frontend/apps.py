@@ -2,6 +2,8 @@ import sys
 
 from django.apps import AppConfig
 
+from framarama import settings
+
 
 class FrontendConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -11,6 +13,9 @@ class FrontendConfig(AppConfig):
         return self._scheduler
 
     def ready(self):
+        if 'frontend' not in settings.FRAMARAMA['MODES']:
+            return
+
         is_manage_py = any(arg.casefold().endswith("manage.py") for arg in sys.argv)
         is_runserver = any(arg.casefold() == "runserver" for arg in sys.argv)
 
