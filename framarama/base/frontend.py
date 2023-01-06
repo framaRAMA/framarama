@@ -121,6 +121,16 @@ class Frontend(Singleton):
     def get_device(self):
         return FrontendDevice.get(self)
 
+    def get_screen(self):
+        _device = self.get_device()
+        _display_status = _device.run_capability(FrontendCapability.DISPLAY_STATUS)
+        _display_size = _device.run_capability(FrontendCapability.DISPLAY_SIZE)
+        return {
+            'on': _display_status,
+            'width': _display_size[0] if _display_size else None,
+            'height': _display_size[1] if _display_size else None,
+        }
+
     def get_status(self):
         _dt_json = lambda dt: dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z' if dt and dt.tzinfo else dt.isoformat() + 'Z' if dt else None
         _config = self.get_config().get_config()
@@ -133,7 +143,6 @@ class Frontend(Singleton):
         _cpu_temp = _device.run_capability(FrontendCapability.CPU_TEMP)
         _disk_data_free = _device.run_capability(FrontendCapability.DISK_DATA_FREE)
         _disk_tmp_free = _device.run_capability(FrontendCapability.DISK_TMP_FREE)
-        _display_size = _device.run_capability(FrontendCapability.DISPLAY_SIZE)
         _network_config = _device.run_capability(FrontendCapability.NET_CONFIG)
         _network_status = _device.network_status()
         _app_revision = _device.run_capability(FrontendCapability.APP_REVISION)
@@ -170,11 +179,7 @@ class Frontend(Singleton):
                     'gateway': _network_config['gateway'] if _network_config else None,
                 }
             },
-            'screen': {
-                'on': _device.run_capability(FrontendCapability.DISPLAY_STATUS),
-                'width': _display_size[0] if _display_size else None,
-                'height': _display_size[1] if _display_size else None,
-            },
+            'screen': self.get_screen(),
             'items': {
                 'total': _config.count_items,
                 'shown': _config.count_views,
