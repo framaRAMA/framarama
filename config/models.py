@@ -359,6 +359,9 @@ class DisplayStatus(BaseModel):
     items_shown = models.IntegerField(
         blank=True, null=True,
         verbose_name='Items shown', help_text='Total amount of items shown')
+    items_error = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Items error', help_text='Total amount of items with errors')
     items_updated = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Items updated', help_text='Time of the last item list update')

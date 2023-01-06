@@ -58,6 +58,9 @@ class Config(BaseModel):
     count_views = models.IntegerField(
         default=0,
         verbose_name='Views', help_text='Total count of images shown on display')
+    count_errors = models.IntegerField(
+        default=0,
+        verbose_name='Errors', help_text='Count of errors on image processing')
     count_items_keep = models.IntegerField(
         blank=True, null=True,
         verbose_name='Keep items', help_text='Amount of item to keep and show preview in frontend (default 6)')

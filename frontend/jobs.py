@@ -108,6 +108,7 @@ class Jobs():
             logger.info("Skipping next item, display is off.")
         elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
+            _config = frontend.Frontend.get().get_config().get_config()
             try:
                 self._last_update = timezone.now()
                 logger.info("Retrieve next item ...")
@@ -121,12 +122,13 @@ class Jobs():
                     _frontend_item.width(),
                     _frontend_item.height(),
                     _frontend_item.mime()))
-                _config = frontend.Frontend.get().get_config()
-                _config.get_config().count_views = _config.get_config().count_views + 1
-                _config.get_config().save()
+                _config.count_views = _config.count_views + 1
             except Exception as e:
                 self._last_update = _last_update
+                _config.count_errors = _config.count_errors + 1
                 raise
+            finally:
+                _config.save()
 
     def submit_status(self):
         if self._display is None:

@@ -183,6 +183,7 @@ class Frontend(Singleton):
             'items': {
                 'total': _config.count_items,
                 'shown': _config.count_views,
+                'error': _config.count_errors,
                 'updated': _dt_json(_config.date_items_update) if _config.date_items_update else None,
                 'latest': _latest_items,
             },
