@@ -289,7 +289,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
 
     def _get(self, request, frame_id, sorting_id, *args, **kwargs):
         _context = super()._get(request, frame_id, sorting_id, *args, **kwargs)
-        _sorting = self.qs().sourtings.filter(pk=sorting_id).get()
+        _sorting = self.qs().sortings.filter(pk=sorting_id).get()
         _sorting_plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
         _sorting= _sorting_plugin.load_model(sorting_id)
         _form = _sorting_plugin.get_update_form(instance=_sorting)
