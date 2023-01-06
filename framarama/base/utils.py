@@ -1,12 +1,15 @@
 import os
 import re
 import time
+import datetime
 import shutil
 import subprocess
 import threading
 import signal
 import logging
 import json
+
+from django.utils import timezone
 
 from frontend import models
 
@@ -207,4 +210,17 @@ class Json:
             else:
                 _result[_suffix] = _value
         return _result
+
+
+class DateTime:
+
+    def now():
+        return timezone.now()
+
+    def delta(time):
+        _time = datetime.time.fromisoformat(time)
+        return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
+
+    def reached(time, delta):
+        return time is None or tme + delta < DateTime.now()
 
