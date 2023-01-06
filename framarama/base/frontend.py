@@ -121,7 +121,7 @@ class Frontend(Singleton):
     def get_device(self):
         return FrontendDevice.get(self)
 
-    def submit_status(self):
+    def get_status(self):
         _dt_json = lambda dt: dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z' if dt and dt.tzinfo else dt.isoformat() + 'Z' if dt else None
         _config = self.get_config().get_config()
         _display = self.get_display()
@@ -187,6 +187,11 @@ class Frontend(Singleton):
                 'branch': _app_revision['branch'] if _app_revision else None,
             },
         }
+        return _data
+
+    def submit_status(self):
+        _display = self.get_display()
+        _data = self.get_status()
         logger.info("Submitting status information: {}".format(_data))
         try:
             self._client.submit_status(_display.get_id(), _data)
