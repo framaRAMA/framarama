@@ -127,7 +127,7 @@ class Processor:
     def _process_items_updates(self, source, last_step):
         _data_out = self._context.get_input(last_step.data_out)[0].convert(DataType(DataType.TYPE, 'dict'))
         _stats = self._process_items_update(source, _data_out)
-        logger.info("Import completed: {} processed, {} created, {} updated, {} deleted, {} errors)".format(
+        logger.info("Import completed: {} processed ({} created, {} updated, {} deleted, {} errors)".format(
             _stats['cnt'],
             _stats['create'],
             _stats['update'],
