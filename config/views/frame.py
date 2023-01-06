@@ -140,6 +140,7 @@ class ViewInfoSourceFrameView(base.BaseSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
+        _context['source_running'] = self.get_scheduler().running(jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(frame_id) + '_' + str(source_id), True)
         return _context
 
 
@@ -149,6 +150,7 @@ class ListStepSourceFrameView(base.BaseSourceFrameConfigView):
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _context['source_plugins'] = plugins.SourcePluginRegistry.all()
+        _context['source_running'] = self.get_scheduler().running(jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(frame_id), True)
         return _context
 
 

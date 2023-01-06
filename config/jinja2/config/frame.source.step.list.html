@@ -55,7 +55,7 @@
 </ul>
 
 {{ lib.nav_actions([
-  {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary'},
+  {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary', 'classes': 'disabled' if source_running else ''},
   {'icon': 'action.add', 'modal': 'createStepType', 'type': 'success'},
 ]) }}
 
