@@ -15,13 +15,17 @@ logger = logging.getLogger(__name__)
 
 class Context:
 
-    def __init__(self, frame, data={}):
+    def __init__(self, frame, source=None, data={}):
         self._frame = frame
+        self._source = None
         self._data = data
     
     def get_frame(self):
         return self._frame
-    
+
+    def get_source(self):
+        return self._source
+
     def get_input(self, name):
         if name not in self._data:
             return []
@@ -50,7 +54,10 @@ class Processor:
         return self.get_plugin(step.plugin).load_model(step.id)
 
     def process(self):
-        for _source in self._context.get_frame().sources.all():
+        _sources = self._context.get_frame().sources
+        if self._context.get_source():
+          _sources = _sources.filter(source=self._context.get_source())
+        for _source in _sources.all():
             logger.info("Processing source {}".format(_source))
             _source.update_count = _source.update_count + 1
             _source.update_date_start = timezone.now()
