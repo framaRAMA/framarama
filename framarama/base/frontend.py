@@ -302,10 +302,11 @@ class FrontendDevice(Singleton):
         self._monitor = FrontendMonitoring()
         self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None, 'networks': None}
         self._renderer_filesystem = FilesystemFrontendRenderer()
+        self._renderer_visualization = VisualizeFrontendRenderer()
         self._renderers = [
             DefaultFrontendRenderer(),
             self._renderer_filesystem,
-            VisualizeFrontendRenderer(),
+            self._renderer_visualization,
         ]
         self._capabilities = None
 
@@ -342,6 +343,7 @@ class FrontendDevice(Singleton):
 
     def activate(self, item):
         self._renderer_filesystem.activate(item)
+        self._renderer_visualization.startup()
 
     def get_files(self):
         return self._renderer_filesystem.files()
@@ -1027,7 +1029,14 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 self._update = getattr(self, 'update_' + _cmd)
                 break
 
-    def update_feh(self, display, item):
+    def startup(self):
+        if self._update == None:
+            self.discover()
+        if self._update == None:
+            return
+        self._update()
+
+    def update_feh(self):
         _file_list = VisualizeFrontendRenderer.FILE_LIST
         if Process.exec_running('feh') is None:
             Process.exec_bg([
@@ -1044,14 +1053,9 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
         if not Filesystem.file_exists(_file_list) or Filesystem.file_size(_file_list) == 0:
             Filesystem.file_write(_file_list, VisualizeFrontendRenderer.IMG_CURRENT.encode())
     
-    def update_magic(self, display, item):
+    def update_magic(self):
         Process.exec_run(self.CMD_IMAGICK + [VisualizeFrontendRenderer.IMG_CURRENT])
 
     def process(self, display, item):
-        if self._update == None:
-            self.discover()
-        if self._update == None:
-            return
-        self._update(display, item)
-
+        self.startup()
 

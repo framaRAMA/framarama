@@ -104,7 +104,11 @@ class Jobs():
                     logger.info("Switch display on at {}".format(self._display.get_time_on()))
                     _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
                     _display_on = True
-        if not _display_on and not force:
+        _device = frontend.Frontend.get().get_device()
+        if self._last_update is None and len(_device.get_files()):
+            self._last_update = timezone.now()
+            _device.activate(0)
+        elif not _display_on and not force:
             logger.info("Skipping next item, display is off.")
         elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
