@@ -218,6 +218,8 @@ class DateTime:
         return timezone.now()
 
     def delta(time):
+        if time is None:
+            return None
         _time = datetime.time.fromisoformat(time)
         return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
 
