@@ -325,7 +325,7 @@
 {% macro nav_actions(actions) %}
   <div class="fixed-action-btn" style="height:{{ actions|length * 50 + 50 }}px;">
     {% for action in actions|reverse %}
-      {% set classes = 'btn btn-' + action['type'] + ' btn-floating btn-lg' %}
+      {% set classes = 'btn btn-' + action['type'] + ' btn-floating btn-lg ' + action['classes']|default('') %}
       {% if loop.index != 0 %}{% set classes = classes + ' mb-3' %}{% endif %}
       {% if action['url'] %}
         <a href="{{ action['url'] }}" class="{{ classes }}">{{ icon(action['icon'], '') }}</a>
