@@ -129,7 +129,15 @@ class Filesystem:
 class Process:
 
     @staticmethod
-    def exec_run(args, silent=False, env=None):
+    def exec_run(args, silent=False, env=None, sudo=False):
+        if sudo:
+            if 'sudo' not in args[0]:
+                raise Exception("Error checking sudo permssion: Command does not contain sudo command: {}".format(args))
+            _sudo_check = args
+            _sudo_check.insert(1, '-l')
+            _sudo = Process.exec_run(_sudo_check)
+            if not _sudo:
+                return _sudo
         _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
             logger.error('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(' '.join(args), _result.returncode, len(_result.stdout), len(_result.stderr)))

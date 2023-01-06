@@ -453,7 +453,7 @@ class FrontendDevice(Singleton):
                 self._capabilities[FrontendCapability.NET_PROFILE_SAVE] = FrontendCapability.nmcli_profile_save
                 self._capabilities[FrontendCapability.NET_PROFILE_DELETE] = FrontendCapability.nmcli_profile_delete
                 self._capabilities[FrontendCapability.NET_PROFILE_CONNECT] = FrontendCapability.nmcli_profile_connect
-            if Process.exec_run(['sudo', '-n', 'systemctl', 'show', 'framarama']):
+            if Process.exec_run(['sudo', '-n', 'systemctl', 'show', 'framarama'], sudo=True):
                 self._capabilities[FrontendCapability.APP_LOG] = FrontendCapability.app_log_systemd
                 self._capabilities[FrontendCapability.APP_RESTART] = FrontendCapability.app_restart_systemd
             if Process.exec_search('shutdown'):
@@ -757,7 +757,7 @@ class FrontendCapability:
             _args.extend(['802-11-wireless-security.key-mgmt', 'wpa-psk'])
             _args.extend(['802-11-wireless-security.psk', password])
             logger.info("Adding network {}".format(name))
-        Process.exec_run(_args)
+        Process.exec_run(_args, sudo=True)
 
     def nmcli_profile_delete(device, name, *args, **kwargs):
         if name is None or name == '':
@@ -766,7 +766,7 @@ class FrontendCapability:
         if name not in _profiles or _profiles[name]['active']:
             return
         logger.info("Deleting network {}".format(name))
-        Process.exec_run(['sudo', 'nmcli', 'connection', 'delete', name])
+        Process.exec_run(['sudo', 'nmcli', 'connection', 'delete', name], sudo=True)
 
     def nmcli_profile_connect(device, name, *args, **kwargs):
         if name is None or name == '':
@@ -778,13 +778,13 @@ class FrontendCapability:
         if name not in _wifi_list:
             return
         logger.info("Connecting network {}".format(name))
-        Process.exec_run(['sudo', 'nmcli', 'connection', 'up', name])
+        Process.exec_run(['sudo', 'nmcli', 'connection', 'up', name], sudo=True)
 
     def nmcli_wifi_list(device, *args, **kwargs):
         _networks = {}
         # IN-USE  BSSID              SSID          MODE   CHAN  RATE        SIGNAL  BARS  SECURITY
         # *       XX:XX:XX:XX:XX:XX  NetworkName   Infra  6     130 Mbit/s  46      ▂▄__  WPA1 WPA2
-        _wifi_list = Process.exec_run(['sudo', 'nmcli', 'device', 'wifi', 'list', '--rescan', 'yes'])
+        _wifi_list = Process.exec_run(['sudo', 'nmcli', 'device', 'wifi', 'list', '--rescan', 'yes'], sudo=True)
         if _wifi_list:
             _wifi_list = _wifi_list.decode().split('\n')
             _columns = _wifi_list.pop(0).lower().split()
@@ -813,21 +813,21 @@ class FrontendCapability:
         if not FrontendCapability.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
             if 'framarama' not in _profiles:
-                Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama', 'band', 'bg'])
+                Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama', 'band', 'bg'], sudo=True)
             else:
-                Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'up', 'framarama'])
+                Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'up', 'framarama'], sudo=True)
         else:
             logger.info("Deactivating Access Point.")
-            Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'delete', 'framarama'])
+            Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'delete', 'framarama'], sudo=True)
 
     def app_log_systemd(device, *args, **kwargs):
-        return Process.exec_run(['sudo', '-n', 'systemctl', 'status', '-n', '100', 'framarama'])
+        return Process.exec_run(['sudo', '-n', 'systemctl', 'status', '-n', '100', 'framarama'], sudo=True)
 
     def app_restart_systemd(device, *args, **kwargs):
-        return Process.exec_run(['sudo', '-n', 'systemctl', 'restart', 'framarama'])
+        return Process.exec_run(['sudo', '-n', 'systemctl', 'restart', 'framarama'], sudo=True)
 
     def app_shutdown(device, *args, **kwargs):
-        return Process.exec_run(['sudo', 'shutdown', '-h', 'now'])
+        return Process.exec_run(['sudo', 'shutdown', '-h', 'now'], sudo=True)
 
     def _git_remotes():
         _remotes = Process.exec_run(['git', 'remote', '-v'])
