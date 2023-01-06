@@ -2,7 +2,6 @@ import datetime
 import subprocess
 import logging
 
-from django.conf import settings
 from django.utils import timezone
 
 from framarama.base import utils
@@ -29,16 +28,15 @@ class Jobs():
         self._last_update = None
         self._scheduler = scheduler
         self._monitor = None
-        if 'frontend' in settings.FRAMARAMA['MODES']:
-            self._scheduler.add(self.tick, 'interval', seconds=5, id=Jobs.FE_INIT, name='Frontend timer')
-            self._monitor = frontend.Frontend.get().get_device().monitor()
-            self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
-            self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
-            self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
-            self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
-            self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
-            self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
-            self._monitor.start()
+        self._scheduler.add(self.tick, 'interval', seconds=5, id=Jobs.FE_INIT, name='Frontend timer')
+        self._monitor = frontend.Frontend.get().get_device().monitor()
+        self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
+        self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
+        self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
+        self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
+        self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
+        self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
+        self._monitor.start()
 
     def _setup_start(self):
         if self._startup is None:

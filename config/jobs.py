@@ -14,8 +14,7 @@ class Jobs():
 
     def __init__(self, scheduler):
         self._scheduler = scheduler
-        if 'server' in settings.FRAMARAMA['MODES']:
-            self._scheduler.add(self.source_update, 'interval', minutes=1, id=Jobs.CFG_SOURCE_UPDATE, name='Config source updates')
+        self._scheduler.add(self.source_update, 'interval', minutes=1, id=Jobs.CFG_SOURCE_UPDATE, name='Config source updates')
         self._scheduler.trigger(Jobs.CFG_SOURCE_UPDATE)
 
     def source_update(self, frame=None, source=None):
