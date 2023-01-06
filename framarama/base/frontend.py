@@ -12,11 +12,11 @@ import logging
 
 from django.conf import settings
 from django.core import management
-from django.utils import timezone, dateparse
+from django.utils import dateparse
 from django.contrib.auth.models import User
 
 from frontend import models
-from framarama.base.utils import Singleton, Config, Filesystem, Process
+from framarama.base.utils import Singleton, Config, Filesystem, Process, DateTime
 from framarama.base.api import ApiClient, ApiResultItem
 from config.utils import finishing
 from config import models as config_models
@@ -132,7 +132,6 @@ class Frontend(Singleton):
         }
 
     def get_status(self):
-        _dt_json = lambda dt: dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z' if dt and dt.tzinfo else dt.isoformat() + 'Z' if dt else None
         _config = self.get_config().get_config()
         _display = self.get_display()
         _device = self.get_device()
@@ -149,7 +148,7 @@ class Frontend(Singleton):
         _files = _device.get_files()
         _latest_items = [{
             'id': _files[_name]['json']['item'].id,
-            'time': _dt_json(_files[_name]['json']['time'])
+            'time': DateTime.utc(_files[_name]['json']['time'])
         } for _name in _files]
         _data = {
             'uptime': _uptime,
@@ -173,7 +172,7 @@ class Frontend(Singleton):
             },
             'network': {
                 'profile': _network_status['profile'],
-                'connected': _dt_json(_network_status['connected']) if _network_status['connected'] else None,
+                'connected': DateTime.utc(_network_status['connected']) if _network_status['connected'] else None,
                 'address': {
                     'ip': _network_config['ip'] if _network_config else None,
                     'gateway': _network_config['gateway'] if _network_config else None,
@@ -184,11 +183,11 @@ class Frontend(Singleton):
                 'total': _config.count_items,
                 'shown': _config.count_views,
                 'error': _config.count_errors,
-                'updated': _dt_json(_config.date_items_update) if _config.date_items_update else None,
+                'updated': DateTime.utc(_config.date_items_update) if _config.date_items_update else None,
                 'latest': _latest_items,
             },
             'app': {
-                'date': _dt_json(_app_revision['date']) if _app_revision else None,
+                'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['branch'] if _app_revision else None,
             },
@@ -214,12 +213,6 @@ class Display(Singleton):
         self._items = None
         self._next = None
         self._finishings = None
-
-    def _time_delta(self, time_str):
-        if time_str is None:
-            return None
-        _time = datetime.time.fromisoformat(time_str)
-        return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
 
     def display(self):
         return self._data.item()
@@ -254,9 +247,9 @@ class Display(Singleton):
         return self._data.item().time_on
 
     def time_on_reached(self, time):
-        _time_on = self._time_delta(self.get_time_on())
+        _time_on = DateTime.delta(self.get_time_on())
         if _time_on:
-            _midnight = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            _midnight = DateTime.midnight()
             return _midnight + _time_on < time
         return False
 
@@ -264,18 +257,18 @@ class Display(Singleton):
         return self._data.item().time_off
 
     def time_off_reached(self, time):
-        _time_off = self._time_delta(self.get_time_off())
+        _time_off = DateTime.delta(self.get_time_off())
         if _time_off:
-            _midnight = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            _midnight = DateTime.midnight()
             return _midnight + _time_off < time
         return False
 
     def get_time_change(self):
-        _time_change = self._data.get('time_change')
-        return self._time_delta(_time_change if _time_change else '00:05:00')
+        return DateTime.delta(
+            self._data.get('time_change', '00:05:00'))
 
     def time_change_reached(self, last_update):
-        _now = timezone.now()
+        _now = DateTime.now()
         _time_change = self.get_time_change()
         return last_update is None or last_update + _time_change < _now
 
@@ -368,7 +361,7 @@ class FrontendDevice(Singleton):
         _profile_list = self.run_capability(FrontendCapability.NET_PROFILE_LIST)
         _ap_active = FrontendCapability.nmcli_ap_active(_profile_list)
         if self._network['started'] is None:
-            self._network['started'] = timezone.now()
+            self._network['started'] = DateTime.now()
             logger.info("Checking network connectivity ...")
             if _ap_active:
                 logger.info("Access Point active - disabling first!")
@@ -377,13 +370,13 @@ class FrontendDevice(Singleton):
             return False
         _profile_list = [_name for _name in _profile_list if _profile_list[_name]['active']]
         if len(_profile_list) == 0:
-            if timezone.now() - self._network['started'] > datetime.timedelta(seconds=30):
+            if DateTime.now() - self._network['started'] > datetime.timedelta(seconds=30):
                 _previous = self._network['previous']
                 if _previous is None:
                     logger.info("Not connected within 30 seconds and no previous network available - starting access point")
                     self._network['networks'] = self.run_capability(FrontendCapability.NET_WIFI_LIST)
                     self.network_ap_toggle()
-                    self._network['connected'] = timezone.now()
+                    self._network['connected'] = DateTime.now()
                 else:
                     logger.info("Not connected within 30 seconds - try to connect previous network {}".format(_previous))
                     self._network['profile'] = None
@@ -392,17 +385,17 @@ class FrontendDevice(Singleton):
             else:
                 _ip = self.run_capability(FrontendCapability.NET_CONFIG)
                 if _ip['ip']:
-                    self._network['connected'] = timezone.now()
+                    self._network['connected'] = DateTime.now()
                     self._network['profile'] = '(automatic)'
                     logger.info("Network already available ({})".format(_ip['ip']))
                 else:
                     logger.info("Not connected!")
         elif _ap_active:
-            self._network['connected'] = timezone.now()
+            self._network['connected'] = DateTime.now()
             self._network['profile'] = _profile_list[0]
             logger.info("Access point active!")
         else:
-            self._network['connected'] = timezone.now()
+            self._network['connected'] = DateTime.now()
             self._network['profile'] = _profile_list[0]
             logger.info("Connected to {}".format(self._network['profile']))
             return True
