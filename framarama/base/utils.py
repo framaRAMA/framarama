@@ -132,9 +132,10 @@ class Process:
     def exec_run(args, silent=False, env=None):
         _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
+            logger.error('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(' '.join(args), _result.returncode, len(_result.stdout), len(_result.stderr)))
             return _result.stdout
         elif not silent:
-            logger.error("Error running {}: code={}, stdout={}, stderr={}".format(' '.join(args), _result.returncode, _result.stdout, _result.stderr))
+            logger.error('Error running "{}": code={}, stdout={}, stderr={}'.format(' '.join(args), _result.returncode, _result.stdout, _result.stderr))
         return None
 
     @staticmethod
