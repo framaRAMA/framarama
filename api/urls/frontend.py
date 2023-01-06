@@ -11,6 +11,7 @@ router.register('display/overview', views.OverviewDisplayView, 'display_overview
 router.register('display/status', views.StatusDisplayView, 'display_status')
 router.register('display/items', views.ItemsDisplayView, 'display_items')
 router.register('display/screen', views.ScreenDisplayView, 'display_screen')
+router.register('display/screen/switch/(?P<state>(on|off))', views.SwitchScreenDisplayView, 'display_screen_switch')
 
 urlpatterns = [
     path('', include(router.urls)),

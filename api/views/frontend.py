@@ -72,3 +72,18 @@ class ScreenDisplayView(viewsets.ViewSet):
         _frontend_device = frontend.Frontend.get()
         return Response(_frontend_device.get_screen())
 
+
+class SwitchScreenDisplayView(viewsets.ViewSet):
+
+    def list(self, request, state):
+        _frontend = frontend.Frontend.get()
+        _frontend_device = _frontend.get_device()
+        _status = _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+        if state == 'toggle':
+            state = 'off' if _status else 'on'
+        if state == 'on' and not _status:
+            _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+        elif state == 'off' and _status:
+            _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+        return Response(_frontend.get_screen())
+
