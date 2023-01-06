@@ -1,4 +1,4 @@
-
+from django.apps import apps
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
@@ -19,6 +19,9 @@ class BaseConfigView(BaseAuthenticatedView):
 
     def get_config(self):
         return self._config.get_config() if self._config else None
+
+    def get_scheduler(self):
+        return apps.get_app_config('config').get_scheduler()
 
     def get_frames(self):
         return self.qs().frames
