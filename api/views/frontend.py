@@ -65,3 +65,10 @@ class ItemsDisplayView(viewsets.GenericViewSet):
         _serializer = self.get_serializer(instance=_files[_pk])
         return Response(_serializer.data)
 
+
+class ScreenDisplayView(viewsets.ViewSet):
+
+    def list(self, request):
+        _frontend_device = frontend.Frontend.get()
+        return Response(_frontend_device.get_screen())
+
