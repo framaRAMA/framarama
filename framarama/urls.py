@@ -28,6 +28,7 @@ if 'server' in settings.FRAMARAMA['MODES']:
 
 if 'frontend' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('frontend/', include('frontend.urls')))
+    urlpatterns.append(path('api/', include('api.urls.frontend')))
 
 urlpatterns += staticfiles_urlpatterns()
 
