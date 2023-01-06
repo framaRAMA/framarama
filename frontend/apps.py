@@ -17,6 +17,7 @@ class FrontendConfig(AppConfig):
         # Instance is running application (no service tasks or other commands)
         if (is_manage_py and is_runserver) or (not is_manage_py):
             from framarama.jobs import Scheduler
+            from frontend import jobs
             self._scheduler = Scheduler()
-            self._scheduler.setup()
+            self._scheduler.setup(jobs)
 

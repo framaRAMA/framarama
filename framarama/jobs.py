@@ -3,11 +3,6 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_SUBMITTED, EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 
-from config import jobs as config_jobs
-from api import jobs as api_jobs
-from frontend import jobs as frontend_jobs
-
-
 class Scheduler:
 
     def __init__(self):
@@ -53,10 +48,9 @@ class Scheduler:
     def get(self, name):
         return self._scheduler.get_job(name)
 
-    def setup(self):
+    def setup(self, module):
         self._scheduler.start()
 
-        for module in [config_jobs, api_jobs, frontend_jobs]:
-            if (hasattr(module, 'Jobs')):
-                _jobs = module.Jobs(self)
+        if (hasattr(module, 'Jobs')):
+            module.Jobs(self)
 
