@@ -10,6 +10,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register('display/overview', views.OverviewDisplayView, 'display_overview')
 router.register('display/status', views.StatusDisplayView, 'display_status')
 router.register('display/items', views.ItemsDisplayView, 'display_items')
+router.register('display/screen', views.ScreenDisplayView, 'display_screen')
 
 urlpatterns = [
     path('', include(router.urls)),
