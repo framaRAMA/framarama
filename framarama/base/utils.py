@@ -217,6 +217,9 @@ class DateTime:
     def now():
         return timezone.now()
 
+    def midnight():
+        return DateTime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
     def delta(time):
         if time is None:
             return None
@@ -225,4 +228,11 @@ class DateTime:
 
     def reached(time, delta):
         return time is None or tme + delta < DateTime.now()
+
+    def utc(dt):
+        if dt and dt.tzinfo:
+            return dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
+        elif dt:
+            return dt.isoformat() + 'Z'
+        return None
 
