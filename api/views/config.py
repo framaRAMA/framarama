@@ -51,7 +51,8 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             'disk_data_free', 'disk_tmp_free',
             'network_profile', 'network_connected', 'network_address_ip', 'network_address_gateway',
             'screen_on', 'screen_width', 'screen_height',
-            'items_total', 'items_shown', 'items_error', 'items_updated'
+            'items_total', 'items_shown', 'items_error', 'items_updated',
+            'app_date', 'app_branch', 'app_hash',
         ]
 
     def to_representation(self, instance):
