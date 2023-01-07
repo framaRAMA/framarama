@@ -36,11 +36,15 @@ class BaseView(TemplateView):
     def post(self, request, *args, **kwargs):
         return self._handle(self._post, request, *args, **kwargs)
 
+    def view_name(self, request):
+        return request.resolver_match.view_name
 
-    def redirect(self, context, page, query=''):
-        if query:
-            query = '?' + query
-        context['_response'] = HttpResponseRedirect(reverse(page) + query)
+    def url(self, request):
+        return request.get_full_path()
+
+    def redirect(self, context, page, query=None):
+        _query = '?' + query if query else ''
+        context['_response'] = HttpResponseRedirect(reverse(page) + _query)
 
     def response(self, context, data, mime=None):
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
