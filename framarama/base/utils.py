@@ -9,7 +9,7 @@ import signal
 import logging
 import json
 
-from django.utils import timezone
+from django.utils import dateparse, timezone
 
 from frontend import models
 
@@ -234,4 +234,7 @@ class DateTime:
         elif dt:
             return dt.isoformat() + 'Z'
         return None
+
+    def parse(date):
+        return dateparse.parse_datetime(date)
 
