@@ -83,7 +83,7 @@ class Frontend(Singleton):
                 _config = models.Config()
                 _config.save()
                 _configs.append(_config)
-            self._configured = _configs[0].mode != None
+            self._configured = _configs[0].mode != None and _configs[0].mode.strip() != ''
             if self._configured:
                 self._init_phase = Frontend.INIT_PHASE_CONFIGURED
         if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
