@@ -1,7 +1,4 @@
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-
 from framarama.base import frontend
 from frontend import forms
 from frontend import models
@@ -48,9 +45,9 @@ class ImageDisplayDashboardView(base.BaseFrontendView):
         _files = list(_frontend_device.get_files().values())
         _file = _files[nr] if nr >= 0 and nr < len(_files) else _files[0]
         if self.request.GET.get('type') == 'preview':
-            _context['_response'] = HttpResponse(_file['preview'], _file['json']['mime'])
+            self.response(_context, _file['preview'], _file['json']['mime'])
         else:
-            _context['_response'] = HttpResponse(_file['image'], _file['json']['mime'])
+            self.response(_context, _file['image'], _file['json']['mime'])
         return _context
 
 
@@ -65,17 +62,17 @@ class DeviceDashboardView(base.BaseFrontendView):
             _name = self.request.GET.get('name')
             _pass = self.request.GET.get('password')
             _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_SAVE, name=_name, password=_pass)
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
             return _context
         elif _action == 'wifi.delete':
             _name = self.request.GET.get('name')
             _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_DELETE, name=_name)
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
             return _context
         elif _action == 'wifi.connect':
             _name = self.request.GET.get('name')
             _frontend_device.network_connect(_name)
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
             return _context
         _wifi = None
         if _action == 'device.log':
@@ -103,7 +100,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             }
         elif _action == 'wifi.ap':
             _frontend_device.network_ap_toggle()
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_device') + '?action=wifi.list')
+            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
             return _context
         _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
@@ -178,13 +175,13 @@ class SoftwareDashboardView(base.BaseFrontendView):
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
                 password=_form_check.cleaned_data['password']), id=jobs.Jobs.FE_APP_CHECK)
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_software'))
+            self.redirect(_context, 'fe_dashboard_software')
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
             _scheduler.add(lambda: _frontend_device.run_capability(
                 frontend.FrontendCapability.APP_UPDATE,
                 revision=_form_update.cleaned_data['revision']), id=jobs.Jobs.FE_APP_UPDATE)
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard_software'))
+            self.redirect(_context, 'fe_dashboard_software')
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
