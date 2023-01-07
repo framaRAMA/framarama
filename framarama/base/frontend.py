@@ -12,7 +12,6 @@ import logging
 
 from django.conf import settings
 from django.core import management
-from django.utils import dateparse
 from django.contrib.auth.models import User
 
 from frontend import models
@@ -190,6 +189,7 @@ class Frontend(Singleton):
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['branch'] if _app_revision else None,
+                'revision': _app_revision['current'] if _app_revision else None,
             },
         }
         return _data
@@ -853,20 +853,31 @@ class FrontendCapability:
             _revisions.extend(_out)
         return [_rev for _rev in _revisions if len(_rev)]
 
+    def _git_current_ref(refs):
+        _refs = [_ref.strip() for _ref in refs.split(',')]        # separate tags
+        _refs = [_ref.replace('HEAD -> ', '') for _ref in _refs]  # remove HEAD pointer
+        _refs = [_ref.replace('tag: ', '') for _ref in _refs]     # remove tag: prefix
+        if 'HEAD' in _refs:
+            _refs.remove('HEAD')
+        return _refs[0] if len(_refs) else None
+
     def app_revision(device, *args, **kwargs):
-        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %s'])
-        # de4a83b 2022-12-17T11:14:06+01:00 Implement frontend capability to retrieve display size (using xrandr)
+        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %d %s', '--decorate'])
+        # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
+        # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
         if _log:
-            _values = _log.decode().split(' ')
+            _commit, _date, _values = _log.decode().split(maxsplit=2)
+            _refs, _comment = _values[1:].split(') ', maxsplit=1)
             _branch = Process.exec_run(['git', 'branch', '--show-current'])
             _branch = _branch.decode().strip() if _branch else None
             _rev = {
-                'hash': _values[0],
-                'date': dateparse.parse_datetime(_values[1]),
-                'comment': _values[2],
+                'hash': _commit,
+                'date': DateTime.parse(_date),
+                'comment': _comment,
                 'branch': _branch,
                 'remotes': FrontendCapability._git_remotes(),
                 'revisions': FrontendCapability._git_revisions(),
+                'current': FrontendCapability._git_current_ref(_refs),
             }
             return _rev
         return None
