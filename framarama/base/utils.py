@@ -136,11 +136,10 @@ class Process:
         if sudo:
             if 'sudo' not in args[0]:
                 raise Exception("Error checking sudo permssion: Command does not contain sudo command: {}".format(args))
-            _sudo_check = args
+            _sudo_check = args.copy()
             _sudo_check.insert(1, '-l')
-            _sudo = Process.exec_run(_sudo_check)
-            if not _sudo:
-                return _sudo
+            if Process.exec_run(_sudo_check) is None:
+                return None
         _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
             logger.error('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(' '.join(args), _result.returncode, len(_result.stdout), len(_result.stderr)))
