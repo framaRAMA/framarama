@@ -4,6 +4,7 @@ from frontend.views import setup, dashboard, system, status
 
 urlpatterns = [
     path('', setup.SetupView.as_view(), name='fe_index'),
+    path('startup', setup.StartupView.as_view(), name='fe_startup'),
     path('setup/mode/local', setup.LocalModeSetupView.as_view(), name='fe_setup_mode_local'),
     path('setup/mode/cloud', setup.CloudModeSetupView.as_view(), name='fe_setup_mode_cloud'),
     path('setup/display', setup.DisplaySetupView.as_view(), name='fe_setup_display'),

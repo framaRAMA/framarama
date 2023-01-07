@@ -9,6 +9,15 @@ from frontend import forms
 from frontend.views import base
 
 
+class StartupView(base.BaseSetupView):
+    template_name = 'frontend/startup.html'
+
+    def _get(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
+        _context['return'] = request.GET['return'] if 'return' in request.GET else ''
+        return _context
+
+
 class SetupView(base.BaseSetupView):
     template_name = 'frontend/setup.html'
 
