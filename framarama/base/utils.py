@@ -138,7 +138,7 @@ class Process:
                 raise Exception("Error checking sudo permssion: Command does not contain sudo command: {}".format(args))
             _sudo_check = args.copy()
             _sudo_check.insert(1, '-l')
-            if Process.exec_run(_sudo_check) is None:
+            if Process.exec_run(_sudo_check, silent=True) is None:
                 return None
         _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
