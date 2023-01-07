@@ -18,12 +18,13 @@ class StartupView(base.BaseSetupView):
         return _context
 
 
-class SetupView(base.BaseSetupView):
+class SetupView(base.BaseFrontendView):
     template_name = 'frontend/setup.html'
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        if _context['config'] and 'edit' not in request.GET:
+        _frontend = _context['frontend']
+        if _frontend.is_setup() and 'edit' not in request.GET:
             _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
         return _context
 

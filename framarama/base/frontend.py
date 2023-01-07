@@ -29,16 +29,13 @@ class Frontend(Singleton):
     INIT_PHASE_DB_DEFAULT = 1   # Check if frontend/default DB is available
     INIT_PHASE_CONFIGURED = 2   # Frontend configuration exists
     INIT_PHASE_DB_CONFIG = 3    # Check if config DB is available
-    INIT_PHASE_API_ACCESS = 4   # API access possible
+    INIT_PHASE_SETUP = 4        # Setup configured
+    INIT_PHASE_API_ACCESS = 5   # API access possible
 
     def __init__(self):
         super().__init__()
         self._client = None
         self._init_phase = Frontend.INIT_PHASE_START
-        self._initialized = False   # database setup
-        self._configured = False    # frontend config exists
-        self._db_access = False     # DB access for config
-        self._api_access = False    # API acccess configured
 
     def _mgmt_cmd(self, *args, **kwargs):
         _out, _err = io.StringIO(), io.StringIO()
@@ -75,7 +72,6 @@ class Frontend(Singleton):
             self._init_connections()
             self._init_migrations('default')
             self._init_phase = Frontend.INIT_PHASE_DB_DEFAULT
-            self._initialized = True
         if self._init_phase < Frontend.INIT_PHASE_CONFIGURED:
             _configs = list(models.Config.objects.all())
             if len(_configs) == 0:
@@ -83,33 +79,37 @@ class Frontend(Singleton):
                 _config = models.Config()
                 _config.save()
                 _configs.append(_config)
-            self._configured = _configs[0].mode != None and _configs[0].mode.strip() != ''
-            if self._configured:
-                self._init_phase = Frontend.INIT_PHASE_CONFIGURED
+                Singleton.clear()
+            self._init_phase = Frontend.INIT_PHASE_CONFIGURED
         if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
             self._init_admin_user()
             self._init_migrations('config')
             self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
-            self._db_access = True
-        if self._configured and not self._api_access:
+        if self._init_phase < Frontend.INIT_PHASE_SETUP:
+            _mode = self.get_config().get_config().mode
+            if _mode != None and _mode.strip() != '':
+                self._init_phase = Frontend.INIT_PHASE_SETUP
+        if self.is_setup() and not self.api_access():
             _client = ApiClient.get()
             if _client.configured():
-                self._api_access = True
                 self._client = _client
                 self._init_phase = Frontend.INIT_PHASE_API_ACCESS
-        return self._initialized and self._configured
+        return self.is_setup()
 
     def is_initialized(self):
-        return self._initialized
+        return self._init_phase >= Frontend.INIT_PHASE_DB_DEFAULT
 
     def is_configured(self):
-        return self._initialized and self._configured
+        return self._init_phase >= Frontend.INIT_PHASE_CONFIGURED
+
+    def is_setup(self):
+        return self._init_phase >= Frontend.INIT_PHASE_SETUP
 
     def db_access(self):
-        return self._db_access
+        return self._init_phase >= Frontend.INIT_PHASE_DB_CONFIG
 
     def api_access(self):
-        return self.is_configured() and self._api_access
+        return self.is_configured() and self._init_phase >= Frontend.INIT_PHASE_API_ACCESS
 
     def get_config(self):
         return Config.get(self)
