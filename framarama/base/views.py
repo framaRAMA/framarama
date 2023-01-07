@@ -1,6 +1,8 @@
 
 from django.conf import settings
 from django.shortcuts import render
+from django.urls import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -33,6 +35,15 @@ class BaseView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         return self._handle(self._post, request, *args, **kwargs)
+
+
+    def redirect(self, context, page, query=''):
+        if query:
+            query = '?' + query
+        context['_response'] = HttpResponseRedirect(reverse(page) + query)
+
+    def response(self, context, data, mime=None):
+        context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
 
 
 class BaseQuerySetMixin:
