@@ -12,6 +12,7 @@ class StartupView(base.BaseSetupView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
+        _context['message'] = request.GET['message'] if 'message' in request.GET else ''
         _context['return'] = request.GET['return'] if 'return' in request.GET else ''
         return _context
 
@@ -64,7 +65,7 @@ class LocalModeSetupView(base.BaseSetupView):
             if _config.mode == 'local' and _config.local_db_type == 'mysql':
                 try:
                     self._update_config(vars(_config))
-                    self.redirect(_context, 'fe_dashboard')
+                    self.redirect_startup(_context, 'fe_dashboard', message='config.save')
                 except Exception as e:
                     _form.add_error('__all__', ValidationError('Error saving settings (' + str(e) +')'))
             else:
@@ -89,7 +90,7 @@ class CloudModeSetupView(base.BaseSetupView):
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
-            self.redirect(_context, 'fe_dashboard')
+            self.redirect_startup(_context, 'fe_dashboard', message='config.save')
         _context['form'] = _form
         return _context
 
@@ -110,7 +111,7 @@ class DisplaySetupView(base.BaseSetupView):
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
-            self.redirect(_context, 'fe_dashboard')
+            self.redirect_startup(_context, 'fe_dashboard', message='config.save')
         _context['form'] = _form
         return _context
 

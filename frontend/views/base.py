@@ -28,10 +28,11 @@ class BaseSetupView(BaseView):
         _context = super()._post(request, *args, **kwargs)
         return self._process_base_setup_view(request, _context, *args, **kwargs)
 
-    def redirect_startup(self, context, page=None, url=None):
+    def redirect_startup(self, context, page=None, url=None, message=None):
         _query = 'startup=1'
         _query = _query + '&' + urlencode({'return': reverse(page)}) if page else ''
         _query = _query + '&' + urlencode({'return': url}) if url else ''
+        _query = _query + '&' + urlencode({'message': message}) if message else ''
         self.redirect(context, BaseSetupView.PAGE_FE_STARTUP, _query)
 
 

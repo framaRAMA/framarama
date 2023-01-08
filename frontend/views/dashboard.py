@@ -80,6 +80,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             _context['log'] = _lines
         elif _action == 'device.restart':
             _frontend_device.run_capability(frontend.FrontendCapability.APP_RESTART)
+            self.redirect_startup(_context, page='fe_dashboard_device', message='device.restart')
         elif _action == 'device.shutdown':
             _frontend_device.run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
         elif _action == 'wifi.list':

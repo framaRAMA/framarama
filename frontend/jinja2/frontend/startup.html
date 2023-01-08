@@ -2,7 +2,11 @@
 
 {% block content %}
   <div id="setup" class="text-center text-muted">
-    Starting up ...
+    {% if message == 'config.save' %}
+       Reloading configuration ...
+    {% else %}
+       Starting up ...
+    {% endif %}
   </div>
 
   <div id="status" class="pt-5 pb-5 text-center">
@@ -16,9 +20,10 @@
 
   <script type="text/javascript">
     function setup_status(status, data) {
+      const message = '{{ message }}';
       if (status == 'success') {
         let setupElement = window.document.getElementById('setup');
-        setupElement.innerHTML = 'Startup complete!'
+        setupElement.innerHTML = message == '' ? 'Startup complete!' : setupElement.innerHTML += ' completed!';
         let statusElement = window.document.getElementById('status');
         statusElement.className += ' d-none';
         let continueElement = window.document.getElementById('continue');
