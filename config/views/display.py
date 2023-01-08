@@ -1,8 +1,4 @@
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-
 from config import models
 from config.views import base
 from config.forms import display as forms
@@ -20,12 +16,12 @@ class CreateDisplayView(base.BaseConfigView):
         return _context
 
     def _post(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
         _form = forms.CreateDisplayForm(request.POST)
         if _form.is_valid():
             _display = models.Display(user=request.user, name=_form.cleaned_data['name'], description=_form.cleaned_data['description'], enabled=_form.cleaned_data['enabled'])
             _display.save()
-            return {'_response': HttpResponseRedirect(reverse('display_info', args=[_display.id]))}
-        _context = super()._get(request, *args, **kwargs)
+            self.redirect(_context, 'display_info', args=[_display.id])
         _context['form'] = _form
         return _context
 
@@ -49,7 +45,7 @@ class UpdateDisplayView(base.BaseDisplayConfigView):
         _form = forms.UpdateDisplayForm(request.POST, instance=_display, user=request.user)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('display_info', args=[_display.id]))}
+            self.redirect(_context, 'display_info', args=[_display.id])
         _context['form'] = _form
         return _context
 
@@ -73,7 +69,7 @@ class UpdateDeviceDisplayView(base.BaseDisplayConfigView):
         _form = forms.UpdateDeviceDisplayForm(request.POST, instance=_display)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('display_device', args=[_display.id]))}
+            self.redirect(_context, 'display_device', args=[_display.id])
         _context['form'] = _form
         return _context
 
@@ -97,7 +93,7 @@ class UpdateTimeDisplayView(base.BaseDisplayConfigView):
         _form = forms.UpdateTimeDisplayForm(request.POST, instance=_display)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('display_time', args=[_display.id]))}
+            self.redirect(_context, 'display_time', args=[_display.id])
         _context['form'] = _form
         return _context
 
@@ -121,7 +117,7 @@ class UpdateAccessDisplayView(base.BaseDisplayConfigView):
         _form = forms.UpdateAccessDisplayForm(request.POST, instance=_display)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('display_access', args=[_display.id]))}
+            self.redirect(_context, 'display_access', args=[_display.id])
         _context['form'] = _form
         return _context
 

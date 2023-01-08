@@ -1,6 +1,4 @@
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
 from django.views.generic import RedirectView
 from django.core.paginator import Paginator
 
@@ -23,12 +21,12 @@ class CreateFrameView(base.BaseConfigView):
         return _context
 
     def _post(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
         _form = forms.CreateFrameForm(request.POST)
         if _form.is_valid():
             _frame = models.Frame(user=request.user, name=_form.cleaned_data['name'], description=_form.cleaned_data['description'], enabled=_form.cleaned_data['enabled'])
             _frame.save()
-            return {'_response': HttpResponseRedirect(reverse('frame_info', args=[_frame.id]))}
-        _context = super()._get(request, *args, **kwargs)
+            self.redirect(_context, 'frame_info', args=[_frame.id])
         _context['form'] = _form
         return _context
 
@@ -56,7 +54,7 @@ class UpdateGeneralFrameView(base.BaseFrameConfigView):
         _form = forms.UpdateFrameForm(request.POST, instance=_frame)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('frame_info', args=[_frame.id]))}
+            self.redirect(_context, 'frame_info', args=[_frame.id])
         _context['form'] = _form
         return _context
 
@@ -77,7 +75,7 @@ class CreateSourceFrameView(base.BaseFrameConfigView):
             _source = models.Source(name=_form.cleaned_data['name'])
             _source.frame = _context['frame']
             _source.save()
-            return {'_response': HttpResponseRedirect(reverse('frame_source_info', args=[_frame.id, _source.id]))}
+            self.redirect(_context, 'frame_source_info', args=[_frame.id, _source.id])
         _context['form'] = _form
         return _context
 
@@ -98,7 +96,7 @@ class UpdateSourceFrameView(base.BaseSourceFrameConfigView):
         _form = forms.UpdateSourceForm(request.POST, instance=_source)
         if _form.is_valid():
             _form.save()
-            return {'_response': HttpResponseRedirect(reverse('frame_source_info', args=[_frame.id, _source.id]))}
+            self.redirect(_context, 'frame_source_info', args=[_frame.id, _source.id])
         _context['form'] = _form
         return _context
 
@@ -116,7 +114,8 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
             _job_id = jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
             _scheduler = self.get_scheduler()
             _scheduler.trigger(jobs.Jobs.CFG_SOURCE_UPDATE, frame=_frame, source=_source)
-        return {'_response': HttpResponseRedirect(reverse('frame_source_step_list', args=[_frame.id, _source.id]))}
+        self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
+        return _context
 
 
 class RedirectSourceFrameView(base.BaseFrameConfigView):
@@ -126,8 +125,10 @@ class RedirectSourceFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _sources = _frame.sources.all()
         if _sources:
-            return {'_response': HttpResponseRedirect(reverse('frame_source_info', args=[_frame.id, _sources[0].id]))}
-        return {'_response': HttpResponseRedirect(reverse('frame_source_create', args=[_frame.id]))}
+            self.redirect(_context, 'frame_source_info', args=[_frame.id, _sources[0].id])
+        else:
+            self.redirect(_context, 'frame_source_create', args=[_frame.id])
+        return _context
 
 
 class RedirectInfoSourceFrameView(RedirectView):
@@ -175,7 +176,7 @@ class CreateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
             _step_model.plugin = _plugin.name
             _step_model.source = _source
             _plugin.save_model(_step_model)
-            return {'_response': HttpResponseRedirect(reverse('frame_source_step_list', args=[_frame.id, _source.id]))}
+            self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         _context['form'] = _form
         return _context
 
@@ -204,7 +205,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         if _form.is_valid():
             _source_step = _form.save(commit=False)
             _plugin.save_model(_source_step)
-            return {'_response': HttpResponseRedirect(reverse('frame_source_step_list', args=[_frame.id, _source.id]))}
+            self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         _context['step'] = _source_step
         _context['form'] = _form
         return _context
@@ -222,7 +223,8 @@ class ActionStepSourceFrameView(base.BaseStepSourceFrameConfigView):
             self._item_order_delete(_source_step.pk, _source.steps)
         elif _action == 'up' or _action == 'down':
             self._item_order_move(_action, _source_step, _source.steps)
-        return {'_response': HttpResponseRedirect(reverse('frame_source_step_list', args=[_frame.id, _source.id]))}
+        self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
+        return _context
 
 
 class ItemsSourceFrameView(base.BaseSourceFrameConfigView):
@@ -282,7 +284,7 @@ class CreateSortingFrameView(base.BaseFrameConfigView):
             _model.plugin = _plugin.name
             _model.frame = _frame
             _plugin.save_model(_model)
-            return {'_response': HttpResponseRedirect(reverse('frame_sorting_list', args=[_frame.id]))}
+            self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
         return _context
@@ -310,7 +312,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
         if _form.is_valid():
             _sorting = _form.save(commit=False)
             _sorting_plugin.save_model(_sorting)
-            return {'_response': HttpResponseRedirect(reverse('frame_sorting_list', args=[_frame.id]))}
+            self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
         _context['form'] = _form
         return _context
 
@@ -324,7 +326,8 @@ class ActionSortingFrameView(base.BaseSortingFrameConfigView):
         _action = request.GET['action']
         if _action == 'delete':
             self._item_order_delete(_sorting.pk, _frame.sortings)
-        return {'_response': HttpResponseRedirect(reverse('frame_sorting_list', args=[_frame.id]))}
+        self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
+        return _context
 
 
 class ListFinishingFrameView(base.BaseFrameConfigView):
@@ -363,7 +366,7 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
             _model.plugin = _plugin.name
             _model.frame = _frame
             _plugin.save_model(_model)
-            return {'_response': HttpResponseRedirect(reverse('frame_finishing_list', args=[_frame.id]))}
+            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
         return _context
@@ -391,7 +394,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         if _form.is_valid():
             _finishing = _form.save(commit=False)
             _finishing_plugin.save_model(_finishing)
-            return {'_response': HttpResponseRedirect(reverse('frame_finishing_list', args=[_frame.id]))}
+            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['form'] = _form
         return _context
 
@@ -407,7 +410,8 @@ class ActionFinishingFrameView(base.BaseFinishingFrameConfigView):
             self._item_order_delete(_finishing.pk, _frame.finishings)
         elif _action == 'up' or _action == 'down':
             self._item_order_move(_action, _finishing, _frame.finishings)
-        return {'_response': HttpResponseRedirect(reverse('frame_finishing_list', args=[_frame.id]))}
+        self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+        return _context
 
 
 class PreviewImageFrameView(base.BaseFrameConfigView):
@@ -430,7 +434,9 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 finishing.WandImageProcessingAdapter())
             with _context:
                 _result = finishing.Processor(_context).process()
-                return {'_response': HttpResponse(_result.get_data(), _result.get_mime())}
-        return {'_response': HttpResponse('', 'text/plain')}
+                self.response(_result.get_data(), _result.get_mime())
+        else:
+            self.response('', 'text/plain')
+        return _context
 
 
