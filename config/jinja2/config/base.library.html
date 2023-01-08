@@ -258,7 +258,7 @@
 <script type="text/javascript">
   let statusCount_{{ name}} = 0;
   function status_fetch_{{ name }}() {
-    fetch("/frontend/status/{{ name }}")
+    fetch("/api/status/{{ name }}")
       .then(function (res) {
         if (res.ok) {
           return res.json();

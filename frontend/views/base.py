@@ -38,14 +38,6 @@ class BaseSetupView(BaseView):
         self.redirect(context, BaseSetupView.PAGE_FE_STARTUP, _query)
 
 
-class BaseStatusView(BaseSetupView):
-
-    def _get(self, request, *args, **kwargs):
-       _context = super()._get(request, *args, **kwargs)
-       _context['_response'] = JsonResponse(self._status(_context))
-       return _context
-
- 
 class BaseFrontendView(BaseSetupView):
     PAGE_FE_INDEX = 'fe_index'
 

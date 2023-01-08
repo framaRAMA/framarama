@@ -13,6 +13,80 @@ class ItemSerializer(serializers.Serializer):
     mime = serializers.CharField(max_length=255)
 
 
+class SetupStatusView(viewsets.ViewSet):
+
+    def list(self, request, format=None):
+        try:
+            if frontend.Frontend.get().is_initialized():
+                return Response({
+                    'status': 'success',
+                    'message': 'Configuration setup completed'
+                })
+            return Response({
+                'status': 'testing',
+                'message': 'Configuration setup not available'
+            })
+        except Exception as e:
+            return Response({
+               'status': 'error',
+               'message': 'Error checking setup status: ' + str(e)
+            })
+
+
+class DatabaseStatusView(viewsets.ViewSet):
+
+    def list(self, request, format=None):
+        try:
+            if frontend.Frontend.get().db_access():
+                return Response({
+                    'status': 'success',
+                    'message': 'Database access successful'
+                })
+            else:
+                return Response({
+                    'status': 'error',
+                    'message': 'No database access possible'
+                })
+        except Exception as e:
+            return Response({
+               'status': 'error',
+               'message': 'Error accessing database: ' + str(e)
+            })
+
+
+class DisplayStatusView(viewsets.ViewSet):
+
+    def list(self, request, format=None):
+        try:
+            if frontend.Frontend.get().api_access():
+                _display = frontend.Frontend.get().get_display()
+                return Response({
+                    'status': 'success',
+                    'message': 'Successful API access',
+                    'data': {
+                      'display': {
+                        'id': _display.get_id(),
+                        'name': _display.get_name(),
+                        'enabled': _display.get_enabled(),
+                        'device_type': _display.get_device_type(),
+                        'device_type_name': _display.get_device_type_name(),
+                        'device_width': _display.get_device_width(),
+                        'device_height': _display.get_device_height()
+                      }
+                    }
+                })
+            else:
+                return Response({
+                    'status': 'error',
+                    'message': 'No display configured',
+                })
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': 'Error accessing API: ' + str(e)
+            })
+
+
 class OverviewDisplayView(viewsets.ViewSet):
 
     def list(self, request, format=None):

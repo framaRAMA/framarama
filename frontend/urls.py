@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from frontend.views import setup, dashboard, system, status
+from frontend.views import setup, dashboard, system
 
 urlpatterns = [
     path('', setup.SetupView.as_view(), name='fe_index'),
@@ -16,9 +16,5 @@ urlpatterns = [
     path('system/help', system.HelpSystemView.as_view(), name='fe_system_help'),
     path('system/usb', system.UsbSystemView.as_view(), name='fe_system_usb'),
     path('system/label', system.LabelSystemView.as_view(), name='fe_system_label'),
-
-    path('status/setup', status.SetupStatusView.as_view(), name='fe_status_setup'),
-    path('status/database', status.DatabaseStatusView.as_view(), name='fe_status_database'),
-    path('status/display', status.DisplayStatusView.as_view(), name='fe_status_display'),
 ]
 
