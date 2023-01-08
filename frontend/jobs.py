@@ -40,9 +40,9 @@ class Jobs():
 
     def _setup_start(self):
         if self._startup is None:
-            self._startup = timezone.now()
+            self._startup = utils.DateTime.now()
             _config = frontend.Frontend.get().get_config()
-            _config.get_config().date_app_startup = timezone.now()
+            _config.get_config().date_app_startup = utils.DateTime.now()
             _config.get_config().save()
         for _job_name in [Jobs.FE_NEXT_ITEM, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
             if self._scheduler.get(_job_name):
@@ -79,7 +79,7 @@ class Jobs():
             self._items = _display.get_items(True)
             logger.info("Have {} items in list.".format(self._items.count()))
             _config = frontend.Frontend.get().get_config()
-            _config.get_config().date_items_update = timezone.now()
+            _config.get_config().date_items_update = utils.DateTime.now()
             _config.get_config().count_items = self._items.count()
             _config.get_config().save()
 
@@ -103,7 +103,7 @@ class Jobs():
                     _display_on = True
         _device = frontend.Frontend.get().get_device()
         if self._last_update is None and len(_device.get_files()):
-            self._last_update = timezone.now()
+            self._last_update = utils.DateTime.now()
             _device.activate(0)
         elif not _display_on and not force:
             logger.info("Skipping next item, display is off.")
@@ -111,7 +111,7 @@ class Jobs():
             _last_update = self._last_update
             _config = frontend.Frontend.get().get_config().get_config()
             try:
-                self._last_update = timezone.now()
+                self._last_update = utils.DateTime.now()
                 logger.info("Retrieve next item ...")
                 _next_item = self._display.get_next_item(True)
                 logger.info("Next item is {}".format(_next_item))
