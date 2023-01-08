@@ -29,6 +29,8 @@ class BaseSetupView(BaseView):
         return self._process_base_setup_view(request, _context, *args, **kwargs)
 
     def redirect_startup(self, context, page=None, url=None, message=None):
+        if page is None and url is None:
+            page = self.view_name(self.request)
         _query = 'startup=1'
         _query = _query + '&' + urlencode({'return': reverse(page)}) if page else ''
         _query = _query + '&' + urlencode({'return': url}) if url else ''
