@@ -64,17 +64,17 @@ class DeviceDashboardView(base.BaseFrontendView):
             _name = self.request.GET.get('name')
             _pass = self.request.GET.get('password')
             _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_SAVE, name=_name, password=_pass)
-            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
+            self.redirect(_context, query='action=wifi.list')
             return _context
         elif _action == 'wifi.delete':
             _name = self.request.GET.get('name')
             _frontend_device.run_capability(frontend.FrontendCapability.NET_PROFILE_DELETE, name=_name)
-            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
+            self.redirect(_context, query='action=wifi.list')
             return _context
         elif _action == 'wifi.connect':
             _name = self.request.GET.get('name')
             _frontend_device.network_connect(_name)
-            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
+            self.redirect(_context, query='action=wifi.list')
             return _context
         _wifi = None
         if _action == 'device.log':
@@ -82,7 +82,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             _context['log'] = _lines
         elif _action == 'device.restart':
             _frontend_device.run_capability(frontend.FrontendCapability.APP_RESTART)
-            self.redirect_startup(_context, page='fe_dashboard_device', message='device.restart')
+            self.redirect_startup(_context, message='device.restart')
         elif _action == 'device.shutdown':
             _frontend_device.run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
         elif _action == 'wifi.list':
@@ -103,7 +103,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             }
         elif _action == 'wifi.ap':
             _frontend_device.network_ap_toggle()
-            self.redirect(_context, 'fe_dashboard_device', 'action=wifi.list')
+            self.redirect(_context, query='action=wifi.list')
             return _context
         _mem_total = _frontend_device.run_capability(frontend.FrontendCapability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(frontend.FrontendCapability.MEM_FREE)
@@ -178,13 +178,13 @@ class SoftwareDashboardView(base.BaseFrontendView):
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
                 password=_form_check.cleaned_data['password']), id=jobs.Jobs.FE_APP_CHECK)
-            self.redirect(_context, 'fe_dashboard_software')
+            self.redirect(_context)
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
             _scheduler.add(lambda: _frontend_device.run_capability(
                 frontend.FrontendCapability.APP_UPDATE,
                 revision=_form_update.cleaned_data['revision']), id=jobs.Jobs.FE_APP_UPDATE)
-            self.redirect(_context, 'fe_dashboard_software')
+            self.redirect(_context)
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
