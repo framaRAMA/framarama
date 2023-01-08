@@ -42,9 +42,10 @@ class BaseView(TemplateView):
     def url(self, request):
         return request.get_full_path()
 
-    def redirect(self, context, page, query=None, args=[]):
+    def redirect(self, context, page=None, query=None, args=[]):
         _query = '?' + query if query else ''
-        context['_response'] = HttpResponseRedirect(reverse(page, args=args) + _query)
+        _page = page if page else self.view_name(self.request)
+        context['_response'] = HttpResponseRedirect(reverse(_page, args=args) + _query)
 
     def response(self, context, data, mime=None):
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
