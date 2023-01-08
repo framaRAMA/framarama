@@ -28,6 +28,8 @@ class DisplayDashboardView(base.BaseFrontendView):
             _scheduler.trigger(jobs.Jobs.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
             _scheduler.add(lambda: _frontend_device.activate(item=self.request.GET['item']), id=jobs.Jobs.FE_ACTIVATE_ITEM)
+        if _action:
+            self.redirect(_context)
         _context['display'] = {
             'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
             'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
