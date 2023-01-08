@@ -1,6 +1,4 @@
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
 from django.core.files import File
 from django.core.exceptions import ValidationError
 
@@ -25,7 +23,7 @@ class SetupView(base.BaseFrontendView):
         _context = super()._get(request, *args, **kwargs)
         _frontend = _context['frontend']
         if _frontend.is_setup() and 'edit' not in request.GET:
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+            self.redirect(_context, 'fe_dashboard')
         return _context
 
 
@@ -66,11 +64,11 @@ class LocalModeSetupView(base.BaseSetupView):
             if _config.mode == 'local' and _config.local_db_type == 'mysql':
                 try:
                     self._update_config(vars(_config))
-                    _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+                    self.redirect(_context, 'fe_dashboard')
                 except Exception as e:
                     _form.add_error('__all__', ValidationError('Error saving settings (' + str(e) +')'))
             else:
-                _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+                self.redirect(_context, 'fe_dashboard')
         _context['form'] = _form
         return _context
 
@@ -91,7 +89,7 @@ class CloudModeSetupView(base.BaseSetupView):
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+            self.redirect(_context, 'fe_dashboard')
         _context['form'] = _form
         return _context
 
@@ -112,7 +110,7 @@ class DisplaySetupView(base.BaseSetupView):
         if _form.is_valid():
             _form.save()
             frontend.Singleton.clear()
-            _context['_response'] = HttpResponseRedirect(reverse('fe_dashboard'))
+            self.redirect(_context, 'fe_dashboard')
         _context['form'] = _form
         return _context
 
