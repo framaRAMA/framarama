@@ -9,7 +9,7 @@
     <div id="status-setup">{{ lib.status_icons('float-none fs-1 fa-spin', '') }}</div>
   </div>
   <div id="continue" class="pt-5 pb-5 text-center d-none">
-    <a href="{{ return|default(url('fe_index')) }}" class="btn btn-primary">OK</a>
+    <a href="{% if return %}{{ return }}{% else %}{{ url('fe_index') }}{% endif %}" class="btn btn-primary">Continue</a>
   </div>
 
   {{ lib.status_script('setup', 'setup_status') }}
