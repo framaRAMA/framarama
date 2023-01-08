@@ -246,22 +246,16 @@ class Display(Singleton):
     def get_time_on(self):
         return self._data.item().time_on
 
-    def time_on_reached(self, time):
-        _time_on = DateTime.delta(self.get_time_on())
-        if _time_on:
-            _midnight = DateTime.midnight()
-            return _midnight + _time_on < time
-        return False
+    def time_on_reached(self):
+        _time_on = self.get_time_on()
+        return DateTime.now(sub=_time_on) > DateTime.midnight() if _time_on else False
 
     def get_time_off(self):
         return self._data.item().time_off
 
-    def time_off_reached(self, time):
-        _time_off = DateTime.delta(self.get_time_off())
-        if _time_off:
-            _midnight = DateTime.midnight()
-            return _midnight + _time_off < time
-        return False
+    def time_off_reached(self):
+        _time_off = self.get_time_off()
+        return DateTime.now(sub=_time_off) > DateTime.midnight() if _time_off else False
 
     def get_time_change(self):
         return DateTime.delta(

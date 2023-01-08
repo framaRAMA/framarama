@@ -86,10 +86,9 @@ class Jobs():
     def next_item(self, force=False):
         if self._display is None:
             return
-        _now = timezone.now()
         _device = frontend.Frontend.get().get_device()
-        _time_on_reached = self._display.time_on_reached(_now)
-        _time_off_reached = self._display.time_off_reached(_now)
+        _time_on_reached = self._display.time_on_reached()
+        _time_off_reached = self._display.time_off_reached()
         _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
         if _time_on_reached or _time_off_reached:
             if _time_off_reached:
