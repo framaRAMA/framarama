@@ -24,7 +24,10 @@ class Jobs():
         if source:
             _sources = _sources.filter(id=source.id)
         if frame is None and source is None:
-            _prev_update = utils.DateTime.now() - utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
+            _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
+            if _interval is None:
+                return
+            _prev_update = utils.DateTime.now() - _interval
             _sources = _sources.filter(update_date_start__lt=_prev_update)
         for _source in _sources.order_by('-update_date_start'):
             _frame = _source.frame
