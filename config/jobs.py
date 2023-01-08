@@ -18,15 +18,14 @@ class Jobs():
         self._scheduler.trigger(Jobs.CFG_SOURCE_UPDATE)
 
     def source_update(self, frame=None, source=None):
-        _prev_update = utils.DateTime.now() - utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
-        _sources = models.Source.objects.filter(
-            update_date_start__lt=_prev_update,
-            frame__enabled=True,
-            frame__display__enabled=True)
+        _sources = models.Source.objects.filter(frame__enabled=True, frame__display__enabled=True)
         if frame:
             _sources = _sources.filter(frame=frame)
         if source:
             _sources = _sources.filter(id=source.id)
+        if frame is None and source is None:
+            _prev_update = utils.DateTime.now() - utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
+            _sources = _sources.filter(update_date_start__lt=_prev_update)
         for _source in _sources.order_by('-update_date_start'):
             _frame = _source.frame
             _job_id = Jobs.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
