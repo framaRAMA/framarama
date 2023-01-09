@@ -32,7 +32,7 @@ class Jobs():
         for _source in _sources.order_by('-update_date_start'):
             _frame = _source.frame
             _job_id = Jobs.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
-            if self._scheduler.running(_job_id, True):
+            if self._scheduler.running(_job_id, True) > 1:
                 logger.info('Skipping update {} {} - already running for frame'.format(_frame, _source))
             else:
                 logger.info("Updating {} {}".format(_frame, _source))
