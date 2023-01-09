@@ -258,13 +258,11 @@ class Display(Singleton):
         return DateTime.now(sub=_time_off) > DateTime.midnight() if _time_off else False
 
     def get_time_change(self):
-        return DateTime.delta(
-            self._data.get('time_change', settings.FRAMARAMA['FRONTEND_ITEM_UPDATE_INTERVAL']))
+        _time_change = self._data.get('time_change')
+        return DateTime.delta(_time_change if _time_change else settings.FRAMARAMA['FRONTEND_ITEM_UPDATE_INTERVAL'])
 
     def time_change_reached(self, last_update):
-        _now = DateTime.now()
-        _time_change = self.get_time_change()
-        return last_update is None or last_update + _time_change < _now
+        return last_update is None or last_update + self.get_time_change() < DateTime.now()
 
     def get_items(self, refresh=False):
         if self._items is None or refresh:
