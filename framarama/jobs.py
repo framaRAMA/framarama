@@ -26,7 +26,7 @@ class Scheduler:
             _compare = lambda job: job.startswith(name)
         else:
             _compare = lambda job: job == name
-        return len([_job for _job in self._running if _compare(_job)]) > 0
+        return len([_job for _job in self._running if _compare(_job)])
 
     def jobs(self):
         return self._scheduler.get_jobs()
