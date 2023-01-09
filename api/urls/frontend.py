@@ -22,7 +22,7 @@ urlpatterns = [
     path('api-auth/',  include('rest_framework.urls', namespace='rest_framework')),
     path('schema/', get_schema_view(
         title="Your Project",
-        description="API for all things …",
+        description="API for frontend system",
         version="1.0.0",
         urlconf='api.urls.frontend'
     ), name='openapi-schema'),
