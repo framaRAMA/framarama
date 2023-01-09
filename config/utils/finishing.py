@@ -53,7 +53,7 @@ class Context:
         self._image_data[Context.DEFAULT_IMAGE_NAME] = image
     
     def get_image_data(self, image_name):
-        return self._image_data[image_name]
+        return self._image_data[image_name] if image_name in self._image_data else None
     
     def set_image_data(self, image_name, image):
         self._image_data[image_name] = image
@@ -217,6 +217,9 @@ class Processor:
             _image = ImageContainer()
             for i, _name in enumerate(_images_in):
                 _image_in = self._context.get_image_data(_name)
+                if not _image_in:
+                    logger.warn('Image {} does not exists - ignoring.'.format(_name))
+                    continue
                 if _name not in _images_out:
                     _image_in = _adapter.image_clone(_image_in)
                 _image.add_images(_image_in.get_images())
