@@ -14,7 +14,7 @@
         {{ loop.index }}. {{ finishing.title }}
         <span class="badge rounded-pill badge-success">
           {{ lib.icon('finishing.plugin.'+finishing_plugins[finishing.plugin].cat) }}
-          {{ finishing.plugin_config }}
+          {{ finishing.plugin }}
         </span>
         {% if finishing.image_in %}
           <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.input') }} {{ finishing.image_in }}</span>
