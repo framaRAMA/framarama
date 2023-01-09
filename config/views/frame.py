@@ -434,9 +434,9 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 finishing.WandImageProcessingAdapter())
             with _context:
                 _result = finishing.Processor(_context).process()
-                self.response(_result.get_data(), _result.get_mime())
+                self.response(_context, _result.get_data(), _result.get_mime())
         else:
-            self.response('', 'text/plain')
+            self.response(_context, '', 'text/plain')
         return _context
 
 
