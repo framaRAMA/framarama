@@ -30,12 +30,6 @@ class Processor:
         self._context = context
         self._instances = {}
 
-    def get_plugin(self, plugin_name):
-        return SortingPluginRegistry.get(plugin_name)
-
-    def get_model(self, sorting):
-        return self.get_plugin(sorting.plugin).load_model(sorting.id)
-
     def process(self):
         '''
 Database shell imports for testing queries:
@@ -50,8 +44,11 @@ Item = models.Item.objects
         for _sorting in self._context.get_frame().sortings.all():
             if not _sorting.enabled:
                 continue
-            _plugin = self.get_plugin(_sorting.plugin)
-            _sorting = self.get_model(_sorting)
+            _plugin = SortingPluginRegistry.get(_sorting.plugin)
+            if not _plugin:
+                logger.warn("Unknown plugin {} - skipping.".format(_sorting.plugin))
+                continue
+            _sorting = _plugin.load_model(_sorting.id)
 
             _code = _plugin.run(_sorting, self._context)
             _code = re.sub(r"[\r\n]+\s*", "", _code)  # fix indent by removing newline/whitespaces

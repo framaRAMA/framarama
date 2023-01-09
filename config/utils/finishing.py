@@ -180,12 +180,6 @@ class Processor:
             }}))
         return _finishings
 
-    def get_plugin(self, plugin_name):
-        return FinishingPluginRegistry.get(plugin_name)
-
-    def get_model(self, finishing):
-        return self.get_plugin(finishing.plugin).create_model(finishing)
-
     def process(self):
         _item = self._context.get_item()
         if not _item.url:
@@ -202,8 +196,11 @@ class Processor:
             if not _finishing.enabled:
                 continue
             logger.info("Processing finishing {}".format(_finishing))
-            _plugin = self.get_plugin(_finishing.plugin)
-            _finishing = self.get_model(_finishing)
+            _plugin = FinishingPluginRegistry.get(_finishing.plugin)
+            if not _plugin:
+                logger.warn("Unknown plugin {} - skipping.".format(_finishing.plugin))
+                continue
+            _finishing = _plugin.create_model(_finishing)
 
             if _finishing.image_in:
                 _images_in = _finishing.get_image_names_in()
