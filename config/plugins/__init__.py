@@ -109,7 +109,8 @@ class PluginRegistry:
 
     @classmethod
     def get(cls, name):
-        return cls._get_instance()._registry[name]
+        _registry = cls._get_instance()._registry
+        return _registry[name] if name in _registry else None
 
     @classmethod
     def all(cls):
