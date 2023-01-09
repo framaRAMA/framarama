@@ -5,6 +5,7 @@ import importlib
 
 from django.core.paginator import Paginator
 
+from framarama.base.utils import Filesystem
 from config import models
 from config.plugins import FinishingPluginRegistry
 from config.utils import context
@@ -538,7 +539,12 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             func(_image)
 
     def image_open(self, url):
-        _image = self._wand_image.Image(blob=requests.get(url, timeout=(15, 30), stream=True).raw)
+        if url.startswith('http://') or url.startswith('https://'):
+            _image = self._wand_image.Image(blob=requests.get(url, timeout=(15, 30), stream=True).raw)
+        elif Filesystem.file_exists(url):
+            _image = self._wand_image.Image(blob=Filesystem.file_read(url))
+        else:
+            raise Exception('Only URLs and files are supported, not {}'.format(url))
         _image.auto_orient()
         _image_container = ImageContainer()
         _image_container.add_image(_image)
