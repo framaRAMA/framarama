@@ -234,6 +234,7 @@ class Finishing(PluginModel):
     CAT_RESIZE = 'resize'
     CAT_TRANSFORM = 'transform'
     CAT_MERGE = 'merge'
+    CAT_IMAGE = 'image'
 
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='finishings')
     ordering = models.IntegerField()
