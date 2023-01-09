@@ -41,18 +41,6 @@ class Processor:
         self._context = context
         self._instances = {}
 
-    def get_plugin(self, plugin_name):
-        return SourcePluginRegistry.get(plugin_name)
-
-    def get_plugin_instance(self, plugin_name, instance_name):
-        _instance_name = plugin_name + ':' + instance_name
-        if _instance_name not in self._instances:
-            self._instances[_instance_name] = self.get_plugin(plugin_name).impl()
-        return self._instances[_instance_name]
-
-    def get_model(self, step):
-        return self.get_plugin(step.plugin).load_model(step.id)
-
     def process(self):
         _sources = self._context.get_frame().sources
         if self._context.get_source():
@@ -66,7 +54,11 @@ class Processor:
             try:
                 _last_step = None
                 for i, _step in enumerate(_source.steps.all()):
-                    self._process_step(i+1, self.get_model(_step))
+                    _plugin = SourcePluginRegistry.get(_step.plugin)
+                    if not _plugin:
+                        logger.warn("Unknown plugin {} - skipping.".format(_step.plugin))
+                        continue
+                    self._process_step(i+1, _plugin, _plugin.load_model(_step.id))
                     _last_step = _step
                 if _last_step and _last_step.data_out:
                     _stats = self._process_items_updates(_source, _last_step)
@@ -80,7 +72,7 @@ class Processor:
                 _source.save()
                 raise e
 
-    def _process_step(self, cnt, step):
+    def _process_step(self, cnt, plugin, step):
         if step.data_in:
             _data_input = self._context.get_input(step.data_in)
         else:
@@ -97,7 +89,7 @@ class Processor:
         
         _data_output = []
         for i, _data_in in enumerate(_data_input):
-            _data_out = self._process_step_plugin(cnt, i+1, len(_data_input), step, _data_in)
+            _data_out = self._process_step_plugin(cnt, i+1, len(_data_input), plugin, step, _data_in)
 
             if step.loop_out and len(_data_out):
                 _data_out = _data_out[0].items()
@@ -108,13 +100,12 @@ class Processor:
         if step.data_out:
             self._context.set_output(step.data_out, _data_output)
 
-    def _process_step_plugin(self, cnt, i, icnt, step, _data_in):
+    def _process_step_plugin(self, cnt, i, icnt, plugin, step, _data_in):
         logger.info("Run step {}: {}/{} {}".format(cnt, i, icnt, step))
         if step.mime_in:
             _data_in = DataContainer(data=_data, data_type=DataType(DataType,MIME, step.mime_in))
 
-        _plugin = self.get_plugin(step.plugin)
-        _data_out = _plugin.run(step, _data_in, self._context, instance=step.instance)
+        _data_out = plugin.run(step, _data_in, self._context, instance=step.instance)
 
         if not step.data_out:
             return []
