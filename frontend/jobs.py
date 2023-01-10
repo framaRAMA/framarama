@@ -104,6 +104,7 @@ class Scheduler(jobs.Scheduler):
                     _display_on = True
         _device = frontend.Frontend.get().get_device()
         if self._last_update is None and len(_device.get_files()):
+            logger.info("Last items exist, activating the last one.")
             self._last_update = utils.DateTime.now()
             _device.activate(0)
         elif not _display_on and not force:
