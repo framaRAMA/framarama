@@ -7,5 +7,6 @@ class FrontendAppConfig(apps.BaseAppConfig):
 
     def setup_frontend(self):
         from frontend import jobs
-        self.get_scheduler().setup(jobs)
+        self._scheduler = jobs.Scheduler()
+        self._scheduler.start()
 

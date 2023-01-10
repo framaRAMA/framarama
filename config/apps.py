@@ -7,5 +7,6 @@ class ConfigAppConfig(apps.BaseAppConfig):
 
     def setup_server(self):
         from config import jobs
-        self.get_scheduler().setup(jobs)
+        self._scheduler = jobs.Scheduler()
+        self._scheduler.start()
 

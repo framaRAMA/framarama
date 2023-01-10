@@ -4,6 +4,7 @@ import logging
 
 from django.utils import timezone
 
+from framarama import jobs
 from framarama.base import utils
 from framarama.base import frontend
 from framarama.base.api import ApiClient
@@ -12,7 +13,7 @@ from framarama.base.api import ApiClient
 logger = logging.getLogger(__name__)
 
 
-class Jobs():
+class Scheduler(jobs.Scheduler):
     FE_INIT = 'fe_init'
     FE_REFRESH_DISPLAY = 'fe_refresh_display'
     FE_NEXT_ITEM = 'fe_next_item'
@@ -22,14 +23,12 @@ class Jobs():
     FE_APP_CHECK = 'fe_app_check'
     FE_APP_UPDATE = 'fe_app_update'
 
-    def __init__(self, scheduler):
+    def configure(self):
         self._display = None
         self._items = None
         self._startup = None
         self._last_update = None
-        self._scheduler = scheduler
         self._monitor = None
-        self._scheduler.add(self.tick, 'interval', seconds=5, id=Jobs.FE_INIT, name='Frontend timer')
         self._monitor = frontend.Frontend.get().get_device().monitor()
         self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
         self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
@@ -38,39 +37,11 @@ class Jobs():
         self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
         self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
         self._monitor.start()
-        self._jobs = {
-            Jobs.FE_REFRESH_DISPLAY: {
-                'func': self.refresh_display,
-                'name': 'Frontend refresh display',
-                'minutes': 10,
-            },
-            Jobs.FE_NEXT_ITEM: {
-                'func': self.next_item,
-                'name': 'Frontend next item',
-                'minutes': 1,
-            },
-            Jobs.FE_REFRESH_ITEM: {
-                'func': self.refresh_items,
-                'name': 'Frontend refresh items',
-                'minutes': 15,
-            },
-            Jobs.FE_SUBMIT_STATUS: {
-                'func': self.submit_status,
-                'name': 'Frontend status submission',
-                'minutes': 5,
-            },
-        }
-
-    def _jobs_setup(self, remove=False):
-        for _id, _job in self._jobs.items():
-            _current_job = self._scheduler.get(_id)
-            if remove:
-                if _current_job:
-                    self._scheduler.remove(_id)
-            else:
-                if not _current_job:
-                    _func = _job.pop('func')
-                    self._scheduler.add(_func, 'interval', id=_id, **_job)
+        self.register_job(Scheduler.FE_REFRESH_DISPLAY, self.refresh_display, minutes=10, name='Frontend refresh display')
+        self.register_job(Scheduler.FE_NEXT_ITEM, self.next_item, minutes=1, name='Frontend next item')
+        self.register_job(Scheduler.FE_REFRESH_ITEM, self.refresh_items, minutes=15, name='Frontend refresh items')
+        self.register_job(Scheduler.FE_SUBMIT_STATUS, self.submit_status, minutes=5, name='Frontend status submission')
+        self.add_job(Scheduler.FE_INIT, self.tick, seconds=5, name='Frontend timer')
 
     def _setup_start(self):
         if self._startup is None:
@@ -78,14 +49,14 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = utils.DateTime.now()
             _config.get_config().save()
-        self._jobs_setup(remove=True)
+        self.disable_jobs()
     
     def _setup_completed(self):
-        self._jobs_setup()
+        self.enable_jobs()
         self.refresh_display()
         self.refresh_items()
-        self._scheduler.trigger(Jobs.FE_NEXT_ITEM)
-        self._scheduler.trigger(Jobs.FE_SUBMIT_STATUS)
+        self.trigger_job(Scheduler.FE_NEXT_ITEM)
+        self.trigger_job(Scheduler.FE_SUBMIT_STATUS)
 
     def key_restart(self):
         logger.info("Restart application!")

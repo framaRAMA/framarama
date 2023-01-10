@@ -25,16 +25,16 @@ class DisplayDashboardView(base.BaseFrontendView):
           else:
               _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
         elif _action == 'display.refresh':
-            _scheduler.trigger(jobs.Jobs.FE_NEXT_ITEM, force=True)
+            _scheduler.trigger_job(jobs.Scheduler.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
-            _scheduler.add(lambda: _frontend_device.activate(item=self.request.GET['item']), id=jobs.Jobs.FE_ACTIVATE_ITEM)
+            _scheduler.run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _frontend_device.activate(item=self.request.GET['item']))
         if _action:
             self.redirect(_context)
         _context['display'] = {
             'status': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS),
             'size': _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_SIZE),
-            'refresh': _scheduler.running(jobs.Jobs.FE_NEXT_ITEM, True),
-            'set': _scheduler.running(jobs.Jobs.FE_ACTIVATE_ITEM),
+            'refresh': _scheduler.running_jobs(jobs.Scheduler.FE_NEXT_ITEM, True),
+            'set': _scheduler.running_jobs(jobs.Scheduler.FE_ACTIVATE_ITEM),
         }
         return _context
 
@@ -159,9 +159,9 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
-            'check': _scheduler.running(jobs.Jobs.FE_APP_CHECK),
+            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
             'form_update': _form_update,
-            'update': _scheduler.running(jobs.Jobs.FE_APP_UPDATE),
+            'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
         })
         return _context
 
@@ -172,25 +172,25 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _scheduler = self.get_scheduler()
         _form_check = forms.SoftwareDashboardCheckForm(request.POST)
         if _form_check.is_valid():
-            _scheduler.add(lambda: _frontend_device.run_capability(
+            _scheduler.run_job(jobs.Scheduler.FE_APP_CHECK, lambda: _frontend_device.run_capability(
                 frontend.FrontendCapability.APP_CHECK,
                 SoftwareDashboardView.REMOTE_NAME,
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
-                password=_form_check.cleaned_data['password']), id=jobs.Jobs.FE_APP_CHECK)
+                password=_form_check.cleaned_data['password']))
             self.redirect(_context)
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
-            _scheduler.add(lambda: _frontend_device.run_capability(
+            _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _frontend_device.run_capability(
                 frontend.FrontendCapability.APP_UPDATE,
-                revision=_form_update.cleaned_data['revision']), id=jobs.Jobs.FE_APP_UPDATE)
+                revision=_form_update.cleaned_data['revision']))
             self.redirect(_context)
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
-            'check': _scheduler.running(jobs.Jobs.FE_APP_CHECK),
+            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
             'form_update': _form_update,
-            'update': _scheduler.running(jobs.Jobs.FE_APP_UPDATE),
+            'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
         })
         return _context
 

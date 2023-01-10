@@ -111,9 +111,9 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
         if _action == 'delete':
             _source.delete()
         elif _action == 'run':
-            _job_id = jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
+            _job_id = jobs.Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
             _scheduler = self.get_scheduler()
-            _scheduler.trigger(jobs.Jobs.CFG_SOURCE_UPDATE, frame=_frame, source=_source)
+            _scheduler.trigger_job(jobs.Scheduler.CFG_SOURCE_UPDATE, frame=_frame, source=_source)
         self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         return _context
 
@@ -141,7 +141,7 @@ class ViewInfoSourceFrameView(base.BaseSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
-        _context['source_running'] = self.get_scheduler().running(jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(frame_id) + '_' + str(source_id), True)
+        _context['source_running'] = self.get_scheduler().running_jobs(jobs.Scheduler.CFG_SOURCE_UPDATE + '_' + str(frame_id) + '_' + str(source_id), True)
         return _context
 
 
@@ -151,7 +151,7 @@ class ListStepSourceFrameView(base.BaseSourceFrameConfigView):
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _context['source_plugins'] = plugins.SourcePluginRegistry.all()
-        _context['source_running'] = self.get_scheduler().running(jobs.Jobs.CFG_SOURCE_UPDATE + '_' + str(frame_id), True)
+        _context['source_running'] = self.get_scheduler().running_jobs(jobs.Scheduler.CFG_SOURCE_UPDATE + '_' + str(frame_id), True)
         return _context
 
 
