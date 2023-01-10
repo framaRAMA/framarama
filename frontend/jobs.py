@@ -38,6 +38,39 @@ class Jobs():
         self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
         self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
         self._monitor.start()
+        self._jobs = {
+            Jobs.FE_REFRESH_DISPLAY: {
+                'func': self.refresh_display,
+                'name': 'Frontend refresh display',
+                'minutes': 10,
+            },
+            Jobs.FE_NEXT_ITEM: {
+                'func': self.next_item,
+                'name': 'Frontend next item',
+                'minutes': 1,
+            },
+            Jobs.FE_REFRESH_ITEM: {
+                'func': self.refresh_items,
+                'name': 'Frontend refresh items',
+                'minutes': 15,
+            },
+            Jobs.FE_SUBMIT_STATUS: {
+                'func': self.submit_status,
+                'name': 'Frontend status submission',
+                'minutes': 5,
+            },
+        }
+
+    def _jobs_setup(self, remove=False):
+        for _id, _job in self._jobs.items():
+            _current_job = self._scheduler.get(_id)
+            if remove:
+                if _current_job:
+                    self._scheduler.remove(_id)
+            else:
+                if not _current_job:
+                    _func = _job.pop('func')
+                    self._scheduler.add(_func, 'interval', id=_id, **_job)
 
     def _setup_start(self):
         if self._startup is None:
@@ -45,19 +78,10 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = utils.DateTime.now()
             _config.get_config().save()
-        for _job_name in [Jobs.FE_REFRESH_DISPLAY, Jobs.FE_NEXT_ITEM, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
-            if self._scheduler.get(_job_name):
-                self._scheduler.remove(_job_name)
+        self._jobs_setup(remove=True)
     
     def _setup_completed(self):
-        if not self._scheduler.get(Jobs.FE_REFRESH_DISPLAY):
-            self._scheduler.add(self.refresh_display, 'interval', minutes=10, id=Jobs.FE_REFRESH_DISPLAY, name='Frontend refresh display')
-        if not self._scheduler.get(Jobs.FE_REFRESH_ITEM):
-            self._scheduler.add(self.refresh_items, 'interval', minutes=15, id=Jobs.FE_REFRESH_ITEM, name='Frontend refresh items')
-        if not self._scheduler.get(Jobs.FE_NEXT_ITEM):
-            self._scheduler.add(self.next_item, 'interval', minutes=1, id=Jobs.FE_NEXT_ITEM, name='Frontend next item')
-        if not self._scheduler.get(Jobs.FE_SUBMIT_STATUS):
-            self._scheduler.add(self.submit_status, 'interval', minutes=5, id=Jobs.FE_SUBMIT_STATUS, name='Frontend status submission')
+        self._jobs_setup()
         self.refresh_display()
         self.refresh_items()
         self._scheduler.trigger(Jobs.FE_NEXT_ITEM)
