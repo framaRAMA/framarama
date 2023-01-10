@@ -114,8 +114,8 @@ class Frontend(Singleton):
     def get_config(self):
         return Config.get(self)
 
-    def get_display(self):
-        return Display.get(self)
+    def get_display(self, force=False):
+        return Display.get(self, force=force)
 
     def get_device(self):
         return FrontendDevice.get(self)
