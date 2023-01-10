@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Jobs():
     FE_INIT = 'fe_init'
+    FE_REFRESH_DISPLAY = 'fe_refresh_display'
     FE_NEXT_ITEM = 'fe_next_item'
     FE_REFRESH_ITEM = 'fe_refresh_items'
     FE_ACTIVATE_ITEM = 'fe_activate_item'
@@ -44,17 +45,20 @@ class Jobs():
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_app_startup = utils.DateTime.now()
             _config.get_config().save()
-        for _job_name in [Jobs.FE_NEXT_ITEM, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
+        for _job_name in [Jobs.FE_REFRESH_DISPLAY, Jobs.FE_NEXT_ITEM, Jobs.FE_REFRESH_ITEM, Jobs.FE_SUBMIT_STATUS]:
             if self._scheduler.get(_job_name):
                 self._scheduler.remove(_job_name)
     
     def _setup_completed(self):
+        if not self._scheduler.get(Jobs.FE_REFRESH_DISPLAY):
+            self._scheduler.add(self.refresh_display, 'interval', minutes=10, id=Jobs.FE_REFRESH_DISPLAY, name='Frontend refresh display')
         if not self._scheduler.get(Jobs.FE_REFRESH_ITEM):
             self._scheduler.add(self.refresh_items, 'interval', minutes=15, id=Jobs.FE_REFRESH_ITEM, name='Frontend refresh items')
         if not self._scheduler.get(Jobs.FE_NEXT_ITEM):
             self._scheduler.add(self.next_item, 'interval', minutes=1, id=Jobs.FE_NEXT_ITEM, name='Frontend next item')
         if not self._scheduler.get(Jobs.FE_SUBMIT_STATUS):
             self._scheduler.add(self.submit_status, 'interval', minutes=5, id=Jobs.FE_SUBMIT_STATUS, name='Frontend status submission')
+        self.refresh_display()
         self.refresh_items()
         self._scheduler.trigger(Jobs.FE_NEXT_ITEM)
         self._scheduler.trigger(Jobs.FE_SUBMIT_STATUS)
@@ -71,12 +75,14 @@ class Jobs():
         logger.info("Toggle network mode!")
         frontend.Frontend.get().get_device().network_ap_toggle()
 
+    def refresh_display(self):
+        logger.info("Updating display ...")
+        self._display = frontend.Frontend.get().get_display(force=True)
+
     def refresh_items(self):
-        _display = frontend.Frontend.get().get_display()
-        if _display:
+        if self._display:
             logger.info("Refreshing items ...")
-            self._display = _display
-            self._items = _display.get_items(True)
+            self._items = self._display.get_items(True)
             logger.info("Have {} items in list.".format(self._items.count()))
             _config = frontend.Frontend.get().get_config()
             _config.get_config().date_items_update = utils.DateTime.now()
