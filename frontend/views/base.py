@@ -1,5 +1,4 @@
 from django.apps import apps
-from django.http import JsonResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
