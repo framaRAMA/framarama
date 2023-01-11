@@ -1,8 +1,9 @@
 import sys
 
+from django.conf import settings
 from django.apps import AppConfig
 
-from framarama import settings, jobs
+from framarama import jobs
 
 
 class BaseAppConfig(AppConfig):
