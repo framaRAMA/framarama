@@ -60,6 +60,7 @@ class DatabaseRouter:
             _routing = DatabaseRouter.routing['remote']
         _app_label = model._meta.app_label
         _route = _routing[_app_label] if _app_label in _routing else None
+        _route = _route if _route in connections else 'default'
         self._dump(model, _route)
         return _route
 

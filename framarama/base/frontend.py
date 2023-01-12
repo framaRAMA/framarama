@@ -13,6 +13,7 @@ import logging
 from django.conf import settings
 from django.core import management
 from django.contrib.auth.models import User
+from django.db import connections
 
 from frontend import models
 from framarama.base.utils import Singleton, Config, Filesystem, Process, DateTime
@@ -83,7 +84,10 @@ class Frontend(Singleton):
             self._init_phase = Frontend.INIT_PHASE_CONFIGURED
         if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
             self._init_admin_user()
-            self._init_migrations('config')
+            if 'config' in connections:
+                self._init_migrations('config')
+            else:
+                logger.info("Skipping migration of config because default is used")
             self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
         if self._init_phase < Frontend.INIT_PHASE_SETUP:
             _mode = self.get_config().get_config().mode
