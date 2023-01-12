@@ -125,10 +125,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'config': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
 }
 DATABASE_ROUTERS = [
     'framarama.base.DatabaseRouter'
@@ -140,16 +136,16 @@ def configure_databases(reload=True):
         if reload:
             import importlib
             from framarama import base
-            #return settings_db
             importlib.reload(settings_db)
-            DATABASES.update(settings_db.dbs)
-            connections.close_all()
-            connections.settings = DATABASES
-            for name in DATABASES:
-                if hasattr(connections._connections, name):
-                    delattr(connections._connections, name)
+            if hasattr(settings_db, 'dbs'):
+                DATABASES.update(settings_db.dbs)
+                connections.close_all()
+                connections.settings = DATABASES
+                for name in DATABASES:
+                    if hasattr(connections._connections, name):
+                        delattr(connections._connections, name)
             base.DatabaseRouter.config = None     # use new settings in database router
-        else:
+        elif hasattr(settings_db, 'dbs'):
             DATABASES.update(settings_db.dbs)
 
 configure_databases(False)
