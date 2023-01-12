@@ -53,10 +53,10 @@ class Scheduler(jobs.Scheduler):
         self.disable_jobs()
     
     def _setup_completed(self):
-        self.enable_jobs()
         self.refresh_display()
         self.refresh_items()
         self.timezone_activate()
+        self.enable_jobs()
         self.trigger_job(Scheduler.FE_NEXT_ITEM)
         self.trigger_job(Scheduler.FE_SUBMIT_STATUS)
 
