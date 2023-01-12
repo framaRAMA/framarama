@@ -103,7 +103,7 @@ class Processor:
     def _process_step_plugin(self, cnt, i, icnt, plugin, step, _data_in):
         logger.info("Run step {}: {}/{} {}".format(cnt, i, icnt, step))
         if step.mime_in:
-            _data_in = DataContainer(data=_data, data_type=DataType(DataType,MIME, step.mime_in))
+            _data_in = DataContainer(data=_data_in, data_type=DataType(DataType.MIME, step.mime_in))
 
         _data_out = plugin.run(step, _data_in, self._context, instance=step.instance)
 
