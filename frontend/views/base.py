@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.apps import apps
 from django.urls import reverse
 from django.utils import timezone
@@ -5,6 +6,7 @@ from django.utils.http import urlencode
 
 from framarama.base import frontend
 from framarama.base.views import BaseView
+from framarama.base.utils import Filesystem
 
 
 class BaseSetupView(BaseView):
@@ -26,6 +28,25 @@ class BaseSetupView(BaseView):
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         return self._process_base_setup_view(request, _context, *args, **kwargs)
+
+    def _update_config(self, config):
+        if config:
+            _vars = config
+            _db = (
+                "{\n"
+                "  'config': {\n"
+                "    'NAME': '%(local_db_name)s',\n"
+                "    'ENGINE': 'django.db.backends.mysql',\n"
+                "    'USER': '%(local_db_user)s',\n"
+                "    'PASSWORD': '%(local_db_pass)s',\n"
+                "    'HOST': '%(local_db_host)s',\n"
+                "  }\n"
+                "}\n"
+            ) % _vars
+        else:
+            _db = "{}\n"
+        eval(_db, {}, {})
+        Filesystem.file_write(settings.BASE_DIR / 'framarama' / 'settings_db.py', b'dbs = ' + _db.encode())
 
     def redirect_startup(self, context, page=None, url=None, message=None):
         if page is None and url is None:
