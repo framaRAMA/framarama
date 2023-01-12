@@ -1,10 +1,11 @@
 import datetime
+import zoneinfo
 import subprocess
 import logging
 
 from django.utils import timezone
 
-from framarama import jobs
+from framarama import settings, jobs
 from framarama.base import utils
 from framarama.base import frontend
 from framarama.base.api import ApiClient
@@ -55,8 +56,15 @@ class Scheduler(jobs.Scheduler):
         self.enable_jobs()
         self.refresh_display()
         self.refresh_items()
+        self.timezone_activate()
         self.trigger_job(Scheduler.FE_NEXT_ITEM)
         self.trigger_job(Scheduler.FE_SUBMIT_STATUS)
+
+    def timezone_activate(self):
+        _time_zone = frontend.Frontend.get().get_config().get_config().sys_time_zone
+        _time_zone = _time_zone if _time_zone else settings.TIME_ZONE
+        logger.info("Using time zone {}".format(_time_zone))
+        timezone.activate(zoneinfo.ZoneInfo(_time_zone))
 
     def key_restart(self):
         logger.info("Restart application!")

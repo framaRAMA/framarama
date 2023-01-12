@@ -46,9 +46,10 @@ class CloudModeSetupForm(base.BaseModelForm):
 class DisplaySetupForm(base.BaseModelForm):
     class Meta:
         model = models.Config
-        fields = ['count_items_keep', 'watermark_type', 'watermark_shift', 'watermark_scale']
+        fields = ['sys_time_zone', 'count_items_keep', 'watermark_type', 'watermark_shift', 'watermark_scale']
 
         widgets = {
+            'sys_time_zone': base.selectFieldWidget(choices=models.TIMEZONE_CHOICES),
             'count_items_keep': base.charFieldWidget(),
             'watermark_type': base.selectFieldWidget(choices=models.WATERMARKTYPE_CHOICES),
             'watermark_shift': base.charFieldWidget(),

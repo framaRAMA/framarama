@@ -1,8 +1,12 @@
+import zoneinfo
+
 from django.db import models
 
 from framarama.base.models import BaseModel
 
 
+TIMEZONE_CHOICES = [(None, '(default)')]
+TIMEZONE_CHOICES.extend([(_tz, _tz) for _tz in sorted(zoneinfo.available_timezones())])
 MODE_CHOICES = [
   ('local', 'Local setup'),
   ('cloud', 'Cloud setup'),
@@ -18,8 +22,13 @@ WATERMARKTYPE_CHOICES = [
   ('vbars', 'Draw vertical bars (left & right)'),
 ]
 
+
 class Config(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS
+
+    sys_time_zone = models.CharField(
+        max_length=32, choices=TIMEZONE_CHOICES, blank=True, null=True,
+        verbose_name='Timezone', help_text='The timezone to use for this device')
 
     mode = models.CharField(
         max_length=32, choices=MODE_CHOICES,
