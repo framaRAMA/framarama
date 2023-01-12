@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Q
 
 from framarama import jobs
 from framarama.base import utils
@@ -19,18 +20,19 @@ class Scheduler(jobs.Scheduler):
         self.trigger_job(Scheduler.CFG_SOURCE_UPDATE)
 
     def source_update(self, frame=None, source=None):
-        _sources = models.Source.objects.filter(frame__enabled=True, frame__display__enabled=True)
+        _critera = Q(frame__enabled=True)
+        _critera.add(Q(frame__display__enabled=True) | Q(frame__display=None), Q.AND)
         if frame:
-            _sources = _sources.filter(frame=frame)
+            _critera = _critera.add(Q(frame=frame), Q.AND)
         if source:
-            _sources = _sources.filter(id=source.id)
+            _critera = _critera.add(Q(id=source.id), Q.AND)
         if frame is None and source is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
             if _interval is None:
                 return
             _prev_update = utils.DateTime.now(sub=_interval)
-            _sources = _sources.filter(update_date_start__lt=_prev_update)
-        for _source in _sources.order_by('-update_date_start'):
+            _critera = _critera.add(Q(update_date_start__lt=_prev_update))
+        for _source in models.Source.objects.filter(_critera).order_by('-update_date_start'):
             _frame = _source.frame
             _job_id = Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
             if self.running_jobs(_job_id, True) > 1:
