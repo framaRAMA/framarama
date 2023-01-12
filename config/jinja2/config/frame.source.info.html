@@ -4,7 +4,11 @@
 <div class="pt-2">
   {{ lib.field_text('Name', source.name) }}
   {{ lib.field_text('Last update', "%s%s"|format(source.update_date_start, ' (currently runnning)' if source_running else '')) }}
-  {{ lib.field_text('Update duration', source.update_date_end - source.update_date_start) }}
+  {% if source.update_date_end and source.update_date_start %}
+    {{ lib.field_text('Update duration', source.update_date_end - source.update_date_start) }}
+  {% else %}
+    {{ lib.field_text('Update duration', '(no update or not completed)') }}
+  {% endif %}
   {{ lib.field_text('Update statistics', '%d total (%d errors)'|format(source.item_count_total, source.item_count_error)) }}
   {{ lib.field_list('Result mapping', {'ID': source.map_item_id_ext, 'URL': source.map_item_url, 'Date creation': source.map_item_date_creation}) }}
   {{ lib.field_pre('Meta mapping', source.map_item_meta) }}
