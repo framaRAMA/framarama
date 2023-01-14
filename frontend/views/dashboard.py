@@ -113,6 +113,8 @@ class DeviceDashboardView(base.BaseFrontendView):
           'usage': int((_mem_total - _mem_free) / _mem_total * 100)
         }
         _uptime = _frontend_device.run_capability(frontend.FrontendCapability.SYS_UPTIME)
+        _disk_tmp = _frontend_device.run_capability(frontend.FrontendCapability.DISK_DATA_FREE)
+        _disk_data = _frontend_device.run_capability(frontend.FrontendCapability.DISK_TMP_FREE)
         _context['sys'] = {
           'uptime' : {
             'total': _uptime,
@@ -123,8 +125,8 @@ class DeviceDashboardView(base.BaseFrontendView):
           }
         }
         _context['disk'] = {
-          'datafree': _frontend_device.run_capability(frontend.FrontendCapability.DISK_DATA_FREE),
-          'tmpfree': _frontend_device.run_capability(frontend.FrontendCapability.DISK_TMP_FREE),
+          'datafree': _disk_data[0],
+          'tmpfree': _disk_tmp[0],
         }
         _context['cpu'] = {
           'load': _frontend_device.run_capability(frontend.FrontendCapability.CPU_LOAD),

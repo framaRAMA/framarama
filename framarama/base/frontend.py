@@ -143,8 +143,8 @@ class Frontend(Singleton):
         _mem_free = _device.run_capability(FrontendCapability.MEM_FREE)
         _cpu_load = _device.run_capability(FrontendCapability.CPU_LOAD)
         _cpu_temp = _device.run_capability(FrontendCapability.CPU_TEMP)
-        _disk_data_free = _device.run_capability(FrontendCapability.DISK_DATA_FREE)
-        _disk_tmp_free = _device.run_capability(FrontendCapability.DISK_TMP_FREE)
+        _disk_data = _device.run_capability(FrontendCapability.DISK_DATA_FREE)
+        _disk_tmp = _device.run_capability(FrontendCapability.DISK_TMP_FREE)
         _network_config = _device.run_capability(FrontendCapability.NET_CONFIG)
         _network_status = _device.network_status()
         _app_revision = _device.run_capability(FrontendCapability.APP_REVISION)
@@ -165,12 +165,12 @@ class Frontend(Singleton):
             },
             'disk': {
                 'data': {
-                    'used': None,
-                    'free': _disk_data_free,
+                    'used': _disk_data[0],
+                    'free': _disk_data[1],
                 },
                 'tmp': {
-                    'used': None,
-                    'free': _disk_tmp_free,
+                    'used': _disk_tmp[0],
+                    'free': _disk_tmp[1],
                 },
             },
             'network': {
@@ -666,7 +666,8 @@ class FrontendCapability:
 
     def _df(partition):
         _info = Process.exec_run(['df', '-k', partition])
-        return int(_info.split()[-3]) if _info else None
+        _info = _info.split() if _info else None
+        return (int(_info[-4]), int(_info[-3])) if _info else None
 
     def df_data(device, *args, **kwargs):
         return FrontendCapability._df(settings.FRAMARAMA['DATA_PATH'])
