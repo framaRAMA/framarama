@@ -56,8 +56,11 @@ class Implementation(PluginImplementation):
     def run(self, model, image, ctx):
         _adapter = ctx.get_adapter()
         _url = model.url.as_str()
-        _image = _adapter.image_open(_url)
-        image.add_images(_image.get_images())
-        return image
+        _color_fill = finishing.Color(model.color_fill.as_str()) if model.color_fill.as_str() else None
+        _color_alpha = model.color_alpha.as_int()
+        _image = _adapter.image_open(_url, _color_fill)
+        if _color_alpha:
+            _adapter.image_alpha(_image, _color_fill, _color_alpha)
+        return _image
 
 
