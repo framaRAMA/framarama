@@ -136,7 +136,6 @@ class Frontend(Singleton):
 
     def get_status(self):
         _config = self.get_config().get_config()
-        _display = self.get_display()
         _device = self.get_device()
         _uptime = _device.run_capability(device.Capability.SYS_UPTIME)
         _mem_total = _device.run_capability(device.Capability.MEM_TOTAL)
