@@ -442,7 +442,7 @@ class ImageContainer:
 
 class ImageProcessingAdapter:
 
-    def image_open(self, url):
+    def image_open(self, url, background=None):
         raise NotImplementedException()
 
     def image_data(self, image):
@@ -539,7 +539,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         for _image in image.get_images():
             func(_image)
 
-    def image_open(self, url):
+    def image_open(self, url, background=None):
         if url.startswith('http://') or url.startswith('https://'):
             _image = self._wand_image.Image(blob=requests.get(url, timeout=(15, 30), stream=True).raw)
         elif Filesystem.file_exists(url):
@@ -547,6 +547,11 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         else:
             raise Exception('Only URLs and files are supported, not {}'.format(url))
         _image.auto_orient()
+        if background:
+            _bg = self._wand_image.Image(width=_image.width, height=_image.height, background=self._color(background))
+            _bg.composite(_image)
+            _image.close()
+            _image = _bg
         _image_container = ImageContainer()
         _image_container.add_image(_image)
         return _image_container
