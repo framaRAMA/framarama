@@ -52,6 +52,9 @@ class Context:
     
     def set_image(self, image):
         self._image_data[Context.DEFAULT_IMAGE_NAME] = image
+
+    def get_images(self):
+        return self._image_data
     
     def get_image_data(self, image_name):
         return self._image_data[image_name] if image_name in self._image_data else None
@@ -213,6 +216,10 @@ class Processor:
             else:
                 _images_out = [Context.DEFAULT_IMAGE_NAME]
 
+            _image_metas = {}
+            for _image_name, _image in self._context.get_images().items():
+                _image_metas[_image_name] = _adapter.image_meta(_image)
+
             _image = ImageContainer()
             for i, _name in enumerate(_images_in):
                 _image_in = self._context.get_image_data(_name)
@@ -229,6 +236,7 @@ class Processor:
             self._context.set_resolver('var', context.MapResolver({}))
             self._context.set_resolver('env', context.EnvironmentResolver())
             self._context.set_resolver('image', context.MapResolver(_adapter.image_meta(_image)))
+            self._context.set_resolver('images', context.MapResolver(_image_metas))
             self._context.set_resolver('exif', context.MapResolver(_adapter.image_exif(_image)))
 
             logger.info("Input: {} = {}".format(_images_in, _image))
