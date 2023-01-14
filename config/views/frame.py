@@ -419,7 +419,10 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _paginator = Paginator(_frame.items.order_by('?').all(), 1)
+        _items = _frame.items
+        _items = _items.filter(id=request.GET['id']) if 'id' in request.GET else _items
+        _items = _items.order_by('?').all()
+        _paginator = Paginator(_items, 1)
         _page = _paginator.get_page(0)
         _item = _page.object_list[0] if len(_page.object_list) else None
         _width = request.GET['w'] if 'w' in request.GET else 1024
