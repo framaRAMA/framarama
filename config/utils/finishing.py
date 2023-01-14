@@ -466,6 +466,9 @@ class ImageProcessingAdapter:
     def image_blur(self, image, factor):
         raise NotImplementedException()
 
+    def image_alpha(self, image, alpha):
+        raise NotImplementedException()
+
     def image_merge(self, image, alignment, coords):
         raise NotImplementedException()
 
@@ -584,6 +587,18 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
 
     def image_blur(self, image, factor):
         self._apply(image, lambda i: i.resize(filter='gaussian', blur=factor))
+
+    def image_alpha(self, image, background, factor):
+        def alpha(i):
+            if background and factor:
+                _bg = self._wand_image.Image(width=i.width, height=i.height, background=self._color(background))
+                _bg.alpha_channel = 'set'
+                _bg.evaluate(operator='set', value=i.quantum_range*factor/100, channel='alpha')
+                i.alpha_channel = 'set'
+                i.composite(_bg)
+                _bg.close()
+            i.evaluate(operator='set', value=i.quantum_range*factor/100, channel='alpha')
+        self._apply(image, alpha)
 
     def image_merge(self, image, alignment, coords=None):
         _gravity_map = {
