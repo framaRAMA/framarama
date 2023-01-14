@@ -190,6 +190,7 @@ class Processor:
         _frame= self._context.get_frame()
         if not _frame.enabled:
             return None
+        logger.info("Finishing {}".format(_item))
         _adapter = self._context.get_adapter()
         self._context.set_image(_adapter.image_open(_item.url))
         for _finishing in list(self._context.get_finishings()) + self._watermark:
