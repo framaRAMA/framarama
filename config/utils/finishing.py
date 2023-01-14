@@ -465,7 +465,7 @@ class ImageProcessingAdapter:
     def image_blur(self, image, factor):
         raise NotImplementedException()
 
-    def image_merge(self, image, alignment):
+    def image_merge(self, image, alignment, coords):
         raise NotImplementedException()
 
     def image_clone(self, image):
@@ -584,21 +584,28 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
     def image_blur(self, image, factor):
         self._apply(image, lambda i: i.resize(filter='gaussian', blur=factor))
 
-    def image_merge(self, image, alignment):
+    def image_merge(self, image, alignment, coords=None):
+        _gravity_map = {
+            'top': 'north',
+            'top-left': 'north_west',
+            'top-right': 'north_east',
+            'bottom': 'south',
+            'bottom-left': 'south_west',
+            'bottom-right': 'south_east',
+            'left': 'west',
+            'right': 'east',
+            'center': 'center',
+        }
         _first = image.get_images()[0]
-        _gravity = 'center'
-        if 'top' == alignment:
-            _gravity = 'north'
-        elif 'bottom' == alignment:
-            _gravity = 'south'
-        elif 'left' == alignment:
-            _gravity = 'west'
-        elif 'right' == alignment:
-            _gravity = 'east'
-        elif 'center' == alignment:
-            _gravity = 'center'
+        if coords:
+            _gravity = None
+            _left, _top = coords
+        else:
+            _gravity = _gravity_map[alignment] if alignment in _gravity_map else 'center'
+            _top = None
+            _left = None
         for _image in image.get_images()[1:]:
-            _first.composite(_image, gravity=_gravity)
+            _first.composite(_image, top=_top, left=_left, gravity=_gravity)
 
     def image_clone(self, image):
         _image_container = ImageContainer()
