@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class Context:
-    DEFAULT_IMAGE_NAME = '__DEFAULT__'
+    DEFAULT_IMAGE_NAME = 'default'
 
     def __init__(self, display, frame, item, finishings, adapter):
         self._display = display
