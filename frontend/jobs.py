@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from framarama import settings, jobs
 from framarama.base import utils
-from framarama.base import frontend
+from framarama.base import frontend, device
 from framarama.base.api import ApiClient
 
 
@@ -68,11 +68,11 @@ class Scheduler(jobs.Scheduler):
 
     def key_restart(self):
         logger.info("Restart application!")
-        frontend.Frontend.get().get_device().run_capability(frontend.FrontendCapability.APP_RESTART)
+        frontend.Frontend.get().get_device().run_capability(device.Capability.APP_RESTART)
 
     def key_shutdown(self):
         logger.info("Shutdown device!")
-        frontend.Frontend.get().get_device().run_capability(frontend.FrontendCapability.APP_SHUTDOWN)
+        frontend.Frontend.get().get_device().run_capability(device.Capability.APP_SHUTDOWN)
 
     def key_network_toggle(self):
         logger.info("Toggle network mode!")
@@ -98,17 +98,17 @@ class Scheduler(jobs.Scheduler):
         _device = frontend.Frontend.get().get_device()
         _time_on_reached = self._display.time_on_reached()
         _time_off_reached = self._display.time_off_reached()
-        _display_on = _device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+        _display_on = _device.run_capability(device.Capability.DISPLAY_STATUS)
         if _time_on_reached or _time_off_reached:
             if _time_off_reached:
                 if _display_on:
                     logger.info("Switch display off at {}".format(self._display.get_time_off()))
-                    _device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+                    _device.run_capability(device.Capability.DISPLAY_OFF)
                     _display_on = False
             elif _time_on_reached:
                 if not _display_on:
                     logger.info("Switch display on at {}".format(self._display.get_time_on()))
-                    _device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+                    _device.run_capability(device.Capability.DISPLAY_ON)
                     _display_on = True
         _device = frontend.Frontend.get().get_device()
         if self._last_update is None and len(_device.get_files()):

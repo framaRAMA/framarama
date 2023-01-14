@@ -3,7 +3,7 @@ from rest_framework import generics, viewsets, serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
-from framarama.base import frontend
+from framarama.base import frontend, device
 from frontend import models
 
 
@@ -152,12 +152,12 @@ class SwitchScreenDisplayView(viewsets.ViewSet):
     def list(self, request, state):
         _frontend = frontend.Frontend.get()
         _frontend_device = _frontend.get_device()
-        _status = _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_STATUS)
+        _status = _frontend_device.run_capability(device.Capability.DISPLAY_STATUS)
         if state == 'toggle':
             state = 'off' if _status else 'on'
         if state == 'on' and not _status:
-            _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_ON)
+            _frontend_device.run_capability(device.Capability.DISPLAY_ON)
         elif state == 'off' and _status:
-            _frontend_device.run_capability(frontend.FrontendCapability.DISPLAY_OFF)
+            _frontend_device.run_capability(device.Capability.DISPLAY_OFF)
         return Response(_frontend.get_screen())
 
