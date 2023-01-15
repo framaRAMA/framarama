@@ -2,6 +2,9 @@
 
 {% block content %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+  {% set display = displays[0] if displays|length else null %}
+  {% set status = display.get_latest_status() if display else null %}
+  {% set items = display.items if display else null %}
 
   {% if 'frames_chart' in dashboards %}
     <div class="col">
@@ -52,66 +55,88 @@
     </div>
   {% endif %}
 
-  <div class="col">
-    <div class="card mt-2">
-      <div class="card-header bg-info text-white">{{ lib.icon('display') }} Display</div>
-      <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
-        <ul class="card-text">
-          <li><strong>Test</strong> frame providing data</li>
-          <li>on a <strong>1440x900</strong> pixel frame</li>
-          <li>with <strong>315</strong> pictures in collection</li>
-          <li><strong>1053</strong> pictures served</li>
-          <li><strong>5</strong> minutes rotation</li>
-          <li>Display is <strong>on</strong></li>
-        </ul>
+  {% if 'display_info' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-header bg-info text-white">{{ lib.icon('display') }} Display</div>
+        {% if display %}
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
+            <ul class="card-text">
+              <li><strong>{{ display.name }}</strong> frame providing data</li>
+              <li>
+                on <strong>{{ 'a %dx%d'|format(display.device_width, display.device_height) if display.device_width and display.device_height else 'an unknown' }}</strong> pixel frame</li>
+              <li>with <strong>{{ display.frame.items|length }} </strong> pictures in collection</li>
+              <li><strong>{{ status if status else '0' }}</strong> pictures served</li>
+              <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
+              <li>Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong></li>
+            </ul>
+            <div class="text-center">
+              <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="card-body text-center">
+            To be able to show some details about the display create a new one.<br/>
+            <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs m-5">Add</a>
+          </div>
+        {% endif %}
       </div>
     </div>
-  </div>
+  {% endif %}
 
   <div class="col">
     <div class="card mt-2">
       <div class="card-header">{{ lib.icon('frame') }} Pictures</div>
       <div class="card-body">
         <h6 class="card-subtitle mb-2 text-muted">Current and latest picture shown</h6>
-        <p class="card-text">
-
-          <div id="carouselPictures" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="1" aria-label="Slide 2"></button>
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="2" aria-label="Slide 3"></button>
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="3" aria-label="Slide 4"></button>
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="4" aria-label="Slide 5"></button>
+        {% if display.items|length %}
+          <p class="card-text">
+            <div id="carouselPictures" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=1&dl=th" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=2&dl=th" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=3&dl=th" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=4&dl=th" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=5&dl=th" class="d-block w-100" alt="...">
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
             </div>
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=1&dl=th" class="d-block w-100" alt="...">
-              </div>
-              <div class="carousel-item">
-                <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=2&dl=th" class="d-block w-100" alt="...">
-              </div>
-              <div class="carousel-item">
-                <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=3&dl=th" class="d-block w-100" alt="...">
-              </div>
-              <div class="carousel-item">
-                <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=4&dl=th" class="d-block w-100" alt="...">
-              </div>
-              <div class="carousel-item">
-                <img src="http://digiframe.home/digiframe/index.php?cmd=picture&picture=5&dl=th" class="d-block w-100" alt="...">
-              </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
+          </p>
+        {% else %}
+          <div class="card-body text-center">
+            Currently no pictures shown on this display. There's no frame assigned to this
+            display or the frame does not have items currently.<br/>
           </div>
-
-        </p>
+          <div class="text-center">
+            <a href="{{ url('frame_create') }}" class="btn btn-primary btn-xs">Create frame</a>
+            <a href="{{ url('display_edit', args=[display.id]) }}" class="btn btn-primary btn-xs">Assign frame</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -123,10 +148,16 @@
         <div class="card-body">
           <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
           <ul class="card-text">
-            <li><strong>54</strong> days running</li>
-            <li><strong>0.8</strong> load, <strong>49.6°C</strong> CPU</li>
-            <li><strong>72%</strong> disk usage, <strong>386</strong>/500 MB</li>
-            <li><strong>26%</strong> memory usage, <strong>86</strong>/512 MB</li>
+            <li><strong>{{ '%d'|format(system.uptime / 60 / 60 / 24) }}</strong> days running</li>
+            <li><strong>{{ '%.2f'|format(system.cpu.load) }}</strong> load, <strong>{{ '%.1f'|format(system.cpu.temp) }}°C</strong> CPU</li>
+            <li>
+              <strong>{{ '%d'|format(system.disk.data.used * 100 / (system.disk.data.used + system.disk.data.free)) }}%</strong> disk usage,
+              <strong>{{ lib.format_bytes(system.disk.data.used) }}</strong>/{{ lib.format_bytes(system.disk.data.used + system.disk.data.free, true) }}
+            </li>
+            <li>
+              <strong>{{ '%d'|format(system.memory.used * 100 / (system.memory.used + system.memory.free)) }}%</strong> memory usage,
+              <strong>{{ lib.format_bytes(system.memory.used) }}</strong>/{{ lib.format_bytes(system.memory.used + system.memory.free, true) }}
+            </li>
           </ul>
         </div>
       </div>
@@ -140,11 +171,8 @@
         <div class="card-body">
           <h6 class="card-subtitle mb-2 text-muted">System information</h6>
           <ul class="card-text">
-            <li>Software Version: 1.342.123 (update available)</li>
-            <li>Environment:
-            {% if config %}{{ config.mode }}{% else %}cloud{% endif %} setup</li>
-            <li>Messages: 5 (see list)</li>
-            <li></li>
+            <li>Software Version: {{ system.app.revision }} ({{ system.app.date }})</li>
+            <li>Environment: <strong>{% if config %}{{ config.mode }}{% else %}cloud{% endif %}</strong> setup</li>
           </ul>
         </div>
       </div>

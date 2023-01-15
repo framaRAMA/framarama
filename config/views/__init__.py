@@ -1,6 +1,7 @@
 
 from django.contrib.auth import views as auth_views
 
+from framarama.base import frontend
 from config.views import base
 from config.forms import AuthenticationForm
 
@@ -14,12 +15,16 @@ class IndexView(base.BaseConfigView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _dashboards = ['frames_chart', 'displays_chart']
-        #if self._config.is_local_mode():
-        #    _dashboards.append('system_info')
-        #    _dashboards.append('software_info')
-        #else:
-        #    _dashboards.append('')
+        _dashboards = []
+        if self._config.is_local_mode():
+            _dashboards.append('display_info')
+            _dashboards.append('system_info')
+            _dashboards.append('software_info')
+            _context['system'] = frontend.Frontend.get().get_status()
+        else:
+            _dashboards.append('frames_chart')
+            _dashbaords.append('displays_chart')
+            _dashboards.append('')
         _context['dashboards'] = _dashboards
         return _context
 
