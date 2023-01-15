@@ -10,8 +10,12 @@ class StartupView(base.BaseSetupView):
 
     def _get(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _context['message'] = request.GET['message'] if 'message' in request.GET else ''
-        _context['return'] = request.GET['return'] if 'return' in request.GET else ''
+        if request.GET.get('message', None):
+            _context['message'] = request.GET['message']
+        if request.GET.get('return', None):
+            _context['return'] = request.GET['return']
+        if request.GET.get('wait', None):
+            _context['wait'] = int(request.GET['wait'])*1000
         return _context
 
 
