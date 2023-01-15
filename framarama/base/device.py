@@ -1,6 +1,8 @@
 import ipaddress
 import logging
 
+from django.conf import settings
+
 from framarama.base.utils import Filesystem, Process, DateTime
 
 
