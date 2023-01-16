@@ -1,7 +1,11 @@
 import time
+import datetime
+
+from django.utils import timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_SUBMITTED, EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+
 
 class Scheduler:
     JOB_PARAM_FUNC = '__func'
@@ -29,8 +33,12 @@ class Scheduler:
         _func_kwargs = kwargs.pop('func_kwargs', {})
         self._scheduler.add_job(lambda *args, **kwargs: func(*args, **kwargs), id=job_id, args=_func_args, kwargs=_func_kwargs, *args, **kwargs)
 
-    def run_job(self, job_id, func, *args, **kwargs):
-        self._add_job(job_id, func, *args, **kwargs)
+    def run_job(self, job_id, func, delay=None, *args, **kwargs):
+        if delay:
+            _run_date = timezone.now() + datetime.timedelta(seconds=delay)
+            self._add_job(job_id, func, trigger='date', run_date=_run_date, *args, **kwargs)
+        else:
+            self._add_job(job_id, func, *args, **kwargs)
 
     def add_job(self, job_id, func, *args, **kwargs):
         self._add_job(job_id, func, trigger='interval', *args, **kwargs)
@@ -64,13 +72,13 @@ class Scheduler:
         for job_id in job_ids if job_ids else self._jobs.keys():
             self.disable_job(job_id)
 
-    def trigger_job(self, job_id, *args, **kwargs):
+    def trigger_job(self, job_id, delay=None, *args, **kwargs):
         if job_id in self._jobs:
             _job = self._jobs.get(job_id)
             _func = _job.get(Scheduler.JOB_PARAM_FUNC)
             _name = _job.get(Scheduler.JOB_PARAM_NAME) + ' triggered'
             _job_id = job_id + '_' + str(time.time())
-            self.run_job(_job_id, _func, name=_name, func_args=args, func_kwargs=kwargs)
+            self.run_job(_job_id, _func, name=_name, delay=delay, func_args=args, func_kwargs=kwargs)
             return _job_id
 
     def running_jobs(self, job_id, starts_with=False):
