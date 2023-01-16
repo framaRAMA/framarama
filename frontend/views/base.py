@@ -48,7 +48,7 @@ class BaseSetupView(BaseView):
         eval(_db, {}, {})
         Filesystem.file_write(settings.BASE_DIR / 'framarama' / 'settings_db.py', b'dbs = ' + _db.encode())
 
-    def redirect_startup(self, context, page=None, url=None, message=None, wait=None):
+    def redirect_startup(self, context, page=None, url=None, message=None, wait=None, negate=False):
         if page is None and url is None:
             page = self.view_name(self.request)
         _query = 'startup=1'
@@ -56,6 +56,7 @@ class BaseSetupView(BaseView):
         _query = _query + ('&' + urlencode({'return': url}) if url else '')
         _query = _query + ('&' + urlencode({'message': message}) if message else '')
         _query = _query + ('&' + urlencode({'wait': wait}) if wait else '')
+        _query = _query + ('&' + urlencode({'negate': '1'}) if negate else '')
         self.redirect(context, BaseSetupView.PAGE_FE_STARTUP, _query)
 
 

@@ -18,7 +18,7 @@
     <a href="{% if return %}{{ return }}{% else %}{{ url('fe_index') }}{% endif %}" class="btn btn-primary">Continue</a>
   </div>
 
-  {{ lib.status_script('setup', 'setup_status', wait) }}
+  {{ lib.status_script('setup', 'setup_status', wait, negate) }}
 
   <script type="text/javascript">
     function setup_status(status, data) {

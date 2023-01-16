@@ -255,7 +255,7 @@
   <div class="status-success mt-2 text-success d-none {{ classes }}">{{ icon('enabled') }}</div>
 {% endmacro %}
 
-{% macro status_script(name, callback, wait=null) %}
+{% macro status_script(name, callback, wait=null, negate=false) %}
 <script type="text/javascript">
   let statusCount_{{ name}} = 0;
   function status_fetch_{{ name }}() {
@@ -276,6 +276,10 @@
         const elementStatusSuccess = element.querySelector('.status-success');
         const elementStatusError = element.querySelector('.status-error');
         let showStatus = [];
+        {% if negate %}
+        if (json.status == 'success') json.status = 'testing';
+        else if (json.status == 'error') json.status = 'success';
+        {% endif %}
         if (json.status == 'success') {
           showStatus = [elementStatusSuccess, elementStatusTesting, elementStatusError];
         } else if (json.status == 'testing') {
