@@ -213,10 +213,12 @@ class Json:
 
 class DateTime:
 
-    def now(sub=None):
+    def now(sub=None, add=None):
         _now = timezone.now()
         if sub:
             _now = _now - DateTime.delta(sub)
+        if add:
+            _now = _now + DateTime.delta(sub)
         return _now
 
     def midnight():
