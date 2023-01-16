@@ -23,6 +23,10 @@ class Scheduler(jobs.Scheduler):
     FE_SUBMIT_STATUS = 'fe_submit_status'
     FE_APP_CHECK = 'fe_app_check'
     FE_APP_UPDATE = 'fe_app_update'
+    FE_DEVICE_RESTART = 'fe_device_restart'
+    FE_DEVICE_SHUTDOWN = 'fe_device_shutdown'
+    FE_WIFI_CONNECT = 'fe_wifi_connect'
+    FE_WIFI_AP = 'fe_wifi_ap'
 
     def configure(self):
         self._display = None

@@ -6,6 +6,12 @@
        Reloading configuration ...
     {% elif message == 'device.restart' %}
        Restarting application ...
+    {% elif message == 'device.shutdown' %}
+       Shutting down ...
+    {% elif message == 'wifi.connect' %}
+       Connecting network ...
+    {% elif message == 'wifi.ap' %}
+       Starting Access Point ...
     {% else %}
        Starting up ...
     {% endif %}
@@ -28,8 +34,10 @@
         setupElement.innerHTML = message == '' ? 'Startup complete!' : setupElement.innerHTML += ' completed!';
         let statusElement = window.document.getElementById('status');
         statusElement.className += ' d-none';
+{% if message not in ['device.shutdown', 'wifi.connect', 'wifi.ap'] %}
         let continueElement = window.document.getElementById('continue');
         continueElement.className = continueElement.className.replace('d-none', '');
+{% endif %}
       }
     }
   </script>

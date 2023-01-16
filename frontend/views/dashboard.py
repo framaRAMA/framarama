@@ -59,6 +59,7 @@ class DeviceDashboardView(base.BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
+        _scheduler = self.get_scheduler()
         _action = self.request.GET.get('action')
         if _action == 'wifi.save':
             _name = self.request.GET.get('name')
@@ -73,18 +74,19 @@ class DeviceDashboardView(base.BaseFrontendView):
             return _context
         elif _action == 'wifi.connect':
             _name = self.request.GET.get('name')
-            _frontend_device.network_connect(_name)
-            self.redirect(_context, query='action=wifi.list')
+            _scheduler.run_job(jobs.Scheduler.FE_WIFI_CONNECT, lambda: _frontend_device.network_connect(_name), delay=2)
+            self.redirect_startup(_context, message='wifi.connect', negate=True)
             return _context
         _wifi = None
         if _action == 'device.log':
             _lines = _frontend_device.run_capability(device.Capability.APP_LOG)
             _context['log'] = _lines
         elif _action == 'device.restart':
-            _frontend_device.run_capability(device.Capability.APP_RESTART)
-            self.redirect_startup(_context, message='device.restart')
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _frontend_device.run_capability(device.Capability.APP_RESTART), delay=2)
+            self.redirect_startup(_context, message='device.restart', wait=3)
         elif _action == 'device.shutdown':
-            _frontend_device.run_capability(device.Capability.APP_SHUTDOWN)
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_SHUTDOWN, lambda: _frontend_device.run_capability(device.Capability.APP_SHUTDOWN), delay=2)
+            self.redirect_startup(_context, message='device.shutdown', negate=True)
         elif _action == 'wifi.list':
             _profiles = _frontend_device.run_capability(device.Capability.NET_PROFILE_LIST)
             _ap_active = device.Capability.nmcli_ap_active(_profiles)
@@ -102,8 +104,8 @@ class DeviceDashboardView(base.BaseFrontendView):
               'ap': _ap_active
             }
         elif _action == 'wifi.ap':
-            _frontend_device.network_ap_toggle()
-            self.redirect(_context, query='action=wifi.list')
+            _scheduler.run_job(jobs.Scheduler.FE_WIFI_AP, lambda: _frontend_device.network_ap_toggle(), delay=2)
+            self.redirect_startup(_context, message='wifi.ap', negate=True)
             return _context
         _mem_total = _frontend_device.run_capability(device.Capability.MEM_TOTAL)
         _mem_free = _frontend_device.run_capability(device.Capability.MEM_FREE)
