@@ -224,11 +224,18 @@ class DateTime:
     def midnight():
         return DateTime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    def delta(time):
-        if time is None:
-            return None
-        _time = datetime.time.fromisoformat(time)
-        return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
+    def delta(time=None, hours=None, minutes=None, seconds=None):
+        if type(time) == datetime.timedelta:
+            return time
+        if time != None:
+            _time = datetime.time.fromisoformat(time)
+            return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
+        if hours != None or minutes != None or seconds != None:
+            return datetime.timedelta(
+                hours=hours if hours else 0,
+                minutes=minutes if minutes else 0,
+                seconds=seconds if seconds else 0)
+        return None
 
     def reached(time, delta):
         return time is None or tme + delta < DateTime.now()
