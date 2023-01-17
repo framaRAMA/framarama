@@ -1,4 +1,5 @@
 import re
+import math
 import logging
 import requests
 import importlib
@@ -89,99 +90,131 @@ class Processor:
         self.set_watermark('ribbon', None, None)
 
     def set_watermark(self, style, shift, scale):
-        _lines = [  # stroke color, stroke width, offset
-            ('#43c7ff', 0.010, 0.045),   # blue
-            ('#ff66c4', 0.009, 0.064),   # pink
-            ('#fcee21', 0.007, 0.079),   # yellow
-            ('#bae580', 0.005, 0.091),   # green
-        ]
-        _scale = scale if scale else 2
-        _shift = shift if shift else 10
         if style == 'ribbon':
-            self._watermark = self._watermark_ribbon(self._context.get_frame(), _lines, _shift, _scale)
+            _scale = scale if scale else 6
+            _shift = shift if shift else 15
+            self._watermark = self._watermark_ribbon(self._context.get_frame(), _shift, _scale)
         elif style == 'hbars':
-            self._watermark = self._watermark_hbars(self._context.get_frame(), _lines, _shift, _scale)
+            _scale = scale if scale else 4
+            _shift = shift if shift else 4
+            self._watermark = self._watermark_hbars(self._context.get_frame(), _shift, _scale)
         elif style == 'vbars':
-            self._watermark = self._watermark_vbars(self._context.get_frame(), _lines, _shift, _scale)
+            _scale = scale if scale else 4
+            _shift = shift if shift else 4
+            self._watermark = self._watermark_vbars(self._context.get_frame(), _shift, _scale)
 
-    def _watermark_ribbon(self, frame, lines, shift, scale):
-        _shift = f"image['width']*0.01*{shift}"
-        _offset = f"image['height']*0.01+{_shift}"
-        _finishings = []
-        for _color, _width, _pos in lines:
-            _size = f"image['height']*{_pos}*{scale}"
-            _width = f"{{image['width']*{_width}*{scale}}}"
-            _model = {
-                'frame': frame, 'enabled': True,
-                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
-                'color_fill': _color, 'plugin': 'shape'
+    def _watermark_ribbon(self, frame, shift, scale):
+        _factor = "images['default']['width']*0.01"
+        _shift = _factor + "*" + str(math.sqrt(int(shift)**2*2))
+        _scale = _factor + "*" + str(math.sqrt(int(scale)**2/2)) + "*1.1"  # 10% saftey factor
+        _size_x = f"{_factor}*{scale}+{_factor}*{shift}"
+        _size_y = f"{_factor}*{scale}"
+        _finishings = [{
+            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+                'url': './static/common/stripes.svg',
             }
-            _model_config = {
-                'shape': 'line',
-                'size_x': f"{{{_offset}+{_size}+{_shift}}}",
-                'size_y': f"-{{{_offset}+{_size}+{_shift}}}",
+        }, {
+            'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
+                'resize_x': "{" + _size_x + "}",
+                'resize_y': "{" + _size_y + "}",
             }
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"-{{{_offset}/2}}",
-                'start_y': f"{{{_offset}/2+{_size}}}",
-            }}))
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"{{-{_offset}/2+image['width']-{_size}-{_shift}}}",
-                'start_y': f"{{{_offset}/2+image['height']}}",
-            }}))
-        return _finishings
+        }, {
+            'plugin': 'transform', 'image_in': 'line', 'image_out': 'linetl', 'plugin_config': {
+                'mode': 'rotate',
+                'factor': '-45',
+            }
+        }, {
+            'plugin': 'transform', 'image_in': 'line', 'image_out': 'linebr', 'plugin_config': {
+                'mode': 'rotate',
+                'factor': '135',
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default linetl', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "{-" + _scale + "}",
+                'top': "{-" + _scale + "}",
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default linebr', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "{" + _scale + "+image['width']-images['linebr']['width']}",
+                'top': " {" + _scale + "+image['height']-images['linebr']['height']}",
+            }
+        }]
+        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
 
-    def _watermark_hbars(self, frame, lines, shift, scale):
-        _shift = f"image['height']*0.001*{shift}"
-        _finishings = []
-        for _color, _width, _pos in lines:
-            _size = f"image['height']*{_pos}*0.8*{scale}"
-            _width = f"{{image['width']*{_width}*{scale}}}"
-            _model = {
-                'frame': frame, 'enabled': True,
-                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
-                'color_fill': _color, 'plugin': 'shape'
+    def _watermark_hbars(self, frame, shift, scale):
+        _factor = "images['default']['width']*0.01"
+        _shift = _factor + "*" + str(shift)
+        _size_x = f"images['default']['width']"
+        _size_y = f"{_factor}*{scale}"
+        _finishings = [{
+            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+                'url': './static/common/stripes.svg',
             }
-            _model_config = {
-                'shape': 'line',
-                'size_x': f"{{image['width']}}",
-                'size_y': 0,
+        }, {
+            'plugin': 'resize', 'image_in': 'line', 'image_out': 'linet', 'plugin_config': {
+                'resize_x': "{" + _size_x + "}",
+                'resize_y': "{" + _size_y + "}",
             }
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"0",
-                'start_y': f"{{{_size}+{_shift}}}",
-            }}))
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"0",
-                'start_y': f"{{image['height']-{_size}-{_shift}}}",
-            }}))
-        return _finishings
+        }, {
+            'plugin': 'transform', 'image_in': 'linet', 'image_out': 'lineb', 'plugin_config': {
+                'mode': 'rotate',
+                'factor': '180',
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default linet', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "0",
+                'top': "{" + _shift + "}",
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default lineb', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "0",
+                'top': "{-" + _shift + "+image['height']-images['lineb']['height']}",
+            }
+        }]
+        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
 
-    def _watermark_vbars(self, frame, lines, shift, scale):
-        _shift = f"image['height']*0.001*{shift}"
-        _finishings = []
-        for _color, _width, _pos in lines:
-            _size = f"image['height']*{_pos}*0.8*{scale}"
-            _width = f"{{image['width']*{_width}*{scale}}}"
-            _model = {
-                'frame': frame, 'enabled': True,
-                'color_stroke': _color, 'stroke_width': _width, 'color_alpha': 60,
-                'color_fill': _color, 'plugin': 'shape'
+    def _watermark_vbars(self, frame, shift, scale):
+        _factor = "images['default']['width']*0.01"
+        _shift = _factor + "*" + str(shift)
+        _size_x = f"images['default']['height']"
+        _size_y = f"{_factor}*{scale}"
+        _finishings = [{
+            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+                'url': './static/common/stripes.svg',
             }
-            _model_config = {
-                'shape': 'line',
-                'size_x': 0,
-                'size_y': f"{{image['height']}}",
+        }, {
+            'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
+                'resize_x': "{" + _size_x + "}",
+                'resize_y': "{" + _size_y + "}",
             }
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"{{{_size}+{_shift}}}",
-                'start_y': f"0",
-            }}))
-            _finishings.append(models.Finishing(**_model, plugin_config={**_model_config, **{
-                'start_x': f"{{image['width']-{_size}-{_shift}}}",
-                'start_y': f"0",
-            }}))
-        return _finishings
+        }, {
+            'plugin': 'transform', 'image_in': 'line', 'image_out': 'linel', 'plugin_config': {
+                'mode': 'rotate',
+                'factor': '-90',
+            }
+        }, {
+            'plugin': 'transform', 'image_in': 'line', 'image_out': 'liner', 'plugin_config': {
+                'mode': 'rotate',
+                'factor': '90',
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default linel', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "{" + _shift + "}",
+                'top': "0",
+            }
+        }, {
+            'plugin': 'merge', 'image_in': 'default liner', 'plugin_config': {
+                'alignment': 'coords',
+                'left': "{-" + _shift + "+image['width']-images['liner']['width']}",
+                'top': "0",
+            }
+        }]
+        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
 
     def process(self):
         _item = self._context.get_item()
