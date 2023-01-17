@@ -16,14 +16,15 @@ class DisplayDashboardView(base.BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
+        _capability = _frontend_device.get_capability()
         _scheduler = self.get_scheduler()
         _context['files'] = _frontend_device.get_files().items()
         _action = self.request.GET.get('action')
         if _action == 'display.toggle':
-          if _frontend_device.run_capability(device.Capability.DISPLAY_STATUS):
-              _frontend_device.run_capability(device.Capability.DISPLAY_OFF)
+          if _capability.display_status():
+              _capability.display_off()
           else:
-              _frontend_device.run_capability(device.Capability.DISPLAY_ON)
+              _capability.display_on()
         elif _action == 'display.refresh':
             _scheduler.trigger_job(jobs.Scheduler.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
@@ -31,8 +32,8 @@ class DisplayDashboardView(base.BaseFrontendView):
         if _action:
             self.redirect(_context)
         _context['display'] = {
-            'status': _frontend_device.run_capability(device.Capability.DISPLAY_STATUS),
-            'size': _frontend_device.run_capability(device.Capability.DISPLAY_SIZE),
+            'status': _capability.display_status(),
+            'size': _capability.display_size(),
             'refresh': _scheduler.running_jobs(jobs.Scheduler.FE_NEXT_ITEM, True),
             'set': _scheduler.running_jobs(jobs.Scheduler.FE_ACTIVATE_ITEM),
         }
@@ -59,17 +60,18 @@ class DeviceDashboardView(base.BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
+        _capability = _frontend_device.get_capability()
         _scheduler = self.get_scheduler()
         _action = self.request.GET.get('action')
         if _action == 'wifi.save':
             _name = self.request.GET.get('name')
             _pass = self.request.GET.get('password')
-            _frontend_device.run_capability(device.Capability.NET_PROFILE_SAVE, name=_name, password=_pass)
+            _capability.net_profile_save(name=_name, password=_pass)
             self.redirect(_context, query='action=wifi.list')
             return _context
         elif _action == 'wifi.delete':
             _name = self.request.GET.get('name')
-            _frontend_device.run_capability(device.Capability.NET_PROFILE_DELETE, name=_name)
+            _capability.net_profile_delete(name=_name)
             self.redirect(_context, query='action=wifi.list')
             return _context
         elif _action == 'wifi.connect':
@@ -79,21 +81,21 @@ class DeviceDashboardView(base.BaseFrontendView):
             return _context
         _wifi = None
         if _action == 'device.log':
-            _lines = _frontend_device.run_capability(device.Capability.APP_LOG)
+            _lines = _capability.app_log()
             _context['log'] = _lines
         elif _action == 'device.restart':
-            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _frontend_device.run_capability(device.Capability.APP_RESTART), delay=2)
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _capability.app_restart(), delay=2)
             self.redirect_startup(_context, message='device.restart', wait=3)
         elif _action == 'device.shutdown':
-            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_SHUTDOWN, lambda: _frontend_device.run_capability(device.Capability.APP_SHUTDOWN), delay=2)
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_SHUTDOWN, lambda: _capability.app_shutdown(), delay=2)
             self.redirect_startup(_context, message='device.shutdown', negate=True)
         elif _action == 'wifi.list':
-            _profiles = _frontend_device.run_capability(device.Capability.NET_PROFILE_LIST)
-            _ap_active = device.Capability.nmcli_ap_active(_profiles)
+            _profiles = _capability.net_profile_list()
+            _ap_active = device.Capabilities.nmcli_ap_active(_profiles)
             if _ap_active:
                 _networks = _frontend_device.network_status()['networks']
             else:
-                _networks = _frontend_device.run_capability(device.Capability.NET_WIFI_LIST)
+                _networks = _capability.net_wifi_list()
             if 'framarama' in _profiles:
                 del _profiles['framarama']
             _networks.update({_name: {'ssid': _name, 'active': False} for _name in _profiles if _name not in _networks})
@@ -107,16 +109,16 @@ class DeviceDashboardView(base.BaseFrontendView):
             _scheduler.run_job(jobs.Scheduler.FE_WIFI_AP, lambda: _frontend_device.network_ap_toggle(), delay=2)
             self.redirect_startup(_context, message='wifi.ap', negate=True)
             return _context
-        _mem_total = _frontend_device.run_capability(device.Capability.MEM_TOTAL)
-        _mem_free = _frontend_device.run_capability(device.Capability.MEM_FREE)
+        _mem_total = _capability.mem_total()
+        _mem_free = _capability.mem_free()
         _context['mem'] = {
           'total': _mem_total,
           'free': _mem_free,
           'usage': int((_mem_total - _mem_free) / _mem_total * 100)
         }
-        _uptime = _frontend_device.run_capability(device.Capability.SYS_UPTIME)
-        _disk_tmp = _frontend_device.run_capability(device.Capability.DISK_DATA_FREE)
-        _disk_data = _frontend_device.run_capability(device.Capability.DISK_TMP_FREE)
+        _uptime = _capability.sys_uptime()
+        _disk_tmp = _capability.disk_data_free()
+        _disk_data = _capability.disk_tmp_free()
         _context['sys'] = {
           'uptime' : {
             'total': _uptime,
@@ -131,11 +133,11 @@ class DeviceDashboardView(base.BaseFrontendView):
           'tmpfree': _disk_tmp[0],
         }
         _context['cpu'] = {
-          'load': _frontend_device.run_capability(device.Capability.CPU_LOAD),
-          'temp': _frontend_device.run_capability(device.Capability.CPU_TEMP),
+          'load': _capability.cpu_load(),
+          'temp': _capability.cpu_temp(),
         }
         _context['network'] = {
-          'config': _frontend_device.run_capability(device.Capability.NET_CONFIG),
+          'config': _capability.net_config(),
           'wifi': _wifi
         }
         return _context
@@ -149,7 +151,8 @@ class SoftwareDashboardView(base.BaseFrontendView):
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
-        _revisions = _frontend_device.run_capability(device.Capability.APP_REVISION)
+        _capability = _frontend_device.get_capability()
+        _revisions = _capability.app_revision()
         _scheduler = self.get_scheduler()
         _remotes = _revisions['remotes'] if _revisions else {}
         _form_check = forms.SoftwareDashboardCheckForm(initial={
@@ -172,12 +175,12 @@ class SoftwareDashboardView(base.BaseFrontendView):
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
-        _revisions = _frontend_device.run_capability(device.Capability.APP_REVISION)
+        _capability = _frontend_device.get_capability()
+        _revisions = _capability.app_revision()
         _scheduler = self.get_scheduler()
         _form_check = forms.SoftwareDashboardCheckForm(request.POST)
         if _form_check.is_valid():
-            _scheduler.run_job(jobs.Scheduler.FE_APP_CHECK, lambda: _frontend_device.run_capability(
-                device.Capability.APP_CHECK,
+            _scheduler.run_job(jobs.Scheduler.FE_APP_CHECK, lambda: _capability.app_check(
                 SoftwareDashboardView.REMOTE_NAME,
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
@@ -185,8 +188,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
             self.redirect(_context)
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
-            _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _frontend_device.run_capability(
-                device.Capability.APP_UPDATE,
+            _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _capability.app_update(
                 revision=_form_update.cleaned_data['revision']))
             self.redirect(_context)
         _context.update({

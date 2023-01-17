@@ -125,9 +125,9 @@ class Frontend(Singleton):
         return FrontendDevice.get(self)
 
     def get_screen(self):
-        _device = self.get_device()
-        _display_status = _device.run_capability(device.Capability.DISPLAY_STATUS)
-        _display_size = _device.run_capability(device.Capability.DISPLAY_SIZE)
+        _capability = self.get_device().get_capability()
+        _display_status = _capability.display_status()
+        _display_size = _capability.display_size()
         return {
             'on': _display_status,
             'width': _display_size[0] if _display_size else None,
@@ -137,16 +137,17 @@ class Frontend(Singleton):
     def get_status(self):
         _config = self.get_config().get_config()
         _device = self.get_device()
-        _uptime = _device.run_capability(device.Capability.SYS_UPTIME)
-        _mem_total = _device.run_capability(device.Capability.MEM_TOTAL)
-        _mem_free = _device.run_capability(device.Capability.MEM_FREE)
-        _cpu_load = _device.run_capability(device.Capability.CPU_LOAD)
-        _cpu_temp = _device.run_capability(device.Capability.CPU_TEMP)
-        _disk_data = _device.run_capability(device.Capability.DISK_DATA_FREE)
-        _disk_tmp = _device.run_capability(device.Capability.DISK_TMP_FREE)
-        _network_config = _device.run_capability(device.Capability.NET_CONFIG)
+        _capability = _device.get_capability()
+        _uptime = _capability.sys_uptime()
+        _mem_total = _capability.mem_total()
+        _mem_free = _capability.mem_free()
+        _cpu_load = _capability.cpu_load()
+        _cpu_temp = _capability.cpu_temp()
+        _disk_data = _capability.disk_data_free()
+        _disk_tmp = _capability.disk_tmp_free()
+        _network_config = _capability.net_config()
         _network_status = _device.network_status()
-        _app_revision = _device.run_capability(device.Capability.APP_REVISION)
+        _app_revision = _capability.app_revision()
         _files = _device.get_files()
         _latest_items = [{
             'id': _files[_name]['json']['item'].id,
@@ -296,17 +297,18 @@ class FrontendDevice(Singleton):
             self._renderer_filesystem,
             self._renderer_visualization,
         ]
-        self._capabilities = None
+        self._capability = None
 
     def monitor(self):
         return self._monitor
 
     def finish(self, display, item, finishings):
-        _mem_total = self.run_capability(device.Capability.MEM_TOTAL)
-        _mem_free = self.run_capability(device.Capability.MEM_FREE)
+        _capability = self.get_capability()
+        _mem_total = _capability.mem_total()
+        _mem_free = _capability.mem_free()
         _mem_max = round(1024 * _mem_free * 0.8)
         logger.info("Restricting memory usage to {:.0f} MB".format(_mem_max/1024/1024))
-        _disk_free_tmp = self.run_capability(device.Capability.DISK_TMP_FREE)
+        _disk_free_tmp = _capability.disk_tmp_free()
         _disk_free_tmp_max = round(1024 * _disk_free_tmp * 0.8)
         logger.info("Restricting disk usage to {:.0f} MB".format(_disk_free_tmp_max/1024/1024))
         _adapter = finishing.WandImageProcessingAdapter()
@@ -337,7 +339,7 @@ class FrontendDevice(Singleton):
         return self._renderer_filesystem.files()
 
     def network_connect(self, name):
-        self.run_capability(device.Capability.NET_PROFILE_CONNECT, name=name)
+        self.get_capability().net_profile_connect(name=name)
         self._network['started'] = None
         self._network['connected'] = None
         self._network['previous'] = self._network['profile']
@@ -348,13 +350,13 @@ class FrontendDevice(Singleton):
         return self._network
 
     def network_ap_toggle(self):
-        self.run_capability(device.Capability.NET_TOGGLE_AP)
+        self.get_capability().net_toggle_ap()
 
     def network_verify(self):
         if self._network['connected']:
             return True
-        _profile_list = self.run_capability(device.Capability.NET_PROFILE_LIST)
-        _ap_active = device.Capability.nmcli_ap_active(_profile_list)
+        _profile_list = self.get_capability().net_profile_list()
+        _ap_active = device.Capabilities.nmcli_ap_active(_profile_list)
         if self._network['started'] is None:
             self._network['started'] = DateTime.now()
             logger.info("Checking network connectivity ...")
@@ -369,7 +371,7 @@ class FrontendDevice(Singleton):
                 _previous = self._network['previous']
                 if _previous is None:
                     logger.info("Not connected within 30 seconds and no previous network available - starting access point")
-                    self._network['networks'] = self.run_capability(device.Capability.NET_WIFI_LIST)
+                    self._network['networks'] = self.get_capability().net_wifi_list()
                     self.network_ap_toggle()
                     self._network['connected'] = DateTime.now()
                 else:
@@ -378,7 +380,7 @@ class FrontendDevice(Singleton):
                     self._network['previous'] = None
                     self.network_connect(_previous)
             else:
-                _ip = self.run_capability(device.Capability.NET_CONFIG)
+                _ip = self.get_capability().net_config()
                 if _ip['ip']:
                     self._network['connected'] = DateTime.now()
                     self._network['profile'] = '(automatic)'
@@ -396,15 +398,10 @@ class FrontendDevice(Singleton):
             return True
         return False
 
-    def get_capabilities(self):
-        if self._capabilities is None:
-            self._capabilities = device.Capability.discover()
-        return self._capabilities
-
-    def run_capability(self, capability, *args, **kwargs):
-        _capabilities = self.get_capabilities()
-        if capability in _capabilities:
-            return _capabilities[capability](self, *args, **kwargs)
+    def get_capability(self):
+        if self._capability is None:
+            self._capability = device.Capabilities.discover()
+        return self._capability
 
 
 class FrontendMonitoring(threading.Thread):

@@ -10,126 +10,152 @@ logger = logging.getLogger(__name__)
 
 
 class Capability:
-    DISPLAY_OFF = 'display.off'
-    DISPLAY_ON = 'display.on'
-    DISPLAY_STATUS = 'display.status'
-    DISPLAY_SIZE = 'display.size'
-    MEM_TOTAL = 'memory.total'
-    MEM_FREE = 'memory.free'
-    DISK_DATA_FREE = 'disk.data.free'
-    DISK_TMP_FREE = 'disk.tmp.free'
-    SYS_UPTIME = 'system.uptime'
-    CPU_LOAD = 'cpu.load'
-    CPU_TEMP = 'cpu.temp'
-    NET_CONFIG = 'network.config'
-    NET_TOGGLE_AP = 'network.toggle.ap'
-    NET_WIFI_LIST = 'network.wifi.list'
-    NET_PROFILE_LIST = 'network.profile.list'
-    NET_PROFILE_SAVE = 'network.profile.save'
-    NET_PROFILE_DELETE = 'network.profile.delete'
-    NET_PROFILE_CONNECT = 'network.profile.connect'
-    APP_LOG = 'app.log'
-    APP_RESTART = 'app.restart'
-    APP_SHUTDOWN = 'app.shutdown'
-    APP_REVISION = 'app.revision'
-    APP_CHECK = 'app.check'
-    APP_UPDATE = 'app.update'
 
+    def _noop(self):
+        return
+
+    def _false(self):
+        return False
+
+    def _true(self):
+        return True
+
+    def _none(self):
+        return None
+
+    def _list(self):
+        return []
+
+    def _dict(self):
+        return {}
+
+    def display_off(self):
+        self._noop()
+
+    def display_on(self):
+        self._noop()
+
+    def display_status(self):
+        return self._true()
+
+    def display_size(self):
+        return self._none()
+
+    def mem_total(self):
+        return self._none()
+
+    def mem_free(self):
+        return self._none()
+
+    def sys_uptime(self):
+        return self._none()
+
+    def cpu_temp(self):
+        return self._none()
+
+    def cpu_load(self):
+        return self._none()
+
+    def disk_data_free(self):
+        return self._none()
+
+    def disk_tmp_free(self):
+        return self._none()
+
+    def sys_uptime(self):
+        return self._none()
+
+    def net_config(self):
+        return self._none()
+
+    def net_toggle_ap(self):
+        return self._none()
+
+    def net_wifi_list(self):
+        return self._dict()
+
+    def net_profile_list(self):
+        return self._list()
+
+    def net_profile_save(self):
+        return self._none()
+
+    def net_profile_delete(self):
+        return self._none()
+
+    def app_log(self):
+        return self._none()
+
+    def app_restart(self):
+        return self._none()
+
+    def app_shutdown(self):
+        return self._none()
+
+    def app_revision(self):
+        return self._none()
+
+    def app_check(self):
+        return self._none()
+
+    def app_update(self):
+        return self._none()
+
+
+class Capabilities:
 
     @staticmethod
     def discover():
-        _capabilities = {
-            Capability.DISPLAY_ON: Capability.noop,
-            Capability.DISPLAY_OFF: Capability.noop,
-            Capability.DISPLAY_STATUS: Capability.return_true,
-            Capability.DISPLAY_SIZE: Capability.return_none,
-            Capability.MEM_TOTAL: Capability.return_none,
-            Capability.MEM_FREE: Capability.return_none,
-            Capability.SYS_UPTIME: Capability.return_none,
-            Capability.CPU_TEMP: Capability.return_none,
-            Capability.CPU_LOAD: Capability.return_none,
-            Capability.DISK_DATA_FREE: Capability.return_none,
-            Capability.DISK_TMP_FREE: Capability.return_none,
-            Capability.NET_CONFIG: Capability.return_none,
-            Capability.NET_TOGGLE_AP: Capability.return_none,
-            Capability.NET_WIFI_LIST: Capability.return_dict,
-            Capability.NET_PROFILE_LIST: Capability.return_list,
-            Capability.NET_PROFILE_SAVE: Capability.return_none,
-            Capability.NET_PROFILE_DELETE: Capability.return_none,
-            Capability.APP_LOG: Capability.return_none,
-            Capability.APP_RESTART: Capability.return_none,
-            Capability.APP_SHUTDOWN: Capability.return_none,
-            Capability.APP_REVISION: Capability.return_none,
-            Capability.APP_CHECK: Capability.return_none,
-            Capability.APP_UPDATE: Capability.return_none,
-        }
+        _capability = Capability()
         if Process.exec_search('vcgencmd'):  # Raspberry PIs
-            _capabilities[Capability.DISPLAY_ON] = Capability.vcgencmd_display_on
-            _capabilities[Capability.DISPLAY_OFF] = Capability.vcgencmd_display_off
-            _capabilities[Capability.DISPLAY_STATUS] = Capability.vcgencmd_display_status
+            _capability.display_on = Capabilities.vcgencmd_display_on
+            _capability.display_off = Capabilities.vcgencmd_display_off
+            _capability.display_status = Capabilities.vcgencmd_display_status
         elif Process.exec_search('xrandr'):
-            _capabilities[Capability.DISPLAY_ON] = Capability.xrandr_display_on
-            _capabilities[Capability.DISPLAY_OFF] = Capability.xrandr_display_off
-            _capabilities[Capability.DISPLAY_STATUS] = Capability.xrandr_display_status
+            _capability.display_on = Capabilities.xrandr_display_on
+            _capability.display_off = Capabilities.xrandr_display_off
+            _capability.display_status = Capabilities.xrandr_display_status
         if Process.exec_search('xrandr'):
-            _capabilities[Capability.DISPLAY_SIZE] = Capability.xrandr_display_size
+            _capability.display_size = Capabilities.xrandr_display_size
         if Filesystem.file_exists('/proc/meminfo'):
-            _capabilities[Capability.MEM_TOTAL] = Capability.read_meminfo_total
-            _capabilities[Capability.MEM_FREE] = Capability.read_meminfo_free
+            _capability.mem_total = Capabilities.read_meminfo_total
+            _capability.mem_free = Capabilities.read_meminfo_free
         if Filesystem.file_exists('/proc/uptime'):
-            _capabilities[Capability.SYS_UPTIME] = Capability.read_uptime
+            _capability.sys_uptime = Capabilities.read_uptime
         if Process.exec_search('uptime'):
-            _capabilities[Capability.CPU_LOAD] = Capability.uptime_loadavg
+            _capability.cpu_load = Capabilities.uptime_loadavg
         if Filesystem.file_exists('/sys/class/thermal/thermal_zone0/temp'):
-            _capabilities[Capability.CPU_TEMP] = Capability.read_thermal
+            _capability.cpu_temp = Capabilities.read_thermal
         if Process.exec_search('df'):
-            _capabilities[Capability.DISK_DATA_FREE] = Capability.df_data
-            _capabilities[Capability.DISK_TMP_FREE] = Capability.df_tmp
+            _capability.disk_data_free = Capabilities.df_data
+            _capability.disk_tmp_free = Capabilities.df_tmp
         if Process.exec_search('ip'):
-            _capabilities[Capability.NET_CONFIG] = Capability.ip_netcfg
+            _capability.net_config = Capabilities.ip_netcfg
         if Process.exec_search('nmcli'):
-            _capabilities[Capability.NET_TOGGLE_AP] = Capability.nmcli_toggle_ap
-            _capabilities[Capability.NET_WIFI_LIST] = Capability.nmcli_wifi_list
-            _capabilities[Capability.NET_PROFILE_LIST] = Capability.nmcli_profile_list
-            _capabilities[Capability.NET_PROFILE_SAVE] = Capability.nmcli_profile_save
-            _capabilities[Capability.NET_PROFILE_DELETE] = Capability.nmcli_profile_delete
-            _capabilities[Capability.NET_PROFILE_CONNECT] = Capability.nmcli_profile_connect
+            _capability.net_toggle_ap = Capabilities.nmcli_toggle_ap
+            _capability.net_wifi_list = Capabilities.nmcli_wifi_list
+            _capability.net_profile_list = Capabilities.nmcli_profile_list
+            _capability.net_profile_save = Capabilities.nmcli_profile_save
+            _capability.net_profile_delete = Capabilities.nmcli_profile_delete
+            _capability.net_profile_connect = Capabilities.nmcli_profile_connect
         if Process.exec_run(['sudo', '-n', 'systemctl', 'show', 'framarama'], sudo=True):
-            _capabilities[Capability.APP_LOG] = Capability.app_log_systemd
-            _capabilities[Capability.APP_RESTART] = Capability.app_restart_systemd
+            _capability.app_log = Capabilities.app_log_systemd
+            _capability.app_restart = Capabilities.app_restart_systemd
         if Process.exec_search('shutdown'):
-            _capabilities[Capability.APP_SHUTDOWN] = Capability.app_shutdown
+            _capability.app_shutdown = Capabilities.app_shutdown
         if Process.exec_search('git'):
-            _capabilities[Capability.APP_REVISION] = Capability.app_revision
-            _capabilities[Capability.APP_CHECK] = Capability.app_check
-            _capabilities[Capability.APP_UPDATE] = Capability.app_update
-        return _capabilities
+            _capability.app_revision = Capabilities.app_revision
+            _capability.app_check = Capabilities.app_check
+            _capability.app_update = Capabilities.app_update
+        return _capability
 
-    def noop(device, *args, **kwargs):
-        return
-
-    def return_false(device, *args, **kwargs):
-        return False
-
-    def return_true(device, *args, **kwargs):
-        return True
-
-    def return_none(device, *args, **kwargs):
-        return None
-
-    def return_list(device, *args, **kwargs):
-        return []
-
-    def return_dict(device, *args, **kwargs):
-        return {}
-
-    def vcgencmd_display_on(device, *args, **kwargs):
+    def vcgencmd_display_on():
         Process.exec_run(['vcgencmd', 'display_power', '1'])
 
-    def vcgencmd_display_off(device, *args, **kwargs):
+    def vcgencmd_display_off():
         Process.exec_run(['vcgencmd', 'display_power', '0'])
 
-    def vcgencmd_display_status(device, *args, **kwargs):
+    def vcgencmd_display_status():
         return Process.exec_run(['vcgencmd', 'display_power']) == b'display_power=1\n'
 
     def _xrandr_display_name():
@@ -148,21 +174,21 @@ class Capability:
                 _status = len([_line for _line in _size if b'*' in _line]) > 0
         return (_name, _status)
 
-    def xrandr_display_on(device, *args, **kwargs):
-        (_name, _status) = Capability._xrandr_display_name()
+    def xrandr_display_on():
+        (_name, _status) = Capabilities._xrandr_display_name()
         if _name:
             Process.exec_run(['xrandr', '--output', _name, '--auto'])
 
-    def xrandr_display_off(device, *args, **kwargs):
-        (_name, _status) = Capability._xrandr_display_name()
+    def xrandr_display_off():
+        (_name, _status) = Capabilities._xrandr_display_name()
         if _name:
             Process.exec_run(['xrandr', '--output', _name, '--off'])
 
-    def xrandr_display_status(device, *args, **kwargs):
-        (_name, _status) = Capability._xrandr_display_name()
+    def xrandr_display_status():
+        (_name, _status) = Capabilities._xrandr_display_name()
         return _status
 
-    def xrandr_display_size(device, *args, **kwargs):
+    def xrandr_display_size():
         _xrandr = Process.exec_run(['xrandr'])
         if _xrandr:
             # Screen 0: minimum 320 x 200, current 1920 x 1080, maximum 16384 x 16384
@@ -182,15 +208,15 @@ class Capability:
         else:
             return _info
 
-    def read_meminfo_total(device, *args, **kwargs):
-        _mem_total, = Capability._read_meminfo(['MemTotal'])
+    def read_meminfo_total():
+        _mem_total, = Capabilities._read_meminfo(['MemTotal'])
         return int(_mem_total) if _mem_total else None
 
-    def read_meminfo_free(device, *args, **kwargs):
-        _mem_free, _mem_cached = Capability._read_meminfo(['MemFree', 'Cached'])
+    def read_meminfo_free():
+        _mem_free, _mem_cached = Capabilities._read_meminfo(['MemFree', 'Cached'])
         return int(_mem_free) + int(_mem_cached) if _mem_free else None
 
-    def read_uptime(device, *args, **kwargs):
+    def read_uptime():
         _info = Filesystem.file_read('/proc/uptime')
         return float(_info.split(b'.')[0]) if _info else None
 
@@ -199,21 +225,21 @@ class Capability:
         _info = _info.split() if _info else None
         return (int(_info[-4]), int(_info[-3])) if _info else None
 
-    def df_data(device, *args, **kwargs):
-        return Capability._df(settings.FRAMARAMA['DATA_PATH'])
+    def df_data():
+        return Capabilities._df(settings.FRAMARAMA['DATA_PATH'])
 
-    def df_tmp(device, *args, **kwargs):
-        return Capability._df('/tmp')
+    def df_tmp():
+        return Capabilities._df('/tmp')
 
-    def uptime_loadavg(device, *args, **kwargs):
+    def uptime_loadavg():
         _info = Process.exec_run(['uptime'])
         return float(_info.split()[-3].rstrip(b',')) if _info else None
 
-    def read_thermal(device, *args, **kwargs):
+    def read_thermal():
         _info = Filesystem.file_read('/sys/class/thermal/thermal_zone0/temp')
         return int(float(_info)/1000) if _info else None
 
-    def ip_netcfg(device, *args, **kwargs):
+    def ip_netcfg():
         _info = Process.exec_run(['ip', 'route'])
         _info = [_line.decode() for _line in _info.split(b'\n') if _line.startswith(b'default via')] if _info else []
         _info = [_line.split() for _line in _info][0] if _info else None
@@ -246,7 +272,7 @@ class Capability:
             'mode': 'DHCP' if _dhcp else 'static'
         }
 
-    def nmcli_profile_list(device, *args, **kwargs):
+    def nmcli_profile_list():
         _profiles = {}
         # NAME       UUID                                  TYPE  DEVICE  ACTIVE
         # NetName1   93dba0ab-4cd6-4c0f-b790-2c5689f8686b  wifi  wlan0   yes
@@ -272,10 +298,10 @@ class Capability:
     def nmcli_ap_active(profiles):
         return 'framarama' in profiles and profiles['framarama']['active']
 
-    def nmcli_profile_save(device, name, password, *args, **kwargs):
+    def nmcli_profile_save(name, password):
         if name is None or name == '' or password is None or password == '':
             return
-        _profiles = Capability.nmcli_profile_list(device, *args, **kwargs)
+        _profiles = Capabilities.nmcli_profile_list(device, *args, **kwargs)
         _args = ['sudo', 'nmcli', 'connection']
         if name in _profiles:
             _args.extend(['modify', name])
@@ -292,28 +318,28 @@ class Capability:
             logger.info("Adding network {}".format(name))
         Process.exec_run(_args, sudo=True)
 
-    def nmcli_profile_delete(device, name, *args, **kwargs):
+    def nmcli_profile_delete(name):
         if name is None or name == '':
             return
-        _profiles = Capability.nmcli_profile_list(device, *args, **kwargs)
+        _profiles = Capabilities.nmcli_profile_list()
         if name not in _profiles or _profiles[name]['active']:
             return
         logger.info("Deleting network {}".format(name))
         Process.exec_run(['sudo', 'nmcli', 'connection', 'delete', name], sudo=True)
 
-    def nmcli_profile_connect(device, name, *args, **kwargs):
+    def nmcli_profile_connect(name):
         if name is None or name == '':
             return
-        _profiles = Capability.nmcli_profile_list(device, *args, **kwargs)
+        _profiles = Capabilities.nmcli_profile_list()
         if name not in _profiles:
             return
-        _wifi_list = Capability.nmcli_wifi_list(device, *args, **kwargs)
+        _wifi_list = Capabilities.nmcli_wifi_list()
         if name not in _wifi_list:
             return
         logger.info("Connecting network {}".format(name))
         Process.exec_run(['sudo', 'nmcli', 'connection', 'up', name], sudo=True)
 
-    def nmcli_wifi_list(device, *args, **kwargs):
+    def nmcli_wifi_list():
         _networks = {}
         # IN-USE  BSSID              SSID          MODE   CHAN  RATE        SIGNAL  BARS  SECURITY
         # *       XX:XX:XX:XX:XX:XX  NetworkName   Infra  6     130 Mbit/s  46      ▂▄__  WPA1 WPA2
@@ -341,9 +367,9 @@ class Capability:
                     _networks[_network['ssid']] = _network
         return _networks
 
-    def nmcli_toggle_ap(device, *args, **kwargs):
-        _profiles = Capability.nmcli_profile_list(device, *args, **kwargs)
-        if not Capability.nmcli_ap_active(_profiles):
+    def nmcli_toggle_ap():
+        _profiles = Capabilities.nmcli_profile_list(device, *args, **kwargs)
+        if not Capabilities.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
             if 'framarama' not in _profiles:
                 Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama', 'band', 'bg'], sudo=True)
@@ -353,13 +379,13 @@ class Capability:
             logger.info("Deactivating Access Point.")
             Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'delete', 'framarama'], sudo=True)
 
-    def app_log_systemd(device, *args, **kwargs):
+    def app_log_systemd():
         return Process.exec_run(['sudo', '-n', 'systemctl', 'status', '-n', '100', 'framarama'], sudo=True)
 
-    def app_restart_systemd(device, *args, **kwargs):
+    def app_restart_systemd():
         return Process.exec_run(['sudo', '-n', 'systemctl', 'restart', 'framarama'], sudo=True)
 
-    def app_shutdown(device, *args, **kwargs):
+    def app_shutdown():
         return Process.exec_run(['sudo', 'shutdown', '-h', 'now'], sudo=True)
 
     def _git_remotes():
@@ -388,7 +414,7 @@ class Capability:
             _refs.remove('HEAD')
         return _refs[0] if len(_refs) else None
 
-    def app_revision(device, *args, **kwargs):
+    def app_revision():
         _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %d %s', '--decorate'])
         # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
         # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
@@ -402,17 +428,17 @@ class Capability:
                 'date': DateTime.parse(_date),
                 'comment': _comment,
                 'branch': _branch,
-                'remotes': Capability._git_remotes(),
-                'revisions': Capability._git_revisions(),
-                'current': Capability._git_current_ref(_refs),
+                'remotes': Capabilities._git_remotes(),
+                'revisions': Capabilities._git_revisions(),
+                'current': Capabilities._git_current_ref(_refs),
             }
             return _rev
         return None
 
-    def app_check(device, remote, url, username, password, *args, **kwargs):
+    def app_check(remote, url, username, password):
         _url = re.sub(r'^(.*://)([^@]+@)?(.*)', '\\1' + re.escape(username) + '@\\3', url)
         logger.info("Check version update from {} using {} ...".format(remote, _url))
-        _remotes = Capability._git_remotes()
+        _remotes = Capabilities._git_remotes()
         if remote in _remotes:
             logger.info("Update remote {} to {}".format(remote, _url))
             _remote_update = Process.exec_run(['git', 'remote', 'set-url', remote, _url])
@@ -432,7 +458,7 @@ class Capability:
             logger.info("Updates fetched!")
         Process.exec_run(['git', 'remote', 'set-url', remote, url])
 
-    def app_update(device, revision, *args, **kwargs):
+    def app_update(revision):
         logger.info("Check version update ...")
         _revisions = Capability._git_revisions()
         if revision not in _revisions:
