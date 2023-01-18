@@ -156,7 +156,8 @@ class Capabilities:
         Process.exec_run(['vcgencmd', 'display_power', '0'])
 
     def vcgencmd_display_status():
-        return Process.exec_run(['vcgencmd', 'display_power']) == b'display_power=1\n'
+        _status = Process.exec_run(['vcgencmd', 'display_power'])
+        return _status is None or _status == b'display_power=1\n'
 
     def _xrandr_display_name():
         _name = None
