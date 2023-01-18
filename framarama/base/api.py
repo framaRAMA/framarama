@@ -60,6 +60,7 @@ class ApiClient(Singleton):
         super().__init__()
         self._base_url = None
         self._display_access_key = None
+        self._user_agent = {'v': None, 'd': None}
         _config = Config.get().get_config()
         if _config:
             if _config.mode == 'local':
@@ -68,6 +69,9 @@ class ApiClient(Singleton):
                 self._base_url = _config.cloud_server
             self._display_access_key = _config.cloud_display_access_key
             self._base_url = self._base_url.rstrip('/') + '/api'
+
+    def register_user_agent(self, _type, _value):
+        self._user_agent[_type] = _value
 
     def configured(self):
         return self._base_url != None and self._display_access_key != None
@@ -78,7 +82,7 @@ class ApiClient(Singleton):
         _headers = {}
         _headers['Connection'] = 'close'
         _headers['X-Display'] = self._display_access_key
-        _headers['User-Agent'] = 'framaRAMA'
+        _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in self._user_agent.items() if _v])
         if method == ApiClient.METHOD_GET:
             _response = requests.get(self._base_url + path, timeout=(15, 30), headers=_headers)
         elif method == ApiClient.METHOD_POST:

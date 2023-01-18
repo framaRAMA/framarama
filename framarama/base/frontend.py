@@ -98,6 +98,14 @@ class Frontend(Singleton):
             if _client.configured():
                 self._client = _client
                 self._init_phase = Frontend.INIT_PHASE_API_ACCESS
+                _revision = self.get_device().get_capability().app_revision()
+                _version = []
+                if _revision and 'current' in _revision:
+                    _version.append(_revision['current'])
+                if _revision and 'hash' in _revision:
+                    _version.append(_revision['hash'])
+                if len(_version):
+                    self._client.register_user_agent('v', '-'.join(_version))
         return self.is_setup()
 
     def is_initialized(self):
@@ -214,6 +222,7 @@ class Display(Singleton):
         super().__init__()
         self._client = ApiClient.get()
         self._data = self._client.get_display()
+        self._client.register_user_agent('d', self.get_id())
         self._items = None
         self._next = None
         self._finishings = None
