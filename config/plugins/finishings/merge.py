@@ -80,7 +80,7 @@ class Implementation(PluginImplementation):
         _adapter = ctx.get_adapter()
         _alignment = model.alignment.as_str()
         _coordinates = [model.left.as_int(), model.top.as_int()] if _alignment == 'coords' else None
-        _adapter.image_merge(image, _alignment, _coordinates)
-        return image
+        _image = _adapter.image_merge(image, _alignment, _coordinates)
+        return _image
 
 
