@@ -668,6 +668,9 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             _left = None
         for _image in image.get_images()[1:]:
             _first.composite(_image, top=_top, left=_left, gravity=_gravity)
+        _image_container = ImageContainer()
+        _image_container.add_image(_first)
+        return _image_container
 
     def image_clone(self, image):
         _image_container = ImageContainer()
