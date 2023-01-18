@@ -636,11 +636,11 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
 
     def image_alpha(self, image, background, factor):
         def alpha(i):
+            i.alpha_channel = 'set'
             if background and factor:
                 _bg = self._wand_image.Image(width=i.width, height=i.height, background=self._color(background))
                 _bg.alpha_channel = 'set'
                 _bg.evaluate(operator='set', value=i.quantum_range*factor/100, channel='alpha')
-                i.alpha_channel = 'set'
                 i.composite(_bg)
                 _bg.close()
             i.evaluate(operator='set', value=i.quantum_range*factor/100, channel='alpha')
