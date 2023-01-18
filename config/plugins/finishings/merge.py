@@ -41,10 +41,10 @@ class MergeModel(Finishing):
         max_length=32,
         verbose_name='Alignment', help_text='Align images when merging (use predefined alignments or coordinates below)')
     left = models.CharField(
-        max_length=64,
+        max_length=64, blank=True, null=True,
         verbose_name='X position', help_text='The horizontal position for the alignment')
     top = models.CharField(
-        max_length=64,
+        max_length=64, blank=True, null=True,
         verbose_name='Y position', help_text='The vertical position for the alignment')
 
     class Meta:
