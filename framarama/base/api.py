@@ -1,5 +1,7 @@
 import requests
 
+from django.conf import settings
+
 from config import models as config_models
 from framarama.base.utils import Singleton, Config
 
@@ -61,7 +63,7 @@ class ApiClient(Singleton):
         _config = Config.get().get_config()
         if _config:
             if _config.mode == 'local':
-                self._base_url = 'http://127.0.0.1:8000'
+                self._base_url = settings.FRAMARAMA['API_URL']
             else:
                 self._base_url = _config.cloud_server
             self._display_access_key = _config.cloud_display_access_key
