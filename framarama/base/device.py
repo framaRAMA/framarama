@@ -223,7 +223,7 @@ class Capabilities:
     def _df(partition):
         _info = Process.exec_run(['df', '-k', partition])
         _info = _info.split() if _info else None
-        return (int(_info[-4]), int(_info[-3])) if _info else None
+        return (float(_info[-4]), float(_info[-3])) if _info else None
 
     def df_data():
         return Capabilities._df(settings.FRAMARAMA['DATA_PATH'])
