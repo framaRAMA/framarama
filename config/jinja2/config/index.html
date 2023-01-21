@@ -165,9 +165,6 @@
             <li>Available Versions:<br/>{% for revision in system.app.revisions %}- {{ revision }}<br/>{% endfor %}</li>
             <li>Environment: <strong>{% if config %}{{ config.mode }}{% else %}cloud{% endif %}</strong> setup</li>
           </ul>
-          <div class="text-center">
-            <a href="{{ url('fe_dashboard_software') }}" class="btn btn-primary btn-xs">Check</a>
-          </div>
         </div>
       </div>
     </div>
