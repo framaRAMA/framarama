@@ -645,6 +645,29 @@
 </div>
 {% endmacro %}
 
+{% macro display_chart_cpu(stats) %}
+  {% set stats_labels = stats|map(attribute='created')|reverse %}
+  {% set stats_load = stats|map(attribute='cpu_load')|reverse|list %}
+  {% set stats_temp = stats|map(attribute='cpu_temp')|reverse|list %}
+  <h6 class="card-subtitle mb-2 text-muted">
+    {{ "CPU (%s - %s)"|format(stats_labels|map('date_format', '%d.%m. %H:%M')|first, stats_labels|reverse|map('date_format', '%d.%m. %H:%M')|first) }}
+  </h6>
+  {{ chart_line('cpu', stats_labels|map('date_format', '%H:%M')|list, {'Load': stats_load, 'Temp': stats_temp}, ['left', 'right']) }}
+{% endmacro %}
+
+{% macro display_info(display, status) %}
+  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|date_format('%d.%m.%Y %H:%M') }})</h6>
+  <ul class="card-text">
+    <li><strong>{{ display.name }}</strong> frame providing data</li>
+    <li>
+      on <strong>{{ 'a %dx%d'|format(display.device_width, display.device_height) if display.device_width and display.device_height else 'an unknown' }}</strong> pixel frame</li>
+    <li>with <strong>{{ display.frame.items.count() }} </strong> pictures in collection</li>
+    <li><strong>{{ status.items_shown if status else '0' }}</strong> pictures served</li>
+    <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
+    <li>Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong></li>
+  </ul>
+{% endmacro %}
+
 {% macro badge_group(items) %}
   <div>
     {% for item in items %}
