@@ -7,6 +7,10 @@ class ListDisplayView(base.BaseConfigView):
     template_name = "config/display.list.html"
 
 
+class OverviewDisplayView(base.BaseDisplayConfigView):
+    template_name= 'config/display.overview.html'
+
+
 class CreateDisplayView(base.BaseConfigView):
     template_name = 'config/display.create.html'
 
@@ -21,7 +25,7 @@ class CreateDisplayView(base.BaseConfigView):
         if _form.is_valid():
             _display = models.Display(user=request.user, name=_form.cleaned_data['name'], description=_form.cleaned_data['description'], enabled=_form.cleaned_data['enabled'])
             _display.save()
-            self.redirect(_context, 'display_info', args=[_display.id])
+            self.redirect(_context, 'display_overview', args=[_display.id])
         _context['form'] = _form
         return _context
 

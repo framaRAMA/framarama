@@ -5,6 +5,9 @@
 
 <ul class="nav nav-tabs pt-2">
   <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'display_overview', args=[display.id]) }}" href="{{ url('display_overview', args=[display.id]) }}">{{ lib.icon('display.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link{{ lib.nav_active(request, 'display_info', args=[display.id]) }}" href="{{ url('display_info', args=[display.id]) }}">{{ lib.icon('display.info') }}<span class="d-none d-lg-inline"> Info</span></a>
   </li>
   <li class="nav-item">

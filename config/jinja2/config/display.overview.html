@@ -1,0 +1,29 @@
+{% extends "config/base.display.html" %}
+
+{% block content_display %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+  {% set stats = display.get_latest_status(60) %}
+
+  <div class="col">
+    <div class="card mt-2">
+      <div class="card-body">
+        {{ lib.display_info(display, stats|last) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mt-2">
+      <div class="card-body text-center">
+        {{ lib.display_chart_cpu(stats) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="rol">
+    {{ lib.list_table(display.get_latest_items(10)|map(attribute='item')|list, {'url': 'URL'}) }}
+  </div>
+
+</div>
+
+{% endblock %}
