@@ -668,7 +668,30 @@
       }
     });
   </script>
+{% endmacro %}
 
+{% macro chart_line(id, labels, values, axis=None) %}
+  <canvas id="{{ id }}" class="ms-5 me-5"></canvas>
+  <script>
+    new Chart(document.getElementById('{{ id }}'), {
+      type: 'line', data: {
+        labels: {{ labels|tojson }},
+        datasets: [
+        {% for name in values %}
+          {
+            label: {{ name|tojson }},
+            borderColor: {{ colors[loop.index-1]|tojson }},
+            backgroundColor: {{ colors[loop.index-1]|tojson }},
+            data: {{ values[name]|tojson }},
+            {% if axis %}yAxisID: {{ axis[loop.index-1]|tojson }},{% endif %}
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}
+        ]
+      }, options: {
+        scales: { left: { position: 'left', min: 0 }, right: { position: 'right', min: 0 } }
+      }
+    });
+  </script>
 {% endmacro %}
 
 {% macro format_bytes(count, show_unit=false, format='%.1f') %}
