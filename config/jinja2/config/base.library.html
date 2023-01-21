@@ -536,7 +536,7 @@
       {% for item in items %}
         <tr>
           {% for col in columns %}
-            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>{{ item[col] }}</th>
+            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>{{ item|getattr(col) }}</th>
           {% endfor %}
         </tr>
       {% endfor %}
