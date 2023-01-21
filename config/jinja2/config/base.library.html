@@ -2,6 +2,7 @@
 {% set color2 = '#ff66c4' %}
 {% set color3 = '#fcee21' %}
 {% set color4 = '#bae580' %}
+{% set colors = [color1, color2, color3, color4] %}
 {% set icons = {
   'action.add' : 'plus',
   'action.delete' : 'trash',
@@ -658,7 +659,7 @@
       type: 'doughnut', data: {
         labels: {{ labels|tojson }},
         datasets: [{
-          backgroundColor: ['{{ color1 }}', '{{ color2 }}', '{{ color3 }}', '{{ color4 }}'],
+          backgroundColor: {{ colors|tojson }},
           data: {{ values|tojson }}
         }]
       }, options: {
