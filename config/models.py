@@ -307,8 +307,9 @@ class Display(BaseModel):
         max_length=64, blank=True, null=True,
         verbose_name='Key', help_text='A secret access token to access data for display.')
 
-    def get_latest_status(self):
-        return self.status.order_by('id').first()
+    def get_latest_status(self, count=None):
+        _latest = self.status.order_by('id').reverse()
+        return _latest.first() if count is None else _latest[:count]
 
 
 class DisplayStatus(BaseModel):
