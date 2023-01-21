@@ -202,6 +202,7 @@ class Frontend(Singleton):
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['branch'] if _app_revision else None,
                 'revision': _app_revision['current'] if _app_revision else None,
+                'revisions': _app_revision['revisions'] if _app_revision else None,
             },
         }
         return _data
