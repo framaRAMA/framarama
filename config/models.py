@@ -311,6 +311,10 @@ class Display(BaseModel):
         _latest = self.status.order_by('id').reverse()
         return _latest.first() if count is None else _latest[:count]
 
+    def get_latest_items(self, count=None):
+        _latest = self.items.order_by('updated').reverse()
+        return _latest.first() if count is None else _latest[:count]
+
 
 class DisplayStatus(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["uptime", "memory_free", "cpu_load", "cpu_temp", "disk_data_free", "disk_tmp_free", "screen_on", "items_total"]
@@ -388,7 +392,7 @@ class DisplayStatus(BaseModel):
 class DisplayItem(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["date_first_seen", "date_last_seen", "count_hit"]
 
-    display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='item')
+    display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='items')
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='display')
     date_first_seen = models.DateTimeField(
         blank=True, null=True,
