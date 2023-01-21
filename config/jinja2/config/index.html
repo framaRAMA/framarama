@@ -177,9 +177,8 @@
   {% if 'software_info' in dashboards %}
     <div class="col">
       <div class="card mt-2">
-        <div class="card-header">{{ lib.icon('info') }} Status</div>
+        <div class="card-header">{{ lib.icon('software') }} Software</div>
         <div class="card-body">
-          <h6 class="card-subtitle mb-2 text-muted">System information</h6>
           <ul class="card-text">
             <li>Software Version:<br/>- {{ system.app.revision }} - {{ system.app.date }}</li>
             <li>Available Versions:<br/>{% for revision in system.app.revisions %}- {{ revision }}<br/>{% endfor %}</li>
