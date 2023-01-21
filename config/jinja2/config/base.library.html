@@ -681,10 +681,10 @@
         {% for name in values %}
           {
             label: {{ name|tojson }},
-            borderColor: {{ colors[loop.index-1]|tojson }},
-            backgroundColor: {{ colors[loop.index-1]|tojson }},
+            borderColor: {{ colors[loop.index0]|tojson }},
+            backgroundColor: {{ colors[loop.index0]|tojson }},
             data: {{ values[name]|tojson }},
-            {% if axis %}yAxisID: {{ axis[loop.index-1]|tojson }},{% endif %}
+            {% if axis %}yAxisID: {{ axis[loop.index0]|tojson }},{% endif %}
           }{% if not loop.last %},{% endif %}
         {% endfor %}
         ]
