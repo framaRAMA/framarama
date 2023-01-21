@@ -672,7 +672,7 @@
 {% endmacro %}
 
 {% macro chart_line(id, labels, values, axis=None) %}
-  <canvas id="{{ id }}" class="ms-5 me-5"></canvas>
+  <canvas id="{{ id }}"></canvas>
   <script>
     new Chart(document.getElementById('{{ id }}'), {
       type: 'line', data: {
