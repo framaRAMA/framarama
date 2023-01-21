@@ -28,6 +28,14 @@ def date_format(value, format="%H:%M %d-%m-%y"):
     return value.strftime(format)
 
 
+def get_attribute(value, key):
+    if type(key) == str:
+        key = key.split('.')
+    if len(key) > 0:
+        return get_attribute(getattr(value, key[0]), key[1:])
+    return value
+
+
 def environment(**options):
     env = Environment(**options)
     env.globals.update({
@@ -37,6 +45,7 @@ def environment(**options):
         'nav': nav,
     })
     env.filters.update({
-        'date_format': date_format
+        'getattr': get_attribute,
+        'date_format': date_format,
     })
     return env
