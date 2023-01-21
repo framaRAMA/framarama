@@ -20,11 +20,11 @@ class IndexView(base.BaseConfigView):
             _dashboards.append('display_info')
             _dashboards.append('system_info')
             _dashboards.append('software_info')
+            _dashboards.append('system_stats')
             _context['system'] = frontend.Frontend.get().get_status()
         else:
             _dashboards.append('frames_chart')
-            _dashbaords.append('displays_chart')
-            _dashboards.append('')
+            _dashboards.append('displays_chart')
         _context['dashboards'] = _dashboards
         return _context
 

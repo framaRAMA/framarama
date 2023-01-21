@@ -3,7 +3,8 @@
 {% block content %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
   {% set display = displays[0] if displays|length else null %}
-  {% set status = display.get_latest_status() if display else null %}
+  {% set stats = display.get_latest_status(60) if display else [] %}
+  {% set status = stats|last if stats|length else null %}
   {% set items = display.items if display else null %}
 
   {% if 'frames_chart' in dashboards %}
@@ -66,8 +67,8 @@
               <li><strong>{{ display.name }}</strong> frame providing data</li>
               <li>
                 on <strong>{{ 'a %dx%d'|format(display.device_width, display.device_height) if display.device_width and display.device_height else 'an unknown' }}</strong> pixel frame</li>
-              <li>with <strong>{{ display.frame.items|length }} </strong> pictures in collection</li>
-              <li><strong>{{ status if status else '0' }}</strong> pictures served</li>
+              <li>with <strong>{{ display.frame.items.count() }} </strong> pictures in collection</li>
+              <li><strong>{{ status.items_shown if status else '0' }}</strong> pictures served</li>
               <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
               <li>Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong></li>
             </ul>
@@ -127,7 +128,16 @@
               </button>
             </div>
           </p>
-        {% else %}
+        {% elif display.frame.items.count() %}
+          <div class="card-body text-center">
+            Currently no pictures served by the display. If you want you can check the the
+            display or frame settings.<br/>
+          </div>
+          <div class="text-center">
+            <a href="{{ url('frame_info', args=[display.frame.id]) }}" class="btn btn-primary btn-xs">Open display</a>
+            <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open frame</a>
+          </div>
+        {% elif display.frame.items.count() %}
           <div class="card-body text-center">
             Currently no pictures shown on this display. There's no frame assigned to this
             display or the frame does not have items currently.<br/>
@@ -146,17 +156,17 @@
       <div class="card mt-2">
         <div class="card-header bg-info text-white">{{ lib.icon('system') }} System</div>
         <div class="card-body">
-          <h6 class="card-subtitle mb-2 text-muted">Runtime information</h6>
+          <h6 class="card-subtitle mb-2 text-muted">System information</h6>
           <ul class="card-text">
             <li><strong>{{ '%d'|format(system.uptime / 60 / 60 / 24) }}</strong> days running</li>
-            <li><strong>{{ '%.2f'|format(system.cpu.load) }}</strong> load, <strong>{{ '%.1f'|format(system.cpu.temp) }}°C</strong> CPU</li>
+            <li><strong>{{ '%.2f'|format(system.cpu.load) }}</strong> CPU load at <strong>{{ '%.1f'|format(system.cpu.temp) }}°C</strong></li>
             <li>
               <strong>{{ '%d'|format(system.disk.data.used * 100 / (system.disk.data.used + system.disk.data.free)) }}%</strong> disk usage,
-              <strong>{{ lib.format_bytes(system.disk.data.used) }}</strong>/{{ lib.format_bytes(system.disk.data.used + system.disk.data.free, true) }}
+              <strong>{{ lib.format_bytes(system.disk.data.used) }}</strong> of {{ lib.format_bytes(system.disk.data.used + system.disk.data.free, true) }}
             </li>
             <li>
               <strong>{{ '%d'|format(system.memory.used * 100 / (system.memory.used + system.memory.free)) }}%</strong> memory usage,
-              <strong>{{ lib.format_bytes(system.memory.used) }}</strong>/{{ lib.format_bytes(system.memory.used + system.memory.free, true) }}
+              <strong>{{ lib.format_bytes(system.memory.used) }}</strong> of {{ lib.format_bytes(system.memory.used + system.memory.free, true) }}
             </li>
           </ul>
         </div>
@@ -171,10 +181,30 @@
         <div class="card-body">
           <h6 class="card-subtitle mb-2 text-muted">System information</h6>
           <ul class="card-text">
-            <li>Software Version: {{ system.app.revision }} ({{ system.app.date }})</li>
+            <li>Software Version:<br/>- {{ system.app.revision }} - {{ system.app.date }}</li>
+            <li>Available Versions:<br/>{% for revision in system.app.revisions %}- {{ revision }}<br/>{% endfor %}</li>
             <li>Environment: <strong>{% if config %}{{ config.mode }}{% else %}cloud{% endif %}</strong> setup</li>
           </ul>
+          <div class="text-center">
+            <a href="{{ url('fe_dashboard_software') }}" class="btn btn-primary btn-xs">Check</a>
+          </div>
         </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if 'system_stats' in dashboards %}
+    <div class="col">
+      <div class="card mt-2">
+        <div class="card-header">{{ lib.icon('system') }} Statistics</div>
+        <div class="card-body">
+          {% set stats_labels = stats|map(attribute='created')|reverse %}
+          {% set stats_load = stats|map(attribute='cpu_load')|reverse|list %}
+          {% set stats_temp = stats|map(attribute='cpu_temp')|reverse|list %}
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ "CPU (%s - %s)"|format(stats_labels|map('date_format', '%d.%m. %H:%M')|first, stats_labels|reverse|map('date_format', '%d.%m. %H:%M')|first) }}
+          </h6>
+          {{ lib.chart_line('cpu', stats_labels|map('date_format', '%H:%M')|list, {'Load': stats_load, 'Temp': stats_temp}, ['left', 'right']) }}
       </div>
     </div>
   {% endif %}
