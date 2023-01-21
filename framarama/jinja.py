@@ -24,6 +24,10 @@ def nav(request, page, args={}):
     return False
 
 
+def date_format(value, format="%H:%M %d-%m-%y"):
+    return value.strftime(format)
+
+
 def environment(**options):
     env = Environment(**options)
     env.globals.update({
@@ -31,5 +35,8 @@ def environment(**options):
         'url': reverse,
         'urle': reverse_exists,
         'nav': nav,
+    })
+    env.filters.update({
+        'date_format': date_format
     })
     return env
