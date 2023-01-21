@@ -436,8 +436,12 @@ class Capabilities:
             return _rev
         return None
 
-    def app_check(remote, url, username, password):
-        _url = re.sub(r'^(.*://)([^@]+@)?(.*)', '\\1' + re.escape(username) + '@\\3', url)
+    def app_check(remote, url, username=None, password=None):
+        _username_pattern = r'^(.*://)([^@]+@)?(.*)'
+        if username is not None:
+            _url = re.sub(_username_pattern, '\\1' + re.escape(username) + '@\\3', url)
+        else:
+            _url = re.sub(_username_pattern, '\\1\\3', url)
         logger.info("Check version update from {} using {} ...".format(remote, _url))
         _remotes = Capabilities._git_remotes()
         if remote in _remotes:
@@ -451,7 +455,7 @@ class Capabilities:
             return
         _fetch = Process.exec_run(['git', 'fetch', remote], env={
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
-            'GIT_PASSWORD': password,
+            'GIT_PASSWORD': password if password is not None else '',
         })
         if _fetch is None:
             logger.error("Can not fetch updates!")
