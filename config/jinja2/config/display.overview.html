@@ -21,7 +21,7 @@
   </div>
 
   <div class="col col-lg-12">
-    {{ lib.list_table(display.get_latest_items(10)|list, {'created': 'Date', 'item.url' : 'URL' }) }}
+    {{ lib.list_table(display.get_latest_items(10)|list, {'date_last_seen': 'Date', 'item.url' : 'URL' }) }}
   </div>
 
 </div>

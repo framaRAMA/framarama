@@ -312,7 +312,7 @@ class Display(BaseModel):
         return _latest.first() if count is None else _latest[:count]
 
     def get_latest_items(self, count=None):
-        _latest = self.items.order_by('updated').reverse()
+        _latest = self.items.order_by('date_last_seen').reverse()
         return _latest.first() if count is None else _latest[:count]
 
 
