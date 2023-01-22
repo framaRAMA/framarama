@@ -665,7 +665,12 @@
     <li>with <strong>{{ display.frame.items.count() }} </strong> pictures in collection</li>
     <li><strong>{{ status.items_shown if status else '0' }}</strong> pictures served</li>
     <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
-    <li>Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong></li>
+    <li>
+      Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong>
+      {% if display.time_on and display.time_off %}
+        ({{ display.time_on }} - {{ display.time_off }})
+      {% endif %}
+    </li>
   </ul>
 {% endmacro %}
 
