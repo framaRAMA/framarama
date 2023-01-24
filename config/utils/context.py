@@ -50,7 +50,7 @@ class Context:
 
     def evaluate_model(self, model):
         _result = Result()
-        for field in [field for field in model._meta.get_fields() if not issubclass(type(field), RelatedField)]:
+        for field in model.get_fields():
             _value = getattr(model, field.name)
             _evaluated = ResultValue(self.evaluate(_value))
             setattr(_result, field.name, _evaluated)
