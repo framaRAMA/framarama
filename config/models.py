@@ -247,18 +247,6 @@ class Finishing(PluginModel):
     image_out = models.CharField(
         max_length=64, blank=True, null=True,
         verbose_name='Image output', help_text='Name to output modified image (empty for default)')
-    color_stroke = models.CharField(
-        max_length=16,
-        verbose_name='Foreground color', help_text='The foreground color (lines, text) to use in HEX (RGB)')
-    color_fill = models.CharField(
-        max_length=16, blank=True, null=True,
-        verbose_name='Background color', help_text='The background color (fill) to use in HEX (RGB)')
-    color_alpha = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Transparency', help_text='The alpha value between 0 (transparent) and 100 (no transparency)')
-    stroke_width = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Line width', help_text='The width to use when drawing lines')
     enabled = models.BooleanField(
         verbose_name='Enabled')
 
