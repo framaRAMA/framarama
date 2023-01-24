@@ -5,6 +5,7 @@ from django.db import models
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import PluginImplementation
+from config.plugins.finishings import ColorStrokeFillAlpha
 from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
 from config.utils import finishing
 
@@ -39,7 +40,7 @@ WIDGETS = {
     'size_y': base.charFieldWidget(),
 }
 
-class ShapeModel(Finishing):
+class ShapeModel(Finishing, ColorStrokeFillAlpha):
     finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
     shape = models.CharField(
         max_length=32,

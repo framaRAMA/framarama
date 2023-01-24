@@ -5,6 +5,7 @@ from django.db import models
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import PluginImplementation
+from config.plugins.finishings import ColorFill, ColorAlpha
 from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
 from config.utils import finishing
 
@@ -18,7 +19,7 @@ WIDGETS = {
     'url': base.charFieldWidget(),
 }
 
-class ImageModel(Finishing):
+class ImageModel(Finishing, ColorFill, ColorAlpha):
     finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
     url = models.CharField(
         max_length=256,
