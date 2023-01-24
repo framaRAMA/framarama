@@ -110,8 +110,9 @@ class Processor:
         _size_x = f"{_factor}*{scale}+{_factor}*{shift}"
         _size_y = f"{_factor}*{scale}"
         _finishings = [{
-            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+            'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
+                'color_alpha': 70,
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
@@ -149,8 +150,9 @@ class Processor:
         _size_x = f"images['default']['width']"
         _size_y = f"{_factor}*{scale}"
         _finishings = [{
-            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+            'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
+                'color_alpha': 70,
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'linet', 'plugin_config': {
@@ -183,8 +185,9 @@ class Processor:
         _size_x = f"images['default']['height']"
         _size_y = f"{_factor}*{scale}"
         _finishings = [{
-            'plugin': 'image', 'color_alpha': 70, 'image_out': 'line', 'plugin_config': {
+            'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
+                'color_alpha': 70,
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
