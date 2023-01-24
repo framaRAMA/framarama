@@ -87,7 +87,7 @@ class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
 class FinishingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Finishing
-        fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'color_stroke', 'color_fill', 'color_alpha', 'stroke_width', 'plugin', 'plugin_config']
+        fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config']
 
 
 class NextItemSerializer(serializers.HyperlinkedModelSerializer):
