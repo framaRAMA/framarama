@@ -231,8 +231,13 @@ class Processor:
             return None
         logger.info("Finishing {}".format(_item))
         _adapter = self._context.get_adapter()
-        self._context.set_image(_adapter.image_open(_item.url))
-        for _finishing in list(self._context.get_finishings()) + self._watermark:
+        _finishings = []
+        _finishings.extend([models.Finishing(frame=_frame, enabled=True, **{
+            'plugin': 'image', 'plugin_config': { 'url': _item.url }
+        })])
+        _finishings.extend(list(self._context.get_finishings()))
+        _finishings.extend(self._watermark)
+        for _finishing in _finishings:
             if not _finishing.enabled:
                 continue
             logger.info("Processing finishing {}".format(_finishing))
@@ -253,20 +258,22 @@ class Processor:
             for i, _name in enumerate(_images_in):
                 _image_in = self._context.get_image_data(_name)
                 if not _image_in:
-                    logger.warn('Image {} does not exists - ignoring.'.format(_name))
                     continue
                 if _name not in _images_out:
                     _image_in = _adapter.image_clone(_image_in)
                 _image.add_images(_image_in.get_images())
+
+            _image_meta = _adapter.image_meta(_image) if _image.get_images() else {}
+            _image_exif = _adapter.image_exif(_image) if _image.get_images() else {}
 
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
             self._context.set_resolver('item', context.ObjectResolver(_item))
             self._context.set_resolver('var', context.MapResolver({}))
             self._context.set_resolver('env', context.EnvironmentResolver())
-            self._context.set_resolver('image', context.MapResolver(_adapter.image_meta(_image)))
+            self._context.set_resolver('image', context.MapResolver(_image_meta))
             self._context.set_resolver('images', context.MapResolver(_image_metas))
-            self._context.set_resolver('exif', context.MapResolver(_adapter.image_exif(_image)))
+            self._context.set_resolver('exif', context.MapResolver(_image_exif))
 
             logger.info("Input: {} = {}".format(_images_in, _image))
             _image_out = _plugin.run(self._context.evaluate_model(_finishing), _image, self._context)
