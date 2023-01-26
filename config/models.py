@@ -254,11 +254,11 @@ class Finishing(PluginModel):
         db_table = 'config_finishing'
         ordering = ['ordering']
 
-    def get_image_names_in(self):
-        return re.split(r' |,', self.image_in)
+    def get_image_names_in(self, default=None):
+        return re.split(r' |,', self.image_in) if self.image_in else default
 
-    def get_image_names_out(self):
-        return re.split(r' |,', self.image_out)
+    def get_image_names_out(self, default=None):
+        return re.split(r' |,', self.image_out) if self.image_out else default
 
 
 class Display(BaseModel):

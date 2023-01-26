@@ -242,15 +242,8 @@ class Processor:
                 continue
             _finishing = _plugin.create_model(_finishing)
 
-            if _finishing.image_in:
-                _images_in = _finishing.get_image_names_in()
-            else:
-                _images_in = [Context.DEFAULT_IMAGE_NAME]
-            
-            if _finishing.image_out:
-                _images_out = _finishing.get_image_names_out()
-            else:
-                _images_out = [Context.DEFAULT_IMAGE_NAME]
+            _images_in = _finishing.get_image_names_in([Context.DEFAULT_IMAGE_NAME])
+            _images_out = _finishing.get_image_names_out([Context.DEFAULT_IMAGE_NAME])
 
             _image_metas = {}
             for _image_name, _image in self._context.get_images().items():
