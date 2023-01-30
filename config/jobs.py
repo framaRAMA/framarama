@@ -31,7 +31,7 @@ class Scheduler(jobs.Scheduler):
             if _interval is None:
                 return
             _prev_update = utils.DateTime.now(sub=_interval)
-            _critera = _critera.add(Q(update_date_start__lt=_prev_update))
+            _critera.add(Q(update_date_start__lt=_prev_update), Q.AND)
         for _source in models.Source.objects.filter(_critera).order_by('-update_date_start'):
             _frame = _source.frame
             _job_id = Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
