@@ -84,6 +84,13 @@ class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
         abstract = True
 
 
+class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.SlugRelatedField(source='item', many=False, read_only=True, slug_field='id')
+    class Meta:
+        model = models.DisplayItem
+        fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit']
+
+
 class FinishingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Finishing
@@ -161,6 +168,16 @@ class ItemDisplayViewSet(BaseViewSet):
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
         return self.qs().items.filter(frame__display__id=_display_id)
+
+
+class HitItemDisplayViewSet(BaseViewSet):
+    serializer_class = DisplayItemSerializer
+    lookup_url_kwargs='pk'
+    lookup_field='item__id'
+
+    def get_queryset(self):
+        _display_id = self.kwargs.get('display_id')
+        return self.qs().displayitems.filter(display__id=_display_id)
 
 
 class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
