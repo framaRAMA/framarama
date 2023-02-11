@@ -1,6 +1,9 @@
+import os
 import re
+import hashlib
 
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from framarama.base import utils
@@ -51,6 +54,50 @@ CODE_TEMPLATES = {
     '''
   },
 }
+
+
+class Data(BaseModel):
+    STR_FIELDS = BaseModel.STR_FIELDS + ['category', 'data_file']
+
+    def _path(instance, path):
+        _md5 = hashlib.md5()
+        _md5.update("{}#{}".format(path, utils.DateTime.now().timestamp()).encode())
+        _md5_hex = _md5.hexdigest()
+        _storage_path = [settings.FRAMARAMA['DATA_PATH'], 'config']
+        _storage_path.extend(instance.storage_path())
+        _storage_path.extend([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
+        return os.path.join(*_storage_path)
+
+    category = models.CharField(
+        max_length=255,
+        verbose_name='Category', help_text='The category of the type of data item')
+    data_file = models.FileField(
+        blank=True, null=True, editable=False, upload_to=_path,
+        verbose_name='Save as file', help_text='Store content in the filesystem')
+    data_json = models.JSONField(
+        blank=True, null=True, editable=False,
+        verbose_name='Save as JSON', help_text='The data object of this item')
+
+    def storage_path(self):
+        return []
+
+
+class ItemThumbnailData(Data):
+
+    class Meta:
+        proxy = True
+
+    def storage_path(self):
+        return ['item', 'thumbnail']
+
+
+class DisplayItemThumbnailData(Data):
+
+    class Meta:
+        proxy = True
+
+    def storage_path(self):
+        return ['display', 'thumbnail']
 
 
 class Frame(BaseModel):
@@ -169,6 +216,7 @@ class Item(BaseModel):
     views = models.IntegerField(
         default=0,
         verbose_name='Views', help_text='Counter how often this item was shown')
+    thumbnail = models.OneToOneField(ItemThumbnailData, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['-created']
@@ -392,6 +440,7 @@ class DisplayItem(BaseModel):
     count_hit = models.IntegerField(
         blank=True, null=True,
         verbose_name='Hits', help_text='Amount of hits for this item')
+    thumbnail = models.OneToOneField(DisplayItemThumbnailData, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         db_table = 'config_display_item'
