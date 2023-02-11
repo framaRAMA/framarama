@@ -238,7 +238,7 @@ class DateTime:
         return None
 
     def reached(time, delta):
-        return time is None or tme + delta < DateTime.now()
+        return time is None or time + delta < DateTime.now()
 
     def utc(dt):
         if dt and dt.tzinfo:
