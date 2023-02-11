@@ -1,8 +1,10 @@
 import io
+import base64
 
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Q
+from django.core.files.base import File
 from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
@@ -86,16 +88,19 @@ class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
 
 class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField()
+    thumbnail = serializers.CharField(required=False, allow_null=True)
+
     class Meta:
         model = models.DisplayItem
-        fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit']
+        fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail']
         read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit']
 
     def create(self, validated_data):
         _view = self.context['view']
         _item_id = validated_data.get('id')
+        _thumbnail = validated_data.get('thumbnail', -1)
         _display_id = _view.kwargs.get('display_id')
-        _items = _view.get_queryset().filter(pk=_item_id).values('id', 'date_first_seen', 'date_last_seen', 'count_hit')
+        _items = _view.get_queryset().filter(pk=_item_id)
         if len(_items) == 0:
             raise serializers.ValidationError({"id": "no such item"})
 
@@ -112,12 +117,28 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
             _display_item = _display_items[0]
             _display_item.date_last_seen = _now
             _display_item.count_hit = _display_item.count_hit + 1
+
+        if _thumbnail != -1:
+            if _thumbnail:
+                _thumbnail = base64.b64decode(_thumbnail)
+                if _display_item.thumbnail:
+                    _display_item.thumbnail.write(_thumbnail)
+                else:
+                    _display_item.thumbnail = models.DisplayItemThumbnailData()
+                    _display_item.thumbnail.data_file = File(io.BytesIO(_thumbnail), name='thumbnail')
+                    _display_item.thumbnail.save()
+            elif _display_item.thumbnail:
+                _display_item.thumbnail.data_file.delete(save=False)
+                _display_item.thumbnail.delete()
+                _display_item.thumbnail = None
+
         _display_item.save()
         return _display_item
 
     def to_representation(self, instance):
         _result = super().to_representation(instance)
         _result['id'] = instance.item.id if type(instance) == models.DisplayItem else instance.id
+        _result['thumbnail'] = base64.b64encode(utils.Filesystem.file_read(instance.thumbnail.data_file.path)) if instance.thumbnail else None
         return _result
 
 
@@ -221,6 +242,7 @@ class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
             'date_first_seen': 'config_display_item.date_first_seen',
             'date_last_seen': 'config_display_item.date_last_seen',
             'count_hit' : 'config_display_item.count_hit',
+            'thumbnail_id': 'config_display_item.thumbnail_id',
         })
         return _filter
 
