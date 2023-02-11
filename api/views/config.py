@@ -99,17 +99,18 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
         if len(_items) == 0:
             raise serializers.ValidationError({"id": "no such item"})
 
+        _now = utils.DateTime.now()
         _display_items = _view.qs().displayitems.filter(display__id=_display_id, item__id=_item_id)
         if len(_display_items) == 0:
             _display_item = models.DisplayItem(
-                display=_view.qs().displays.filter(pk=_display_id).first(),
-                item=_view.qs().items.filter(pk=_item_id).first(),
-                date_first_seen=utils.DateTime.now(),
-                date_last_seen=utils.DateTime.now(),
+                display=_view.qs().displays.get(pk=_display_id),
+                item=_view.qs().items.get(pk=_item_id),
+                date_first_seen=_now,
+                date_last_seen=_now,
                 count_hit=1)
         else:
             _display_item = _display_items[0]
-            _display_item.date_last_seen=utils.DateTime.now()
+            _display_item.date_last_seen = _now
             _display_item.count_hit = _display_item.count_hit + 1
         _display_item.save()
         return _display_item

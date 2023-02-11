@@ -3,6 +3,7 @@ import re
 from django.db import models
 from django.contrib.auth.models import User
 
+from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel
 
 
