@@ -122,8 +122,11 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
         if _thumbnail != -1:
             if _thumbnail:
                 _thumbnail = base64.b64decode(_thumbnail)
+                if len(_thumbnail) > 1*1024*1024:
+                    raise serializers.ValidationError({"thumbnail": "maximum size of 1mb exceeded"})
                 if _display_item.thumbnail:
-                    _display_item.thumbnail.write(_thumbnail)
+                    _display_item.thumbnail.data_file.open('wb')
+                    _display_item.thumbnail.data_file.write(_thumbnail)
                 else:
                     _display_item.thumbnail = models.DisplayItemThumbnailData()
                     _display_item.thumbnail.data_file = File(io.BytesIO(_thumbnail), name='thumbnail')
