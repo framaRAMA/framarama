@@ -144,6 +144,7 @@ class Scheduler(jobs.Scheduler):
                 raise
             finally:
                 _config.save()
+            self._display.submit_item_hit(_frontend_item)
 
     def submit_status(self):
         if self._display is None:

@@ -1,3 +1,4 @@
+import base64
 import requests
 
 from django.conf import settings
@@ -115,6 +116,12 @@ class ApiClient(Singleton):
             self._request('/displays/{}/items/next?hit={}'.format(display_id, int(hit))),
             lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
         return _result.get(0) if _result.count() > 0 else None
+
+    def submit_item_hit(self, display_id, item_id, thumbnail=None):
+        _data = {'id': item_id}
+        if thumbnail:
+            _data['thumbnail'] = base64.b64encode(thumbnail).decode()
+        self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, _data)
 
     def get_finishings(self, display_id):
         return ApiResultList(

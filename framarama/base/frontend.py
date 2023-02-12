@@ -283,6 +283,11 @@ class Display(Singleton):
             self._items = self._client.get_items_list(self.get_id())
         return self._items
 
+    def submit_item_hit(self, frontend_item):
+        _item = frontend_item.item()
+        _thumbnail = frontend_item.preview()
+        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail)
+
     def get_next_item(self, refresh=False, hit=True):
         if self._next is None or refresh:
             self._next = self._client.get_items_next(self.get_id(), hit)
