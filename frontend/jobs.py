@@ -121,6 +121,8 @@ class Scheduler(jobs.Scheduler):
             _device.activate(0)
         elif not _display_on and not force:
             logger.info("Skipping next item, display is off.")
+        elif not self._display.get_enabled():
+            logger.info("Skipping next item, display is not enabled.")
         elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
             _config = frontend.Frontend.get().get_config().get_config()
