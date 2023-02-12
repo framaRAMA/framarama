@@ -340,7 +340,7 @@ class FrontendDevice(Singleton):
             _processor = finishing.Processor(_context)
             _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
             _result = _processor.process()
-            return FrontendItem(item, _result)
+            return FrontendItem(item, _result) if _result else None
 
     def render(self, display, item):
         for renderer in self._renderers:
