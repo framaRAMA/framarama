@@ -657,7 +657,7 @@
 {% endmacro %}
 
 {% macro display_info(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|date_format('%d.%m.%Y %H:%M') }})</h6>
+  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|date_format('%d.%m.%Y %H:%M') if status else 'not available' }})</h6>
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
