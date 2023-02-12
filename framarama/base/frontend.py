@@ -338,7 +338,7 @@ class FrontendDevice(Singleton):
         with _context:
             _config = Frontend.get().get_config().get_config()
             _processor = finishing.Processor(_context)
-            _processor.set_watermark(_config.watermark_type, _config.watermark_scale, _config.watermark_scale)
+            _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
             _result = _processor.process()
             return FrontendItem(item, _result)
 
