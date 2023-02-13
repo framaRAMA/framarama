@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('category', models.CharField(help_text='The category of the type of data item', max_length=255, verbose_name='Category')),
                 ('data_file', models.FileField(blank=True, editable=False, help_text='Store content in the filesystem', null=True, upload_to=config.models.Data._path, verbose_name='Save as file')),
-                ('data_json', models.JSONField(blank=True, editable=False, help_text='The data object of this item', null=True, verbose_name='Save as JSON')),
             ],
             options={
                 'abstract': False,

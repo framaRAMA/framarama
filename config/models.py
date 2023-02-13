@@ -74,9 +74,6 @@ class Data(BaseModel):
     data_file = models.FileField(
         blank=True, null=True, editable=False, upload_to=_path,
         verbose_name='Save as file', help_text='Store content in the filesystem')
-    data_json = models.JSONField(
-        blank=True, null=True, editable=False,
-        verbose_name='Save as JSON', help_text='The data object of this item')
 
     def storage_path(self):
         return []
