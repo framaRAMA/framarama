@@ -1,10 +1,9 @@
-import io
 import base64
+import mimetypes
 
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Q
-from django.core.files.base import File
 from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
@@ -87,9 +86,40 @@ class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
         abstract = True
 
 
+class DataFieldSerializer(serializers.Field):
+
+    def __init__(self, cls, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._cls = cls
+
+    def to_representation(self, value):
+        if value is None:
+            return None
+        return {
+            'mime': value.data_mime,
+            'size': value.data_size,
+            'data': base64.b64encode(utils.Filesystem.file_read(value.data_file.path)),
+        }
+
+    def to_internal_value(self, data, *args, **kwargs):
+        if data is None:
+            return None
+        if type(data) != dict or 'mime' not in data or 'data' not in data:
+            raise serializers.ValidationError('not a structure, requires mime and data')
+        _mime = data['mime']
+        if len(_mime) > 64:
+            raise serializers.ValidationError("mime type too long")
+        if _mime not in mimetypes.types_map.values():
+            raise serializers.ValidationError("unkown mime type")
+        _data = base64.b64decode(data['data'])
+        if len(_data) > 1*1024*1024:
+            raise serializers.ValidationError("maximum size of 1mb exceeded")
+        return self._cls.create(data=_data, mime=_mime)
+
+
 class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField()
-    thumbnail = serializers.CharField(required=False, allow_null=True)
+    thumbnail = DataFieldSerializer(models.DisplayItemThumbnailData, required=False, allow_null=True)
 
     class Meta:
         model = models.DisplayItem
@@ -121,16 +151,11 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
 
         if _thumbnail != -1:
             if _thumbnail:
-                _thumbnail = base64.b64decode(_thumbnail)
-                if len(_thumbnail) > 1*1024*1024:
-                    raise serializers.ValidationError({"thumbnail": "maximum size of 1mb exceeded"})
                 if _display_item.thumbnail:
-                    _display_item.thumbnail.data_file.open('wb')
-                    _display_item.thumbnail.data_file.write(_thumbnail)
+                    _thumbnail.update(_display_item.thumbnail)
                 else:
-                    _display_item.thumbnail = models.DisplayItemThumbnailData()
-                    _display_item.thumbnail.data_file = File(io.BytesIO(_thumbnail), name='thumbnail')
-                    _display_item.thumbnail.save()
+                    _display_item.thumbnail = _thumbnail
+                _display_item.thumbnail.save()
             elif _display_item.thumbnail:
                 _display_item.thumbnail.data_file.delete(save=False)
                 _display_item.thumbnail.delete()
@@ -142,7 +167,6 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
     def to_representation(self, instance):
         _result = super().to_representation(instance)
         _result['id'] = instance.item.id if type(instance) == models.DisplayItem else instance.id
-        _result['thumbnail'] = base64.b64encode(utils.Filesystem.file_read(instance.thumbnail.data_file.path)) if instance.thumbnail else None
         return _result
 
 
