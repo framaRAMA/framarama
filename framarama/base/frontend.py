@@ -285,8 +285,9 @@ class Display(Singleton):
 
     def submit_item_hit(self, frontend_item):
         _item = frontend_item.item()
+        _mime = frontend_item.mime()
         _thumbnail = frontend_item.preview()
-        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail)
+        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime)
 
     def get_next_item(self, refresh=False, hit=True):
         if self._next is None or refresh:
