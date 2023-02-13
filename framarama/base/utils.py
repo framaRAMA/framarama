@@ -175,6 +175,13 @@ class Process:
 
 class Json:
 
+    @staticmethod
+    def from_dict(data):
+        return json.dumps(data)
+
+    @staticmethod
+    def to_dict(data):
+        return json.loads(data)
 
     @staticmethod
     def to_object_dict(data, fields, prefix=''):
