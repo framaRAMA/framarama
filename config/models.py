@@ -71,6 +71,12 @@ class Data(BaseModel):
     category = models.CharField(
         max_length=255,
         verbose_name='Category', help_text='The category of the type of data item')
+    data_size = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Size', help_text='Amount of bytes used for this data item')
+    data_mime = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Mime type', help_text='The content type of this data item')
     data_file = models.FileField(
         blank=True, null=True, editable=False, upload_to=_path,
         verbose_name='Save as file', help_text='Store content in the filesystem')
