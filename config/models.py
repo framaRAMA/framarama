@@ -1,3 +1,4 @@
+import io
 import os
 import re
 import hashlib
@@ -5,6 +6,7 @@ import hashlib
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.base import File
 
 from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel
@@ -83,6 +85,29 @@ class Data(BaseModel):
 
     def storage_path(self):
         return []
+
+    def update(self, existing):
+        existing.data_mime = self.data_mime
+        existing.data_size = self.data_file.size
+        existing.data_file.open('wb')
+        existing.data_file.write(self.data_file.read())
+        existing.data_file.close()
+
+    @classmethod
+    def create(cls, json=None, data=None, mime=None):
+        if json:
+            _data = utils.Json.from_dict(json)
+            _mime = 'application/json' if mime is None else mime
+        elif data:
+            _data = data
+        else:
+            raise Exception('Specify JSON or data to create a Data object')
+        _file = File(io.BytesIO(_data), name='display_item_thumbnail')
+        _instance = cls()
+        _instance.data_mime = mime
+        _instance.data_size = _file.size
+        _instance.data_file = _file
+        return _instance
 
 
 class ItemThumbnailData(Data):
