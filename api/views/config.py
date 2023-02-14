@@ -98,7 +98,7 @@ class DataFieldSerializer(serializers.Field):
         return {
             'mime': value.data_mime,
             'size': value.data_size,
-            'data': base64.b64encode(utils.Filesystem.file_read(value.data_file.path)),
+            'data': base64.b64encode(value.data()),
         }
 
     def to_internal_value(self, data, *args, **kwargs):
