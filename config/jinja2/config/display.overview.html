@@ -3,7 +3,7 @@
 {% block content_display %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
   {% set stats = display.get_latest_status(60) %}
-  {% set latest = display.get_latest_items(10)|list %}
+  {% set latest = display.get_latest_items(10) %}
 
   <div class="col">
     <div class="card mt-2">
@@ -27,28 +27,33 @@
         <h6 class="card-subtitle mb-2 text-muted">
           Latest items
         </h6>
-        <div id="carouselPictures" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
-          <div class="carousel-indicators">
-            {% for item in latest %}
-              <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
-            {% endfor %}
+        {% set carousel_items = latest|map(attribute='thumbnail')|selectattr('data_mime')|list %}
+        {% if carousel_items %}
+          <div id="carouselPictures" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              {% for item in carousel_items %}
+                <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
+              {% endfor %}
+            </div>
+            <div class="carousel-inner bg-light rounded rounded-5">
+              {% for item in carousel_items %}
+                <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
+                  <img src="data:{{ item.data_mime }};base64,{{ item.data()|b64encode }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/>
+                </div>
+              {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
           </div>
-          <div class="carousel-inner bg-light rounded rounded-5">
-            {% for item in latest %}
-              <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-                <img src="data:{{ item.thumbnail.data_mime }};base64,{{ item.thumbnail.data()|b64encode }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/>
-              </div>
-            {% endfor %}
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
+        {% else %}
+          (no thumbnails available)
+        {% endif %}
       </div>
     </div>
   </div>
@@ -60,7 +65,7 @@
           Latest items
         </h6>
         {% set latest_items = [] %}
-        {% for item in display.get_latest_items(10)|list %}
+        {% for item in latest %}
           {% set tmp = latest_items.append({
             'date': item.date_last_seen|date_format('%Y-%m-%d %H:%m:%S'),
             'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
@@ -80,7 +85,7 @@
           Top items
         </h6>
         {% set latest_items = [] %}
-        {% for item in display.get_top_items(10)|list %}
+        {% for item in display.get_top_items(10) %}
           {% set tmp = latest_items.append({
             'date': item.date_last_seen|date_format('%Y-%m-%d %H:%m:%S'),
             'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
