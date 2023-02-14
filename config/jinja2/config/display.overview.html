@@ -67,7 +67,7 @@
         {% set latest_items = [] %}
         {% for item in latest %}
           {% set tmp = latest_items.append({
-            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%m:%S'),
+            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%M:%S'),
             'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
             'count': item.count_hit,
           }) %}
@@ -87,7 +87,7 @@
         {% set latest_items = [] %}
         {% for item in display.get_top_items(10) %}
           {% set tmp = latest_items.append({
-            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%m:%S'),
+            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%M:%S'),
             'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
             'count': item.count_hit,
           }) %}
