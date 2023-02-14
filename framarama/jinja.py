@@ -1,3 +1,5 @@
+import base64
+
 from django.templatetags.static import static
 from django.urls import reverse
 
@@ -28,6 +30,14 @@ def date_format(value, format="%H:%M %d-%m-%y"):
     return value.strftime(format)
 
 
+def b64decode(value):
+    return base64.b64decode(value).encode()
+
+
+def b64encode(value):
+    return base64.b64encode(value).decode()
+
+
 def get_attribute(value, key):
     if type(key) == str:
         key = key.split('.')
@@ -51,5 +61,7 @@ def environment(**options):
     env.filters.update({
         'getattr': get_attribute,
         'date_format': date_format,
+        'b64decode': b64decode,
+        'b64encode': b64encode,
     })
     return env
