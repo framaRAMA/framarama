@@ -383,6 +383,10 @@ class Display(BaseModel):
         _latest = self.items.order_by('date_last_seen').reverse()
         return _latest.first() if count is None else _latest[:count]
 
+    def get_top_items(self, count=None):
+        _latest = self.items.order_by('count_hit').reverse()
+        return _latest.first() if count is None else _latest[:count]
+
 
 class DisplayStatus(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["uptime", "memory_free", "cpu_load", "cpu_temp", "disk_data_free", "disk_tmp_free", "screen_on", "items_total"]
