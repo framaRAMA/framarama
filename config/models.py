@@ -93,6 +93,9 @@ class Data(BaseModel):
         existing.data_file.write(self.data_file.read())
         existing.data_file.close()
 
+    def data(self):
+        return utils.Filesystem.file_read(self.data_file.path)
+
     @classmethod
     def create(cls, json=None, data=None, mime=None):
         if json:
