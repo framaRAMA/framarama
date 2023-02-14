@@ -32,7 +32,11 @@ def get_attribute(value, key):
     if type(key) == str:
         key = key.split('.')
     if len(key) > 0:
-        return get_attribute(getattr(value, key[0]), key[1:])
+        if type(value) == dict:
+            value = value[key[0]]
+        else:
+            value = getattr(value, key[0])
+        return get_attribute(value, key[1:])
     return value
 
 
