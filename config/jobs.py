@@ -23,9 +23,9 @@ class Scheduler(jobs.Scheduler):
         _criteria = Q(frame__enabled=True)
         _criteria.add(Q(frame__display__enabled=True) | Q(frame__display=None), Q.AND)
         if frame:
-            _criteria = _criteria.add(Q(frame=frame), Q.AND)
+            _criteria.add(Q(frame=frame), Q.AND)
         if source:
-            _criteria = _criteria.add(Q(id=source.id), Q.AND)
+            _criteria.add(Q(id=source.id), Q.AND)
         if frame is None and source is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
             if _interval is None:
