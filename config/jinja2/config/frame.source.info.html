@@ -4,6 +4,7 @@
 <div class="pt-2">
   {{ lib.field_text('Name', source.name) }}
   {{ lib.field_text('Last update', "%s%s"|format(source.update_date_start, ' (currently runnning)' if source_running else '')) }}
+  {{ lib.field_text('Update interval', source.update_interval) }}
   {% if source.update_date_end and source.update_date_start %}
     {{ lib.field_text('Update duration', source.update_date_end - source.update_date_start) }}
   {% else %}
