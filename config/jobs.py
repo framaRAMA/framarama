@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, F, functions
 
 from framarama import jobs
 from framarama.base import utils
@@ -20,18 +20,28 @@ class Scheduler(jobs.Scheduler):
         self.trigger_job(Scheduler.CFG_SOURCE_UPDATE)
 
     def source_update(self, frame=None, source=None):
-        _criteria = Q(frame__enabled=True)
-        _criteria.add(Q(frame__display__enabled=True) | Q(frame__display=None), Q.AND)
-        if frame:
-            _criteria.add(Q(frame=frame), Q.AND)
-        if source:
-            _criteria.add(Q(id=source.id), Q.AND)
+        _ignored = Q(id__gt=0)
+        _enabled_frame = Q(frame__enabled=True)
+        _enabled_display = Q(frame__display__enabled=True) | Q(frame__display=None)
+        _specific_frame = Q(frame=frame) if frame else _ignored
+        _specific_source = Q(id=source.id) if source else _ignored
+
         if frame is None and source is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
             if _interval is None:
                 return
-            _prev_update = utils.DateTime.now(sub=_interval)
-            _criteria.add(Q(update_date_start__lt=_prev_update), Q.AND)
+            _update_initial = Q(update_date_start__isnull=True)
+            _update_by_interval = Q(update_interval__isnull=False) & Q(update_date_start__lt=utils.DateTime.now()-F('update_interval'))
+            _update_by_source_interval = _update_initial | _update_by_interval
+            _update_by_global_interval = Q(update_interval__isnull=True) | Q(update_date_start__gt=functions.Now()-_interval)
+        else:
+            _update_by_source_interval = _ignored
+            _update_by_global_interval = _ignored
+
+        _criteria = _enabled_frame & _enabled_display & _specific_frame & _specific_source
+        _criteria.add(_update_by_source_interval, Q.AND)
+        _criteria.add(_update_by_global_interval, Q.AND)
+
         for _source in models.Source.objects.filter(_criteria).order_by('-update_date_start'):
             _frame = _source.frame
             _job_id = Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
