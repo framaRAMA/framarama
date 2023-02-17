@@ -59,9 +59,9 @@ CODE_TEMPLATES = {
 
 SOURCE_UPDATE_INTERVAL_CHOICES = [
   (None, 'no automatic update'),
-  ('00:15:00', 'each 15 minutes'),
-  ('01:00:00', 'each hour'),
-  ('24:00:00', 'once a day'),
+  ('PT15M', 'each 15 minutes'),
+  ('PT1H', 'each hour'),
+  ('P1D', 'once a day'),
 ]
 
 class Data(BaseModel):
@@ -172,7 +172,7 @@ class Source(BaseModel):
     map_item_meta = models.TextField(
         default="", blank=True,
         verbose_name='Additional fields', help_text='When more fields should be mapped add them line by line (format: "&lt;target-name&gt;=&lt;source-name&gt;\\n")')
-    update_interval = models.TimeField(
+    update_interval = models.DurationField(
         blank=True, null=True,
         verbose_name='Update interval', help_text='Time interval to run an automatic update of items')
     update_count = models.IntegerField(

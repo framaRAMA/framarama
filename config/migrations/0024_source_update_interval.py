@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='source',
             name='update_interval',
-            field=models.TimeField(blank=True, help_text='Time interval to run an automatic update of items', null=True, verbose_name='Update interval'),
+            field=models.DurationField(blank=True, help_text='Time interval to run an automatic update of items', null=True, verbose_name='Update interval'),
         ),
     ]
