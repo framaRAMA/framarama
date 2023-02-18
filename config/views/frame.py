@@ -492,17 +492,17 @@ class UpdateContextFrameView(base.BaseContextFrameConfigView):
         _context = super()._get(request, frame_id, context_id, *args, **kwargs)
         _frame_context = _context['context']
         _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
-        _frame_context = _finishing_plugin.load_model(finishing_id)
+        _frame_context = _context_plugin.load_model(context_id)
         _form = _context_plugin.get_update_form(instance=_frame_context)
         _context['form'] = _form
         return _context
 
-    def _post(self, request, frame_id, finishing_id, *args, **kwargs):
-        _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
+    def _post(self, request, frame_id, context_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, context_id, *args, **kwargs)
         _frame = _context['frame']
         _frame_context = _context['context']
         _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
-        _frame_context = _context_plugin.load_model(finishing_id)
+        _frame_context = _context_plugin.load_model(context_id)
         _form = _context_plugin.get_update_form(request.POST, instance=_frame_context)
         if _form.is_valid():
             _frame_context = _form.save(commit=False)
