@@ -3,7 +3,8 @@
 {% block content_display %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
   {% set stats = display.get_latest_status(60) %}
-  {% set latest = display.get_latest_items(10) %}
+  {% set latest_items = display.get_latest_items(10) %}
+  {% set top_items = display.get_top_items(10) %}
 
   <div class="col">
     <div class="card mt-2">
@@ -27,7 +28,7 @@
         <h6 class="card-subtitle mb-2 text-muted">
           Latest items
         </h6>
-        {% set carousel_items = latest|map(attribute='thumbnail')|selectattr('data_mime')|list %}
+        {% set carousel_items = latest_items|map(attribute='thumbnail')|selectattr('data_mime')|list %}
         {% if carousel_items %}
           <div id="carouselPictures" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -62,17 +63,12 @@
     <div class="card mt-2">
       <div class="card-body text-center">
         <h6 class="card-subtitle mb-2 text-muted">
-          Latest items
+          Latest items ({{ latest_items|count }})
         </h6>
-        {% set latest_items = [] %}
-        {% for item in latest %}
-          {% set tmp = latest_items.append({
-            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%M:%S'),
-            'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
-            'count': item.count_hit,
-          }) %}
-        {% endfor %}
-        {{ lib.list_table(latest_items, {'date': 'Date', 'url': 'URL', 'count': 'Views' }) }}
+        {{ lib.list_table(latest_items,
+          {'date_last_seen': 'Date', 'item.url': 'URL', 'count_hit': 'Views' },
+          {'date_last_seen': '{{ value|date_format("%Y-%m-%d %H:%M:%S") }}', 'item.url': '<a href="{{ value }}" target="_blank">{{ value }}</a>'}
+        ) }}
       </div>
     </div>
   </div>
@@ -82,17 +78,12 @@
     <div class="card mt-2">
       <div class="card-body text-center">
         <h6 class="card-subtitle mb-2 text-muted">
-          Top items
+          Top items ({{ top_items|count }})
         </h6>
-        {% set latest_items = [] %}
-        {% for item in display.get_top_items(10) %}
-          {% set tmp = latest_items.append({
-            'date': item.date_last_seen|date_format('%Y-%m-%d %H:%M:%S'),
-            'url': ('<a href="' + item.item.url + '" target="_blank">' + item.item.url + '</a>')|safe,
-            'count': item.count_hit,
-          }) %}
-        {% endfor %}
-        {{ lib.list_table(latest_items, {'date': 'Date', 'url': 'URL', 'count': 'Views' }) }}
+        {{ lib.list_table(top_items,
+          {'date_last_seen': 'Date', 'item.url': 'URL', 'count_hit': 'Views' },
+          {'date_last_seen': '{{ value|date_format("%Y-%m-%d %H:%M:%S") }}', 'item.url': '<a href="{{ value }}" target="_blank">{{ value }}</a>'}
+        ) }}
       </div>
     </div>
   </div>
