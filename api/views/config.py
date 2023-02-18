@@ -176,6 +176,12 @@ class FinishingSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config']
 
 
+class ContextSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.FrameContext
+        fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config']
+
+
 class NextItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Item
@@ -311,6 +317,14 @@ class FinishingDisplayViewSet(BaseViewSet):
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
         return self.qs().finishings.filter(frame__display__id=_display_id)
+
+
+class ContextDisplayViewSet(BaseViewSet):
+    serializer_class = ContextSerializer
+
+    def get_queryset(self):
+        _display_id = self.kwargs.get('display_id')
+        return self.qs().contexts.filter(frame__display__id=_display_id)
 
 
 

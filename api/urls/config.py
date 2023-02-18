@@ -15,6 +15,7 @@ router.register('displays/(?P<display_id>[0-9]+)/items/all', views.ItemDisplayVi
 router.register('displays/(?P<display_id>[0-9]+)/items/hits', views.HitItemDisplayViewSet, 'display_item_hit')
 router.register('displays/(?P<display_id>[0-9]+)/items/next', views.NextItemDisplayViewSet, 'display_item_next')
 router.register('displays/(?P<display_id>[0-9]+)/finishings', views.FinishingDisplayViewSet, 'display_finishing')
+router.register('displays/(?P<display_id>[0-9]+)/contexts', views.ContextDisplayViewSet, 'display_context')
 router.register('displays/(?P<display_id>[0-9]+)/status', views.StatusDisplayViewSet, 'display_status')
 
 urlpatterns = [

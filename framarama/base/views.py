@@ -84,6 +84,9 @@ class BaseQuerySetMixin:
               'finishings': (
                   _user.qs_finishings if hasattr(_user, 'qs_finishings') else
                   models.Finishing.objects).filter(frame__user=_user),
+              'contexts': (
+                  _user.qs_contexts if hasattr(_user, 'qs_contexts') else
+                  models.FrameContext.objects).filter(frame__user=_user),
             })
         return self._qs
 
