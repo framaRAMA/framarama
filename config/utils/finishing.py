@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 
 from framarama.base.utils import Filesystem
 from config import models
-from config.plugins import FinishingPluginRegistry
+from config.plugins import FinishingPluginRegistry, ContextPluginRegistry
 from config.utils import context
 
 
@@ -223,6 +223,18 @@ class Processor:
         }]
         return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
 
+    def _register_context_resolvers(self, image):
+        _resolvers = {}
+        for _context in self._context.get_contexts():
+            if not _context.enabled:
+                continue
+            _plugin = ContextPluginRegistry.get(_context.plugin)
+            _instance = _plugin.create_model(_context)
+            _resolvers.update(_plugin.run(_instance, image, self._context))
+        print(_resolvers)
+        for _name, _resolver in _resolvers.items():
+            self._context.set_resolver(_name, _resolver)
+
     def process(self):
         _item = self._context.get_item()
         if not _item.url:
@@ -268,7 +280,8 @@ class Processor:
                 _image.add_images(_image_in.get_images())
 
             _image_meta = _adapter.image_meta(_image) if _image.get_images() else {}
-            _image_exif = _adapter.image_exif(_image) if _image.get_images() else {}
+
+            self._register_context_resolvers(_image)
 
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
@@ -277,7 +290,6 @@ class Processor:
             self._context.set_resolver('env', context.EnvironmentResolver())
             self._context.set_resolver('image', context.MapResolver(_image_meta))
             self._context.set_resolver('images', context.MapResolver(_image_metas))
-            self._context.set_resolver('exif', context.MapResolver(_image_exif))
 
             logger.info("Input: {} = {}".format(_images_in, _image))
             _image_out = _plugin.run(self._context.evaluate_model(_finishing), _image, self._context)
