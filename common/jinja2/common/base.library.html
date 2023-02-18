@@ -525,7 +525,7 @@
   </div>
 {% endmacro %}
 
-{% macro list_table(items, columns={}) %}
+{% macro list_table(items, columns={}, templates={}) %}
   <table class="table">
     <thead>
       <tr>
@@ -536,7 +536,13 @@
       {% for item in items %}
         <tr>
           {% for col in columns %}
-            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>{{ item|getattr(col) }}</th>
+            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>
+              {% if col in templates %}
+                {{ templates[col]|template({'value':item|getattr(col)})|safe }}
+              {% else %}
+                {{ item|getattr(col) }}
+              {% endif %}
+            </th>
           {% endfor %}
         </tr>
       {% endfor %}

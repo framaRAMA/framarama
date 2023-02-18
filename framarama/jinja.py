@@ -3,7 +3,7 @@ import base64
 from django.templatetags.static import static
 from django.urls import reverse
 
-from jinja2 import Environment
+from jinja2 import Environment, Template, BaseLoader
 
 
 def reverse_exists(*args, **kwargs):
@@ -50,6 +50,11 @@ def get_attribute(value, key):
     return value
 
 
+def template(value, context):
+    template = environment(loader=BaseLoader()).from_string(value)
+    return template.render(context)
+
+
 def environment(**options):
     env = Environment(**options)
     env.globals.update({
@@ -63,5 +68,6 @@ def environment(**options):
         'date_format': date_format,
         'b64decode': b64decode,
         'b64encode': b64encode,
+        'template': template,
     })
     return env
