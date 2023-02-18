@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 class Context:
     DEFAULT_IMAGE_NAME = 'default'
 
-    def __init__(self, display, frame, item, finishings, adapter):
+    def __init__(self, display, frame, contexts, item, finishings, adapter):
         self._display = display
         self._frame = frame
+        self._contexts = contexts
         self._item = item
         self._finishings = finishings
         self._image_data = {}
@@ -38,6 +39,9 @@ class Context:
     
     def get_frame(self):
         return self._frame
+
+    def get_contexts(self):
+        return self._contexts
     
     def get_item(self):
         return self._item

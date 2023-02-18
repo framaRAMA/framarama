@@ -324,7 +324,7 @@ class FrontendDevice(Singleton):
     def monitor(self):
         return self._monitor
 
-    def finish(self, display, item, finishings):
+    def finish(self, display, contexts, item, finishings):
         _capability = self.get_capability()
         _mem_total = _capability.mem_total()
         _mem_free = _capability.mem_free()
@@ -339,6 +339,7 @@ class FrontendDevice(Singleton):
         _context = finishing.Context(
             display.display(),
             display.frame(),
+            contexts,
             item,
             finishings.items(),
             _adapter)

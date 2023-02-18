@@ -432,6 +432,7 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
             _finishing_context = finishing.Context(
                 _display,
                 _frame,
+                _frame.contexts.all(),
                 _item,
                 _frame.finishings.all(),
                 finishing.WandImageProcessingAdapter())
