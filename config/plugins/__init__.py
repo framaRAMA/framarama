@@ -3,6 +3,7 @@ import importlib
 import config.plugins.sources
 import config.plugins.sortings
 import config.plugins.finishings
+import config.plugins.contexts
 import config.models as models
 
 
@@ -149,4 +150,10 @@ class FinishingPluginRegistry(PluginRegistry):
     def _get_base_module(cls):
         return finishings
 
+
+class ContextPluginRegistry(PluginRegistry):
+
+    @classmethod
+    def _get_base_module(cls):
+        return contexts
 

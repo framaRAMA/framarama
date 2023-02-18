@@ -350,6 +350,24 @@ class Finishing(PluginModel):
         return re.split(r' |,', self.image_out) if self.image_out else default
 
 
+class FrameContext(PluginModel):
+    STR_FIELDS = PluginModel.STR_FIELDS + ["name", "enabled"]
+
+    CAT_EXIF = 'shape'
+
+    frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='contexts')
+    ordering = models.IntegerField()
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Name', help_text='Name to access the context data (use lowercase and single word)')
+    enabled = models.BooleanField(
+        verbose_name='Enabled')
+
+    class Meta:
+        db_table = 'config_frame_context'
+        ordering = ['ordering']
+
+
 class Display(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["name"]
 

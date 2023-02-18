@@ -107,6 +107,16 @@ class BaseFinishingFrameConfigView(BaseFrameConfigView):
         return _context
 
 
+class BaseContextFrameConfigView(BaseFrameConfigView):
+
+    def _get(self, request, frame_id, context_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _frame_context = _frame.contexts.get(pk=context_id)
+        _context['context'] = _frame_context
+        return _context
+
+
 class BaseDisplayConfigView(BaseConfigView):
 
     def _get(self, request, display_id, *args, **kwargs):

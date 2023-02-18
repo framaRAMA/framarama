@@ -443,3 +443,87 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
         return _context
 
 
+class ListContextFrameView(base.BaseFrameConfigView):
+    template_name = 'config/frame.context.list.html'
+
+    def _get(self, request, frame_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _contexts = []
+        for _finishing_context in list(_frame.contexts.all()):
+            _plugin = plugins.ContextPluginRegistry.get(_finishing_context.plugin)
+            _contexts.append(_plugin.create_model(_finishing_context))
+        _context['contexts'] = _contexts
+        _context['context_plugins'] = plugins.ContextPluginRegistry.all()
+        return _context
+
+
+class CreateContextFrameView(base.BaseFrameConfigView):
+    template_name = 'config/frame.context.create.html'
+
+    def _get(self, request, frame_id, plugin, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _plugin = plugins.ContextPluginRegistry.get(plugin)
+        _context['plugin'] = _plugin
+        _context['form'] = _plugin.get_create_form()
+        return _context
+
+    def _post(self, request, frame_id, plugin, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _plugin = plugins.ContextPluginRegistry.get(plugin)
+        _frame = _context['frame']
+        _form = _plugin.get_create_form(request.POST)
+        if _form.is_valid():
+            _model = _form.save(commit=False)
+            _model.ordering = _frame.contexts.count()
+            _model.plugin = _plugin.name
+            _model.frame = _frame
+            _plugin.save_model(_model)
+            self.redirect(_context, 'frame_context_list', args=[_frame.id])
+        _context['plugin'] = _plugin
+        _context['form'] = _form
+        return _context
+
+
+class UpdateContextFrameView(base.BaseContextFrameConfigView):
+    template_name = 'config/frame.context.update.html'
+
+    def _get(self, request, frame_id, context_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, context_id, *args, **kwargs)
+        _frame_context = _context['context']
+        _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
+        _frame_context = _finishing_plugin.load_model(finishing_id)
+        _form = _context_plugin.get_update_form(instance=_frame_context)
+        _context['form'] = _form
+        return _context
+
+    def _post(self, request, frame_id, finishing_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
+        _frame = _context['frame']
+        _frame_context = _context['context']
+        _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
+        _frame_context = _context_plugin.load_model(finishing_id)
+        _form = _context_plugin.get_update_form(request.POST, instance=_frame_context)
+        if _form.is_valid():
+            _frame_context = _form.save(commit=False)
+            _context_plugin.save_model(_frame_context)
+            self.redirect(_context, 'frame_context_list', args=[_frame.id])
+        _context['form'] = _form
+        return _context
+
+
+class ActionContextFrameView(base.BaseContextFrameConfigView):
+
+    def _get(self, request, frame_id, context_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, context_id, *args, **kwargs)
+        _frame = _context['frame']
+        _frame_context = _context['context']
+        _action = request.GET['action']
+        if _action == 'delete':
+            self._item_order_delete(_frame_context.pk, _frame.contexts)
+        elif _action == 'up' or _action == 'down':
+            self._item_order_move(_action, _frame_context, _frame.contexts)
+        self.redirect(_context, 'frame_context_list', args=[_frame.id])
+        return _context
+
+

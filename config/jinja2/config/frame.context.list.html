@@ -1,0 +1,57 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+
+<ul class="list-group list-group-light">
+{% for context in contexts %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <div class="position-absolute">
+        <a href="{{ url('frame_context_action', args=[frame.id, context.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
+        <a href="{{ url('frame_context_action', args=[frame.id, context.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
+      </div>
+      <div class="ms-5 fw-bold {% if not context.enabled %}text-muted{% endif %}">
+        {{ loop.index }}. {{ context.name }}
+        <span class="badge rounded-pill badge-success">
+          {{ lib.icon('context.plugin.'+context_plugins[context.plugin].cat) }}
+          {{ context.plugin }}
+        </span>
+      </div>
+      <div class="ms-5 text-muted smaller font-monospace">
+        {% for field_name, field_value in context.get_field_values().items() %}
+          {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+            <strong>{{ context.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    <div class="ms-0 pt-2 pb-2">
+      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
+        <a href="{{ url('frame_context_edit', args=[frame.id, context.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit', '') }}</a>
+        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteFinishingContext%s'|format(context.id) }}">{{ lib.icon('action.delete', '') }}</a>
+      </div>
+    </div>
+    {{ lib.modal_delete('deleteFinishingContext%s'|format(context.id), 'Delete context', 'Do you really want to delete the selected context "%s"?'|format(context.name), url('frame_context_action', args=[frame.id, context.id])+'?action=delete') }}
+  </li>
+{% else %}
+  <div class="col-12 pt-2">
+    {{ lib.note('No context defined. Click on the add button to create a new one.', 'info') }}
+  </div>
+{% endfor %}
+</ul>
+
+{{ lib.nav_actions([
+  {'icon': 'action.add', 'modal': 'createFinishingContext', 'type': 'success'},
+]) }}
+
+{{ lib.modal_start('createFinishingContext', 'Select context to create', classes='modal-fullscreen-lg-down modal-xl') }}
+  <div class="row">
+  {% for name, context_plugin in context_plugins.items() %}
+    {{ lib.card_item(context_plugin.title, context_plugin.descr, actions=[
+        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_context_create', args=[frame.id, name])}
+    ], icon=lib.icon('context.plugin.' + context_plugin.cat)) }}
+  {% endfor %}
+  </div>
+{{ lib.modal_end() }}
+
+{% endblock %}

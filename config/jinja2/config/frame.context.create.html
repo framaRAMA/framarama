@@ -1,0 +1,8 @@
+{% extends "config/base.frame.html" %}
+
+{% block content_frame %}
+{{ lib.form_start(form, csrf_input, 'Add context') }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_class="btn-success", cancel=url('frame_context_list', args=[frame.id])) }}
+{% endblock %}
+

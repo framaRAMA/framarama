@@ -157,4 +157,27 @@ class UpdateFinishingForm(BasePluginForm):
         return self._field_groups(UpdateFinishingForm.Meta.fields)
 
 
+class CreateContextForm(BasePluginForm):
+    class Meta:
+        model = models.FrameContext
+        fields = ['name', 'enabled']
+        widgets = {
+            'name': base.charFieldWidget(),
+            'enabled': base.booleanFieldWidget(),
+        }
+    def field_groups(self):
+        return self._field_groups(CreateContextForm.Meta.fields)
+
+
+class UpdateContextForm(BasePluginForm):
+    class Meta:
+        model = models.FrameContext
+        fields = ['name', 'enabled']
+        widgets = {
+            'name': base.charFieldWidget(),
+            'enabled': base.booleanFieldWidget(),
+        }
+    def field_groups(self):
+        return self._field_groups(UpdateContextForm.Meta.fields)
+
 

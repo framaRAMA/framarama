@@ -36,6 +36,10 @@ urlpatterns = [
     path('frames/<int:frame_id>/finishings/create?plugin=<str:plugin>', frame.CreateFinishingFrameView.as_view(), name='frame_finishing_create'),
     path('frames/<int:frame_id>/finishings/<int:finishing_id>/edit', frame.UpdateFinishingFrameView.as_view(), name='frame_finishing_edit'),
     path('frames/<int:frame_id>/finishings/<int:finishing_id>/action', frame.ActionFinishingFrameView.as_view(), name='frame_finishing_action'),
+    path('frames/<int:frame_id>/contexts', frame.ListContextFrameView.as_view(), name='frame_context_list'),
+    path('frames/<int:frame_id>/contexts/create?plugin=<str:plugin>', frame.CreateContextFrameView.as_view(), name='frame_context_create'),
+    path('frames/<int:frame_id>/contexts/<int:context_id>/edit', frame.UpdateContextFrameView.as_view(), name='frame_context_edit'),
+    path('frames/<int:frame_id>/contexts/<int:context_id>/action', frame.ActionContextFrameView.as_view(), name='frame_context_action'),
 
     path('frames/<int:frame_id>/images/preview', frame.PreviewImageFrameView.as_view(), name='frame_image_preview'),
 

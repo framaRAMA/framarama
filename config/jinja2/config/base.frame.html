@@ -17,6 +17,9 @@
     <a class="nav-link{{ lib.nav_active(request, 'frame_finishing_list', args=[frame.id]) }}" href="{{ url('frame_finishing_list', args=[frame.id]) }}">{{ lib.icon('frames.finishing') }}<span class="d-none d-lg-inline"> Finishing</span></a>
   </li>
   <li class="nav-item">
+    <a class="nav-link{{ lib.nav_active(request, 'frame_context_list', args=[frame.id]) }}" href="{{ url('frame_context_list', args=[frame.id]) }}">{{ lib.icon('frames.context') }}<span class="d-none d-lg-inline"> Context</span></a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
   </li>
 </ul>
