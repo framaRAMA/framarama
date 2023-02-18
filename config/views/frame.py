@@ -377,7 +377,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
 
     def _get(self, request, frame_id, finishing_id, *args, **kwargs):
         _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
-        _finishing = self.qs().finishings.filter(pk=finishing_id).get()
+        _finishing = _context['finishing']
         _finishing_plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
         _finishing= _finishing_plugin.load_model(finishing_id)
         _form = _finishing_plugin.get_update_form(instance=_finishing)
