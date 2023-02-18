@@ -227,6 +227,7 @@ class Display(Singleton):
         self._items = None
         self._next = None
         self._finishings = None
+        self._contexts = None
 
     def display(self):
         return self._data.item()
@@ -293,6 +294,11 @@ class Display(Singleton):
         if self._next is None or refresh:
             self._next = self._client.get_items_next(self.get_id(), hit)
         return self._next
+
+    def get_contexts(self, refresh=False):
+        if self._contexts is None or refresh:
+            self._contexts = self._client.get_contexts(self.get_id())
+        return self._contexts
 
     def get_finishings(self, refresh=False):
         if self._finishings is None or refresh:

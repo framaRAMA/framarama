@@ -128,6 +128,11 @@ class ApiClient(Singleton):
             _data['thumbnail'] = _thumbnail
         self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, _data)
 
+    def get_contexts(self, display_id):
+        return ApiResultList(
+            self._request('/displays/{}/contexts'.format(display_id)),
+            lambda d: config_models.FrameContext(**d))
+
     def get_finishings(self, display_id):
         return ApiResultList(
             self._request('/displays/{}/finishings'.format(display_id)),
