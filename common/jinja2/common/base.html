@@ -1,4 +1,4 @@
-{% import "config/base.library.html" as lib %}
+{% import "common/base.library.html" as lib %}
 {{ lib.html_start() }}
   {% if user.is_authenticated %}
     {{ lib.html_nav(request, config, user) }}
