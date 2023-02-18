@@ -34,8 +34,7 @@ class DatabaseRouter:
             return
         params = connections[route].get_connection_params()
         params = {name: value for name, value in params.items() if name in ['database', 'host', 'user']}
-        cls = cls if type(cls) == type else type(cls)
-        logger.debug("DB for \"{}\" routed to \"{}\" {}".format(cls.__name__, route, params));
+        logger.debug("DB for \"{}\" routed to \"{}\" {}".format(cls, route, params));
 
     def _init(self):
         if DatabaseRouter.config is None:
@@ -46,23 +45,29 @@ class DatabaseRouter:
                 return False
         return True
 
-    def _route(self, model):
-        if model == models.Config:
-            self._dump(model, 'default')
-            return 'default'
+    def _route_app(self, app_label):
         if not self._init():
-            self._dump(model, 'default')
-            return 'default'
+            self._dump(app_label, 'default')
+            return None
         _config = DatabaseRouter.config
         if _config.mode == 'local' and _config.local_db_type == 'local':
             _routing = DatabaseRouter.routing['local']
         else:
             _routing = DatabaseRouter.routing['remote']
-        _app_label = model._meta.app_label
-        _route = _routing[_app_label] if _app_label in _routing else None
-        _route = _route if _route in connections else 'default'
-        self._dump(model, _route)
+        _route = _routing[app_label] if app_label in _routing else None
+        _route = _route if _route in connections else None
+        self._dump(app_label, _route)
         return _route
+
+    def _route_model(self, model):
+        if model == models.Config:
+            self._dump(model.__name__, 'default')
+            return None
+        return self._route_app(model._meta.app_label)
+
+    def _route(self, model):
+        _route = self._route_model(model)
+        return _route if _route else 'default'
 
     def db_for_read(self, model, **hints):
         return self._route(model)
@@ -72,13 +77,13 @@ class DatabaseRouter:
 
     def allow_relation(self, obj1, obj2, **hints):
         _route1 = self._route(obj1)
+        _route1 = _route1 if _route1 else 'default'
         _route2 = self._route(obj2)
+        _route2 = _route2 if _route2 else 'default'
         if _route1 and _route2 and _route1 == _route2:
             return True
         return False
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
-        if app_label in self.routing:
-            return db == self.routing[app_label]
-        return False
+        return True
 
