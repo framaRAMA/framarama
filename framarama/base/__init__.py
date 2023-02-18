@@ -75,10 +75,10 @@ class DatabaseRouter:
         _route2 = self._route(obj2)
         if _route1 and _route2 and _route1 == _route2:
             return True
-        return None
+        return False
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         if app_label in self.routing:
             return db == self.routing[app_label]
-        return None
+        return False
 
