@@ -339,7 +339,7 @@ class FrontendDevice(Singleton):
         _context = finishing.Context(
             display.display(),
             display.frame(),
-            contexts,
+            contexts.items(),
             item,
             finishings.items(),
             _adapter)
