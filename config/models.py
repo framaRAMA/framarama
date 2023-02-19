@@ -353,7 +353,8 @@ class Finishing(PluginModel):
 class FrameContext(PluginModel):
     STR_FIELDS = PluginModel.STR_FIELDS + ["name", "enabled"]
 
-    CAT_EXIF = 'shape'
+    CAT_EXIF = 'exif'
+    CAT_GEO = 'geo'
 
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='contexts')
     ordering = models.IntegerField()

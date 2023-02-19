@@ -46,7 +46,7 @@ class GeoUpdateForm(UpdateContextForm):
 
 
 class Implementation(PluginImplementation):
-    CAT = FrameContext.CAT_EXIF
+    CAT = FrameContext.CAT_GEO
     TITLE = 'Geo'
     DESCR = 'Provide geo location information of image'
 
