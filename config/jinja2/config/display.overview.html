@@ -66,8 +66,8 @@
           Latest items ({{ latest_items|count }})
         </h6>
         {{ lib.list_table(latest_items,
-          {'date_last_seen': 'Date', 'item.url': 'URL', 'count_hit': 'Views' },
-          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item.url': '<a href="{{ value }}" target="_blank">{{ value }}</a>'}
+          {'date_last_seen': 'Date', 'item': 'URL', 'count_hit': 'Views' },
+          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="{{ value.url }}" target="_blank" title="Item #{{ value.id }}">{{ value.url }}</a>'}
         ) }}
       </div>
     </div>
@@ -81,8 +81,8 @@
           Top items ({{ top_items|count }})
         </h6>
         {{ lib.list_table(top_items,
-          {'date_last_seen': 'Date', 'item.url': 'URL', 'count_hit': 'Views' },
-          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item.url': '<a href="{{ value }}" target="_blank">{{ value }}</a>'}
+          {'date_last_seen': 'Date', 'item': 'URL', 'count_hit': 'Views' },
+          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="{{ value.url }}" target="_blank" title="Item #{{ value.id }}">{{ value.url }}</a>'}
         ) }}
       </div>
     </div>
