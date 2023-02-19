@@ -290,7 +290,7 @@ class Display(Singleton):
         _thumbnail = frontend_item.preview()
         self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime)
 
-    def get_next_item(self, refresh=False, hit=True):
+    def get_next_item(self, refresh=False, hit=False):
         if self._next is None or refresh:
             self._next = self._client.get_items_next(self.get_id(), hit)
         return self._next
