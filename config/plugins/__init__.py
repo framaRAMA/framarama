@@ -80,12 +80,12 @@ class Plugin:
         return self.impl.UpdateForm(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        _instance = kwargs.pop('instance', None)
-        if _instance:
-            if _instance not in self._instances:
-                self._instances[_instance] = self.impl()
-            return self._instances[_instance].run(*args, **kwargs)
-        return self.impl().run(*args, **kwargs)
+        return self.run_instance('__default__', *args, **kwargs)
+
+    def run_instance(self, instance, *args, **kwargs):
+        if instance not in self._instances:
+            self._instances[instance] = self.impl()
+        return self._instances[instance].run(*args, **kwargs)
 
 
 class PluginRegistry:
