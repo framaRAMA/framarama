@@ -114,6 +114,19 @@ class PluginRegistry:
         return _registry[name] if name in _registry else None
 
     @classmethod
+    def get_enabled(cls, models):
+        _plugins = []
+        for _model in models:
+            if not _model.enabled:
+                continue
+            _plugin = cls.get(_model.plugin)
+            if not _plugin:
+                logger.warn("Unknown {} plugin {} - skipping.".format(cls.__name__, _model.plugin))
+                continue
+            _plugins.append((_plugin, _plugin.create_model(_model)))
+        return _plugins
+
+    @classmethod
     def all(cls):
         return cls._get_instance()._registry
 

@@ -253,15 +253,8 @@ class Processor:
         })])
         _finishings.extend(list(self._context.get_finishings()))
         _finishings.extend(self._watermark)
-        for _finishing in _finishings:
-            if not _finishing.enabled:
-                continue
+        for _plugin, _finishing in FinishingPluginRegistry.get_enabled(_finishings):
             logger.info("Processing finishing {}".format(_finishing))
-            _plugin = FinishingPluginRegistry.get(_finishing.plugin)
-            if not _plugin:
-                logger.warn("Unknown plugin {} - skipping.".format(_finishing.plugin))
-                continue
-            _finishing = _plugin.create_model(_finishing)
 
             _images_in = _finishing.get_image_names_in([Context.DEFAULT_IMAGE_NAME])
             _images_out = _finishing.get_image_names_out([Context.DEFAULT_IMAGE_NAME])

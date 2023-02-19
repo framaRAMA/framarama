@@ -41,15 +41,7 @@ Item = models.Item.objects
         _result = {'errors':{}}
         _queries = []
         _data = self._context.get_data()
-        for _sorting in self._context.get_frame().sortings.all():
-            if not _sorting.enabled:
-                continue
-            _plugin = SortingPluginRegistry.get(_sorting.plugin)
-            if not _plugin:
-                logger.warn("Unknown plugin {} - skipping.".format(_sorting.plugin))
-                continue
-            _sorting = _plugin.load_model(_sorting.id)
-
+        for _plugin, _sorting in SortingPluginRegistry.get_enabled(self._context.get_frame().sortings.all()):
             _code = _plugin.run(_sorting, self._context)
             _code = re.sub(r"[\r\n]+\s*", "", _code)  # fix indent by removing newline/whitespaces
             try:
