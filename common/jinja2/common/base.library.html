@@ -538,11 +538,12 @@
     </thead>
     <tbody>
       {% for item in items %}
+        {% set ploop = loop %}
         <tr>
           {% for col in columns %}
             <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>
               {% if col in templates %}
-                {{ templates[col]|template({'value':item|getattr(col)})|safe }}
+                {{ templates[col]|template({'loop':ploop, 'value':item|getattr(col)})|safe }}
               {% else %}
                 {{ item|getattr(col) }}
               {% endif %}
