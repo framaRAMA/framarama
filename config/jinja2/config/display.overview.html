@@ -67,10 +67,13 @@
         </h6>
         {{ lib.list_table(latest_items,
           {'date_last_seen': 'Date', 'item': 'URL', 'count_hit': 'Views' },
-          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="{{ value.url }}" target="_blank" title="Item #{{ value.id }}">{{ value.url }}</a>'}
+          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="#" data-bs-toggle="modal" data-bs-target="#displayImageTop{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}
         ) }}
       </div>
     </div>
+    {% for item in latest_items %}
+      {{ lib.modal_image('displayImageLatest%s'|format(loop.index), item.item.url, item.item.url) }}
+    {% endfor %}
   </div>
 
 
@@ -82,10 +85,13 @@
         </h6>
         {{ lib.list_table(top_items,
           {'date_last_seen': 'Date', 'item': 'URL', 'count_hit': 'Views' },
-          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="{{ value.url }}" target="_blank" title="Item #{{ value.id }}">{{ value.url }}</a>'}
+          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="#" data-bs-toggle="modal" data-bs-target="#displayImageTop{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}
         ) }}
       </div>
     </div>
+    {% for item in top_items %}
+      {{ lib.modal_image('displayImageTop%s'|format(loop.index), item.item.url, item.item.url) }}
+    {% endfor %}
   </div>
 
 </div>
