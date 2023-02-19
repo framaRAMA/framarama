@@ -616,6 +616,12 @@
 {% macro modal_confirm(id, title, message, submit, submit_title) %}
   {{ modal_start(id, title) }}
     <strong>{{ message }}</strong>
+  {{ modal_end(cancel_title='Close') }}
+{% endmacro %}
+
+{% macro modal_image(id, title, img) %}
+  {{ modal_start(id, title, 'modal-fullscreen') }}
+    <a href="#" data-bs-dismiss="modal"><img src="{{ img }}" class="w-100 h-100" style="object-fit: contain;" loading="lazy"/></a>
   {{ modal_end(submit=submit, submit_class='btn-primary', submit_title=submit_title, cancel_title='Close') }}
 {% endmacro %}
 
