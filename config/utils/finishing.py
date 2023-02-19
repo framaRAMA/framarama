@@ -223,15 +223,10 @@ class Processor:
         }]
         return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
 
-    def _register_context_resolvers(self, image):
+    def _register_context_resolvers(self, plugins, image):
         _resolvers = {}
-        for _context in self._context.get_contexts():
-            if not _context.enabled:
-                continue
-            _plugin = ContextPluginRegistry.get(_context.plugin)
-            _instance = _plugin.create_model(_context)
-            _resolvers.update(_plugin.run(_instance, image, self._context))
-        print(_resolvers)
+        for _plugin, _model in plugins:
+            _resolvers.update(_plugin.run(_model, image, self._context))
         for _name, _resolver in _resolvers.items():
             self._context.set_resolver(_name, _resolver)
 
@@ -245,6 +240,7 @@ class Processor:
         _frame= self._context.get_frame()
         if not _frame.enabled:
             return None
+        _context_plugins = ContextPluginRegistry.get_enabled(self._context.get_contexts())
         logger.info("Finishing {}".format(_item))
         _adapter = self._context.get_adapter()
         _finishings = []
@@ -274,7 +270,7 @@ class Processor:
 
             _image_meta = _adapter.image_meta(_image) if _image.get_images() else {}
 
-            self._register_context_resolvers(_image)
+            self._register_context_resolvers(_context_plugins, _image)
 
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
