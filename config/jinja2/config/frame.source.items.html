@@ -3,8 +3,12 @@
 {% block content_frame_source %}
 
 {{ lib.list_paginator('il1', 'Item list', items, url('frame_source_images', args=[frame.id, source.id])) }}
-{{ lib.list_table(items, {'id':'ID', 'url':'URL'}, {'url':'<a href="{{ value }}" target="_blank">{{ value }}</a>'}) }}
+{{ lib.list_table(items, {'id':'ID', '__dict__':'URL'}, {'__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}) }}
 {{ lib.list_paginator('il2', '', items, url('frame_source_images', args=[frame.id, source.id])) }}
+
+{% for item in items %}
+  {{ lib.modal_image('itemImage%s'|format(loop.index), item.url, item.url) }}
+{% endfor %}
 
 {% endblock %}
 

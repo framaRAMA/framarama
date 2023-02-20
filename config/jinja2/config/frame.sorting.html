@@ -59,8 +59,12 @@
 {% endif %}
  
 {{ lib.list_paginator('il1', 'Sorted item list preview', items, url('frame_sorting_list', args=[frame.id])) }}
-{{ lib.list_table(items, {'rank': 'Rank', 'id': 'ID', 'url':'URL', 'date_creation': 'Date'}) }}
+{{ lib.list_table(items, {'rank': 'Rank', 'id': 'ID', '__dict__':'URL', 'date_creation': 'Date'}, {'__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}) }}
 {{ lib.list_paginator('il2', '', items, url('frame_sorting_list', args=[frame.id]), pages=10) }}
+
+{% for item in items %}
+  {{ lib.modal_image('itemImage%s'|format(loop.index), item.url, item.url) }}
+{% endfor %}
 
 {{ lib.modal_start('createSorting', 'Select sorting to create', classes='modal-fullscreen-lg-down modal-xl') }}
   <div class="row">
