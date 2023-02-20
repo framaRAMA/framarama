@@ -620,6 +620,9 @@
 {% endmacro %}
 
 {% macro modal_image(id, title, img) %}
+  {% if title.startswith('http://') or title.startswith('https://') %}
+    {% set title = '<a href="{}" target="_blank"><span class="text-uppercase">{}</span></a>'.format(title, title.split('/')[-1])|safe %}
+  {% endif %}
   {{ modal_start(id, title, 'modal-fullscreen') }}
     <a href="#" data-bs-dismiss="modal"><img src="{{ img }}" class="w-100 h-100" style="object-fit: contain;" loading="lazy"/></a>
   {{ modal_end(submit=submit, submit_class='btn-primary', submit_title=submit_title, cancel_title='Close') }}
