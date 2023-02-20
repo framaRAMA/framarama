@@ -67,7 +67,7 @@
         </h6>
         {{ lib.list_table(latest_items,
           {'date_last_seen': 'Date', 'item': 'URL', 'count_hit': 'Views' },
-          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="#" data-bs-toggle="modal" data-bs-target="#displayImageTop{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}
+          {'date_last_seen': '{{ value|date_format("%d.%m.%Y %H:%M") }}', 'item': '<a href="#" data-bs-toggle="modal" data-bs-target="#displayImageLatest{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}
         ) }}
       </div>
     </div>
