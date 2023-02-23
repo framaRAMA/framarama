@@ -31,11 +31,11 @@ def date_format(value, format="%H:%M %d-%m-%y"):
 
 
 def b64decode(value):
-    return base64.b64decode(value).encode()
+    return base64.b64decode(value).encode() if value else None
 
 
 def b64encode(value):
-    return base64.b64encode(value).decode()
+    return base64.b64encode(value).decode() if value else None
 
 
 def get_attribute(value, key):
