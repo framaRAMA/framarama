@@ -40,6 +40,8 @@ def b64encode(value):
 
 def get_attribute(value, key):
     if type(key) == str:
+        if ':' in key:
+            key = key.split(':')[1]
         key = key.split('.')
     if len(key) > 0:
         if type(value) == dict:
