@@ -10,6 +10,7 @@ from apscheduler.events import EVENT_JOB_SUBMITTED, EVENT_JOB_EXECUTED, EVENT_JO
 class Scheduler:
     JOB_PARAM_FUNC = '__func'
     JOB_PARAM_NAME = 'name'
+    JOB_PARAM_MODE = 'mode'
 
     def __init__(self):
         self._scheduler = BackgroundScheduler()
@@ -33,6 +34,14 @@ class Scheduler:
         _func_kwargs = kwargs.pop('func_kwargs', {})
         self._scheduler.add_job(lambda *args, **kwargs: func(*args, **kwargs), id=job_id, args=_func_args, kwargs=_func_kwargs, *args, **kwargs)
 
+    def _job_id(self, job_id, instance=None, suffix=None):
+        return "{}{}{}{}{}".format(
+            job_id,
+            '_' if instance else '',
+            instance if instance else '',
+            '_' if suffix else '',
+            suffix if suffix else '')
+
     def run_job(self, job_id, func, delay=None, *args, **kwargs):
         if delay:
             _run_date = timezone.now() + datetime.timedelta(seconds=delay)
@@ -49,16 +58,19 @@ class Scheduler:
     def get_job(self, job_id):
         return self._scheduler.get_job(job_id)
 
-    def register_job(self, job_id, func, **kwargs):
+    def register_job(self, job_id, func, manually=False, **kwargs):
         _job = kwargs.copy()
         _job[Scheduler.JOB_PARAM_FUNC] = func
+        _job[Scheduler.JOB_PARAM_MODE] = 'manual' if manually else 'auto'
         self._jobs[job_id] = _job
 
     def enable_job(self, job_id):
         if job_id in self._jobs and not self.get_job(job_id):
             _job = self._jobs.get(job_id).copy()
             _func = _job.pop(Scheduler.JOB_PARAM_FUNC)
-            self.add_job(job_id, _func, **_job)
+            _mode = _job.pop(Scheduler.JOB_PARAM_MODE)
+            if _mode == 'auto':
+                self.add_job(job_id, _func, **_job)
 
     def enable_jobs(self, job_ids=None):
         for job_id in job_ids if job_ids else self._jobs.keys():
@@ -66,27 +78,32 @@ class Scheduler:
 
     def disable_job(self, job_id):
         if job_id in self._jobs and self._scheduler.get_job(job_id):
-            self.remove_job(job_id)
+            _job = self._jobs.get(job_id).copy()
+            _mode = _job.pop(Scheduler.JOB_PARAM_MODE)
+            if _mode == 'auto':
+                self.remove_job(job_id)
 
     def disable_jobs(self, job_ids=None):
         for job_id in job_ids if job_ids else self._jobs.keys():
             self.disable_job(job_id)
 
-    def trigger_job(self, job_id, delay=None, *args, **kwargs):
+    def trigger_job(self, job_id, instance=None, delay=None, *args, **kwargs):
         if job_id in self._jobs:
             _job = self._jobs.get(job_id)
             _func = _job.get(Scheduler.JOB_PARAM_FUNC)
             _name = _job.get(Scheduler.JOB_PARAM_NAME) + ' triggered'
-            _job_id = job_id + '_' + str(time.time())
+            _job_id = self._job_id(job_id, instance, time.time())
             self.run_job(_job_id, _func, name=_name, delay=delay, func_args=args, func_kwargs=kwargs)
             return _job_id
 
-    def running_jobs(self, job_id, starts_with=False):
+    def running_jobs(self, job_id, instance=None, starts_with=False, names=False):
+        _job_id = self._job_id(job_id, instance)
         if starts_with:
-            _compare = lambda job: job.startswith(job_id)
+            _compare = lambda job: job.startswith(_job_id)
         else:
-            _compare = lambda job: job == job_id
-        return len([_job for _job in self._running if _compare(_job)])
+            _compare = lambda job: job == _job_id
+        _jobs = [_job for _job in self._running if _compare(_job)]
+        return _jobs if names else len(_jobs)
 
     def configure(self):
         pass
