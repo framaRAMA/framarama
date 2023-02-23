@@ -541,7 +541,7 @@
         {% set ploop = loop %}
         <tr>
           {% for col in columns %}
-            <th class="p-2" {% if col == columns.keys()|first %}scope="row"{% endif %}>
+            <th class="p-2 text-break" {% if col == columns.keys()|first %}scope="row"{% endif %}>
               {% if col in templates %}
                 {{ templates[col]|template({'loop':ploop, 'value':item|getattr(col)})|safe }}
               {% else %}
