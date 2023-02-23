@@ -616,7 +616,7 @@
 {% macro modal_confirm(id, title, message, submit, submit_title) %}
   {{ modal_start(id, title) }}
     <strong>{{ message }}</strong>
-  {{ modal_end(cancel_title='Close') }}
+  {{ modal_end(submit=submit, submit_title=submit_title, cancel_title='Close') }}
 {% endmacro %}
 
 {% macro modal_image(id, title, img) %}
