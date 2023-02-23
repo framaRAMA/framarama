@@ -6,16 +6,18 @@ from django.db.models import Q, F, functions
 from framarama import jobs
 from framarama.base import utils
 from config import models
-from config.utils import source as source_util
+from config.utils import source as source_util, finishing
 
 logger = logging.getLogger(__name__)
 
 
 class Scheduler(jobs.Scheduler):
     CFG_SOURCE_UPDATE = 'cfg_source_update'
+    CFG_ITEM_THUMBNAIL = 'cfg_item_thumbnail'
 
     def configure(self):
         self.register_job(Scheduler.CFG_SOURCE_UPDATE, self.source_update, minutes=1, name='Config source updates')
+        self.register_job(Scheduler.CFG_ITEM_THUMBNAIL, self.item_thumbnail, manually=True, name='Generate item thumbnail')
         self.enable_jobs()
         self.trigger_job(Scheduler.CFG_SOURCE_UPDATE)
 
@@ -55,4 +57,21 @@ class Scheduler(jobs.Scheduler):
     def run_source_update(self, source):
         _processor = source_util.Processor(source_util.Context(source.frame, source))
         _processor.process()
+
+    def item_thumbnail(self, item):
+        logger.info("Generating thumbnail for {}".format(item))
+        _size = settings.FRAMARAMA['CONFIG_THUMBNAIL_SIZE']
+        _adapter = finishing.WandImageProcessingAdapter()
+        _image = _adapter.image_open(item.url)
+        _adapter.image_resize(_image, _size[0], _size[1], True)
+        logger.info("Result: {}".format(_image))
+        _data = _adapter.image_data(_image)
+        _meta = _adapter.image_meta(_image)
+        _thumbnail = models.ItemThumbnailData.create(data=_data, mime=_meta['mime'])
+        if item.thumbnail:
+            _thumbnail.update(item.thumbnail)
+        else:
+            item.thumbnail = _thumbnail
+        item.thumbnail.save()
+        item.save()
 
