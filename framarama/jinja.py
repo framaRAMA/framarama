@@ -44,7 +44,9 @@ def get_attribute(value, key):
             key = key.split(':')[1]
         key = key.split('.')
     if len(key) > 0:
-        if type(value) == dict:
+        if key[0] == '__self__':
+            return get_attribute(value, key[1:])
+        elif type(value) == dict:
             value = value[key[0]]
         else:
             value = getattr(value, key[0])
