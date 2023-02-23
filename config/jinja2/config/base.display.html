@@ -5,22 +5,22 @@
 
 <ul class="nav nav-tabs pt-2">
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'display_overview', args=[display.id]) }}" href="{{ url('display_overview', args=[display.id]) }}">{{ lib.icon('display.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'display_overview', args=[display.id]) }}" href="{{ url('display_overview', args=[display.id]) }}">{{ lib.icon('display.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'display_info', args=[display.id]) }}" href="{{ url('display_info', args=[display.id]) }}">{{ lib.icon('display.info') }}<span class="d-none d-lg-inline"> Info</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'display_info', args=[display.id]) }}" href="{{ url('display_info', args=[display.id]) }}">{{ lib.icon('display.info') }}<span class="d-none d-lg-inline"> Info</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'display_device', args=[display.id]) }}" href="{{ url('display_device', args=[display.id]) }}">{{ lib.icon('display.device') }}<span class="d-none d-lg-inline"> Device</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'display_device', args=[display.id]) }}" href="{{ url('display_device', args=[display.id]) }}">{{ lib.icon('display.device') }}<span class="d-none d-lg-inline"> Device</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'display_time', args=[display.id]) }}" href="{{ url('display_time', args=[display.id]) }}">{{ lib.icon('display.time') }}<span class="d-none d-lg-inline"> Time</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'display_time', args=[display.id]) }}" href="{{ url('display_time', args=[display.id]) }}">{{ lib.icon('display.time') }}<span class="d-none d-lg-inline"> Time</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link{{ lib.nav_active(request, 'display_access', args=[display.id]) }}" href="{{ url('display_access', args=[display.id]) }}">{{ lib.icon('display.access') }}<span class="d-none d-lg-inline"> Access</span></a>
+    <a class="nav-link p-3{{ lib.nav_active(request, 'display_access', args=[display.id]) }}" href="{{ url('display_access', args=[display.id]) }}">{{ lib.icon('display.access') }}<span class="d-none d-lg-inline"> Access</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
+    <a class="nav-link p-3" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
   </li>
 </ul>
 
