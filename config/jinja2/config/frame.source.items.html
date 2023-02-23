@@ -2,12 +2,39 @@
 
 {% block content_frame_source %}
 
+{% for item in items %}
+  {{ lib.modal_image('itemImage%s'|format(loop.index), item.url, item.url) }}
+{% endfor %}
+
 {{ lib.list_paginator('il1', 'Item list', items, url('frame_source_images', args=[frame.id, source.id])) }}
-{{ lib.list_table(items, {'id':'ID', '__dict__':'URL'}, {'__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}) }}
+{{ lib.list_table(items, {
+  'thumbnail:__dict__': '',
+  '__dict__': '<form method="get" action="">Item <input type="text" name="search" value="%s" placeholder="search" class="p-0 m-0 float-end" style="height: 1.6em;"/></form>'|format(search|e)|safe
+}, {
+  'thumbnail:__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemThumbnail{{ loop.index }}"><img src="{{ url("frame_source_image_thumbnail", args=' + ('[%d, %d, value.id]'|format(frame.id, source.id)) + ') }}" loading="lazy" style="width:2.5em;" class="border rounded"/></a>',
+  '__dict__': '{{ value.id }} - {{ value.date_creation|date_format("%Y-%m-%d %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'
+}) }}
 {{ lib.list_paginator('il2', '', items, url('frame_source_images', args=[frame.id, source.id])) }}
 
 {% for item in items %}
-  {{ lib.modal_image('itemImage%s'|format(loop.index), item.url, item.url) }}
+  {{ lib.modal_start('itemThumbnail%s'|format(loop.index), item.url.split('/')[-1], 'modal-fullscreen-sm-down') }}
+    {% set thumbnail = item.thumbnail.id != null %}
+    <div class="text-center">
+      <img src="{{ item.url }}" class="w-75 m-1 border rounded-5 border-0 opacity-50" loading="lazy"/>
+      <span class="w-25 shadow position-absolute mt-5 start-50 translate-middle-x border border-red rounded border-5 bg-light">
+        {% if thumbnail %}
+          <img src="{{ url('frame_source_image_thumbnail', args=[frame.id, source.id, item.id]) }}" class="w-100" loading="lazy"/>
+        {% else %}
+          <div class="p-1"><br/>no<br/>thumbnail<br/><br/></div>
+        {% endif %}
+      </span>
+    </div>
+    <div class="text-center">
+      <a href="{{ url('frame_source_images', args=[frame.id, source.id]) }}?action=item.thumbnail.generate&id={{ item.id }}" class="btn btn-xs btn-primary">Generate</a>
+      <a href="{{ url('frame_source_images', args=[frame.id, source.id]) }}?action=item.thumbnail.delete&id={{ item.id }}" class="btn btn-xs btn-danger {% if not thumbnail %}disabled{% endif %}">Remove</a>
+      <a href="{{ url('frame_source_images', args=[frame.id, source.id]) }}?action=item.thumbnail.highlight&id={{ item.id }}" class="btn btn-xs btn-success {% if not thumbnail %}disabled{% endif %}">Highlight</a>
+    </div>
+  {{ lib.modal_end() }}
 {% endfor %}
 
 {% endblock %}

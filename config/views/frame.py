@@ -239,10 +239,39 @@ class ItemsSourceFrameView(base.BaseSourceFrameConfigView):
     def _get(self, request, frame_id, source_id, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _source = self.qs().sources.filter(pk=source_id).get()
+        _search = request.GET.get('search', '')
         _page = request.GET.get('page')
         _page_size = request.GET.get('page_size', 20)
-        _items = _source.items.all().order_by('created')
-        _context['items'] = Paginator(_items, _page_size).get_page(_page)
+        if _search:
+            _items = _source.items.filter(url__icontains=_search)
+        else:
+            _items = _source.items.all()
+        _context['items'] = Paginator(_items.order_by('created'), _page_size).get_page(_page)
+        _context['search'] = _search
+
+        _scheduler = self.get_scheduler()
+        _action = request.GET.get('action')
+        _id = request.GET.get('id')
+        _item = list(self.qs().items.filter(pk=_id)) if _id else None
+        _job_id = jobs.Scheduler.CFG_ITEM_THUMBNAIL
+        _running = [_job.split('_')[-1] for _job in _scheduler.running_jobs(_job_id, instance=frame_id, starts_with=True, names=True)]
+        if _action == 'item.thumbnail.generate' and len(_item):
+            if len(_running) == 0:
+                _scheduler.trigger_job(_job_id, instance=str(_id), item=_item[0])
+        elif _action == 'item.thumbnail.delete' and len(_item):
+            if _item[0].thumbnail:
+                _item[0].thumbnail.data_file.delete()
+                _item[0].thumbnail.delete()
+        _context['running'] = _running
+        return _context
+
+
+class ThumbnailItemFrameView(base.BaseSourceFrameConfigView):
+
+    def _get(self, request, frame_id, source_id, item_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, source_id, *args, **kwargs)
+        _items = list(self.qs().items.filter(pk=item_id))
+        self.response_thumbnail(_context, _items[0].thumbnail if len(_items) and _items[0].thumbnail else None)
         return _context
 
 
