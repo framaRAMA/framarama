@@ -46,6 +46,7 @@ urlpatterns = [
     path('displays', display.ListDisplayView.as_view(), name='display_list'),
     path('displays/create', display.CreateDisplayView.as_view(), name='display_create'),
     path('displays/<int:display_id>/overview', display.OverviewDisplayView.as_view(), name='display_overview'),
+    path('displays/<int:display_id>/items/<int:item_id>/thumbnail', display.ThumbnailItemDisplayView.as_view(), name='display_item_thumbnail'),
     path('displays/<int:display_id>/info', display.ViewInfoDisplayView.as_view(), name='display_info'),
     path('displays/<int:display_id>/info/edit', display.UpdateDisplayView.as_view(), name='display_edit'),
     path('displays/<int:display_id>/device', display.ViewDeviceDisplayView.as_view(), name='display_device'),

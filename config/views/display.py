@@ -126,4 +126,12 @@ class UpdateAccessDisplayView(base.BaseDisplayConfigView):
         return _context
 
 
+class ThumbnailItemDisplayView(base.BaseDisplayConfigView):
+
+    def _get(self, request, display_id, item_id, *args, **kwargs):
+        _context = super()._get(request, display_id, *args, **kwargs)
+        _items = list(self.qs().displayitems.filter(display__id=display_id, item_id=item_id))
+        self.response_thumbnail(_context, _items[0].thumbnail if len(_items) and _items[0].thumbnail else None)
+        return _context
+
 
