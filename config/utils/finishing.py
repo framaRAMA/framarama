@@ -4,6 +4,7 @@ import logging
 import requests
 import importlib
 
+from django.conf import settings
 from django.core.paginator import Paginator
 
 from framarama.base.utils import Filesystem
@@ -291,7 +292,8 @@ class Processor:
         _image_data = _adapter.image_data(_image)
         _image_meta = _adapter.image_meta(_image)
 
-        _adapter.image_resize(_image, 640, 480, True)
+        _preview_size = settings.FRAMARAMA['FRONTEND_THUMBNAIL_SIZE']
+        _adapter.image_resize(_image, _preview_size[0], _preview_size[1], True)
         _image_preview = _adapter.image_data(_image)
 
         logger.info("Result: {}x{} pixels, {} bytes".format(
