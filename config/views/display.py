@@ -30,6 +30,15 @@ class CreateDisplayView(base.BaseConfigView):
         return _context
 
 
+class ThumbnailDisplayView(base.BaseDisplayConfigView):
+
+    def _get(self, request, display_id, *args, **kwargs):
+        _context = super()._get(request, display_id, *args, **kwargs)
+        _items = list(self.qs().displayitems.filter(display__id=display_id, thumbnail__isnull=False).order_by('?'))
+        self.response_thumbnail(_context, _items[0].thumbnail if len(_items) and _items[0].thumbnail else None)
+        return _context
+
+
 class ViewInfoDisplayView(base.BaseDisplayConfigView):
     template_name= 'config/display.info.html'
 

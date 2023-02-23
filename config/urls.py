@@ -12,6 +12,7 @@ urlpatterns = [
     path('frames/create', frame.CreateFrameView.as_view(), name='frame_create'),
     path('frames/<int:frame_id>/info', frame.ViewInfoFrameView.as_view(), name='frame_info'),
     path('frames/<int:frame_id>/edit', frame.UpdateGeneralFrameView.as_view(), name='frame_edit'),
+    path('frames/<int:frame_id>/thumbnail', frame.ThumbnailFrameView.as_view(), name='frame_thumbnail'),
 
     path('frames/<int:frame_id>/sources', frame.RedirectSourceFrameView.as_view(), name='frame_source_list'),
     path('frames/<int:frame_id>/sources/create', frame.CreateSourceFrameView.as_view(), name='frame_source_create'),
@@ -56,4 +57,5 @@ urlpatterns = [
     path('displays/<int:display_id>/time/edit', display.UpdateTimeDisplayView.as_view(), name='display_time_edit'),
     path('displays/<int:display_id>/access', display.ViewAccessDisplayView.as_view(), name='display_access'),
     path('displays/<int:display_id>/access/edit', display.UpdateAccessDisplayView.as_view(), name='display_access_edit'),
+    path('displays/<int:display_id>/thumbnail', display.ThumbnailDisplayView.as_view(), name='display_thumbnail'),
 ]
