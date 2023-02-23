@@ -2,6 +2,7 @@ import io
 import os
 import re
 import hashlib
+import logging
 
 from django.db import models
 from django.conf import settings
@@ -10,6 +11,9 @@ from django.core.files.base import File
 
 from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel
+
+
+logger = logging.getLogger(__name__)
 
 
 MIME_CHOICES = [
@@ -64,6 +68,7 @@ SOURCE_UPDATE_INTERVAL_CHOICES = [
   ('P1D', 'once a day'),
 ]
 
+
 class Data(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ['category', 'data_file']
 
@@ -100,7 +105,11 @@ class Data(BaseModel):
         existing.data_file.close()
 
     def data(self):
-        return utils.Filesystem.file_read(self.data_file.path)
+        try:
+            return utils.Filesystem.file_read(self.data_file.path)
+        except FileNotFoundError as e:
+            logger.error("Can not load data file for {}: {}".format(self, e))
+        return None
 
     @classmethod
     def create(cls, json=None, data=None, mime=None):
