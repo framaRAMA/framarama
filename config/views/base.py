@@ -4,18 +4,17 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.db.models import F
 
+from framarama.base import utils
 from framarama.base.views import BaseAuthenticatedView
-from framarama.base.utils import Config
-#from frontend.models import Config
-from config import forms
-from config import models
-from config import plugins
+from config import forms, models, plugins
 
 
 class BaseConfigView(BaseAuthenticatedView):
+    DEFAULT_THUMBNAIL = utils.Filesystem.file_read('common/static/common/fontawesome-free-6.1.1-web/svgs/regular/image.svg')
+    DEFAULT_THUMBNAIL_MIME = 'image/svg+xml'
 
     def __init__(self):
-        self._config = Config.get()
+        self._config = utils.Config.get()
 
     def get_config(self):
         return self._config.get_config() if self._config else None
@@ -35,6 +34,13 @@ class BaseConfigView(BaseAuthenticatedView):
         _context['frames'] = self.get_frames()
         _context['displays'] = self.get_displays()
         return _context
+
+    def response_thumbnail(self, context, data):
+        _thumbnail_data = data.data() if data else None
+        if _thumbnail_data:
+            self.response(context, _thumbnail_data, data.data_mime)
+        else:
+            self.response(context, BaseConfigView.DEFAULT_THUMBNAIL, BaseConfigView.DEFAULT_THUMBNAIL_MIME)
 
 
 class BaseFrameConfigView(BaseConfigView):
