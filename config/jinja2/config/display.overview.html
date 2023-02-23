@@ -39,7 +39,7 @@
             <div class="carousel-inner bg-light rounded rounded-5">
               {% for item in carousel_items %}
                 <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-                  <img src="{{ url('display_item_thumbnail', args=[display.id, item.id]) }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/>
+                  <img src="{{ url('display_item_thumbnail', args=[display.id, item.item.id]) }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/>
                 </div>
               {% endfor %}
             </div>
