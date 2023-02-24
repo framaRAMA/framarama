@@ -95,6 +95,7 @@ class Implementation(ContextPluginImplementation):
             _json = _response.json()
 
             # Extract information from JSON response:
+            # https://nominatim.openstreetmap.org/reverse.php?lat=48.8031042&lon=8.5028172&zoom=22&format=jsonv2
             #   place_id	92224919
             #   licence	"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright"
             #   osm_type	"node"
@@ -121,7 +122,7 @@ class Implementation(ContextPluginImplementation):
             if 'address' in _json:
                 _addr = _json['address']
                 _info = []
-                for _item in ['postcode', 'road', 'village', 'state', 'country']:
+                for _item in ['road', 'postcode', 'village', 'state', 'country']:
                     if _item in _addr:
                         _info.append(_addr[_item])
                 _json['geo_display_name'] = ', '.join(_info)
