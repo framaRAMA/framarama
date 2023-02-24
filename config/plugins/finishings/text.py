@@ -37,7 +37,7 @@ FIELDS = [
     'border_padding',
 ]
 WIDGETS = {
-    'text': base.charFieldWidget(),
+    'text': base.textareaFieldWidget(),
     'font': base.charFieldWidget(),
     'weight': base.charFieldWidget(),
     'size': base.charFieldWidget(),
