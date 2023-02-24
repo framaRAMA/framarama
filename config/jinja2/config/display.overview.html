@@ -74,7 +74,7 @@
           'count_hit': 'Views'
         }, {
           'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
-          'item:__self__': '{{ value.date_last_seen|date_format("%d.%m.%Y %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#displayImageTop{{ loop.index }}" title="Item #{{ value.item.id }}">{{ value.item.url }}</a>'
+          'item:__self__': '{{ value.date_last_seen|date_format("%d.%m.%Y %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#displayImageLatest{{ loop.index }}" title="Item #{{ value.item.id }}">{{ value.item.url }}</a>'
         }) }}
       </div>
     </div>
