@@ -125,6 +125,7 @@ class Implementation(PluginImplementation):
                     if _item in _addr:
                         _info.append(_addr[_item])
                 _json['geo_display_name'] = ', '.join(_info)
+            logger.debug("Resolving coordinates via {} to {}".format(_url, _json))
             self._cache[_key] = _json
         return self._cache[_key]
 
