@@ -5,7 +5,7 @@ from django.template import Context, Template
 
 from framarama.base import forms as base
 from config.models import FrameContext
-from config.plugins import PluginImplementation
+from config.plugins import ContextPluginImplementation
 from config.forms.frame import CreateContextForm, UpdateContextForm
 from config.utils import context
 
@@ -44,7 +44,7 @@ class ExifUpdateForm(UpdateContextForm):
         widgets = UpdateContextForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(ContextPluginImplementation):
     CAT = FrameContext.CAT_EXIF
     TITLE = 'Exif'
     DESCR = 'Extract and provide EXIF information'

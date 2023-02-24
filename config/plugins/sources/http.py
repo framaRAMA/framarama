@@ -7,7 +7,7 @@ from django.db import models
 
 from framarama.base import forms as base
 from config.models import SourceStep
-from config.plugins import PluginImplementation
+from config.plugins import SourcePluginImplementation
 from config.forms.frame import CreateSourceStepForm, UpdateSourceStepForm
 from config.utils import data
 
@@ -88,7 +88,7 @@ class HttpUpdateForm(UpdateSourceStepForm):
         widgets = UpdateSourceStepForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(SourcePluginImplementation):
     CAT = SourceStep.CAT_NETWORK
     TITLE = 'HTTP'
     DESCR = 'Fetch data using HTTP protocol'

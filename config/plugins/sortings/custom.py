@@ -4,7 +4,7 @@ from django.db import models
 
 from framarama.base import forms as base
 from config.models import Sorting
-from config.plugins import PluginImplementation
+from config.plugins import SortingPluginImplementation
 from config.forms.frame import CreateSortingForm, UpdateSortingForm
 
 
@@ -40,7 +40,7 @@ class CustomUpdateForm(UpdateSortingForm):
         widgets = UpdateSortingForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(SortingPluginImplementation):
     CAT = Sorting.CAT_CUSTOM
     TITLE = 'Custom'
     DESCR = 'Specify a custom query'

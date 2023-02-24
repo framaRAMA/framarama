@@ -4,7 +4,7 @@ from django.db import models
 
 from framarama.base import forms as base
 from config.models import Finishing
-from config.plugins import PluginImplementation
+from config.plugins import FinishingPluginImplementation
 from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
 from config.utils import finishing
 
@@ -53,7 +53,7 @@ class ResizeUpdateForm(UpdateFinishingForm):
         widgets = UpdateFinishingForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(FinishingPluginImplementation):
     CAT = Finishing.CAT_RESIZE
     TITLE = 'Resize'
     DESCR = 'Apply horizontal and/or vertical resize'

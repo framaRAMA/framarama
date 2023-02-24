@@ -5,7 +5,7 @@ from django.template import Context, Template
 
 from framarama.base import forms as base
 from config.models import SourceStep
-from config.plugins import PluginImplementation
+from config.plugins import SourcePluginImplementation
 from config.forms.frame import CreateSourceStepForm, UpdateSourceStepForm
 from config.utils import data
 
@@ -60,7 +60,7 @@ class DataUpdateForm(UpdateSourceStepForm):
         widgets = UpdateSourceStepForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(SourcePluginImplementation):
     CAT = SourceStep.CAT_DATA
     TITLE = 'Data'
     DESCR = 'Process data (filter, convert)'

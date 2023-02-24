@@ -150,11 +150,19 @@ class SourcePluginRegistry(PluginRegistry):
         return sources
 
 
+class SourcePluginImplementation(PluginImplementation):
+    pass
+
+
 class SortingPluginRegistry(PluginRegistry):
 
     @classmethod
     def _get_base_module(cls):
         return sortings
+
+
+class SortingPluginImplementation(PluginImplementation):
+    pass
 
 
 class FinishingPluginRegistry(PluginRegistry):
@@ -164,9 +172,17 @@ class FinishingPluginRegistry(PluginRegistry):
         return finishings
 
 
+class FinishingPluginImplementation(PluginImplementation):
+    pass
+
+
 class ContextPluginRegistry(PluginRegistry):
 
     @classmethod
     def _get_base_module(cls):
         return contexts
+
+
+class ContextPluginImplementation(PluginImplementation):
+    pass
 

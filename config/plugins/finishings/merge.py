@@ -4,7 +4,7 @@ from django.db import models
 
 from framarama.base import forms as base
 from config.models import Finishing
-from config.plugins import PluginImplementation
+from config.plugins import FinishingPluginImplementation
 from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
 from config.utils import finishing
 
@@ -67,7 +67,7 @@ class MergeUpdateForm(UpdateFinishingForm):
         widgets = UpdateFinishingForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(FinishingPluginImplementation):
     CAT = Finishing.CAT_MERGE
     TITLE = 'Merge'
     DESCR = 'Merge multiple images into one'

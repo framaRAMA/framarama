@@ -6,7 +6,7 @@ from django.template import Context, Template
 
 from framarama.base import forms as base
 from config.models import FrameContext
-from config.plugins import PluginImplementation
+from config.plugins import ContextPluginImplementation
 from config.forms.frame import CreateContextForm, UpdateContextForm
 from config.utils import context
 
@@ -45,7 +45,7 @@ class GeoUpdateForm(UpdateContextForm):
         widgets = UpdateContextForm.widgets(WIDGETS)
 
 
-class Implementation(PluginImplementation):
+class Implementation(ContextPluginImplementation):
     CAT = FrameContext.CAT_GEO
     TITLE = 'Geo'
     DESCR = 'Provide geo location information of image'
