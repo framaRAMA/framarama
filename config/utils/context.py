@@ -43,7 +43,7 @@ class NoneContextValue:
     def __eq__(self, other):
         if other is None:
             return True
-        if other is '':
+        if other == '':
             return True
         return False
 
