@@ -119,12 +119,43 @@ class Implementation(ContextPluginImplementation):
             #     1	"48.8031542"
             #     2	"8.5027672"
             #     3	"8.5028672"
+            # https://nominatim.openstreetmap.org/reverse.php?lat=49.013343810833&lon=8.4008913038889&zoom=22&format=jsonv2
+            # place_id	59049923
+            # licence	"Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright"
+            # osm_type	"node"
+            # osm_id	5486732812
+            # lat	"49.0131412"
+            # lon	"8.4008583"
+            # place_rank	30
+            # category	"tourism"
+            # type	"artwork"
+            # importance	0.00000999999999995449
+            # addresstype	"tourism"
+            # name	"Orest und Pylades"
+            # display_name	"Orest und Pylades, Schlossbezirk, Innenstadt-West Östlicher Teil, Innenstadt-West, Karlsruhe, Baden-Württemberg, 76131, Germany"
+            # address
+            #   tourism	"Orest und Pylades"
+            #   road	"Schlossbezirk"
+            #   neighbourhood	"Innenstadt-West Östlicher Teil"
+            #   suburb	"Innenstadt-West"
+            #   city	"Karlsruhe"
+            #   state	"Baden-Württemberg"
+            #   ISO3166-2-lvl4	"DE-BW"
+            #   postcode	"76131"
+            #   country	"Germany"
+            #   country_code	"de"
+            # boundingbox
+            #   0	"49.0130912"
+            #   1	"49.0131912"
+            #   2	"8.4008083"
+            #   3	"8.4009083"
             if 'address' in _json:
                 _addr = _json['address']
                 _info = []
-                for _item in ['road', 'postcode', 'village', 'state', 'country']:
-                    if _item in _addr:
-                        _info.append(_addr[_item])
+                for _items in [['road'], ['postcode'], ['city', 'village'], ['state'], ['country']]:
+                    _items = [_item for _item in _items if _item in _addr]
+                    if _items and _addr[_items[0]]:
+                        _info.append(_addr[_items[0]])
                 _json['geo_display_name'] = ', '.join(_info)
             logger.debug("Resolving coordinates via {} to {}".format(_url, _json))
             self._cache[_key] = _json
