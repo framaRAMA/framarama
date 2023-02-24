@@ -21,6 +21,10 @@ SHAPE_CHOICES = [
 
 FIELDS = [
     'shape',
+    'color_stroke',
+    'stroke_width',
+    'color_fill',
+    'color_alpha',
     'start_x',
     'start_y',
     'size_x',
@@ -34,6 +38,10 @@ FIELD_DEPENDENCIES = {
 }
 WIDGETS = {
     'shape': base.selectFieldWidget(choices=SHAPE_CHOICES),
+    'color_stroke': base.charFieldWidget(),
+    'stroke_width': base.charFieldWidget(),
+    'color_fill': base.charFieldWidget(),
+    'color_alpha': base.charFieldWidget(),
     'start_x': base.charFieldWidget(),
     'start_y': base.charFieldWidget(),
     'size_x': base.charFieldWidget(),
