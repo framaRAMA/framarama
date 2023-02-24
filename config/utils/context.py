@@ -32,7 +32,24 @@ class ResultValue:
         return str(self._value).lower() in ['true', '1', 't', 'y', 'yes']
 
 
+class NoneContextValue:
+
+    def __str__(self):
+        return ''
+
+    def __repr__(self):
+        return None
+
+    def __eq__(self, other):
+        if other is None:
+            return True
+        if other is '':
+            return True
+        return False
+
+
 class Context:
+    NONE_VALUE = NoneContextValue()
 
     def __init__(self):
         self._resolver = ChainedResolver()
@@ -82,7 +99,7 @@ class ChainedResolver(ContextResolver):
             _value = _resolver.resolve(name)
             if _value is not None:
                 return _value
-        return None
+        return ''
 
 
 class MapResolver(ContextResolver):
@@ -91,7 +108,7 @@ class MapResolver(ContextResolver):
         self._map = variables
 
     def _resolve(self, name):
-        return self._map[name]
+        return self._map[name] if name in self._map else Context.NONE_VALUE
 
 
 class EnvironmentResolver(ContextResolver):
@@ -101,7 +118,7 @@ class EnvironmentResolver(ContextResolver):
         self._env = os.environ
 
     def _resolve(self, name):
-        return self._env[name]
+        return self._env[name] if name in self._env else Context.NONE_VALUE
 
 
 class ObjectResolver(ContextResolver):
@@ -112,5 +129,5 @@ class ObjectResolver(ContextResolver):
     def _resolve(self, name):
         if hasattr(self._instance, name):
             return getattr(self._instance, name)
-        return None
+        return Context.NONE_VALUE
 
