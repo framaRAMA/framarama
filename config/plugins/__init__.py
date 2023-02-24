@@ -184,5 +184,14 @@ class ContextPluginRegistry(PluginRegistry):
 
 
 class ContextPluginImplementation(PluginImplementation):
-    pass
+
+    def get_images(self, ctx, names, default=True):
+        _names = ['default'] if default else []
+        _names.extend(names.split(' '))
+        _images = {}
+        for _name in _names:
+            _image = ctx.get_image_data(_name)
+            if _image:
+                _images[_name] = _image
+        return _images
 

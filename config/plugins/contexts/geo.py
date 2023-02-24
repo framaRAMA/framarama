@@ -130,15 +130,10 @@ class Implementation(ContextPluginImplementation):
         return self._cache[_key]
 
     def run(self, model, image, ctx):
-        _images = {'default': image}
-        for _name in model.image.split(' '):
-            _image = ctx.get_image_data(_name)
-            if _image:
-                _images[_name] = _image
-
         _adapter = ctx.get_adapter()
+
         _resolvers = {'geos': {}}
-        for _name, _image in _images.items():
+        for _name, _image in self.get_images(ctx, model.image).items():
             _image_exif = _adapter.image_exif(_image) if _image.get_images() else {}
 
             _resolver = context.MapResolver(self._geo(_image_exif))
