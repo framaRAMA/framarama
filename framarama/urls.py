@@ -16,10 +16,15 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic import base
+from django.contrib.staticfiles import urls as static_urls, storage as static_storage
 
 
 urlpatterns = []
+
+urlpatterns.extend([
+    path('favicon.ico', base.RedirectView.as_view(url=static_storage.staticfiles_storage.url('common/icon/favicon.ico'), permanent=True))
+])
 
 if 'server' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('config/', include('config.urls')))
@@ -30,5 +35,5 @@ if 'frontend' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('frontend/', include('frontend.urls')))
     urlpatterns.append(path('api/', include('api.urls.frontend')))
 
-urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static_urls.staticfiles_urlpatterns()
 
