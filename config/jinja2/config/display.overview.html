@@ -79,7 +79,7 @@
       </div>
     </div>
     {% for item in latest_items %}
-      {{ lib.modal_image('displayImageLatest%s'|format(loop.index), item.item.url, item.item.url) }}
+      {{ lib.modal_image('displayImageLatest%s'|format(loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
     {% endfor %}
   </div>
 
@@ -101,7 +101,7 @@
       </div>
     </div>
     {% for item in top_items %}
-      {{ lib.modal_image('displayImageTop%s'|format(loop.index), item.item.url, item.item.url) }}
+      {{ lib.modal_image('displayImageTop%s'|format(loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
     {% endfor %}
   </div>
 
