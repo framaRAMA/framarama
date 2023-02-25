@@ -1,5 +1,9 @@
+import logging
 
 from django.db.models.fields.related import RelatedField
+
+
+logger = logging.getLogger(__name__)
 
 
 class Result:
@@ -69,7 +73,11 @@ class Context:
         _globals = {}
         _globals.update(self._resolver.get_resolvers())
         _expr = 'f"' + str(expr) + '"'
-        return eval(_expr, _globals, {})
+        try:
+            return eval(_expr, _globals, {})
+        except Error as e:
+            logger.error("Can not evaluate expression {}: {}", _expr, e)
+            raise
 
     def evaluate_model(self, model):
         _result = Result()
