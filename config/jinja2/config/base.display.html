@@ -1,7 +1,7 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-{{ lib.display_header(display.name, display.description) }}
+{{ lib.display_header(display.name, display.description, url('display_thumbnail', args=[display.id])) }}
 
 <ul class="nav nav-tabs pt-2">
   <li class="nav-item">

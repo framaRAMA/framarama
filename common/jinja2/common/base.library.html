@@ -628,12 +628,11 @@
   {{ modal_end(submit=submit, submit_class='btn-primary', submit_title=submit_title, cancel_title='Close') }}
 {% endmacro %}
 
-{% macro frame_header(title, description) %}
+{% macro frame_header(title, description, bg='') %}
 <div class="row pt-3">
   <div class="col-md-12 mb-4">
     <div class="card border rounded-5">
-      <div class="card-body">
-
+      <div class="card-body"{% if bg %} style="background: linear-gradient(to right, rgba(255,255,255,1) 20%, rgba(255,255,255,0.1)), url('{{ bg }}') 0% 50% no-repeat; background-size:100%; border-radius:0.5em;"{% endif %}>
         <div class="d-flex align-items-center">
           <a href="{{ url('frame_list') }}">{{ icon('action.back') }}</a>
           <div class="ms-3">
@@ -647,12 +646,11 @@
 </div>
 {% endmacro %}
 
-{% macro display_header(title, description) %}
+{% macro display_header(title, description, bg='') %}
 <div class="row pt-3">
   <div class="col-md-12 mb-4">
     <div class="card border rounded-5">
-      <div class="card-body">
-
+      <div class="card-body"{% if bg %} style="background: linear-gradient(to right, rgba(255,255,255,1) 20%, rgba(255,255,255,0.1)), url('{{ bg }}') 0% 50% no-repeat; background-size:100%; border-radius:0.5em;"{% endif %}>
         <div class="d-flex align-items-center">
           <a href="{{ url('display_list') }}">{{ icon('action.back') }}</a>
           <div class="ms-3">
