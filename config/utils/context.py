@@ -50,6 +50,9 @@ class NoneContextValue:
     def __add__(self, other):
         return other
 
+    def __radd__(self, other):
+        return other
+
 
 class Context:
     NONE_VALUE = NoneContextValue()
