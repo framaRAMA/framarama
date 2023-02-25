@@ -4,7 +4,7 @@ import requests
 from django.db import models
 from django.template import Context, Template
 
-from framarama.base import forms as base
+from framarama.base import utils, forms as base
 from config.models import FrameContext
 from config.plugins import ContextPluginImplementation
 from config.forms.frame import CreateContextForm, UpdateContextForm
@@ -71,6 +71,18 @@ class Implementation(ContextPluginImplementation):
             _num, _fract = _val.split('/')
             _coord = _coord / 60 + _factor * int(_num) / int(_fract)
         return _coord
+
+    def _resolve(self, data, attrs, level=0):
+        _info = []
+        for _attr in attrs:
+            if type(_attr) == list:
+                _recurse = self._resolve(data, _attr, level=level+1)
+                if len(_recurse):
+                    _info.append(' '.join(_recurse))
+            elif _attr in data and data[_attr] != '':
+                _info.append(data[_attr])
+                break;
+        return ', '.join(_info) if level == 0 else _info
 
     def _geo(self, exif):
         _coords = {}
@@ -150,13 +162,8 @@ class Implementation(ContextPluginImplementation):
             #   2	"8.4008083"
             #   3	"8.4009083"
             if 'address' in _json:
-                _addr = _json['address']
-                _info = []
-                for _items in [['road'], ['postcode'], ['city', 'village'], ['state'], ['country']]:
-                    _items = [_item for _item in _items if _item in _addr]
-                    if _items and _addr[_items[0]]:
-                        _info.append(_addr[_items[0]])
-                _json['geo_display_name'] = ', '.join(_info)
+                _fields = [['road'], [['postcode'], ['city', 'town', 'village']], ['state'], ['country']]
+                _json['geo_display_name'] = self._resolve(_json['address'], _field)
             logger.debug("Resolving coordinates via {} to {}".format(_url, _json))
             self._cache[_key] = _json
         return self._cache[_key]
