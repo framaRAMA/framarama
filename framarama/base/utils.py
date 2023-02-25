@@ -184,12 +184,12 @@ class Json:
         return json.loads(data)
 
     @staticmethod
-    def to_object_dict(data, fields, prefix=''):
+    def to_object_dict(data, fields, delim='_', prefix=''):
         _result = {}
         for _name, _value in data.items():
             if type(_value) == dict:
                 _not_mapped = {}
-                for _result_name, _result_value in Json.to_object_dict(_value, fields, prefix + _name + '_').items():
+                for _result_name, _result_value in Json.to_object_dict(_value, fields, delim, prefix + _name + delim).items():
                     if _result_name in fields:
                         _result[_result_name] = _result_value
                     else:
@@ -203,14 +203,14 @@ class Json:
         return _result
 
     @staticmethod
-    def from_object_dict(data, prefix=''):
+    def from_object_dict(data, delim='_', prefix=''):
         _result = {}
         for _name in [_name for _name in data if _name.startswith(prefix)]:
             _value = data[_name]
             _suffix = _name[len(prefix):]
-            if '_' in _suffix:
-                _key = _suffix.split('_')[0]
-                _result[_key] = Json.from_object_dict(data, prefix + _key + '_')
+            if delim in _suffix:
+                _key = _suffix.split(delim)[0]
+                _result[_key] = Json.from_object_dict(data, delim, prefix + _key + delim)
             elif type(_value) == str and len(_value) > 0 and _value[0] in ['[', '{', '"']:
                 _result[_suffix] = json.loads(_value)
             else:
