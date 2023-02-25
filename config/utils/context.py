@@ -75,7 +75,7 @@ class Context:
         _expr = 'f"' + str(expr) + '"'
         try:
             return eval(_expr, _globals, {})
-        except Error as e:
+        except Exception as e:
             logger.error("Can not evaluate expression {}: {}", _expr, e)
             raise
 
