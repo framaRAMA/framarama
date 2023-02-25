@@ -163,7 +163,7 @@ class Implementation(ContextPluginImplementation):
             #   3	"8.4009083"
             if 'address' in _json:
                 _fields = [['road'], [['postcode'], ['city', 'town', 'village']], ['state'], ['country']]
-                _json['geo_display_name'] = self._resolve(_json['address'], _field)
+                _json['geo_display_name'] = self._resolve(_json['address'], _fields)
             logger.debug("Resolving coordinates via {} to {}".format(_url, _json))
             self._cache[_key] = _json
         return self._cache[_key]
