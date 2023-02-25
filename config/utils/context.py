@@ -38,7 +38,7 @@ class NoneContextValue:
         return ''
 
     def __repr__(self):
-        return None
+        return ''
 
     def __eq__(self, other):
         if other is None:
@@ -46,6 +46,9 @@ class NoneContextValue:
         if other == '':
             return True
         return False
+
+    def __add__(self, other):
+        return other
 
 
 class Context:
