@@ -39,7 +39,7 @@ class ThumbnailFrameView(base.BaseFrameConfigView):
 
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
-        _items = list(self.qs().items.filter(frame__id=frame_id, thumbnail__isnull=False).order_by('?'))
+        _items = self.qs().items.filter(frame__id=frame_id, thumbnail__isnull=False).order_by('?').all()[:1]
         self.response_thumbnail(_context, _items[0].thumbnail if len(_items) and _items[0].thumbnail else None)
         return _context
 
