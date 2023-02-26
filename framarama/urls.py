@@ -19,21 +19,34 @@ from django.urls import include, path
 from django.views.generic import base
 from django.contrib.staticfiles import urls as static_urls, storage as static_storage
 
+from rest_framework.schemas import get_schema_view
 
-urlpatterns = []
 
-urlpatterns.extend([
-    path('favicon.ico', base.RedirectView.as_view(url=static_storage.staticfiles_storage.url('common/icon/favicon.ico'), permanent=True))
-])
+urlpatterns = [
+    path('favicon.ico', base.RedirectView.as_view(url=static_storage.staticfiles_storage.url('common/icon/favicon.ico'), permanent=True)),
+]
+urlpatterns_api = []
 
 if 'server' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('config/', include('config.urls')))
     urlpatterns.append(path('admin/', admin.site.urls))
-    urlpatterns.append(path('api/', include('api.urls.config')))
+    urlpatterns_api.append(path('', include('api.urls.config')))
 
 if 'frontend' in settings.FRAMARAMA['MODES']:
     urlpatterns.append(path('frontend/', include('frontend.urls')))
-    urlpatterns.append(path('api/', include('api.urls.frontend')))
+    urlpatterns_api.append(path('', include('api.urls.frontend')))
+
+
+urlpatterns_api.append(path('api-auth/',  include('rest_framework.urls', namespace='rest_framework')))
+urlpatterns_api.append(path('schema/', get_schema_view(
+        title="framaRAMA",
+        description="API",
+        version="1.0.0",
+        patterns=urlpatterns_api
+    ), name='openapi-schema'))
+
+
+urlpatterns.append(path('api/', include(urlpatterns_api)))
 
 urlpatterns += static_urls.staticfiles_urlpatterns()
 

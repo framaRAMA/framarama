@@ -1,6 +1,5 @@
 from django.urls import path, include
 from rest_framework import routers
-from rest_framework.schemas import get_schema_view
 
 from api.views import config as views
 
@@ -20,12 +19,5 @@ router.register('displays/(?P<display_id>[0-9]+)/status', views.StatusDisplayVie
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-auth/',  include('rest_framework.urls', namespace='rest_framework')),
-    path('schema/', get_schema_view(
-        title="Your Project",
-        description="API for config system",
-        version="1.0.0",
-        urlconf='api.urls.config'
-    ), name='openapi-schema'),
 ]
 
