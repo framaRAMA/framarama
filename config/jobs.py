@@ -26,7 +26,7 @@ class Scheduler(jobs.Scheduler):
         _enabled_frame = Q(frame__enabled=True)
         _enabled_display = Q(frame__display__enabled=True) | Q(frame__display=None)
         _specific_frame = Q(frame=frame) if frame else _ignored
-        _specific_source = Q(id=source.id) if source else _ignored
+        _specific_source = Q(pk=source.id) if source else _ignored
 
         if frame is None and source is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
