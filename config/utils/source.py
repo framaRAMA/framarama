@@ -17,7 +17,7 @@ class Context:
 
     def __init__(self, frame, source=None, data={}):
         self._frame = frame
-        self._source = None
+        self._source = source
         self._data = data
     
     def get_frame(self):
@@ -44,7 +44,7 @@ class Processor:
     def process(self):
         _sources = self._context.get_frame().sources
         if self._context.get_source():
-          _sources = _sources.filter(source=self._context.get_source())
+            _sources = _sources.filter(pk=self._context.get_source().id)
         for _source in _sources.all():
             logger.info("Processing source {}".format(_source))
             _source.update_count = _source.update_count + 1
