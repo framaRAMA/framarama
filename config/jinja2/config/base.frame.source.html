@@ -5,7 +5,12 @@
   {% for source in sources %}
     {% set active = lib.nav_active(request, 'frame_source', args=[frame.id, source.id]) %}
     <li class="nav-item d-flex justify-content-between">
-      <a class="{%if active %}btn-nb-r{% endif %} nav-link nav-link{{ active }}" href="{{ url('frame_source', args=[frame.id, source.id]) }}">{{ source.name }}</a>
+      <a class="{%if active %}btn-nb-r{% endif %} nav-link nav-link{{ active }}" href="{{ url('frame_source', args=[frame.id, source.id]) }}">
+        {{ source.name }}
+        {% if source.update_error %}
+          <span class="text-danger">{{ lib.icon('error', '') }}</span>
+        {% endif %}
+      </a>
       {% if active %}
         {{ lib.modal_delete('deleteSource', 'Delete source', 'Do you really want to delete the selected source "%s" including configuration?'|format(source.name), url('frame_source_action', args=[frame.id, source.id])+'?action=delete') }}
       {% endif %}

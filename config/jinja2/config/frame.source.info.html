@@ -10,6 +10,11 @@
   {% else %}
     {{ lib.field_text('Update duration', '(no update or not completed)') }}
   {% endif %}
+  {% if source.update_error %}
+    {{ lib.field_text('Update errors', '<code>'|safe + source.update_error + '</code>'|safe) }}
+  {% elif source.update_status %}
+    {{ lib.field_text('Update status', source.update_status) }}
+  {% endif %}
   {{ lib.field_text('Update statistics', '%d total (%d errors)'|format(source.item_count_total, source.item_count_error)) }}
   {{ lib.field_list('Result mapping', {'ID': source.map_item_id_ext, 'URL': source.map_item_url, 'Date creation': source.map_item_date_creation}) }}
   {{ lib.field_pre('Meta mapping', source.map_item_meta) }}
