@@ -29,9 +29,21 @@ class UpdateFrameForm(base.BaseModelForm):
 class CreateSourceForm(base.BaseModelForm):
     class Meta:
         model = models.Source
-        fields = ['name']
+        fields = ['name', 'map_item_url']
         widgets = {
             'name': base.charFieldWidget(),
+            'map_item_url': base.charFieldWidget(),
+        }
+    def field_groups(self):
+        return {
+            'default': {
+                'title': 'Source',
+                'fields': ['name'],
+            },
+            'mapping': {
+                'title': 'Result to item mapping',
+                'fields': ['map_item_url'],
+            }
         }
 
 
