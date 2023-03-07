@@ -195,7 +195,10 @@ class Source(BaseModel):
         verbose_name='End date of update', help_text='Date when the update process finished')
     update_error = models.CharField(
         max_length=256, null=True,
-        verbose_name='Update error', help_text='Which field to map to item\'s creation date')
+        verbose_name='Update error', help_text='Errors of last update process')
+    update_status = models.CharField(
+        max_length=256, null=True,
+        verbose_name='Update status', help_text='Result status information of last update process')
     item_count_total = models.IntegerField(
         default=0,
         verbose_name='Total item count', help_text='Amount of items currently imported')
