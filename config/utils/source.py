@@ -64,11 +64,14 @@ class Processor:
                     _stats = self._process_items_updates(_source, _last_step)
                     _source.item_count_total = _stats['create'] + _stats['update']
                     _source.item_count_error = len(_stats['errors'])
+                    _source.update_status = _stats['status']
+                    _source.update_error = None
                 _source.update_date_end = timezone.now()
                 _source.save()
             except Exception as e:
                 _source.update_date_end = timezone.now()
                 _source.update_error = getattr(e, 'message', repr(e))
+                _source.update_status = None
                 _source.save()
                 raise e
 
@@ -118,12 +121,13 @@ class Processor:
     def _process_items_updates(self, source, last_step):
         _data_out = self._context.get_input(last_step.data_out)[0].convert(DataType(DataType.TYPE, 'dict'))
         _stats = self._process_items_update(source, _data_out)
-        logger.info("Import completed: {} processed ({} created, {} updated, {} deleted, {} errors)".format(
+        _stats['status'] = "Import completed: {} processed ({} created, {} updated, {} deleted, {} errors)".format(
             _stats['cnt'],
             _stats['create'],
             _stats['update'],
             _stats['delete'],
-            len(_stats['errors'])))
+            len(_stats['errors']))
+        logger.info(_stats['status'])
         if len(_stats['errors']):
             logger.info("Last errors:\n- {}".format(
               "\n- ".join("{}: {}".format(e['item'], e['error']) for e in _stats['errors'])))
