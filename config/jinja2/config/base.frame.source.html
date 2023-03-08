@@ -8,7 +8,7 @@
       <a class="{%if active %}btn-nb-r{% endif %} nav-link nav-link{{ active }}" href="{{ url('frame_source', args=[frame.id, source.id]) }}">
         {{ source.name }}
         {% if source.update_error %}
-          <span class="text-danger">{{ lib.icon('error', '') }}</span>
+          <span class="text-danger" title="Error: {{ source.update_error }}">{{ lib.icon('error', '') }}</span>
         {% endif %}
       </a>
       {% if active %}
