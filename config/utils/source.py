@@ -65,6 +65,7 @@ class Processor:
                     _source.item_count_total = _stats['create'] + _stats['update']
                     _source.item_count_error = len(_stats['errors'])
                     _source.update_status = _stats['status']
+                if _last_step:
                     _source.update_error = None
                 _source.update_date_end = timezone.now()
                 _source.save()
