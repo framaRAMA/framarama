@@ -5,7 +5,7 @@ import logging
 
 from django.db import models
 
-from framarama.base import forms as base
+from framarama.base import forms as base, api
 from config.models import SourceStep
 from config.plugins import SourcePluginImplementation
 from config.forms.frame import CreateSourceStepForm, UpdateSourceStepForm
@@ -101,10 +101,16 @@ class Implementation(SourcePluginImplementation):
         self._cookies = {}
 
     def _args(self, model, data_in):
+        _api_methods = {
+            'GET': api.ApiClient.METHOD_GET,
+            'POST': api.ApiClient.METHOD_POST,
+            'PUT': api.ApiClient.METHOD_PUT,
+            'HEAD': api.ApiClient.METHOD_HEAD,
+        }
         _data = data_in.get_as_dict()
         _args = {}
         _args["url"] = self.format_field(model.url, model.url_formatted, _data.get() if _data else {})
-        _args["method"] = model.method
+        _args["method"] = _api_methods[model.method] if model.method in _api_methods else api.ApiClient.METHOD_GET
         _args["cookies"] = self._cookies
         _args["headers"] = {}
 
@@ -125,7 +131,7 @@ class Implementation(SourcePluginImplementation):
     def run(self, model, data_in, ctx):
         _args = self._args(model, data_in)
         logger.info("Loading {}".format(_args["url"]))
-        _response = requests.request(**_args)
+        _response = api.ApiClient.get().get_url(**_args)
         if _response:
             _content_type = _response.headers['content-type'] if 'content-type' in _response.headers else None
             _mime_type = cgi.parse_header(_content_type)[0] if _content_type is not None else None
