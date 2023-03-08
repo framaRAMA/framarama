@@ -1,12 +1,12 @@
 import re
 import math
 import logging
-import requests
 import importlib
 
 from django.conf import settings
 from django.core.paginator import Paginator
 
+from framarama.base import api
 from framarama.base.utils import Filesystem
 from config import models
 from config.plugins import FinishingPluginRegistry, ContextPluginRegistry
@@ -592,7 +592,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
 
     def image_open(self, url, background=None):
         if url.startswith('http://') or url.startswith('https://'):
-            _image = self._wand_image.Image(blob=requests.get(url, timeout=(15, 30), stream=True).raw)
+            _image = self._wand_image.Image(blob=api.ApiClient.get().get_url(url, stream=True).raw)
         elif Filesystem.file_exists(url):
             _image = self._wand_image.Image(blob=Filesystem.file_read(url))
         else:
