@@ -56,6 +56,8 @@ class ApiResultList(ApiResult):
 class ApiClient(Singleton):
     METHOD_GET = 'GET'
     METHOD_POST = 'POST'
+    METHOD_PUT = 'PUT'
+    METHOD_HEAD = 'HEAD'
 
     def __init__(self):
         super().__init__()
@@ -77,26 +79,37 @@ class ApiClient(Singleton):
     def configured(self):
         return self._base_url != None and self._display_access_key != None
 
+    def _http(self, url, method, data=None, headers={}, **kwargs):
+        _headers = {}
+        _headers['Connection'] = 'close'
+        _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in self._user_agent.items() if _v])
+        _headers.update(headers.copy())
+        if method == ApiClient.METHOD_GET:
+            _response = requests.get(url, timeout=(15, 30), headers=_headers, **kwargs)
+        elif method == ApiClient.METHOD_POST:
+            if 'Content-Type' not in _headers:
+                _headers['Content-Type'] = 'application/json; charset=utf-8'
+                kwargs['json'] = data
+            else:
+                kwargs['data'] = data
+            _response = requests.post(url, timeout=(15, 30), headers=_headers, **kwargs)
+        else:
+            raise Exception("Can not handle HTTP method {}".format(method))
+        return _response
+
     def _request(self, path, method=METHOD_GET, data=None):
         if not self.configured():
             raise Exception("API client not configured")
-        _headers = {}
-        _headers['Connection'] = 'close'
-        _headers['X-Display'] = self._display_access_key
-        _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in self._user_agent.items() if _v])
-        if method == ApiClient.METHOD_GET:
-            _response = requests.get(self._base_url + path, timeout=(15, 30), headers=_headers)
-        elif method == ApiClient.METHOD_POST:
-            _headers['Content-Type'] = 'application/json; charset=utf-8'
-            _response = requests.post(self._base_url + path, timeout=(15, 30), headers=_headers, json=data)
-        else:
-            raise Exception("Can not handle HTTP method {}".format(method))
+        _response = self._http(self._base_url + path, method, data, {'X-Display': self._display_access_key})
         _response.raise_for_status()
         return _response.json()
 
     def _list(self, mapper):
         _data = ApiResultList()
         return _data
+
+    def get_url(self, url, method, data=None, headers={}, **kwargs):
+        return self._http(url, method, data, headers, **kwargs)
 
     def get_display(self):
         _data = self._request('/displays')
