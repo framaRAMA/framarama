@@ -108,7 +108,7 @@ class ApiClient(Singleton):
         _data = ApiResultList()
         return _data
 
-    def get_url(self, url, method, data=None, headers={}, **kwargs):
+    def get_url(self, url, method=METHOD_GET, data=None, headers={}, **kwargs):
         return self._http(url, method, data, headers, **kwargs)
 
     def get_display(self):
