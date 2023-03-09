@@ -9,7 +9,15 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body">
-        {{ lib.display_info(display, stats|first if stats else null) }}
+        {{ lib.display_info_device(display, stats|first if stats else null) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mt-2">
+      <div class="card-body">
+        {{ lib.display_info_media(display, stats|first if stats else null) }}
       </div>
     </div>
   </div>
