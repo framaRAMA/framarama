@@ -1,5 +1,5 @@
 
-from framarama.base import frontend, device
+from framarama.base import frontend, device, utils
 from frontend import forms
 from frontend import models
 from frontend import jobs
@@ -120,13 +120,7 @@ class DeviceDashboardView(base.BaseFrontendView):
         _disk_tmp = _capability.disk_data_free()
         _disk_data = _capability.disk_tmp_free()
         _context['sys'] = {
-          'uptime' : {
-            'total': _uptime,
-            'seconds': int(_uptime % 60),
-            'minutes': int(_uptime % 3600 / 60),
-            'hours': int(_uptime % 86400 / 3600),
-            'days': int(_uptime / 86400),
-          }
+          'uptime' : utils.DateTime.delta_dict(_uptime)
         }
         _context['disk'] = {
           'datafree': _disk_data[0],
