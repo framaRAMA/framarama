@@ -234,6 +234,8 @@ class DateTime:
     def delta(time=None, hours=None, minutes=None, seconds=None):
         if type(time) == datetime.timedelta:
             return time
+        if type(time) == int or type(time) == float:
+            return datetime.timedelta(seconds=time)
         if time != None:
             _time = datetime.time.fromisoformat(time)
             return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
