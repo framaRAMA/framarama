@@ -3,6 +3,8 @@ import zoneinfo
 import subprocess
 import logging
 
+from apscheduler.triggers.cron import CronTrigger
+
 from django.utils import timezone
 
 from framarama import settings, jobs
@@ -17,6 +19,8 @@ logger = logging.getLogger(__name__)
 class Scheduler(jobs.Scheduler):
     FE_INIT = 'fe_init'
     FE_REFRESH_DISPLAY = 'fe_refresh_display'
+    FE_DISPLAY_ON = 'fe_display_on'
+    FE_DISPLAY_OFF = 'fe_display_off'
     FE_NEXT_ITEM = 'fe_next_item'
     FE_REFRESH_ITEM = 'fe_refresh_items'
     FE_ACTIVATE_ITEM = 'fe_activate_item'
@@ -85,6 +89,28 @@ class Scheduler(jobs.Scheduler):
     def refresh_display(self):
         logger.info("Updating display ...")
         self._display = frontend.Frontend.get().get_display(force=True)
+        _jobs = {
+            Scheduler.FE_DISPLAY_ON: (self._display.get_time_on(), self.display_on, 'Frontend display on'),
+            Scheduler.FE_DISPLAY_OFF: (self._display.get_time_off(), self.display_off, 'Frontend display off'),
+        }
+        for _job, _conf in _jobs.items():
+            if self.get_job(_job):
+                self.disable_job(_job)
+                self.remove_job(_job)
+            if _conf[0]:
+                _delta = utils.DateTime.delta_dict(_conf[0])
+                _trigger = CronTrigger(year="*", month="*", day="*", hour=_delta['hours'], minute=_delta['minutes'], second="0")
+                self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
+
+    def display_on(self):
+        logger.info("Switch display on at {}".format(self._display.get_time_on()))
+        _device = frontend.Frontend.get().get_device()
+        _device.get_capability().display_on()
+
+    def display_off(self):
+        logger.info("Switch display off at {}".format(self._display.get_time_off()))
+        _device = frontend.Frontend.get().get_device()
+        _device.get_capability().display_off()
 
     def refresh_items(self):
         if self._display:
@@ -100,21 +126,7 @@ class Scheduler(jobs.Scheduler):
         if self._display is None:
             return
         _device = frontend.Frontend.get().get_device()
-        _time_on_reached = self._display.time_on_reached()
-        _time_off_reached = self._display.time_off_reached()
         _display_on = _device.get_capability().display_status()
-        if _time_on_reached or _time_off_reached:
-            if _time_off_reached:
-                if _display_on:
-                    logger.info("Switch display off at {}".format(self._display.get_time_off()))
-                    _device.get_capability().display_off()
-                    _display_on = False
-            elif _time_on_reached:
-                if not _display_on:
-                    logger.info("Switch display on at {}".format(self._display.get_time_on()))
-                    _device.get_capability().display_on()
-                    _display_on = True
-        _device = frontend.Frontend.get().get_device()
         if self._last_update is None and len(_device.get_files()):
             logger.info("Last items exist, activating the last one.")
             self._last_update = utils.DateTime.now()
