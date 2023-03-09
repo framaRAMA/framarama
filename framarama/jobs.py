@@ -49,8 +49,8 @@ class Scheduler:
         else:
             self._add_job(job_id, func, *args, **kwargs)
 
-    def add_job(self, job_id, func, *args, **kwargs):
-        self._add_job(job_id, func, trigger='interval', *args, **kwargs)
+    def add_job(self, job_id, func, trigger='interval', *args, **kwargs):
+        self._add_job(job_id, func, trigger=trigger, *args, **kwargs)
 
     def remove_job(self, job_id):
         self._scheduler.remove_job(job_id)
