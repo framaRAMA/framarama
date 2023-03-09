@@ -244,6 +244,16 @@ class DateTime:
                 seconds=seconds if seconds else 0)
         return None
 
+    def delta_dict(delta):
+        _seconds = DateTime.delta(delta).total_seconds()
+        return {
+            'total': _seconds,
+            'seconds': int(_seconds % 60),
+            'minutes': int(_seconds % 3600 / 60),
+            'hours': int(_seconds % 86400 / 3600),
+            'days': int(_seconds / 86400),
+        }
+
     def reached(time, delta):
         return time is None or time + delta < DateTime.now()
 
