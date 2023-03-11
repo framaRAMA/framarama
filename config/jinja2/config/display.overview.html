@@ -75,44 +75,18 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted text-center">
-          Latest items ({{ latest_items|count }})
-        </h6>
-        {{ lib.list_table(latest_items, {
-          'thumbnail:__self__': '',
-          'item:__self__': 'Item',
-          'count_hit': 'Views'
-        }, {
-          'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
-          'item:__self__': '{{ value.date_last_seen|date_format("%d.%m.%Y %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#displayImageLatest{{ loop.index }}" title="Item #{{ value.item.id }}">{{ value.item.url }}</a>'
-        }) }}
+        {{ lib.display_items('displayImageLatest', 'Latest items (%s)'|format(latest_items|count), latest_items, 'grid') }}
       </div>
     </div>
-    {% for item in latest_items %}
-      {{ lib.modal_image('displayImageLatest%s'|format(loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
-    {% endfor %}
   </div>
 
 
   <div class="col">
     <div class="card mt-2">
       <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted text-center">
-          Top items ({{ top_items|count }})
-        </h6>
-        {{ lib.list_table(top_items, {
-          'thumbnail:__self__': '',
-          'item:__self__': 'Item',
-          'count_hit': 'Views'
-        }, {
-          'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
-          'item:__self__': '{{ value.date_last_seen|date_format("%d.%m.%Y %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#displayImageTop{{ loop.index }}" title="Item #{{ value.item.id }}">{{ value.item.url }}</a>'
-        }) }}
+        {{ lib.display_items('displayImageTop', 'Top items(%s)'|format(top_items|count), top_items, 'grid') }}
       </div>
     </div>
-    {% for item in top_items %}
-      {{ lib.modal_image('displayImageTop%s'|format(loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
-    {% endfor %}
   </div>
 
 </div>
