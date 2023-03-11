@@ -702,6 +702,39 @@
   </ul>
 {% endmacro %}
 
+{% macro display_items(id, title, items, style='list') %}
+  <h6 class="card-subtitle mb-2 text-muted text-center">{{ title }}</h6>
+  <div class="row">
+    {% if style == 'grid' %}
+      {% for item in items %}
+        <div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">
+          <span class="d-inline-block position-relative">
+            <span class="position-absolute bottom-0 start-50 translate-middle w-100">
+              <span class="smaller badge rounded-pill bg-success">{{ icon('action.date', '') }} {{ item.date_last_seen|date_format('%d.%m. %H:%M') }} </span>
+              <span class="smaller badge rounded-pill bg-info">{{ icon('action.view', '') }} {{ item.count_hit }}</span>
+            </span>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}" title="Item #{{ item.item_id }}: {{ item.date_last_seen|date_format('%d.%m.%Y %H:%M') }}">
+              <img src="{{ url('display_item_thumbnail', args=[item.display_id, item.item_id]) }}" loading="lazy" style="width:2.5em;" class="border rounded w-100">
+            </a>
+          </span>
+        </div>
+      {% endfor %}
+    {% else %}
+      {{ list_table(items, {
+        'thumbnail:__self__': '',
+        'item:__self__': 'Item',
+        'count_hit': 'Views'
+      }, {
+        'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
+        'item:__self__': '{{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#%s{{ loop.index }}" title="Item #{{ value.item.id }}: {{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}">{{ value.item.url }}</a>'|format(id)
+      }) }}
+    {% endif %}
+    {% for item in items %}
+      {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
 {% macro badge_group(items) %}
   <div>
     {% for item in items %}
