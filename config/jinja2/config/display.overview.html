@@ -33,41 +33,7 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body text-center">
-        <h6 class="card-subtitle mb-2 text-muted">
-          Latest items
-        </h6>
-        <div class="d-flex justify-content-center">
-          {% set carousel_items = latest_items|list %}
-          {% if carousel_items|selectattr('data_mime') %}
-            <div id="carouselPictures" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
-              <div class="carousel-indicators">
-                {% for item in carousel_items %}
-                  <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
-                {% endfor %}
-              </div>
-              <div class="carousel-inner bg-light rounded rounded-5">
-                {% for item in carousel_items %}
-                  <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-                    <a href="#"  data-bs-toggle="modal" data-bs-target="#displayImageCarousel{{ loop.index }}" title="Item #{{ item.item.id }}"><img src="{{ url('display_item_thumbnail', args=[display.id, item.item.id]) }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/></a>
-                  </div>
-                {% endfor %}
-              </div>
-              <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-              </button>
-            </div>
-            {% for item in carousel_items %}
-              {{ lib.modal_image('displayImageCarousel%s'|format(loop.index), item.item.url, url('display_item_thumbnail', args=[display.id, item.item.id])) }}
-            {% endfor %}
-          {% else %}
-            (no thumbnails available)
-          {% endif %}
-        </div>
+        {{ lib.display_items('displayImageLatestCarousel', 'Latest items', latest_items, 'carousel') }}
       </div>
     </div>
   </div>
