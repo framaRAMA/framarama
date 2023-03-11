@@ -704,8 +704,8 @@
 
 {% macro display_items(id, title, items, style='list') %}
   <h6 class="card-subtitle mb-2 text-muted text-center">{{ title }}</h6>
-  <div class="row">
-    {% if style == 'grid' %}
+  {% if style == 'grid' %}
+    <div class="row">
       {% for item in items %}
         <div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">
           <span class="d-inline-block position-relative">
@@ -719,20 +719,53 @@
           </span>
         </div>
       {% endfor %}
-    {% else %}
-      {{ list_table(items, {
-        'thumbnail:__self__': '',
-        'item:__self__': 'Item',
-        'count_hit': 'Views'
-      }, {
-        'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
-        'item:__self__': '{{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#%s{{ loop.index }}" title="Item #{{ value.item.id }}: {{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}">{{ value.item.url }}</a>'|format(id)
-      }) }}
-    {% endif %}
-    {% for item in items %}
-      {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
-    {% endfor %}
-  </div>
+    </div>
+  {% elif style == 'carousel' %}
+    <div class="d-flex justify-content-center">
+      {% set carousel_items = items|list %}
+      {% if carousel_items|selectattr('data_mime') %}
+        <div id="{{ id }}" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            {% for item in carousel_items %}
+              <button type="button" data-bs-target="#{{ id }}" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
+            {% endfor %}
+          </div>
+          <div class="carousel-inner bg-light rounded rounded-5">
+            {% for item in carousel_items %}
+              <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
+                <a href="#"  data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}" title="Item #{{ item.item.id }}"><img src="{{ url('display_item_thumbnail', args=[item.display.id, item.item.id]) }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/></a>
+              </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#{{ id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#{{ id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        {% for item in carousel_items %}
+          {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
+        {% endfor %}
+      {% else %}
+        (no thumbnails available)
+      {% endif %}
+    </div>
+  {% else %}
+    {{ list_table(items, {
+      'thumbnail:__self__': '',
+      'item:__self__': 'Item',
+      'count_hit': 'Views'
+    }, {
+      'thumbnail:__self__': '<img src="{{ url("display_item_thumbnail", args=[value.display.id, value.item.id]) }}" loading="lazy" style="width:2.5em;" class="border rounded"/>',
+      'item:__self__': '{{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#%s{{ loop.index }}" title="Item #{{ value.item.id }}: {{ value.date_last_seen|date_format("%%d.%%m.%%Y %%H:%%M") }}">{{ value.item.url }}</a>'|format(id)
+    }) }}
+  {% endif %}
+  {% for item in items %}
+    {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
+  {% endfor %}
 {% endmacro %}
 
 {% macro badge_group(items) %}
