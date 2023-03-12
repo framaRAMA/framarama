@@ -130,7 +130,7 @@ class ApiClient(Singleton):
             lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
         return _result.get(0) if _result.count() > 0 else None
 
-    def submit_item_hit(self, display_id, item_id, thumbnail=None, mime=None):
+    def submit_item_hit(self, display_id, item_id, thumbnail=None, mime=None, meta=None):
         _data = {'id': item_id}
         if thumbnail or mime:
             _thumbnail = {}
@@ -138,6 +138,8 @@ class ApiClient(Singleton):
                 _thumbnail['data'] = base64.b64encode(thumbnail).decode()
             if mime:
                 _thumbnail['mime'] = mime
+            if meta:
+                _thumbnail['meta'] = meta
             _data['thumbnail'] = _thumbnail
         self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, _data)
 

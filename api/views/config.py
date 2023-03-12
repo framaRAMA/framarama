@@ -99,6 +99,7 @@ class DataFieldSerializer(serializers.Field):
             'mime': value.data_mime,
             'size': value.data_size,
             'data': base64.b64encode(value.data()),
+            'meta': value.meta,
         }
 
     def to_internal_value(self, data, *args, **kwargs):
@@ -114,7 +115,8 @@ class DataFieldSerializer(serializers.Field):
         _data = base64.b64decode(data['data'])
         if len(_data) > 1*1024*1024:
             raise serializers.ValidationError("maximum size of 1mb exceeded")
-        return self._cls.create(data=_data, mime=_mime)
+        _meta = data['meta'] if 'meta' in data else {}
+        return self._cls.create(data=_data, mime=_mime, meta=_meta)
 
 
 class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
