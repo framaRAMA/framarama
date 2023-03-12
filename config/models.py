@@ -93,6 +93,9 @@ class Data(BaseModel):
     data_file = models.FileField(
         blank=True, null=True, editable=False, upload_to=_path,
         verbose_name='Save as file', help_text='Store content in the filesystem')
+    meta = models.JSONField(
+        blank=True, null=True, editable=False, default={},
+        verbose_name='Info', help_text='Meta information for data item')
 
     def storage_path(self):
         return []
@@ -100,9 +103,16 @@ class Data(BaseModel):
     def update(self, existing):
         existing.data_mime = self.data_mime
         existing.data_size = self.data_file.size
+        existing.meta = self.meta
         existing.data_file.open('wb')
         existing.data_file.write(self.data_file.read())
         existing.data_file.close()
+
+    def set_meta(self, name, value):
+        self.meta[name] = value
+
+    def get_meta(self, name):
+        self.meta.get(name, None)
 
     def data(self):
         try:
@@ -112,7 +122,7 @@ class Data(BaseModel):
         return None
 
     @classmethod
-    def create(cls, json=None, data=None, mime=None):
+    def create(cls, json=None, data=None, mime=None, meta=None):
         if json:
             _data = utils.Json.from_dict(json)
             _mime = 'application/json' if mime is None else mime
@@ -125,6 +135,7 @@ class Data(BaseModel):
         _instance.data_mime = mime
         _instance.data_size = _file.size
         _instance.data_file = _file
+        _instance.meta = meta if meta else {}
         return _instance
 
 
