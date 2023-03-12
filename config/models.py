@@ -94,7 +94,7 @@ class Data(BaseModel):
         blank=True, null=True, editable=False, upload_to=_path,
         verbose_name='Save as file', help_text='Store content in the filesystem')
     meta = models.JSONField(
-        blank=True, null=True, editable=False, default={},
+        blank=True, null=True, editable=False, default=dict,
         verbose_name='Info', help_text='Meta information for data item')
 
     def storage_path(self):

@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='data',
             name='meta',
-            field=models.JSONField(blank=True, default={}, editable=False, help_text='Meta information for data item', null=True, verbose_name='Info'),
+            field=models.JSONField(blank=True, default=dict, editable=False, help_text='Meta information for data item', null=True, verbose_name='Info'),
         ),
     ]
