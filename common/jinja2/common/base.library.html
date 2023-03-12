@@ -722,16 +722,15 @@
     </div>
   {% elif style == 'carousel' %}
     <div class="d-flex justify-content-center">
-      {% set carousel_items = items|list %}
-      {% if carousel_items|selectattr('data_mime') %}
+      {% if items|selectattr('data_mime') %}
         <div id="{{ id }}" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
           <div class="carousel-indicators">
-            {% for item in carousel_items %}
+            {% for item in items %}
               <button type="button" data-bs-target="#{{ id }}" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
             {% endfor %}
           </div>
           <div class="carousel-inner bg-light rounded rounded-5">
-            {% for item in carousel_items %}
+            {% for item in items %}
               <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
                 <a href="#"  data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}" title="Item #{{ item.item.id }}"><img src="{{ url('display_item_thumbnail', args=[item.display.id, item.item.id]) }}" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5" loading="lazy"/></a>
               </div>
@@ -746,7 +745,7 @@
             <span class="visually-hidden">Next</span>
           </button>
         </div>
-        {% for item in carousel_items %}
+        {% for item in items %}
           {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
         {% endfor %}
       {% else %}
