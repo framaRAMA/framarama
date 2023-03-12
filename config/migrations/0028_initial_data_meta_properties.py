@@ -8,7 +8,7 @@ def forward(apps, schema_editor):
     _adapter = finishing.WandImageProcessingAdapter()
     model = apps.get_model('config', 'Data')
     for row in model.objects.all():
-        if 'width' in row.meta:
+        if row.meta and 'width' in row.meta:
             continue
         _image = _adapter.image_open(row.data_file.path)
         _meta = _adapter.image_meta(_image)
