@@ -139,7 +139,25 @@ class Data(BaseModel):
         return _instance
 
 
-class ItemThumbnailData(Data):
+class BaseImageData(Data):
+
+    class Meta:
+        proxy = True
+
+    def get_width(self):
+        return self.get_meta('width')
+
+    def set_width(self, width):
+        return self.set_meta('width', width)
+
+    def get_height(self):
+        return self.get_meta('height')
+
+    def set_width(self, height):
+        return self.set_meta('height', height)
+
+
+class ItemThumbnailData(BaseImageData):
 
     class Meta:
         proxy = True
@@ -148,7 +166,7 @@ class ItemThumbnailData(Data):
         return ['item', 'thumbnail']
 
 
-class DisplayItemThumbnailData(Data):
+class DisplayItemThumbnailData(BaseImageData):
 
     class Meta:
         proxy = True
