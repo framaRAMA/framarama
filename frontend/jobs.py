@@ -96,6 +96,7 @@ class Scheduler(jobs.Scheduler):
         for _job, _conf in _jobs.items():
             self.disable_job(_job)
             if _conf[0]:
+                logger.info("Register job {} at {}".format(_job, _conf[0]))
                 _delta = utils.DateTime.delta_dict(_conf[0])
                 _trigger = CronTrigger(year="*", month="*", day="*", hour=_delta['hours'], minute=_delta['minutes'], second="0")
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
