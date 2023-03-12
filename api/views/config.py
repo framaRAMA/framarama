@@ -12,7 +12,7 @@ from rest_framework.parsers import JSONParser
 from framarama.base import utils
 from framarama.base.views import BaseQuerySetMixin
 from config import models
-from config.utils import sorting
+from config.utils import sorting, finishing
 from api import auth
 
 
@@ -157,6 +157,13 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
                     _thumbnail.update(_display_item.thumbnail)
                 else:
                     _display_item.thumbnail = _thumbnail
+                if 'width' not in _display_item.thumbnail.meta or 'height' not in _display_item.thumbnail.meta:
+                    _adapter = finishing.WandImageProcessingAdapter()
+                    _image = _adapter.image_open(_display_item.thumbnail.data_file.path)
+                    _meta = _adapter.image_meta(_image)
+                    _adapter.image_close(_image)
+                    _display_item.thumbnail.meta['width'] = _meta['width']
+                    _display_item.thumbnail.meta['height'] = _meta['height']
                 _display_item.thumbnail.save()
             elif _display_item.thumbnail:
                 _display_item.thumbnail.data_file.delete(save=False)
