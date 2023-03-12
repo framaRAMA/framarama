@@ -288,7 +288,11 @@ class Display(Singleton):
         _item = frontend_item.item()
         _mime = frontend_item.mime()
         _thumbnail = frontend_item.preview()
-        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime)
+        _meta = {
+            'width': frontend_item.preview_width(),
+            'height': frontend_item.preview_height(),
+        }
+        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime, _meta)
 
     def get_next_item(self, refresh=False, hit=False):
         if self._next is None or refresh:
@@ -526,6 +530,12 @@ class FrontendItem:
 
     def height(self):
         return self._result.get_height()
+
+    def preview_width(self):
+        return self._result.get_preview_width()
+
+    def preview_height(self):
+        return self._result.get_preview_height()
 
 
 class BaseFrontendRenderer:

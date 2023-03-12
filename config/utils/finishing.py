@@ -294,37 +294,45 @@ class Processor:
 
         _preview_size = settings.FRAMARAMA['FRONTEND_THUMBNAIL_SIZE']
         _adapter.image_resize(_image, _preview_size[0], _preview_size[1], True)
-        _image_preview = _adapter.image_data(_image)
+        _preview_data = _adapter.image_data(_image)
+        _preview_meta = _adapter.image_meta(_image)
 
         logger.info("Result: {}x{} pixels, {} bytes".format(
             _image_meta['width'],
             _image_meta['height'],
             len(_image_data)))
 
-        return ProcessingResult(_image_meta, _image_data, _image_preview)
+        return ProcessingResult(_image_meta, _image_data, _preview_meta, _preview_data)
 
 
 class ProcessingResult:
 
-    def __init__(self, meta, image_data, image_preview):
+    def __init__(self, image_meta, image_data, preview_meta, preview_data):
+        self._image_meta = image_meta
         self._image_data = image_data
-        self._image_preview = image_preview
-        self._meta = meta
+        self._preview_meta = preview_meta
+        self._preview_data = preview_data
 
     def get_data(self):
         return self._image_data
 
     def get_preview(self):
-        return self._image_preview
+        return self._preview_data
 
     def get_width(self):
-        return self._meta['width']
+        return self._image_meta['width']
 
     def get_height(self):
-        return self._meta['height']
+        return self._image_meta['height']
 
     def get_mime(self):
-        return self._meta['mime']
+        return self._image_meta['mime']
+
+    def get_preview_width(self):
+        return self._preview_meta['width']
+
+    def get_preview_height(self):
+        return self._preview_meta['height']
 
 
 class Color:
