@@ -80,9 +80,7 @@ class Context:
     def close(self):
         _names = list(self._image_data.keys())
         for _name in _names:
-            _images = self._image_data[_name].get_images()
-            for _image in _images:
-                self._adapter.image_close(_image)
+            self._adapter.image_close(self._image_data[_name])
             del self._image_data[_name]
 
 
@@ -697,7 +695,8 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         return _image_container
     
     def image_close(self, image):
-        image.destroy()
+        for _image in image.get_images():
+            _image.destroy()
 
     def draw_line(self, image, start, end, brush):
         with self._drawing(brush=brush) as _drawing:
