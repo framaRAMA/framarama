@@ -12,10 +12,14 @@ def forward(apps, schema_editor):
             continue
         _image = _adapter.image_open(row.data_file.path)
         _meta = _adapter.image_meta(_image)
-        row.meta.update({
+        _row_meta = {
             'width': _meta['width'],
             'height': _meta['height']
-        })
+        }
+        if row.meta:
+            row.meta.update(_row_meta)
+        else:
+            row.meta = _row_meta
         row.save(update_fields=['meta'])
 
 
