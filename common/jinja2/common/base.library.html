@@ -714,7 +714,7 @@
               <span class="smaller badge rounded-pill bg-info">{{ icon('action.view', '') }} {{ item.count_hit }}</span>
             </span>
             <a href="#" data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}" title="Item #{{ item.item_id }}: {{ item.date_last_seen|date_format('%d.%m.%Y %H:%M') }}">
-              <img src="{{ url('display_item_thumbnail', args=[item.display_id, item.item_id]) }}" loading="lazy" style="width:2.5em;" class="border rounded w-100">
+              <img src="{{ url('display_item_thumbnail', args=[item.display_id, item.item_id]) }}" loading="lazy" class="border rounded w-100">
             </a>
           </span>
         </div>
