@@ -100,6 +100,7 @@ class Scheduler(jobs.Scheduler):
                 _delta = utils.DateTime.delta_dict(_conf[0])
                 _trigger = CronTrigger(year="*", month="*", day="*", hour=_delta['hours'], minute=_delta['minutes'], second="0")
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
+                self.enable_job(_job)
             else:
                 self.display_on()
 
