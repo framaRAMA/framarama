@@ -61,7 +61,7 @@ class Scheduler(jobs.Scheduler):
     def item_thumbnail(self, item):
         logger.info("Generating thumbnail for {}".format(item))
         _size = settings.FRAMARAMA['CONFIG_THUMBNAIL_SIZE']
-        _adapter = finishing.WandImageProcessingAdapter()
+        _adapter = finishing.ImageProcessingAdapter.get_default()
         _image = _adapter.image_open(item.url)
         _adapter.image_resize(_image, _size[0], _size[1], True)
         logger.info("Result: {}".format(_image))

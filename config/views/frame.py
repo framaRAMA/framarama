@@ -479,7 +479,7 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 _frame.contexts.all(),
                 _item,
                 _frame.finishings.all(),
-                finishing.WandImageProcessingAdapter())
+                finishing.ImageProcessingAdapter.get_default())
             with _finishing_context:
                 _result = finishing.Processor(_finishing_context).process()
                 self.response(_context, _result.get_data(), _result.get_mime())

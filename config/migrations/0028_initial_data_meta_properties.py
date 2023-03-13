@@ -5,7 +5,7 @@ from config.utils import finishing
 
 
 def forward(apps, schema_editor):
-    _adapter = finishing.WandImageProcessingAdapter()
+    _adapter = finishing.ImageProcessingAdapter.get_default()
     model = apps.get_model('config', 'Data')
     for row in model.objects.all():
         if row.meta and 'width' in row.meta:

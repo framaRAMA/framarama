@@ -158,7 +158,7 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
                 else:
                     _display_item.thumbnail = _thumbnail
                 if 'width' not in _display_item.thumbnail.meta or 'height' not in _display_item.thumbnail.meta:
-                    _adapter = finishing.WandImageProcessingAdapter()
+                    _adapter = finishing.ImageProcessingAdapter.get_default()
                     _image = _adapter.image_open(_display_item.thumbnail.data_file.path)
                     _meta = _adapter.image_meta(_image)
                     _adapter.image_close(_image)

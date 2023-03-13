@@ -222,6 +222,7 @@ FRAMARAMA = {
     'ADMIN_PASSWORD': 'testabc123',
     'ADMIN_MAIL': 'admin@some-domain.tld',
     'API_URL': 'http://127.0.0.1:8000',
+    'IMAGE_PROCESSING_ADAPTER': 'config.utils.finishing.WandImageProcessingAdapter',
     'FRONTEND_ITEM_UPDATE_INTERVAL': '00:05:00',
     'CONFIG_SOURCE_UPDATE_INTERVAL': '00:05:00',
     'FRONTEND_THUMBNAIL_SIZE': [640, 480],

@@ -498,6 +498,11 @@ class ImageContainer:
 
 class ImageProcessingAdapter:
 
+    @staticmethod
+    def get_default():
+        _adapter = Classes.load(settings.FRAMARAMA['IMAGE_PROCESSING_ADAPTER'], fqcn=True)
+        return _adapter()
+
     def image_open(self, url, background=None):
         raise NotImplementedException()
 

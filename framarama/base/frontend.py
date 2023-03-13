@@ -337,7 +337,7 @@ class FrontendDevice(Singleton):
         _disk_free_tmp = _capability.disk_tmp_free()
         _disk_free_tmp_max = round(1024 * _disk_free_tmp[1] * 0.8)
         logger.info("Restricting disk usage to {:.0f} MB".format(_disk_free_tmp_max/1024/1024))
-        _adapter = finishing.WandImageProcessingAdapter()
+        _adapter = finishing.ImageProcessingAdapter.get_default()
         _adapter._wand_resource.limits['memory'] = _mem_max
         _adapter._wand_resource.limits['disk'] = _disk_free_tmp_max
         _context = finishing.Context(
