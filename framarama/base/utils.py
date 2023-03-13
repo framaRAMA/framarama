@@ -8,6 +8,7 @@ import threading
 import signal
 import logging
 import json
+import importlib
 
 from django.utils import dateparse, timezone
 
@@ -268,4 +269,21 @@ class DateTime:
 
     def parse(date):
         return dateparse.parse_datetime(date)
+
+
+class Classes:
+
+    @staticmethod
+    def load(name, fqcn=False, fallback=None):
+        if fqcn:
+            _name, _, _class = name.rpartition('.')
+        else:
+            _name = name
+        try:
+            _module = importlib.import_module(_name)
+            return getattr(_module, _class) if fqcn else _module
+        except Exception as e:
+            if fallback:
+                return importlib.import_module(fallback, fqcn)
+            raise e
 
