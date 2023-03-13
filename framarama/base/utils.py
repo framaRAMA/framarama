@@ -221,6 +221,7 @@ class Json:
 
 class DateTime:
 
+    @staticmethod
     def now(sub=None, add=None):
         _now = timezone.now()
         if sub:
@@ -229,9 +230,11 @@ class DateTime:
             _now = _now + DateTime.delta(sub)
         return _now
 
+    @staticmethod
     def midnight():
         return DateTime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
+    @staticmethod
     def delta(time=None, hours=None, minutes=None, seconds=None):
         if type(time) == datetime.timedelta:
             return time
@@ -247,6 +250,7 @@ class DateTime:
                 seconds=seconds if seconds else 0)
         return None
 
+    @staticmethod
     def delta_dict(delta):
         _seconds = DateTime.delta(delta).total_seconds()
         return {
@@ -257,9 +261,11 @@ class DateTime:
             'days': int(_seconds / 86400),
         }
 
+    @staticmethod
     def reached(time, delta):
         return time is None or time + delta < DateTime.now()
 
+    @staticmethod
     def utc(dt):
         if dt and dt.tzinfo:
             return dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
@@ -267,6 +273,7 @@ class DateTime:
             return dt.isoformat() + 'Z'
         return None
 
+    @staticmethod
     def parse(date):
         return dateparse.parse_datetime(date)
 
