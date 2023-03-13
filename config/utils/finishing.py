@@ -1,13 +1,12 @@
 import re
 import math
 import logging
-import importlib
 
 from django.conf import settings
 from django.core.paginator import Paginator
 
 from framarama.base import api
-from framarama.base.utils import Filesystem
+from framarama.base.utils import Filesystem, Classes
 from config import models
 from config.plugins import FinishingPluginRegistry, ContextPluginRegistry
 from config.utils import context
@@ -551,10 +550,10 @@ class ImageProcessingAdapter:
 class WandImageProcessingAdapter(ImageProcessingAdapter):
 
     def __init__(self):
-        self._wand_resource = importlib.import_module('wand.resource')
-        self._wand_image = importlib.import_module('wand.image')
-        self._wand_drawing = importlib.import_module('wand.drawing')
-        self._wand_color = importlib.import_module('wand.color')
+        self._wand_resource = Classes.load('wand.resource')
+        self._wand_image = Classes.load('wand.image')
+        self._wand_drawing = Classes.load('wand.drawing')
+        self._wand_color = Classes.load('wand.color')
 
     def _color(self, color):
         if color is None:

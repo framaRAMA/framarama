@@ -1,10 +1,8 @@
 import pkgutil
-import importlib
-import config.plugins.sources
-import config.plugins.sortings
-import config.plugins.finishings
-import config.plugins.contexts
-import config.models as models
+
+from framarama.base import utils
+from config import models
+from config.plugins import sources, sortings, finishings, contexts
 
 
 class Plugin:
@@ -104,7 +102,7 @@ class PluginRegistry:
             _sub_modules = pkgutil.iter_modules(_base_module.__path__)
             for _name in [_submodule.name for _submodule in _sub_modules]:
                 _package = _base_module.__name__ + '.' + _name
-                _module = importlib.import_module(_package)
+                _module = utils.Classes.load(_package)
                 cls.instance._registry[_name] = Plugin(_name, _module);
         return cls.instance
 
