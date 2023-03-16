@@ -15,9 +15,9 @@ STATUS_RESTRICTION_CHOICES = [
   ('sys', 'System (like uptime)'),
   ('memory', 'Memory (usage and free)'),
   ('cpu', 'CPU (device load)'),
-  ('disk', 'Dik (usage and free)'),
+  ('disk', 'Disk (usage and free)'),
   ('network', 'Network (status and connectivty)'),
-  ('screen', 'Display (statu and geometry)'),
+  ('screen', 'Display (status and geometry)'),
   ('item', 'Item (views, counts, hits)'),
   ('app', 'Application (release and version)'),
 ]
