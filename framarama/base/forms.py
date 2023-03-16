@@ -21,6 +21,10 @@ def selectFieldWidget(choices, *args, **kwargs):
     return forms.Select(attrs={'class':'form-control'}, choices=choices, *args, **kwargs)
 
 
+def multiChoiceFieldWidget(choices=(), *args, **kwargs):
+    return forms.CheckboxSelectMultiple(attrs={'class':'form-check-input'}, choices=choices, *args, *kwargs)
+
+
 def timeFieldWidget(*args, **kwargs):
     return forms.TimeInput(attrs={'class':'form-control'}, *args, **kwargs)
 

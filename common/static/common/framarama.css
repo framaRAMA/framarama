@@ -89,3 +89,28 @@
   transition: all .3s ease;
   cursor: pointer;
 }
+
+/** reverse order label, input -> remove padding */
+.form-floating > label.form-label {
+  padding-top: 0px;
+}
+/** remove bottom padding from label of multi-checkbox */
+.form-check-multiple > label.form-label {
+  margin-bottom: 0px;
+}
+/** fix label color for multi-checkbox, use same as for normal checkbox */
+.form-check-multiple > .form-check-input > div > label {
+  padding-top: 0px;
+  color: rgba(0,0,0,.6);
+}
+/** remove styling completely for mult-checkbox container div */
+.form-check-multiple div.form-check-input {
+  width: auto;
+  height: auto;
+  border: 0px;
+}
+/** do not highlight multi-checkbox container div when clicked */
+.form-check-multiple div.form-check-input:active {
+  filter: unset;
+}
+
