@@ -11,6 +11,16 @@ MODE_CHOICES = [
   ('local', 'Local setup'),
   ('cloud', 'Cloud setup'),
 ]
+STATUS_RESTRICTION_CHOICES = [
+  ('sys', 'System (like uptime)'),
+  ('memory', 'Memory (usage and free)'),
+  ('cpu', 'CPU (device load)'),
+  ('disk', 'Dik (usage and free)'),
+  ('network', 'Network (status and connectivty)'),
+  ('screen', 'Display (statu and geometry)'),
+  ('item', 'Item (views, counts, hits)'),
+  ('app', 'Application (release and version)'),
+]
 DBTYPE_CHOICES = [
   ('local', 'Integrated database (no database config required)'),
   ('mysql', 'MySQL/MariaDB server')
@@ -54,6 +64,9 @@ class Config(BaseModel):
     cloud_display_access_key = models.CharField(
         max_length=64, blank=True, null=True,
         verbose_name='Display', help_text='Access key for display')
+    cloud_status_restriction = models.JSONField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Status reporting', help_text='Define which status information will be submitted to server')
 
     date_app_startup = models.DateTimeField(
         null=True,

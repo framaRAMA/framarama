@@ -33,9 +33,13 @@ class LocalModeSetupForm(base.BaseModelForm):
 
 
 class CloudModeSetupForm(base.BaseModelForm):
+    cloud_status_restriction = forms.MultipleChoiceField(
+        choices=models.STATUS_RESTRICTION_CHOICES,
+        widget=base.multiChoiceFieldWidget())
+
     class Meta:
         model = models.Config
-        fields = ['mode', 'cloud_server', 'cloud_display_access_key']
+        fields = ['mode', 'cloud_server', 'cloud_display_access_key', 'cloud_status_restriction']
         widgets = {
             'mode': base.hiddenFieldWidget(),
             'cloud_server': base.charFieldWidget(),
