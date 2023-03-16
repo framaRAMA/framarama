@@ -142,15 +142,12 @@ class Frontend(Singleton):
             'height': _display_size[1] if _display_size else None,
         }
 
-    def get_status(self):
+    def get_status(self, restrictions=None):
         _config = self.get_config().get_config()
         _device = self.get_device()
         _capability = _device.get_capability()
-        _uptime = _capability.sys_uptime()
         _mem_total = _capability.mem_total()
         _mem_free = _capability.mem_free()
-        _cpu_load = _capability.cpu_load()
-        _cpu_temp = _capability.cpu_temp()
         _disk_data = _capability.disk_data_free()
         _disk_tmp = _capability.disk_tmp_free()
         _network_config = _capability.net_config()
@@ -161,17 +158,21 @@ class Frontend(Singleton):
             'id': _files[_name]['json']['item'].id,
             'time': DateTime.utc(_files[_name]['json']['time'])
         } for _name in _files]
-        _data = {
-            'uptime': _uptime,
-            'memory': {
+        _data = {}
+        if restrictions is None or 'sys' in restrictions:
+            _data['uptime'] = _capability.sys_uptime()
+        if restrictions is None  or 'memory' in restrictions:
+            _data['memory'] = {
                 'used': _mem_total - _mem_free if _mem_total and _mem_free else None,
                 'free': _mem_free if _mem_free else None,
-            },
-            'cpu': {
-                'load': _cpu_load,
-                'temp': _cpu_temp,
-            },
-            'disk': {
+            }
+        if restrictions is None  or 'cpu' in restrictions:
+            _data['cpu'] = {
+                'load': _capability.cpu_load(),
+                'temp': _capability.cpu_temp(),
+            }
+        if restrictions is None  or 'disk' in restrictions:
+            _data['disk'] = {
                 'data': {
                     'used': _disk_data[0],
                     'free': _disk_data[1],
@@ -180,37 +181,44 @@ class Frontend(Singleton):
                     'used': _disk_tmp[0],
                     'free': _disk_tmp[1],
                 },
-            },
-            'network': {
+            }
+        if restrictions is None  or 'network' in restrictions:
+            _data['network'] = {
                 'profile': _network_status['profile'],
                 'connected': DateTime.utc(_network_status['connected']) if _network_status['connected'] else None,
                 'address': {
                     'ip': _network_config['ip'] if _network_config else None,
                     'gateway': _network_config['gateway'] if _network_config else None,
                 }
-            },
-            'screen': self.get_screen(),
-            'items': {
+            }
+        if restrictions is None  or 'screen' in restrictions:
+            _data['screen'] = self.get_screen()
+        if restrictions is None  or 'items' in restrictions:
+            _data['items'] = {
                 'total': _config.count_items,
                 'shown': _config.count_views,
                 'error': _config.count_errors,
                 'updated': DateTime.utc(_config.date_items_update) if _config.date_items_update else None,
                 'latest': _latest_items,
-            },
-            'app': {
+            }
+        if restrictions is None  or 'app' in restrictions:
+            _data['app'] = {
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['branch'] if _app_revision else None,
                 'revision': _app_revision['current'] if _app_revision else None,
                 'revisions': _app_revision['revisions'] if _app_revision else None,
-            },
-        }
+            }
         return _data
 
     def submit_status(self):
+        _config = self.get_config().get_config()
+        _restrictions = _config.cloud_status_restriction
         _display = self.get_display()
-        _data = self.get_status()
-        logger.info("Submitting status information: {}".format(_data))
+        _data = self.get_status(_restrictions if _restrictions else [])
+        if not _data:
+            return
+        logger.info("Submitting {} status information: {}".format(_restrictions, _data))
         try:
             self._client.submit_status(_display.get_id(), _data)
         except Exception as e:
