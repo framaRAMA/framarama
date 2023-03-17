@@ -702,7 +702,7 @@
   <h6 class="card-subtitle mb-2 text-muted">Media information ({{ status.created|date_format('%d.%m.%Y %H:%M') if status else 'not available' }})</h6>
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> pictures in collection</li>
-    <li><strong>{{ status.items_shown if status else '0' }}</strong> pictures served</li>
+    <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> pictures served</li>
     <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
   </ul>
 {% endmacro %}
