@@ -193,7 +193,7 @@ class Frontend(Singleton):
             }
         if restrictions is None  or 'screen' in restrictions:
             _data['screen'] = self.get_screen()
-        if restrictions is None  or 'items' in restrictions:
+        if restrictions is None  or 'item' in restrictions:
             _data['items'] = {
                 'total': _config.count_items,
                 'shown': _config.count_views,
