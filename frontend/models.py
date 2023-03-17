@@ -20,6 +20,7 @@ STATUS_RESTRICTION_CHOICES = [
   ('screen', 'Display (status and geometry)'),
   ('item', 'Item (views, counts, hits)'),
   ('app', 'Application (release and version)'),
+  ('thumbs', 'Thumbnails (media thumbnails)'),
 ]
 DBTYPE_CHOICES = [
   ('local', 'Integrated database (no database config required)'),

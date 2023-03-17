@@ -292,7 +292,7 @@ class Display(Singleton):
             self._items = self._client.get_items_list(self.get_id())
         return self._items
 
-    def submit_item_hit(self, frontend_item):
+    def submit_item_hit(self, frontend_item, thumbnail=False):
         _item = frontend_item.item()
         _mime = frontend_item.mime()
         _thumbnail = frontend_item.preview()
@@ -300,7 +300,10 @@ class Display(Singleton):
             'width': frontend_item.preview_width(),
             'height': frontend_item.preview_height(),
         }
-        self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime, _meta)
+        if thumbnail:
+            self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime, _meta)
+        else:
+            self._client.submit_item_hit(self.get_id(), _item.id)
 
     def get_next_item(self, refresh=False, hit=False):
         if self._next is None or refresh:

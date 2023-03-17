@@ -140,6 +140,7 @@ class Scheduler(jobs.Scheduler):
         elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
             _config = frontend.Frontend.get().get_config().get_config()
+            _restrictions = _config.cloud_status_restriction
             try:
                 self._last_update = utils.DateTime.now()
                 logger.info("Retrieve next item ...")
@@ -161,7 +162,7 @@ class Scheduler(jobs.Scheduler):
                 raise
             finally:
                 _config.save()
-            self._display.submit_item_hit(_frontend_item)
+            self._display.submit_item_hit(_frontend_item, 'thumbs' in _restrictions if _restrictions else False)
 
     def submit_status(self):
         if self._display is None:
