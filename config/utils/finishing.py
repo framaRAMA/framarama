@@ -441,17 +441,18 @@ class Text:
     ALIGN_RIGHT = 'right'
     ALIGN_CENTER = 'center'
 
-    def __init__(self, text:str, font:str=None, size:int=None, weight:int=None, alignment:str=None, border:int=None, border_radius:int=None):
+    def __init__(self, text:str, font:str=None, size:int=None, weight:int=None, alignment:str=None, alignment_vertical:str=None, border:int=None, border_radius:int=None):
         self._text = text
         self._font = font
         self._size = size
         self._weight = weight
         self._alignment = alignment
+        self._alignment_vertical = alignment_vertical
         self._border = border
         self._border_radius = border_radius
 
     def __repr__(self):
-        return "<{}: text={}, font={}, size={}, align={}>".format(type(self).__name__, self._text, self._font, self._size, self._align)
+        return "<{}: text={}, font={}, size={}, align={}, valign=[}>".format(type(self).__name__, self._text, self._font, self._size, self._alignment, self._alignment_vertical)
 
     def get_text(self):
         return self._text
@@ -467,6 +468,9 @@ class Text:
 
     def get_alignment(self):
         return self._alignment
+
+    def get_alignment_vertical(self):
+        return self._alignment_vertical
 
     def get_border(self):
         return self._border
@@ -720,25 +724,37 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
     def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None):
         with self._drawing(text=text, brush=brush) as _drawing:
             _text = text.get_text()
+            _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
+            _padding = int(border_padding) if border_padding else 0
+            if text.get_alignment() == Text.ALIGN_LEFT:
+                _xoffset = 0
+            elif text.get_alignment() == Text.ALIGN_RIGHT:
+                _xoffset = -_metrics.text_width
+            elif text.get_alignment() == Text.ALIGN_CENTER:
+                _xoffset = int(-_metrics.text_width/2)
+            else:
+                _xoffest = 0
+            if text.get_alignment_vertical() == Text.ALIGN_CENTER:
+                _yoffset = int(_metrics.text_height/2)
+            else:
+                _yoffset = 0
+            # Rectangle size is text_width x text_height (both full size, height includes
+            # ascender and descrender). Vertically shift down by descender. Horizontally
+            # increased by descender for equal padding.
+            # ascender (to top) is positive, descender (to bottom) is negative
+            _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
+            _y1 = pos.get_y() - _padding + _yoffset - _metrics.text_height - _metrics.descender
+            _x2 = pos.get_x() + _padding + _xoffset + _metrics.text_width - _metrics.descender
+            _y2 = pos.get_y() + _padding + _yoffset - _metrics.descender
+            _x = pos.get_x()
+            _y = int(pos.get_y() + _yoffset)
             if border_brush and border_brush.get_stroke_width() is not None:
-                _padding = int(border_padding) if border_padding else 0
-                _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
-                if text.get_alignment() == Text.ALIGN_LEFT:
-                    _xoffset = 0
-                elif text.get_alignment() == Text.ALIGN_RIGHT:
-                    _xoffset = -_metrics.text_width
-                elif text.get_alignment() == Text.ALIGN_CENTER:
-                    _xoffset = int(-_metrics.text_width/2)
                 if border_brush.get_stroke_width() == 0:
                     border_brush = Brush(
                         None, 0,
                         border_brush.get_fill_color())
-                _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
-                _y1 = pos.get_y() - _padding - _metrics.text_height - _metrics.descender
-                _x2 = pos.get_x() + _padding + _metrics.text_width + _xoffset - _metrics.descender
-                _y2 = pos.get_y() + _padding - _metrics.descender
                 self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius)
-            _drawing.text(pos.get_x(), pos.get_y(), _text)
+            _drawing.text(_x, _y, _text)
             self._apply_drawing(image, _drawing)
 
 

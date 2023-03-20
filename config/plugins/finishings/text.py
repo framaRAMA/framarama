@@ -17,6 +17,10 @@ TEXT_ALIGNMENTS = [
     ('right', 'Right'),
     ('center', 'Center'),
 ]
+TEXT_VERTICAL_ALIGNMENTS = [
+    ('default', 'Default'),
+    ('center', 'Center'),
+]
 
 
 FIELDS = [
@@ -77,6 +81,9 @@ class TextModel(Finishing, ColorStrokeFillAlpha):
     alignment = models.CharField(
         max_length=16, choices = TEXT_ALIGNMENTS,
         verbose_name='Alignment', help_text='How to align the text')
+    alignment_vertical = models.CharField(
+        max_length=16, choices = TEXT_VERTICAL_ALIGNMENTS,
+        verbose_name='Vertical alignment', help_text='How to align the text vertically')
     border = models.CharField(
         max_length=16, blank=True, null=True,
         verbose_name='Border', help_text='Draw border around the text with given width')
@@ -130,6 +137,7 @@ class Implementation(FinishingPluginImplementation):
         _size = model.size.as_int()
         _weight = model.weight.as_int()
         _alignment = model.alignment.as_str()
+        _alignment_vertical = model.alignment_vertical.as_str()
         _border = model.border.as_int()
         _border_radius = model.border_radius.as_int()
         _border_alpha = model.border_alpha.as_int()
@@ -147,7 +155,7 @@ class Implementation(FinishingPluginImplementation):
             stroke_color=finishing.Color(_color_stroke, _border_alpha),
             stroke_width=_border,
             fill_color=_fill_color)
-        _text = finishing.Text(_text, font=_font, size=_size, weight=_weight, alignment=_alignment)
+        _text = finishing.Text(_text, font=_font, size=_size, weight=_weight, alignment=_alignment, alignment_vertical=_alignment_vertical)
         _adapter.draw_text(image, _pos, _text, _brush, border_brush=_brush_border, border_radius=_border_radius, border_padding=_border_padding)
         return image
 
