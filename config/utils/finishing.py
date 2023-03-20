@@ -122,7 +122,15 @@ class Processor:
                 'resize_y': "{" + _size_y + "}",
             }
         }, {
-            'plugin': 'transform', 'image_in': 'line', 'image_out': 'linetl', 'plugin_config': {
+            'plugin': 'text', 'image_in': 'line', 'image_out': 'linetl', 'plugin_config': {
+                'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
+                'font': 'Helvetica', 'weight': '700', 'size': '{' + _scale + '*0.3}',
+                'color_stroke': '#ffffff', 'color_alpha': '50',
+                'start_x': "{images['line']['width']/2}",
+                'start_y': "{" + _scale + "*0.17}",
+            }
+        }, {
+            'plugin': 'transform', 'image_in': 'linetl', 'image_out': 'linetl', 'plugin_config': {
                 'mode': 'rotate',
                 'factor': '-45',
             }
@@ -167,6 +175,14 @@ class Processor:
                 'factor': '180',
             }
         }, {
+            'plugin': 'text', 'image_in': 'linet', 'image_out': 'linet', 'plugin_config': {
+                'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
+                'font': 'Helvetica', 'weight': '700', 'size': '{' + _size_y + '*0.22}',
+                'color_stroke': '#ffffff', 'color_alpha': '50',
+                'start_x': "{images['linet']['width']/2}",
+                'start_y': "{" + _size_y + "*0.12}",
+            }
+        }, {
             'plugin': 'merge', 'image_in': 'default linet', 'plugin_config': {
                 'alignment': 'coords',
                 'left': "0",
@@ -197,7 +213,15 @@ class Processor:
                 'resize_y': "{" + _size_y + "}",
             }
         }, {
-            'plugin': 'transform', 'image_in': 'line', 'image_out': 'linel', 'plugin_config': {
+            'plugin': 'text', 'image_in': 'line', 'image_out': 'linel', 'plugin_config': {
+                'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
+                'font': 'Helvetica', 'weight': '700', 'size': '{' + _size_y + '*0.22}',
+                'color_stroke': '#ffffff', 'color_alpha': '50',
+                'start_x': "{images['line']['width']/2}",
+                'start_y': "{" + _size_y + "*0.12}",
+            }
+        }, {
+            'plugin': 'transform', 'image_in': 'linel', 'image_out': 'linel', 'plugin_config': {
                 'mode': 'rotate',
                 'factor': '-90',
             }

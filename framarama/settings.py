@@ -212,6 +212,7 @@ REST_FRAMEWORK = {
 }
 
 FRAMARAMA = {
+    'TITLE': 'framaRAMA',
     'MODES': [
         'server',
         'frontend'
