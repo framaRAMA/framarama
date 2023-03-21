@@ -56,6 +56,7 @@
   'system': 'server',
   'software': 'cubes',
   'help': 'question',
+  'account': 'user',
 
   'frame' : 'image',
   'frames' : 'images',
@@ -184,13 +185,11 @@
         </form>
         <div class="dropdown ps-2">
           <a
-            class="dropdown-toggle d-flex align-items-center hidden-arrow"
-            href="#" id="avatarMenu" role="button"
+            class="float-end rounded-circle bg-dark dropdown-toggle d-flex justify-content-center align-items-center hidden-arrow text-white"
+            href="#" id="avatarMenu" role="button" style="width:32px;height:32px;"
             data-bs-toggle="dropdown" aria-expanded="false"
           >
-            <img
-              src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-              class="rounded-circle" height="32" alt="{{ request.user.username }}" loading="lazy"/>
+            {{ icon('account', '') }}
           </a>
           <ul
             class="dropdown-menu dropdown-menu-end"
