@@ -1,5 +1,7 @@
 # framaRAMA
 
+<img src="common/static/common/stripes.svg" alt="stripes" style="width:100%" height="48"/>
+
 Keep your memories alive with framaRAMA. The smart way to show your memories from
 a photo collection on a digital photo frame.
 
