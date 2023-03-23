@@ -9,7 +9,6 @@ Features:
 * 🤝 integrate you own photo collections
 * 🎯 priorize the photos to show by meta data (e.g. date taken)
 * 🪄 add make up to your photos (resize, write text, etc)
-* ✨ 
 * 🍿 enjoy your memories
 
 ## 🚀 How to start
@@ -23,7 +22,7 @@ the frontend component is runningo on a device attached to a display (e.g.
 a Raspberry Pi with a display connected). But it's also possible to run
 both components on the same device.
 
-### Setup
+### ⚙ Setup
 
 Follow the steps below to setup both components on the same system. If you
 want to separate them, see sections below.
@@ -89,7 +88,7 @@ Checkout the project as mentioned before and adjust the configuration:
 
 After application startup you can open the server setup in the browser.
 
-## Final notes
+## ☯ Final notes
 
 This project was born because we all have large collection of photo but
 don't regularly look at them to benefit. Maybe we have some photos
