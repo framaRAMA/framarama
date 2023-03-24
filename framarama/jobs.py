@@ -13,7 +13,10 @@ class Scheduler:
     JOB_PARAM_MODE = 'mode'
 
     def __init__(self):
-        self._scheduler = BackgroundScheduler()
+        self._scheduler = BackgroundScheduler(job_defaults={
+          'misfire_grace_time': None,
+          'coalesce': True,
+        })
         self._scheduler.add_listener(self._event_start, EVENT_JOB_SUBMITTED)
         self._scheduler.add_listener(self._event_success, EVENT_JOB_EXECUTED)
         self._scheduler.add_listener(self._event_error, EVENT_JOB_ERROR)
