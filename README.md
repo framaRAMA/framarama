@@ -24,10 +24,14 @@ the frontend component is runningo on a device attached to a display (e.g.
 a Raspberry Pi with a display connected). But it's also possible to run
 both components on the same device.
 
-### ⚙ Setup
+### ⚙ General setup
 
 Follow the steps below to setup both components on the same system. If you
 want to separate them, see sections below.
+
+📢 Before starting check the requirements of the components below and install
+them if required.
+
 
 ```
 git clone https://github.com/framaRAMA/framarama.git framarama
@@ -58,7 +62,7 @@ python manage.py runserver 0.0.0.0:8000 --noreload
 Enjoy!
 
 
-### 🏢 Server component
+### 🏢 Server setup
 
 This component is the central place where all the configuration and
 setup is done. It is providing a web interface to setup your photo collection
@@ -72,9 +76,14 @@ Checkout the project as mentioned before and adjust the configuration:
     ],
 ```
 
-After application startup you can open the frontend setup in the browser.
+The server component depends on the following dependencies:
+* ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
+* ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them an check via `convert -list font`)
+* 💡 `libmariadb3` - for external database support
 
-### 📺 Frontend component
+After application startup you can open the server setup in the browser.
+
+### 📺 Frontend setup
 
 This component is used to retrieve data from the server component and
 prepare the photo to display it - usually - locally on the display
@@ -88,7 +97,14 @@ Checkout the project as mentioned before and adjust the configuration:
     ],
 ```
 
-After application startup you can open the server setup in the browser.
+The frontend component depends on the following dependencies:
+* ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
+* 💡 `network-manager`, `dnsmasq-base` - configuring and setting up networking
+* 💡 `plymouth`, `plymouth-themes`, `plymouth-x11` - create startup booting screen
+* 💡 `xserver-xorg`, `xrandr|x11-server-utils`, `xinit`, `openbox`, `feh`, `imagemagick` - show pictures using graphical frontend
+* 💡 `xinput` - register keystores for fallback commands
+
+After application startup you can open the frontend setup in the browser.
 
 ## ☯ Final notes
 
