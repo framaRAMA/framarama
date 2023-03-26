@@ -235,7 +235,7 @@ class DateTime:
         return DateTime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     @staticmethod
-    def delta(time=None, hours=None, minutes=None, seconds=None):
+    def delta(time=None, days=None, hours=None, minutes=None, seconds=None):
         if type(time) == datetime.timedelta:
             return time
         if type(time) == int or type(time) == float:
@@ -243,8 +243,9 @@ class DateTime:
         if time != None:
             _time = datetime.time.fromisoformat(time)
             return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
-        if hours != None or minutes != None or seconds != None:
+        if days != None or hours != None or minutes != None or seconds != None:
             return datetime.timedelta(
+                days=days if days else 0,
                 hours=hours if hours else 0,
                 minutes=minutes if minutes else 0,
                 seconds=seconds if seconds else 0)
