@@ -63,9 +63,10 @@ CODE_TEMPLATES = {
 
 SOURCE_UPDATE_INTERVAL_CHOICES = [
   (None, 'no automatic update'),
-  ('PT15M', 'each 15 minutes'),
-  ('PT1H', 'each hour'),
-  ('P1D', 'once a day'),
+  (utils.DateTime.delta(0), 'use defaults'),
+  (utils.DateTime.delta(minutes=15), 'each 15 minutes'),
+  (utils.DateTime.delta(hours=1), 'each hour'),
+  (utils.DateTime.delta(days=1), 'once a day'),
 ]
 
 
@@ -211,7 +212,7 @@ class Source(BaseModel):
         default="", blank=True,
         verbose_name='Additional fields', help_text='When more fields should be mapped add them line by line (format: "&lt;target-name&gt;=&lt;source-name&gt;\\n")')
     update_interval = models.DurationField(
-        blank=True, null=True,
+        blank=True, null=True, choices=SOURCE_UPDATE_INTERVAL_CHOICES,
         verbose_name='Update interval', help_text='Time interval to run an automatic update of items')
     update_count = models.IntegerField(
         default=0,
