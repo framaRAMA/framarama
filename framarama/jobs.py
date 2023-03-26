@@ -38,12 +38,12 @@ class Scheduler:
         self._scheduler.add_job(lambda *args, **kwargs: func(*args, **kwargs), id=job_id, args=_func_args, kwargs=_func_kwargs, *args, **kwargs)
 
     def _job_id(self, job_id, instance=None, suffix=None):
-        return "{}{}{}{}{}".format(
-            job_id,
-            '_' if instance else '',
-            instance if instance else '',
-            '_' if suffix else '',
-            suffix if suffix else '')
+        _id = job_id
+        for _info in [instance, suffix]:
+            _info = '' if _info is None else _info
+            _info = _info if type(_info) == list else [_info]
+            _id = _id + '_' + '_'.join([str(v) for v in _info])
+        return _id
 
     def run_job(self, job_id, func, delay=None, *args, **kwargs):
         if delay:

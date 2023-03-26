@@ -120,9 +120,8 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
         if _action == 'delete':
             _source.delete()
         elif _action == 'run':
-            _job_id = jobs.Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
             _scheduler = self.get_scheduler()
-            _scheduler.trigger_job(jobs.Scheduler.CFG_SOURCE_UPDATE, frame=_frame, source=_source)
+            _scheduler.trigger_job(jobs.Scheduler.CFG_SOURCE_UPDATE, instance=[_frame.id, _source.id], frame=_frame, source=_source)
         self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         return _context
 
@@ -152,7 +151,7 @@ class ViewInfoSourceFrameView(base.BaseSourceFrameConfigView):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _context['source_running'] = self.get_scheduler().running_jobs(
             jobs.Scheduler.CFG_SOURCE_UPDATE,
-            instance=str(frame_id) + '_' + str(source_id),
+            instance=[frame_id, source_id],
             starts_with=True)
         return _context
 
@@ -165,7 +164,7 @@ class ListStepSourceFrameView(base.BaseSourceFrameConfigView):
         _context['source_plugins'] = plugins.SourcePluginRegistry.all()
         _context['source_running'] = self.get_scheduler().running_jobs(
             jobs.Scheduler.CFG_SOURCE_UPDATE,
-            instance=str(frame_id),
+            instance=frame_id,
             starts_with=True)
         return _context
 
@@ -266,7 +265,7 @@ class ItemsSourceFrameView(base.BaseSourceFrameConfigView):
         _running = [_job.split('_')[-1] for _job in _scheduler.running_jobs(_job_id, instance=frame_id, starts_with=True, names=True)]
         if _action == 'item.thumbnail.generate' and len(_item):
             if len(_running) == 0:
-                _scheduler.trigger_job(_job_id, instance=str(_id), item=_item[0])
+                _scheduler.trigger_job(_job_id, instance=_id, item=_item[0])
         elif _action == 'item.thumbnail.delete' and len(_item):
             if _item[0].thumbnail:
                 _item[0].thumbnail.data_file.delete()
