@@ -27,15 +27,19 @@ class Scheduler(jobs.Scheduler):
         _enabled_display = Q(frame__display__enabled=True) | Q(frame__display=None)
         _specific_frame = Q(frame=frame) if frame else _ignored
         _specific_source = Q(pk=source.id) if source else _ignored
+        _update_frame_disabled = Q(update_interval__isnull=True)
+        _update_frame_defaults = Q(update_interval=utils.DateTime.delta(0))
+        _update_frame_initially = Q(update_date_start__isnull=True)
+        _update_frame_required = Q(update_date_start__lt=utils.DateTime.now()-F('update_interval'))
 
         if frame is None and source is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['CONFIG_SOURCE_UPDATE_INTERVAL'])
             if _interval is None:
                 return
-            _update_initial = Q(update_date_start__isnull=True)
-            _update_by_interval = Q(update_interval__isnull=False) & Q(update_date_start__lt=utils.DateTime.now()-F('update_interval'))
+            _update_initial = ~_update_frame_disabled & _update_frame_initially
+            _update_by_interval = ~_update_frame_disabled & ~_update_frame_defaults & _update_frame_required
             _update_by_source_interval = _update_initial | _update_by_interval
-            _update_by_global_interval = Q(update_interval__isnull=True) | Q(update_date_start__gt=functions.Now()-_interval)
+            _update_by_global_interval = _update_frame_defaults | Q(update_date_start__gt=functions.Now()-_interval)
         else:
             _update_by_source_interval = _ignored
             _update_by_global_interval = _ignored
