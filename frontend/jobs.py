@@ -93,6 +93,7 @@ class Scheduler(jobs.Scheduler):
             Scheduler.FE_DISPLAY_ON: (self._display.get_time_on(), self.display_on, 'Frontend display on'),
             Scheduler.FE_DISPLAY_OFF: (self._display.get_time_off(), self.display_off, 'Frontend display off'),
         }
+        _schedules = {}
         for _job, _conf in _jobs.items():
             self.disable_job(_job)
             if _conf[0]:
@@ -101,8 +102,11 @@ class Scheduler(jobs.Scheduler):
                 _trigger = CronTrigger(year="*", month="*", day="*", hour=_delta['hours'], minute=_delta['minutes'], second="0")
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
                 self.enable_job(_job)
-            else:
-                self.display_on()
+                _schedules[_job] = utils.DateTime.delta(_conf[0])
+        if Scheduler.FE_DISPLAY_OFF == utils.DateTime.in_range(utils.DateTime.midnight(), _schedules):
+            self.display_off()
+        else:
+            self.display_on()
 
     def display_on(self):
         logger.info("Switch display on at {}".format(self._display.get_time_on()))
