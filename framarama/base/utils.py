@@ -231,8 +231,9 @@ class DateTime:
         return _now
 
     @staticmethod
-    def midnight():
-        return DateTime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    def midnight(time=None):
+        _time = time if time else DateTime.now()
+        return _time.replace(hour=0, minute=0, second=0, microsecond=0)
 
     @staticmethod
     def delta(time=None, days=None, hours=None, minutes=None, seconds=None):
