@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils import timezone
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -11,13 +12,23 @@ from config import models
 
 class BaseView(TemplateView):
 
+    def _tz(self, context):
+        return settings.TIME_ZONE
+
     def _handle(self, callback, request, *args, **kwargs):
         _context = {}
         _context['MODES'] = settings.FRAMARAMA['MODES']
         _context.update(callback(request, *args, **kwargs))
         if '_response' in _context:
            return _context['_response']
-        return render(request, self.template_name, _context)
+        _tz_new = self._tz(_context)
+        _tz_change = _tz_new and _tz_new != timezone.get_current_timezone_name()
+        if _tz_change:
+            timezone.activate(_tz_new)
+        _result = render(request, self.template_name, _context)
+        if _tz_change:
+            timezone.deactivate()
+        return _result
 
     def _get(self, request):
         return {}

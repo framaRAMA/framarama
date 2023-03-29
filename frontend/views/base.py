@@ -12,6 +12,11 @@ from framarama.base.utils import Filesystem
 class BaseSetupView(BaseView):
     PAGE_FE_STARTUP = 'fe_startup'
 
+    def _tz(self, context):
+        if context['config'] and context['config'].sys_time_zone:
+            return context['config'].sys_time_zone
+        return super()._tz(context)
+
     def _process_base_setup_view(self, request, context, *args, **kwargs):
         _frontend = frontend.Frontend.get()
         context['now'] = timezone.now()

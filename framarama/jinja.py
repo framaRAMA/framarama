@@ -1,6 +1,7 @@
 import base64
 
 from django.templatetags.static import static
+from django.utils.timezone import localtime
 from django.urls import reverse
 
 from jinja2 import Environment, Template, BaseLoader
@@ -27,7 +28,7 @@ def nav(request, page, args={}):
 
 
 def date_format(value, format="%H:%M %d-%m-%y"):
-    return value.strftime(format)
+    return localtime(value).strftime(format)
 
 
 def b64decode(value):
