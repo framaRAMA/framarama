@@ -268,6 +268,26 @@ class DateTime:
         return time is None or time + delta < DateTime.now()
 
     @staticmethod
+    def in_range(time, deltas):
+        if type(deltas) == dict:
+            _deltas = deltas
+        else:
+            _deltas = {i: v for i, v in enumerate(deltas)}
+        _keys = list(_deltas)
+        _reached = None
+        for _key in _keys[1:]:
+            if DateTime.reached(time, _deltas[_key]):
+                _reached = _key
+        if _reached is None and len(_deltas):
+            if DateTime.reached(time, _deltas[_keys[0]]):
+                _reached = _keys[0]
+            else:
+                _reached = _keys[-1]
+        if type(deltas) == dict:
+            return _reached
+        return _deltas[_reached] if _reached is not None else None
+
+    @staticmethod
     def utc(dt):
         if dt and dt.tzinfo:
             return dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
