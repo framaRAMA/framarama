@@ -227,7 +227,7 @@ class DateTime:
         if sub:
             _now = _now - DateTime.delta(sub)
         if add:
-            _now = _now + DateTime.delta(sub)
+            _now = _now + DateTime.delta(add)
         return _now
 
     @staticmethod
@@ -242,7 +242,7 @@ class DateTime:
             return datetime.timedelta(seconds=time)
         if time != None:
             _time = datetime.time.fromisoformat(time)
-            return datetime.timedelta(hours=_time.hour, minutes=_time.minute)
+            return datetime.timedelta(hours=_time.hour, minutes=_time.minute, seconds=_time.second)
         if days != None or hours != None or minutes != None or seconds != None:
             return datetime.timedelta(
                 days=days if days else 0,
