@@ -310,9 +310,14 @@ class Classes:
             _name = name
         try:
             _module = importlib.import_module(_name)
-            return getattr(_module, _class) if fqcn else _module
+            if fqcn:
+                if hasattr(_module, _class):
+                    return getattr(_module, _class)
+                raise ModuleNotFoundError("Class {} does not exists in {}".format(_class, _module))
+            else:
+                return _module
         except Exception as e:
             if fallback:
-                return importlib.import_module(fallback, fqcn)
+                return Classes.load(fallback, fqcn)
             raise e
 
