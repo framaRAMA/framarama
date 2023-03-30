@@ -120,7 +120,7 @@ class DeviceDashboardView(base.BaseFrontendView):
         _disk_tmp = _capability.disk_data_free()
         _disk_data = _capability.disk_tmp_free()
         _context['sys'] = {
-          'uptime' : utils.DateTime.delta_dict(_uptime)
+          'uptime' : _uptime
         }
         _context['disk'] = {
           'datafree': _disk_data[0],

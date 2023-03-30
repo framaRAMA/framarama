@@ -139,7 +139,7 @@
         <div class="card-body">
           <h6 class="card-subtitle mb-2 text-muted">System information</h6>
           <ul class="card-text">
-            <li><strong>{{ '%d'|format(system.uptime / 60 / 60 / 24) }}</strong> days running</li>
+            <li><strong>{{ system.uptime|duration(['days']) }}</strong> running</li>
             <li><strong>{{ '%.2f'|format(system.cpu.load) }}</strong> CPU load at <strong>{{ '%.1f'|format(system.cpu.temp) }}°C</strong></li>
             <li>
               <strong>{{ '%d'|format(system.disk.data.used * 100 / (system.disk.data.used + system.disk.data.free)) }}%</strong> disk usage,
