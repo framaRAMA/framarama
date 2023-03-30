@@ -11,6 +11,12 @@
   background: linear-gradient(to right, rgba(82, 0, 153, 1), rgba(255, 0, 184, 1))
 }
 
+/** Activate style for profile menu in navbar */
+#avatarMenu.active {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
 /** Add styling for dashboard card headers */
 .card-header {
   color: white;

@@ -185,7 +185,7 @@
         </form>
         <div class="dropdown ps-2">
           <a
-            class="float-end rounded-circle bg-dark dropdown-toggle d-flex justify-content-center align-items-center hidden-arrow text-white"
+            class="float-end rounded-circle bg-dark dropdown-toggle d-flex justify-content-center align-items-center hidden-arrow text-white{{ nav_active(request, 'profile_info') }}"
             href="#" id="avatarMenu" role="button" style="width:32px;height:32px;"
             data-bs-toggle="dropdown" aria-expanded="false"
           >
@@ -195,10 +195,10 @@
             class="dropdown-menu dropdown-menu-end"
             aria-labelledby="avatarMenu"
           >
-            <!-- li>
-              <a class="dropdown-item" href="#">My profile</a>
-            </li>
             <li>
+              <a class="dropdown-item" href="{{ url('profile_info') }}">Profile</a>
+            </li>
+            <!-- li>
               <a class="dropdown-item" href="#">Settings</a>
             </li -->
             <li>

@@ -1,11 +1,14 @@
 from django.urls import path, include
 
-from config.views import LoginView, LogoutView, IndexView
+from config.views import LoginView, LogoutView, IndexView, ProfileView, ProfileEditView
 from config.views import frame, display
 
 urlpatterns = [
     path('accounts/login', LoginView.as_view()),
     path('accounts/logout', LogoutView.as_view(), name='logout'),
+
+    path('profile', ProfileView.as_view(), name='profile_info'),
+    path('profile/edit', ProfileEditView.as_view(), name='profile_edit'),
 
     path('', IndexView.as_view(), name='index'),
     path('frames', frame.ListFrameView.as_view(), name='frame_list'),
