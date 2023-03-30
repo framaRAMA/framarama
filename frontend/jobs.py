@@ -37,6 +37,7 @@ class Scheduler(jobs.Scheduler):
         self._items = None
         self._startup = None
         self._last_update = None
+        self._time_zone = None
         self._monitor = None
         self._monitor = frontend.Frontend.get().get_device().monitor()
         self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
@@ -61,18 +62,17 @@ class Scheduler(jobs.Scheduler):
         self.disable_jobs()
     
     def _setup_completed(self):
+        self.timezone_activate()
         self.refresh_display()
         self.refresh_items()
-        self.timezone_activate()
         self.enable_jobs()
         self.trigger_job(Scheduler.FE_NEXT_ITEM)
         self.trigger_job(Scheduler.FE_SUBMIT_STATUS)
 
     def timezone_activate(self):
-        _time_zone = frontend.Frontend.get().get_config().get_config().sys_time_zone
-        _time_zone = _time_zone if _time_zone else settings.TIME_ZONE
-        logger.info("Using time zone {}".format(_time_zone))
-        timezone.activate(zoneinfo.ZoneInfo(_time_zone))
+        self._time_zone = frontend.Frontend.get().get_config().get_config().sys_time_zone
+        self._time_zone = self._time_zone if self._time_zone else settings.TIME_ZONE
+        logger.info("Scheduler timezone is {}".format(self._time_zone))
 
     def key_restart(self):
         logger.info("Restart application!")
@@ -98,8 +98,9 @@ class Scheduler(jobs.Scheduler):
             self.disable_job(_job)
             if _conf[0]:
                 logger.info("Register job {} at {}".format(_job, _conf[0]))
-                _delta = utils.DateTime.delta_dict(_conf[0])
-                _trigger = CronTrigger(year="*", month="*", day="*", hour=_delta['hours'], minute=_delta['minutes'], second="0")
+                _target = utils.DateTime.get(utils.DateTime.midnight(tz=self._time_zone), add=_conf[0])
+                _trigger = CronTrigger(year="*", month="*", day="*", hour=_target.hour, minute=_target.minute, second="0")
+                logger.info("SCHEDULE {} {}".format(_target, _trigger))
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
                 self.enable_job(_job)
                 _schedules[_job] = utils.DateTime.delta(_conf[0])
