@@ -129,6 +129,13 @@ class DateTimeTestCase(TestCase):
         self.assertEqual(45, _time.minute)
         self.assertEqual(10, _time.second)
 
+    def test_zoned(self):
+        with utils.DateTime.zoned('UTC'):
+            _time_utc = utils.DateTime.now()
+        with utils.DateTime.zoned('Europe/Berlin'):
+            _time_europe = utils.DateTime.now()
+        self.assertNotEqual(_time_utc.tzinfo.key, _time_europe.tzinfo.key)
+
 
 class ClassesTestCase(TestCase):
 

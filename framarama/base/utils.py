@@ -303,6 +303,21 @@ class DateTime:
     def parse(date):
         return dateparse.parse_datetime(date)
 
+    @staticmethod
+    def zoned(tz):
+        class Zoned:
+            def __init__(self, tz):
+                self._tz = tz
+                self._changed = False
+            def __enter__(self):
+                self._changed = self._tz and self._tz != timezone.get_current_timezone_name()
+                if self._changed:
+                    timezone.activate(tz)
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                if self._changed:
+                    timezone.deactivate()
+        return Zoned(tz)
+
 
 class Classes:
 
