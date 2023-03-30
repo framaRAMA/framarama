@@ -685,14 +685,17 @@
     <li>
       on <strong>{{ 'a %dx%d'|format(display.device_width, display.device_height) if display.device_width and display.device_height else 'an unknown' }}</strong> pixel frame</li>
     <li>
-      running software version <strong>{{ status['app_branch'] }}</strong>
-      ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
-    </li>
-    <li>
       Display is <strong>{{ '%s'|format('on' if status.screen_on else 'off') if status else 'off'}}</strong>
       {% if display.time_on and display.time_off %}
         ({{ display.time_on }} - {{ display.time_off }})
       {% endif %}
+    </li>
+    <li>
+      running software version <strong>{{ status['app_branch'] }}</strong>
+      ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
+    </li>
+    <li>
+      up since <strong>{{ status['uptime']|duration }}</strong>
     </li>
   </ul>
 {% endmacro %}
