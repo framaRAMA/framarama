@@ -1,0 +1,9 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+{{ lib.frame_header('Edit profile', 'Setup and edit your profile') }}
+{{ lib.form_start(form, csrf_input) }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_title='Update', submit_class="btn-primary", cancel=url('profile_info')) }}
+{% endblock %}
+
