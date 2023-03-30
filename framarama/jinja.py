@@ -6,6 +6,8 @@ from django.urls import reverse
 
 from jinja2 import Environment, Template, BaseLoader
 
+from framarama.base import utils
+
 
 def reverse_exists(*args, **kwargs):
     try:
@@ -29,6 +31,17 @@ def nav(request, page, args={}):
 
 def date_format(value, format="%H:%M %d-%m-%y"):
     return localtime(value).strftime(format)
+
+
+def duration(value, parts=None):
+    _delta = utils.DateTime.delta_dict(value)
+    _result = []
+    for _part in ['days', 'hours', 'minutes']:
+        if _delta[_part] and (parts is None or _part in parts):
+            _result.append('{} {}'.format(_delta[_part], _part))
+    if len(_result) == 0:
+        _result.append('{} seconds'.format(_delta['seconds']))
+    return ', '.join(_result)
 
 
 def b64decode(value):
@@ -71,6 +84,7 @@ def environment(**options):
     env.filters.update({
         'getattr': get_attribute,
         'date_format': date_format,
+        'duration': duration,
         'b64decode': b64decode,
         'b64encode': b64encode,
         'template': template,
