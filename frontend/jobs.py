@@ -103,7 +103,7 @@ class Scheduler(jobs.Scheduler):
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
                 self.enable_job(_job)
                 _schedules[_job] = utils.DateTime.delta(_conf[0])
-        if Scheduler.FE_DISPLAY_OFF == utils.DateTime.in_range(utils.DateTime.midnight(), _schedules):
+        if Scheduler.FE_DISPLAY_OFF == utils.DateTime.in_range(utils.DateTime.midnight(tz=self._time_zone), _schedules):
             self.display_off()
         else:
             self.display_on()
