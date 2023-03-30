@@ -2,6 +2,7 @@ import os
 import re
 import time
 import datetime
+import zoneinfo
 import shutil
 import subprocess
 import threading
@@ -222,17 +223,20 @@ class Json:
 class DateTime:
 
     @staticmethod
-    def now(sub=None, add=None):
-        _now = timezone.now()
+    def get(time, sub=None, add=None, tz=None):
         if sub:
-            _now = _now - DateTime.delta(sub)
+            time = time - DateTime.delta(sub)
         if add:
-            _now = _now + DateTime.delta(add)
-        return _now
+            time = time + DateTime.delta(add)
+        return time.astimezone(zoneinfo.ZoneInfo(tz)) if tz else time.astimezone(timezone.get_current_timezone())
 
     @staticmethod
-    def midnight(time=None):
-        _time = time if time else DateTime.now()
+    def now(sub=None, add=None, tz=None):
+        return DateTime.get(timezone.now(), sub=sub, add=add, tz=tz)
+
+    @staticmethod
+    def midnight(time=None, tz=None):
+        _time = time if time else DateTime.now(tz=tz)
         return _time.replace(hour=0, minute=0, second=0, microsecond=0)
 
     @staticmethod

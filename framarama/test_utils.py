@@ -7,8 +7,27 @@ from framarama.base import utils
 
 class DateTimeTestCase(TestCase):
 
+    def test_get(self):
+        self.assertIsNotNone(utils.DateTime.get(datetime.datetime.now()))
+
+    def test_get_sub(self):
+        _now = utils.DateTime.get(datetime.datetime.now())
+        _past = utils.DateTime.get(datetime.datetime.now(), sub='01:00:00')
+        self.assertTrue(_past < _now, 'Past date is not in past')
+
+    def test_get_add(self):
+        _now = utils.DateTime.get(datetime.datetime.now())
+        _future = utils.DateTime.get(datetime.datetime.now(), add='01:00:00')
+        self.assertTrue(_future > _now, 'Future date is not in future')
+
     def test_now(self):
         self.assertIsNotNone(utils.DateTime.now())
+
+    def test_now_tz(self):
+        _now = utils.DateTime.now(tz='UTC')
+        self.assertEqual('UTC', _now.tzinfo.key)
+        _now = utils.DateTime.now(tz='Europe/Berlin')
+        self.assertEqual('Europe/Berlin', _now.tzinfo.key)
 
     def test_now_sub(self):
         _now = utils.DateTime.now()
@@ -22,6 +41,13 @@ class DateTimeTestCase(TestCase):
 
     def test_midnight(self):
         _midnight = utils.DateTime.midnight()
+        self.assertEqual(0, _midnight.hour, 'Midnight does not have hour 0')
+        self.assertEqual(0, _midnight.minute, 'Midnight does not have minute 0')
+        self.assertEqual(0, _midnight.second, 'Midnight does not have second 0')
+        self.assertEqual(0, _midnight.microsecond, 'Midnight does not have microsecond 0')
+
+    def test_midnight_tz(self):
+        _midnight = utils.DateTime.midnight(tz='Europe/Berlin')
         self.assertEqual(0, _midnight.hour, 'Midnight does not have hour 0')
         self.assertEqual(0, _midnight.minute, 'Midnight does not have minute 0')
         self.assertEqual(0, _midnight.second, 'Midnight does not have second 0')
