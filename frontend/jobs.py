@@ -100,7 +100,6 @@ class Scheduler(jobs.Scheduler):
                 logger.info("Register job {} at {}".format(_job, _conf[0]))
                 _target = utils.DateTime.get(utils.DateTime.midnight(tz=self._time_zone), add=_conf[0])
                 _trigger = CronTrigger(year="*", month="*", day="*", hour=_target.hour, minute=_target.minute, second="0")
-                logger.info("SCHEDULE {} {}".format(_target, _trigger))
                 self.register_job(_job, _conf[1], trigger=_trigger, name=_conf[2])
                 self.enable_job(_job)
                 _schedules[_job] = utils.DateTime.delta(_conf[0])
