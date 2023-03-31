@@ -20,12 +20,16 @@ class Context:
         self._frame = frame
         self._source = source
         self._data = data
+        self._time_zone = utils.DateTime.tz(self._frame.user.time_zone)
     
     def get_frame(self):
         return self._frame
 
     def get_source(self):
         return self._source
+
+    def get_time_zone(self):
+        return self._time_zone
 
     def get_input(self, name):
         if name not in self._data:
@@ -137,6 +141,7 @@ class Processor:
 
     def _process_items_update(self, source, data_out):
         _frame = self._context.get_frame()
+        _time_zone = self._context.get_time_zone()
         _existing = {_item.url: _item for _item in source.items.all()}
         _fields = self._item_mapping(source)
         _stats = {'cnt': 0, 'create': 0, 'update': 0, 'delete': 0, 'errors': []}
@@ -154,7 +159,7 @@ class Processor:
                     _stats['delete'],
                     len(_stats['errors'])))
             _stats['cnt'] = _stats['cnt'] + 1
-            _values = self._item_values(_fields, _data)
+            _values = self._item_values(_fields, _data, _time_zone)
 
             _item_id = _values.get('id')
             _item_url = _values.get('url')
@@ -212,7 +217,7 @@ class Processor:
             _fields.update(dict(map(lambda l: l.split("="), _map_item_meta.splitlines())))
         return _fields
 
-    def _item_values(self, fields, data):
+    def _item_values(self, fields, data, time_zone):
         _values = {}
         for _field_target, _field_source in fields.items():
             if ':' in _field_source:
@@ -227,8 +232,10 @@ class Processor:
                     _value = int(_value)
                 elif _field_type == 'date':
                     _value_parsed = parse_datetime(_value)
-                    if _value_parsed and _value_parsed.tzinfo is None:
-                        _value = _value_parsed.astimezone(zoneinfo.ZoneInfo('Europe/Berlin'))
+                    if _value_parsed:
+                        if _value_parsed.tzinfo is None:
+                            _value = utils.DateTime.as_tz(_value_parsed, time_zone)
+                        _value = utils.DateTime.get(_value, tz=utils.DateTime.tz())
                 _values[_field_target] = _value
         return _values
 
