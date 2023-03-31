@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 from framarama.base import forms as base
+from framarama.base.models import TIMEZONE_CHOICES
 from frontend import models
 
 
@@ -53,7 +54,7 @@ class DisplaySetupForm(base.BaseModelForm):
         fields = ['sys_time_zone', 'count_items_keep', 'watermark_type', 'watermark_shift', 'watermark_scale']
 
         widgets = {
-            'sys_time_zone': base.selectFieldWidget(choices=models.TIMEZONE_CHOICES),
+            'sys_time_zone': base.selectFieldWidget(choices=TIMEZONE_CHOICES),
             'count_items_keep': base.charFieldWidget(),
             'watermark_type': base.selectFieldWidget(choices=models.WATERMARKTYPE_CHOICES),
             'watermark_shift': base.charFieldWidget(),

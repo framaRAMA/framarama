@@ -1,5 +1,10 @@
+import zoneinfo
 
 from django.db import models
+
+
+TIMEZONE_CHOICES = [(None, '(default)')]
+TIMEZONE_CHOICES.extend([(_tz, _tz) for _tz in sorted(zoneinfo.available_timezones())])
 
 
 class BaseModel(models.Model):

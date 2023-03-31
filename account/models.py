@@ -2,6 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from framarama.base.models import TIMEZONE_CHOICES
+
+
 ''' Use our own User model
 
     It is a little bit tricky to exchange the user model when not doing so at the
@@ -49,6 +52,9 @@ from django.contrib.auth.models import AbstractUser
     "makemigrations" & "migrate" combo again.
 '''
 class User(AbstractUser):
+    time_zone = models.CharField(
+        max_length=32, choices=TIMEZONE_CHOICES, blank=True, null=True,
+        verbose_name='Timezone', help_text='The timezone to use for the account')
 
     def __str__(self):
         return self.username

@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import forms as auth_forms, get_user_model
 
 from framarama.base import forms as base
+from framarama.base.models import TIMEZONE_CHOICES
 
 
 class AuthenticationForm(base.BaseForm, auth_forms.AuthenticationForm):
@@ -18,11 +19,12 @@ class UpdateProfileForm(base.BaseModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ['username', 'first_name', 'last_name', 'email', 'time_zone']
         widgets = {
             'first_name': base.charFieldWidget(),
             'last_name': base.charFieldWidget(),
             'email': base.charFieldWidget(),
+            'time_zone': base.selectFieldWidget(choices=TIMEZONE_CHOICES),
         }
 
 

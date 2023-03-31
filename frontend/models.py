@@ -1,12 +1,9 @@
-import zoneinfo
 
 from django.db import models
 
-from framarama.base.models import BaseModel
+from framarama.base.models import BaseModel, TIMEZONE_CHOICES
 
 
-TIMEZONE_CHOICES = [(None, '(default)')]
-TIMEZONE_CHOICES.extend([(_tz, _tz) for _tz in sorted(zoneinfo.available_timezones())])
 MODE_CHOICES = [
   ('local', 'Local setup'),
   ('cloud', 'Cloud setup'),

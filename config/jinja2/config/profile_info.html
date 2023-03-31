@@ -7,6 +7,7 @@
   {{ lib.field_text('Username', user.username) }}
   {{ lib.field_text('Name', user.get_full_name()) }}
   {{ lib.field_text('Mail', user.email) }}
+  {{ lib.field_text('Timezone', user.time_zone) }}
   {{ lib.field_text('Registered', user.date_joined|date_format('%d.%m.%Y')) }}
   {{ lib.form_end(submit_title=null) }}
 </div>
