@@ -2,8 +2,9 @@ import sys
 import logging
 import zoneinfo
 
-from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+
+from framarama.base import utils
 
 from config.plugins import SourcePluginRegistry
 from config.utils.data import DataType, DataContainer, NoopDataConverter
@@ -48,7 +49,7 @@ class Processor:
         for _source in _sources.all():
             logger.info("Processing source {}".format(_source))
             _source.update_count = _source.update_count + 1
-            _source.update_date_start = timezone.now()
+            _source.update_date_start = utils.DateTime.now()
             _source.save()
 
             try:
@@ -67,10 +68,10 @@ class Processor:
                     _source.update_status = _stats['status']
                 if _last_step:
                     _source.update_error = None
-                _source.update_date_end = timezone.now()
+                _source.update_date_end = utils.DateTime.now()
                 _source.save()
             except Exception as e:
-                _source.update_date_end = timezone.now()
+                _source.update_date_end = utils.DateTime.now()
                 _source.update_error = getattr(e, 'message', repr(e))
                 _source.update_status = None
                 _source.save()
@@ -179,12 +180,12 @@ class Processor:
                     _item.source = source
                     _item.version = 0
                     _item.url = _item_url
-                    _item.created = timezone.now()
+                    _item.created = utils.DateTime.now()
                     _stats_type = 'create'
 
                 _item.id_ext = _item_id
                 _item.date_creation = _item_date_creation
-                _item.updated = timezone.now()
+                _item.updated = utils.DateTime.now()
                 _item.save()
 
                 if _stats_type == 'update':
