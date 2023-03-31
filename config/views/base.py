@@ -28,6 +28,11 @@ class BaseConfigView(BaseAuthenticatedView):
     def get_displays(self):
         return self.qs().displays
 
+    def _tz(self, context):
+        if self.request.user and self.request.user.time_zone:
+            return self.request.user.time_zone
+        return super()._tz(context)
+
     def _get(self, request):
         _context = {}
         _context['config'] = self.get_config()
