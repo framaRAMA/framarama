@@ -223,12 +223,24 @@ class Json:
 class DateTime:
 
     @staticmethod
+    def tz(tz=None):
+        if tz is None:
+            return timezone.get_current_timezone()
+        if type(tz) == zoneinfo.ZoneInfo:
+            return tz
+        return zoneinfo.ZoneInfo(tz)
+
+    @staticmethod
+    def as_tz(time, tz):
+        return time.replace(tzinfo=DateTime.tz(tz))
+
+    @staticmethod
     def get(time, sub=None, add=None, tz=None):
         if sub:
             time = time - DateTime.delta(sub)
         if add:
             time = time + DateTime.delta(add)
-        return time.astimezone(zoneinfo.ZoneInfo(tz)) if tz else time.astimezone(timezone.get_current_timezone())
+        return time.astimezone(DateTime.tz(tz))
 
     @staticmethod
     def now(sub=None, add=None, tz=None):

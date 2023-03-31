@@ -1,6 +1,9 @@
 import datetime
+import zoneinfo
 
 from unittest import TestCase
+
+from django.utils import timezone
 
 from framarama.base import utils
 
@@ -25,6 +28,29 @@ class JsonTestCase(TestCase):
 
 
 class DateTimeTestCase(TestCase):
+
+    def test_tz(self):
+        _tz = utils.DateTime.tz()
+        self.assertEqual(timezone.get_current_timezone(), _tz)
+
+    def test_tz_as_string(self):
+        _tz = utils.DateTime.tz('Europe/Berlin')
+        self.assertEqual('Europe/Berlin', _tz.key)
+
+    def test_tz_as_zoneinfo(self):
+        _tz = utils.DateTime.tz(zoneinfo.ZoneInfo('Europe/Berlin'))
+        self.assertEqual('Europe/Berlin', _tz.key)
+
+    def test_as_tz(self):
+        _time = utils.DateTime.now(tz='UTC')
+        _time_tz = utils.DateTime.as_tz(_time, 'Europe/Berlin')
+        self.assertNotEqual(_time.tzinfo, _time_tz.tzinfo)
+        self.assertEqual(_time.day, _time_tz.day)
+        self.assertEqual(_time.month, _time_tz.month)
+        self.assertEqual(_time.year, _time_tz.year)
+        self.assertEqual(_time.hour, _time_tz.hour)
+        self.assertEqual(_time.minute, _time_tz.minute)
+        self.assertEqual(_time.second, _time_tz.second)
 
     def test_get(self):
         self.assertIsNotNone(utils.DateTime.get(datetime.datetime.now()))
