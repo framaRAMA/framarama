@@ -44,11 +44,11 @@ from django.contrib.auth.models import AbstractUser
     
     At this point the new User model can be changed/updated and we can use normal migration
     process with new user model.
+
+    If required - which was also done here - remove the Meta class from model and run a
+    "makemigrations" & "migrate" combo again.
 '''
 class User(AbstractUser):
-
-    class Meta:
-        db_table = 'auth_user'    
 
     def __str__(self):
         return self.username
