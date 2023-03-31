@@ -15,6 +15,7 @@ class DatabaseRouter:
         'local': {
             'auth': 'default',
             'sessions': 'default',
+            'account': 'default',
             'api': 'default',
             'config': 'default',
             'frontend': 'default'
@@ -22,6 +23,7 @@ class DatabaseRouter:
         'remote': {
             'auth': 'config',
             'sessions': 'config',
+            'account': 'config',
             'api': 'config',
             'config': 'config',
             'frontend': 'default'
