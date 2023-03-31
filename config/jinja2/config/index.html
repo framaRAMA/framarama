@@ -62,7 +62,7 @@
         <div class="card-header bg-info text-white">{{ lib.icon('display') }} Display</div>
         {% if display %}
           <div class="card-body">
-            {{ lib.display_info(display, status) }}
+            {{ lib.display_info_device(display, status) }}
             <div class="text-center">
               <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open</a>
             </div>
