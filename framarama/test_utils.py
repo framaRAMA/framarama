@@ -5,6 +5,25 @@ from unittest import TestCase
 from framarama.base import utils
 
 
+class JsonTestCase(TestCase):
+
+    def test_from_dict(self):
+        _data = utils.Json.from_dict({'a':'b', 'c':'d', 'd':[1, 2], 'e':{'f':'g', 'h':'i', 'j':[3, 4]}})
+        self.assertEqual('{"a": "b", "c": "d", "d": [1, 2], "e": {"f": "g", "h": "i", "j": [3, 4]}}', _data)
+
+    def test_from_dict(self):
+        _data = utils.Json.to_dict('{"a": "b", "c": "d", "d": [1, 2], "e": {"f": "g", "h": "i", "j": [3, 4]}}')
+        self.assertEqual({'a':'b', 'c':'d', 'd':[1, 2], 'e':{'f':'g', 'h':'i', 'j':[3, 4]}}, _data)
+
+    def test_to_object_dict(self):
+        _data = utils.Json.to_object_dict({'key':'value', 'nested':{'key':'value'}}, fields=['key', 'nested_key'])
+        self.assertEqual({'key':'value', 'nested_key':'value'}, _data)
+
+    def test_from_object_dict(self):
+        _data = utils.Json.from_object_dict({'key':'value', 'nested_key':'value'})
+        self.assertEqual({'key':'value', 'nested':{'key':'value'}}, _data)
+
+
 class DateTimeTestCase(TestCase):
 
     def test_get(self):
