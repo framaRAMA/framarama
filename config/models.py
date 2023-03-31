@@ -6,7 +6,6 @@ import logging
 
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.files.base import File
 
 from framarama.base import utils
@@ -179,7 +178,7 @@ class DisplayItemThumbnailData(BaseImageData):
 class Frame(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["name"]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(
         max_length=255,
         verbose_name='Name', help_text='A name for this frame configuration.')
@@ -414,7 +413,7 @@ class FrameContext(PluginModel):
 class Display(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["name"]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     frame = models.ForeignKey(Frame, on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(
         max_length=255,

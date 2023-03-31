@@ -1,10 +1,11 @@
-from django.contrib.auth.models import User
 from rest_framework import authentication, exceptions
+
+from django.contrib.auth import get_user_model
 
 from config import models
 
 
-class ApiUser(User):
+class ApiUser(get_user_model()):
     class Meta:
         abstract = True   # required for makemigrations to irgnore table?
         proxy = True

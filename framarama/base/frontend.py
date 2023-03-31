@@ -11,7 +11,7 @@ import logging
 
 from django.conf import settings
 from django.core import management
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import connections
 
 from frontend import models
@@ -57,15 +57,15 @@ class Frontend(Singleton):
         logger.info("Migrations for {} complete!".format(database))
 
     def _init_admin_user(self):
-        _users = User.objects.filter(is_superuser=True).all()
+        _users = get_user_model().objects.filter(is_superuser=True).all()
         if len(_users) == 0:
             logger.info("Creating admin user")
-            User.objects.create_user(
+            get_user_model().objects.create_user(
                 username=settings.FRAMARAMA['ADMIN_USERNAME'],
                 email=settings.FRAMARAMA['ADMIN_MAIL'],
                 password=settings.FRAMARAMA['ADMIN_PASSWORD'],
                 is_superuser=True)
-            _users = User.objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
+            _users = get_user_model().objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
         logger.info("Admin user is {}".format(_users[0]))
 
     def initialize(self):
