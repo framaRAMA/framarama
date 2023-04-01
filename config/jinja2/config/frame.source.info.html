@@ -3,7 +3,7 @@
 {% block content_frame_source %}
 <div class="pt-2">
   {{ lib.field_text('Name', source.name) }}
-  {{ lib.field_text('Last update', "%s%s"|format(source.update_date_start, ' (currently runnning)' if source_running else '')) }}
+  {{ lib.field_text('Last update', "%s%s"|format(source.update_date_start|date_format('%Y-%m-%d %H:%M'), ' (currently runnning)' if source_running else '')) }}
   {% if source.update_interval|string == '0:00:00' %}
     {{ lib.field_text('Update interval', '(use defaults)') }}
   {% elif not source.update_interval %}
@@ -12,7 +12,7 @@
     {{ lib.field_text('Update interval', source.update_interval) }}
   {% endif %}
   {% if source.update_date_end and source.update_date_start %}
-    {{ lib.field_text('Update duration', source.update_date_end - source.update_date_start) }}
+    {{ lib.field_text('Update duration', (source.update_date_end - source.update_date_start)|duration) }}
   {% else %}
     {{ lib.field_text('Update duration', '(no update or not completed)') }}
   {% endif %}
