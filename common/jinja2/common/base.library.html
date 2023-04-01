@@ -500,15 +500,15 @@
   {% set pager_top = title != '' %}
   <div class="row w-100 {% if pager_top %}mt-3 pt-1 pb-1 bg-light border-top border-bottom{% endif %} m-0">
     {% if pager_top %}
-      <h5 class="col-auto pt-1 ps-2">
+      <h5 class="col-12 col-md-auto pt-1 ps-2 float-md-start text-center">
         {{ title }}
         {% if items.paginator.count %} ({{ items.start_index() }}-{{ items.end_index() }} of {{ items.paginator.count }}){% endif %}
       </h5>
     {% endif %}
     <div class="col">
-    <nav aria-label="..." class="col d-flex justify-content-center float-end">
+    <nav aria-label="..." class="col d-flex justify-content-center float-md-end">
       <ul class="pagination m-0">
-        <li class="page-item {% if items.number == 0 %}disabled{% endif %} me-2">
+        <li class="page-item {% if items.number == 0 %}disabled{% endif %} me-1">
           <a class="page-link" {% if items.number != 0 %}href="{{ link }}?page=1"{% endif %}>{{ icon('action.begin', '') }}</a>
         </li>
         <li class="page-item {% if not items.has_previous() %}disabled{% endif %} me-2">
