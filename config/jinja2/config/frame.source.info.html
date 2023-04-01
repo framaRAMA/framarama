@@ -22,9 +22,9 @@
     {{ lib.field_text('Update status', source.update_status) }}
   {% endif %}
   {{ lib.field_text('Update statistics', '%d total (%d errors)'|format(source.item_count_total, source.item_count_error)) }}
-  {{ lib.field_list('Result mapping', {'ID': source.map_item_id_ext, 'URL': source.map_item_url, 'Date creation': source.map_item_date_creation}) }}
+  {{ lib.field_list('Result mapping', {'ID': '<code>%s</code>'|format(source.map_item_id_ext)|safe, 'URL': '<code>%s</code>'|format(source.map_item_url)|safe, 'Date creation': '<code>%s</code>'|format(source.map_item_date_creation)|safe}) }}
   {% if source.map_item_meta %}
-    {{ lib.field_pre('Meta mapping', source.map_item_meta) }}
+    {{ lib.field_text('Meta mapping', '<code><pre>%s</pre></code>'|format(source.map_item_meta)|safe) }}
   {% else %}
     {{ lib.field_text('Meta mapping', '(no additional mapping defined)') }}
   {% endif %}
