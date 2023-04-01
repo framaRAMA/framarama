@@ -709,7 +709,7 @@
       {% endif %}
     </li>
     <li>
-      up since <strong>{{ status['uptime']|duration }}</strong>
+      up since <strong>{{ status['uptime']|duration if status else 'unknown' }}</strong>
     </li>
   </ul>
 {% endmacro %}
