@@ -39,14 +39,18 @@ class Scheduler(jobs.Scheduler):
             _update_initial = ~_update_frame_disabled & _update_frame_initially
             _update_by_interval = ~_update_frame_disabled & ~_update_frame_defaults & _update_frame_required
             _update_by_source_interval = _update_initial | _update_by_interval
-            _update_by_global_interval = _update_frame_defaults | Q(update_date_start__gt=functions.Now()-_interval)
+            _update_by_global_interval = _update_frame_defaults & Q(update_date_start__gt=functions.Now()-_interval)
         else:
             _update_by_source_interval = _ignored
             _update_by_global_interval = _ignored
 
-        _criteria = _enabled_frame & _enabled_display & _specific_frame & _specific_source
-        _criteria.add(_update_by_source_interval, Q.AND)
-        _criteria.add(_update_by_global_interval, Q.AND)
+        _criteria = (
+          _enabled_frame &
+          _enabled_display &
+          _specific_frame &
+          _specific_source &
+          (_update_by_source_interval | _update_by_global_interval)
+        )
 
         for _source in models.Source.objects.filter(_criteria).order_by('-update_date_start'):
             _frame = _source.frame
