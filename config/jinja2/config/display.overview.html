@@ -5,6 +5,7 @@
   {% set stats = display.get_latest_status(60) %}
   {% set latest_items = display.get_latest_items(10) %}
   {% set top_items = display.get_top_items(10) %}
+  {% set newest_items = display.get_newest_items(10) %}
 
   <div class="col">
     <div class="card mt-2">
@@ -41,16 +42,22 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body">
-        {{ lib.display_items('displayImageLatest', 'Latest items (%s)'|format(latest_items|count), latest_items, 'grid') }}
-      </div>
-    </div>
-  </div>
-
-
-  <div class="col">
-    <div class="card mt-2">
-      <div class="card-body">
-        {{ lib.display_items('displayImageTop', 'Top items(%s)'|format(top_items|count), top_items, 'grid') }}
+        {{ lib.nav_tabs('displayImages', {
+            'displayImageLatest': 'Latest (%s)'|format(latest_items|count),
+            'displayImageTop': 'Top (%s)'|format(top_items|count),
+            'displayImageNewest': 'New (%s)'|format(newest_items|count),
+        }) }}
+        <div class="tab-content">
+          <div id="displayImageLatestTab" role="tabpanel" aria-labelledby="displayImageLastest" class="tab-pane fade show active">
+            {{ lib.display_items('displayImageLatest', '', latest_items, 'grid') }}
+          </div>
+          <div id="displayImageTopTab" role="tabpanel" aria-labelledby="displayImageTop" class="tab-pane fade">
+            {{ lib.display_items('displayImageTop', '', top_items, 'grid') }}
+          </div>
+          <div id="displayImageNewestTab" role="tabpanel" aria-labelledby="displayImageNewest" class="tab-pane fade ">
+            {{ lib.display_items('displayImageNewest', '', newest_items, 'grid') }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
