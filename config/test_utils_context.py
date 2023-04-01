@@ -68,6 +68,27 @@ class ResultValueTestCase(TestCase):
         self.assertEqual(False, context.ResultValue('n').as_bool())
 
 
+class ContextTestCase(TestCase):
+
+    def test_context_evaluate_none(self):
+        _context = context.Context()
+        self.assertIsNone(_context.evaluate(None))
+
+    def test_context_evaluate_no_resolver(self):
+        _context = context.Context()
+        self.assertEqual('hello world', _context.evaluate("hello world"))
+
+    def test_context_evaluate_no_resolver_key_missing(self):
+        _context = context.Context()
+        with self.assertRaises(NameError):
+            self.assertEqual('', _context.evaluate("{missing}"))
+
+    def test_context_evaluate_keys(self):
+        _context = context.Context()
+        _context.set_resolver('test', context.MapResolver({'key': 'value', 'second':'other'}))
+        self.assertEqual('value-other', _context.evaluate("{test['key']}-{test['second']}"))
+
+
 class ContextResolverTestCase(TestCase):
 
     def test_mapresolver(self):
