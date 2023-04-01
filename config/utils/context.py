@@ -18,6 +18,8 @@ class ResultValue:
     def as_str(self):
         if self._value is None:
             return None
+        if type(self._value) == bool:
+            return str(self._value).lower()
         return str(self._value)        
 
     def as_int(self):
