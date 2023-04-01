@@ -632,14 +632,14 @@
   {{ modal_end(submit=submit, submit_class='btn-primary', submit_title=submit_title, cancel_title='Close') }}
 {% endmacro %}
 
-{% macro frame_header(title, description, bg='') %}
+{% macro page_header(title, description, back='frame_list', bg='') %}
 <div class="row pt-3">
   <div class="col-md-12 mb-4">
     <div class="card border rounded-5">
       <div class="card-body p-0 m-0" style="{% if bg %}background: linear-gradient(to right, rgba(255,255,255,1) 20%, rgba(255,255,255,0.1)), url('{{ bg }}') 0% 50% no-repeat; background-size:100%; {% endif %}border-radius:0.5em;">
         <div class="d-flex align-items-center">
           <div class="ps-3">
-            <a class="fs-2" href="{{ url('frame_list') }}">{{ icon('action.back') }}</a>
+            <a class="fs-2" href="{{ url(back) }}">{{ icon('action.back') }}</a>
           </div>
           <div class="ms-3 ps-2 p-4">
             <p class="fw-bold mb-1">{{ title }}</p>
