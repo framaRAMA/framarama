@@ -1,16 +1,12 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-
-<div class="pt-2">
-  {{ lib.form_start(None, csrf_input, 'Profile') }}
-  {{ lib.field_text('Username', user.username) }}
-  {{ lib.field_text('Name', user.get_full_name()) }}
-  {{ lib.field_text('Mail', user.email) }}
-  {{ lib.field_text('Timezone', user.time_zone) }}
-  {{ lib.field_text('Registered', user.date_joined|date_format('%d.%m.%Y')) }}
-  {{ lib.form_end(submit_title=null) }}
-</div>
+{{ lib.page_header('Profile', 'View your profile and settings', 'index') }}
+{{ lib.field_text('Username', '<code>%s</code>'|format(user.username)|safe) }}
+{{ lib.field_text('Name', user.get_full_name()) }}
+{{ lib.field_text('Mail', '<code>%s</code>'|format(user.email)|safe) }}
+{{ lib.field_text('Timezone', user.time_zone) }}
+{{ lib.field_text('Registered', user.date_joined|date_format('%d.%m.%Y')) }}
 
 {{ lib.nav_actions([
   {'icon': 'action.edit', 'url': url('profile_edit'), 'type': 'primary'},
