@@ -703,8 +703,10 @@
       {% endif %}
     </li>
     <li>
-      running software version <strong>{{ status['app_branch'] }}</strong>
-      ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
+      running software version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
+      {% if status and status['app_hash'] and status['app_date'] %}
+        ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
+      {% endif %}
     </li>
     <li>
       up since <strong>{{ status['uptime']|duration }}</strong>
