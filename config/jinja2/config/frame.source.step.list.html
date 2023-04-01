@@ -5,19 +5,21 @@
 <ul class="list-group list-group-light">
 {% for source_step in source.steps.all() %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="">
+    <div class="w-100">
       <div class="position-absolute">
         <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
         <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
       </div>
       <div class="ms-5 fw-bold">
-        {{ loop.index }}. {{ source_step.title }}
-        {% if source_step.merge_in %}
-          {{ lib.icon('source.mergein', '') }}
-        {% endif %}
-        {% if source_step.loop_out %}
-          {{ lib.icon('source.loopout', '') }}
-        {% endif %}
+        <div class="d-inline-block col-auto col-12 col-md-auto">
+          {{ loop.index }}. {{ source_step.title }}
+          {% if source_step.merge_in %}
+            {{ lib.icon('source.mergein', '') }}
+          {% endif %}
+          {% if source_step.loop_out %}
+            {{ lib.icon('source.loopout', '') }}
+          {% endif %}
+        </div>
         <span class="badge rounded-pill badge-success">
           {{ lib.icon('source.plugin.'+source_plugins[source_step.plugin].cat) }}
           {{ source_step.plugin }}

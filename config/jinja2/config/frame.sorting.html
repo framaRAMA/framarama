@@ -6,14 +6,16 @@
 <ul class="list-group list-group-light">
 {% for sorting in sortings %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div>
+    <div class="w-100">
       <div class="fw-bold {% if not sorting.enabled %}text-muted{% endif %}">
-        {{ loop.index }}. {{ sorting.title }}
-        {% if 'sorting%d'|format(sorting.id) in errors %}
-          <span title="{{ errors['sorting%d'|format(sorting.id)] }}" class="text-danger">
-            {{ lib.icon('error') }}
-          </span>
-        {% endif %}
+        <div class="d-inline-block col-auto col-12 col-md-auto">
+          {{ loop.index }}. {{ sorting.title }}
+          {% if 'sorting%d'|format(sorting.id) in errors %}
+            <span title="{{ errors['sorting%d'|format(sorting.id)] }}" class="text-danger">
+              {{ lib.icon('error') }}
+            </span>
+          {% endif %}
+        </div>
         <span class="badge rounded-pill badge-success">
           {{ lib.icon('sorting.plugin.'+sorting_plugins[sorting.plugin].cat) }}
           {{ sorting.plugin }}

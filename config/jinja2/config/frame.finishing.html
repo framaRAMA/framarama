@@ -5,13 +5,15 @@
 <ul class="list-group list-group-light">
 {% for finishing in finishings %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div>
+    <div class="w-100">
       <div class="position-absolute">
         <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
         <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
       </div>
       <div class="ms-5 fw-bold {% if not finishing.enabled %}text-muted{% endif %}">
-        {{ loop.index }}. {{ finishing.title }}
+        <div class="d-inline-block col-auto col-12 col-md-auto">
+          {{ loop.index }}. {{ finishing.title }}
+        </div>
         <span class="badge rounded-pill badge-success">
           {{ lib.icon('finishing.plugin.'+finishing_plugins[finishing.plugin].cat) }}
           {{ finishing.plugin }}
