@@ -88,6 +88,52 @@ class ContextTestCase(TestCase):
         _context.set_resolver('test', context.MapResolver({'key': 'value', 'second':'other'}))
         self.assertEqual('value-other', _context.evaluate("{test['key']}-{test['second']}"))
 
+    def test_context_evaluate_quotes(self):
+        _context = context.Context()
+        self.assertEqual('"some quotes"', _context.evaluate('"some quotes"'))
+        self.assertEqual("'some quotes'", _context.evaluate("'some quotes'"))
+
+    def test_context_evaluate_long(self):
+        _context = context.Context()
+        _text = """
+hello world
+"""
+        self.assertEqual("\nhello world\n", _context.evaluate(_text))
+
+    def test_context_evaluate_long_quotes(self):
+        _context = context.Context()
+        _text = """
+hello \"\"\" world \"\"\"
+"""
+        self.assertEqual('\nhello """ world """\n', _context.evaluate(_text))
+
+    def test_context_evaluate_long_html(self):
+        _context = context.Context()
+        _text = """
+<html>
+<body>
+  <a href="http://github.com/framarama/">framaRAMA</a>
+</body>
+</html>
+"""
+        self.assertEqual('\n<html>\n<body>\n  <a href="http://github.com/framarama/">framaRAMA</a>\n</body>\n</html>\n', _context.evaluate(_text))
+
+    def test_context_evaluate_long_script(self):
+        _context = context.Context()
+        _text = """
+<html>
+<head>
+  <script>
+  function dummy() {{
+    return 'hello world';
+  }}
+  </script>
+</head>
+<body/>
+</html>
+"""
+        self.assertEqual('\n<html>\n<head>\n  <script>\n  function dummy() {\n    return \'hello world\';\n  }\n  </script>\n</head>\n<body/>\n</html>\n', _context.evaluate(_text))
+
 
 class ContextResolverTestCase(TestCase):
 
