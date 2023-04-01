@@ -12,7 +12,7 @@
   '__dict__': '<form method="get" action="">Item <input type="text" name="search" value="%s" placeholder="search" class="p-0 m-0 float-end form-control w-auto ps-2" style="height: 1.6em;"/></form>'|format(search|e)|safe
 }, {
   'thumbnail:__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemThumbnail{{ loop.index }}"><img src="{{ url("frame_source_image_thumbnail", args=' + ('[%d, %d, value.id]'|format(frame.id, source.id)) + ') }}" loading="lazy" style="width:2.5em;" class="border rounded"/></a>',
-  '__dict__': '{{ value.id }} - {{ value.date_creation|date_format("%Y-%m-%d %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'
+  '__dict__': '<span class="text-muted">{{ value.id }} - </span> {{ value.date_creation|date_format("%Y-%m-%d %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'
 }) }}
 {{ lib.list_paginator('il2', '', items, url('frame_source_images', args=[frame.id, source.id])) }}
 

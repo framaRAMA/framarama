@@ -61,7 +61,12 @@
 {% endif %}
  
 {{ lib.list_paginator('il1', 'Sorted item list preview', items, url('frame_sorting_list', args=[frame.id])) }}
-{{ lib.list_table(items, {'rank': 'Rank', 'id': 'ID', '__dict__':'URL', 'date_creation': 'Date'}, {'__dict__': '<a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'}) }}
+{{ lib.list_table(items, {
+  'rank': 'Rank',
+  '__dict__': 'Item'
+}, {
+  '__dict__': '<span class="text-muted">{{ value.id }} - </span> {{ value.date_creation|date_format("%Y-%m-%d %H:%M") }}<br/><a href="#" data-bs-toggle="modal" data-bs-target="#itemImage{{ loop.index }}" title="Item #{{ value.id }}">{{ value.url }}</a>'
+}) }}
 {{ lib.list_paginator('il2', '', items, url('frame_sorting_list', args=[frame.id]), pages=10) }}
 
 {% for item in items %}
