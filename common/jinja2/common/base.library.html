@@ -347,6 +347,16 @@
   </div>
 {% endmacro %}
 
+{% macro nav_tabs(id, tabs, active='') %}
+  <ul class="nav nav-tabs mb-3" id="{{ id }}" role="tablist">
+    {% for name in tabs %}
+      <li class="nav-item" role="presentation">
+        <a class="nav-link{% if loop.index0 == 0 %} active{% endif %}" id="{{ name }}" data-bs-toggle="tab" href="#{{ name }}Tab" role="tab" aria-controls="{{ name }}Tab" aria-selected="true">{{ tabs[name] }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
 {% macro form_start(form, csrf, title) %}
   {% if title %}<h5 class="pt-2">{{ title }}</h5>{% endif %}
   <form class="pt-2" method="post">
