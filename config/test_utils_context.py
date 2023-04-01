@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from unittest import TestCase
 
@@ -19,3 +20,9 @@ class ContextResolverTestCase(TestCase):
         self.assertEqual('/some/path', _context['HOME'])
         self.assertEqual(None, _context['missing'])
 
+    def test_objectresolver(self):
+        _context = context.ObjectResolver(datetime.datetime.now())
+        self.assertIsNotNone(_context['hour'])
+        self.assertIsNotNone(_context['minute'])
+        self.assertIsNotNone(_context['second'])
+        self.assertEqual(None, _context['missing'])
