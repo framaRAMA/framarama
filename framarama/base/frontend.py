@@ -154,7 +154,7 @@ class Frontend(Singleton):
         _network_config = _capability.net_config()
         _network_status = _device.network_status()
         _app_revision = _capability.app_revision()
-        _items = _device.get_files()
+        _items = _device.get_items()
         _latest_items = [{
             'id': _file.item().id,
             'time': DateTime.utc(_file.time())
@@ -385,15 +385,15 @@ class FrontendDevice(Singleton):
                 Filesystem.file_write(_files['image'], _result.get_image_data())
                 Filesystem.file_write(_files['preview'], _result.get_preview_data())
 
-                return self.get_files()[0]
+                return self.get_items()[0]
 
     def activate(self, idx):
-        _items = self.get_files(idx, 1)
+        _items = self.get_items(idx, 1)
         if len(_items):
             for _renderer in self._renderers:
                 _renderer.activate(_items[0])
 
-    def get_files(self, start=None, count=None):
+    def get_items(self, start=None, count=None):
         _files = []
         for (_file, _num, _ext) in Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN):
             if start != None and start < len(_files):

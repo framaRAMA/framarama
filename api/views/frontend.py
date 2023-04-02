@@ -117,18 +117,18 @@ class StatusDisplayView(viewsets.ViewSet):
 class ItemsDisplayView(viewsets.GenericViewSet):
     serializer_class = ItemSerializer
 
-    def _files(self):
+    def _items(self):
         _frontend_device = frontend.Frontend.get().get_device()
-        _files = _frontend_device.get_files()
-        _files = [{
+        _items = _frontend_device.get_items()
+        _items = [{
             'id': _no,
-            'url': _file.item().url,
-            'mime': _file.mime(),
-        } for _no, _file in enumerate(_files)]
-        return _files
+            'url': _item.item().url,
+            'mime': _item.mime(),
+        } for _no, _item in enumerate(_items)]
+        return _items
 
     def list(self, request, format=None):
-        _serializer = self.get_serializer(instance=self._files(), many=True)
+        _serializer = self.get_serializer(instance=self._items(), many=True)
         return Response(_serializer.data)
 
     def retrieve(self, request, pk):

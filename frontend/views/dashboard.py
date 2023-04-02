@@ -18,7 +18,7 @@ class DisplayDashboardView(base.BaseFrontendView):
         _frontend_device = _context['frontend'].get_device()
         _capability = _frontend_device.get_capability()
         _scheduler = self.get_scheduler()
-        _context['files'] = _frontend_device.get_files()
+        _context['items'] = _frontend_device.get_items()
         _action = self.request.GET.get('action')
         if _action == 'display.toggle':
           if _capability.display_status():
@@ -45,12 +45,12 @@ class ImageDisplayDashboardView(base.BaseFrontendView):
     def _get(self, request, nr, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
-        _files = _frontend_device.get_files()
-        _file = _files[nr] if nr >= 0 and nr < len(_files) else _files[0]
+        _items = _frontend_device.get_items()
+        _item = _items[nr] if nr >= 0 and nr < len(_items) else _items[0]
         if self.request.GET.get('type') == 'preview':
-            self.response(_context, _file.preview(), _file.preview_mime())
+            self.response(_context, _item.preview(), _item.preview_mime())
         else:
-            self.response(_context, _file.image(), _file.mime())
+            self.response(_context, _item.image(), _item.mime())
         return _context
 
 
