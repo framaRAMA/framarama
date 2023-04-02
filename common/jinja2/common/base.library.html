@@ -390,8 +390,8 @@
     {{ field }}
   {% else %}
     <div class="mb-3 {{ input_class }} {{ input_error_class }}">
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
         {{ field }}
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
         {% if field_class == 'GenerateKeyTextInput' %}
           <button id="{{ field.id_for_label }}pwdgen" tabindex="0" type="button" class="password-generator-button">
             {{ icon('action.generate') }}

@@ -96,10 +96,6 @@
   cursor: pointer;
 }
 
-/** reverse order label, input -> remove padding */
-.form-floating > label.form-label {
-  padding-top: 0px;
-}
 /** remove bottom padding from label of multi-checkbox */
 .form-check-multiple > label.form-label {
   margin-bottom: 0px;
@@ -118,5 +114,10 @@
 /** do not highlight multi-checkbox container div when clicked */
 .form-check-multiple div.form-check-input:active {
   filter: unset;
+}
+/** more spacing between checkbox and label */
+input.form-check-input[type="checkbox"] + label.form-label {
+  margin-left: 1em;
+  padding-top: 0px;
 }
 
