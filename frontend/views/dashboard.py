@@ -28,7 +28,7 @@ class DisplayDashboardView(base.BaseFrontendView):
         elif _action == 'display.refresh':
             _scheduler.trigger_job(jobs.Scheduler.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
-            _scheduler.run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _frontend_device.activate(item=self.request.GET['item']))
+            _scheduler.run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _frontend_device.activate(self.request.GET['item']))
         if _action:
             self.redirect(_context)
         _context['display'] = {
