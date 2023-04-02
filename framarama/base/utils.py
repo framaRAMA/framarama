@@ -174,6 +174,10 @@ class Process:
             timeout = timeout - 1
         return False
 
+    @staticmethod
+    def eval(code, global_vars={}, local_vars={}):
+        return eval(code, global_vars, local_vars)
+
 
 class Json:
 

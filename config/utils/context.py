@@ -1,9 +1,7 @@
-import logging
 
 from django.db.models.fields.related import RelatedField
 
-
-logger = logging.getLogger(__name__)
+from framarama.base import utils
 
 
 class Result:
@@ -74,12 +72,8 @@ class Context:
             return None
         _globals = {}
         _globals.update(self._resolver.get_resolvers())
-        _expr = 'f"' + str(expr) + '"'
-        try:
-            return eval(_expr, _globals, {})
-        except Exception as e:
-            logger.error("Can not evaluate expression {}: {}", _expr, e)
-            raise
+        _expr = 'f"""' + str(expr).replace('"', '\\"') + '"""'
+        return utils.Process.eval(_expr, _globals, {})
 
     def evaluate_model(self, model):
         _result = Result()
