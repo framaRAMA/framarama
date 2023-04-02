@@ -7,6 +7,7 @@ import threading
 import datetime
 import jsonpickle
 import urllib
+import base64
 import logging
 
 from django.conf import settings
@@ -18,7 +19,7 @@ from frontend import models
 from framarama.base import device
 from framarama.base.utils import Singleton, Config, Filesystem, Process, DateTime
 from framarama.base.api import ApiClient, ApiResultItem
-from config.utils import finishing
+from config.utils import context, finishing
 from config import models as config_models
 
 
@@ -666,3 +667,34 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
     def activate(self, item):
         self.startup()
 
+
+class WebsiteFrontendRenderer(BaseFrontendRenderer):
+    FILE_OUTPUT = BaseFrontendRenderer.DATA_PATH + '/framarama.html'
+    TEMPLATE = """<html>
+  <head>
+    <title>framaRAMA - {item['title']}</title>
+    <script type="text/javascript">
+      window.setTimeout(() => window.location.reload(), 60000);
+    </script>
+  </head>
+  <body>
+    <img src="data:{item['mime']};base64,{item['data']}" style="width: 100%; height: 100%; object-fit: contain;"/>
+  </body>
+</html>
+"""
+
+    def _update(self, title, mime, data):
+        _context = context.Context()
+        _context.set_resolver('item', context.MapResolver({
+            'title': title,
+            'mime': mime,
+            'data': base64.b64encode(data).decode() if data else ''
+        }))
+        _content = _context.evaluate(self.TEMPLATE)
+        Filesystem.file_write(self.FILE_OUTPUT, _content.encode())
+
+    def process(self, display, item):
+        pass
+
+    def activate(self, item):
+        self._update(item['json']['item'].url, item['json']['mime'], item['image'])
