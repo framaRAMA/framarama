@@ -1,7 +1,7 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-{{ lib.display_header('Create a new display', 'Use the following form to add a new display to your collection') }}
+{{ lib.page_header('Create a new display', 'Use the following form to add a new display to your collection', 'display_list') }}
 {{ lib.form_start(form, csrf_input, 'Add new display') }}
 {{ lib.form_fields(form) }}
 {{ lib.form_end(form, submit_class='btn-success', cancel=url('display_list')) }}
