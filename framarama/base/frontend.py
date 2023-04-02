@@ -550,6 +550,10 @@ class FrontendItem:
 
 
 class BaseFrontendRenderer:
+    DATA_PATH = settings.FRAMARAMA['DATA_PATH']
+    COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
+    IMG_CURRENT = DATA_PATH + '/framarama-current.image'
+    FILE_LIST = DATA_PATH + '/framarama-current.csv'
 
     def process(self, display, item):
         pass
@@ -562,18 +566,18 @@ class DefaultFrontendRenderer(BaseFrontendRenderer):
 
 
 class FilesystemFrontendRenderer(BaseFrontendRenderer):
-    FILE_PATH = settings.FRAMARAMA['DATA_PATH']
+    FILE_PATH = BaseFrontendRenderer.DATA_PATH
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
-    FILE_CURRENT = 'framarama-current.image'
+    FILE_CURRENT = BaseFrontendRenderer.DATA_PATH + '/' + 'framarama-current.image'
 
     def _file(self, file_name):
-        return self.FILE_PATH + '/' + file_name
+        return self.DATA_PATH + '/' + file_name
 
     def process(self, display, item):
         _config = Frontend.get().get_config().get_config()
         _files = Filesystem.file_rotate(
-            self.FILE_PATH,
+            self.DATA_PATH,
             self.FILE_PATTERN,
             self.FILE_FORMAT,
             _config.count_items_keep if _config.count_items_keep else 6,
@@ -594,7 +598,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         _item = int(item)
         _files = list(self.files().values())
         if _item >=0 and _item < len(_files):
-            Filesystem.file_copy(_files[_item]['image_file'], self.FILE_PATH + '/' + self.FILE_CURRENT)
+            Filesystem.file_copy(_files[_item]['image_file'], self.FILE_CURRENT)
 
     def files(self):
         _files = []
@@ -613,12 +617,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
-    DATA_PATH = settings.FRAMARAMA['DATA_PATH']
-    COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
-    IMG_CURRENT = DATA_PATH + '/framarama-current.image'
-    FILE_LIST = DATA_PATH + '/framarama-current.csv'
-
-    CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', DATA_PATH + '/picture-background.jpg', '-f', DATA_PATH + '/picture-current.csv', '--reload', '10']
+    CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', BaseFrontendRenderer.DATA_PATH + '/picture-background.jpg', '-f', BaseFrontendRenderer.DATA_PATH + '/picture-current.csv', '--reload', '10']
     CMD_IMAGICK = ['magick', 'display', '-window', 'root']
 
     def __init__(self):
@@ -639,7 +638,7 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
         self._update()
 
     def update_feh(self):
-        _file_list = VisualizeFrontendRenderer.FILE_LIST
+        _file_list = self.FILE_LIST
         if Process.exec_running('feh') is None:
             Process.exec_bg([
                 'feh',
@@ -653,10 +652,10 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
                 '--reload', '2'
             ])
         if not Filesystem.file_exists(_file_list) or Filesystem.file_size(_file_list) == 0:
-            Filesystem.file_write(_file_list, VisualizeFrontendRenderer.IMG_CURRENT.encode())
+            Filesystem.file_write(_file_list, self.IMG_CURRENT.encode())
     
     def update_magic(self):
-        Process.exec_run(self.CMD_IMAGICK + [VisualizeFrontendRenderer.IMG_CURRENT])
+        Process.exec_run(self.CMD_IMAGICK + [self.IMG_CURRENT])
 
     def process(self, display, item):
         self.startup()
