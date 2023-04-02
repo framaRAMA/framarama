@@ -334,20 +334,29 @@ class ProcessingResult:
         self._preview_meta = preview_meta
         self._preview_data = preview_data
 
-    def get_data(self):
+    def get_image_data(self):
         return self._image_data
 
-    def get_preview(self):
+    def get_preview_data(self):
         return self._preview_data
 
-    def get_width(self):
+    def get_image_meta(self):
+        return self._image_meta
+
+    def get_preview_meta(self):
+        return self._preview_meta
+
+    def get_image_mime(self):
+        return self._image_meta['mime']
+
+    def get_preview_mime(self):
+        return self._preview_meta['mime']
+
+    def get_image_width(self):
         return self._image_meta['width']
 
-    def get_height(self):
+    def get_image_height(self):
         return self._image_meta['height']
-
-    def get_mime(self):
-        return self._image_meta['mime']
 
     def get_preview_width(self):
         return self._preview_meta['width']

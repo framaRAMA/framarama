@@ -153,7 +153,7 @@ class Scheduler(jobs.Scheduler):
                 _contexts = self._display.get_contexts(True)
                 _finishings = self._display.get_finishings(True)
                 _frontend_item = _device.finish(self._display, _contexts, _next_item, _finishings)
-                _device.render(self._display, _frontend_item)
+                _device.activate(0)
                 logger.info("Image updated ({} bytes, {}x{} pixels, mime {})!".format(
                     len(_frontend_item.data()),
                     _frontend_item.width(),

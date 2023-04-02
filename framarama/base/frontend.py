@@ -154,11 +154,11 @@ class Frontend(Singleton):
         _network_config = _capability.net_config()
         _network_status = _device.network_status()
         _app_revision = _capability.app_revision()
-        _files = _device.get_files()
+        _items = _device.get_files()
         _latest_items = [{
-            'id': _file['json']['item'].id,
-            'time': DateTime.utc(_file['json']['time'])
-        } for _file in _files]
+            'id': _file.item().id,
+            'time': DateTime.utc(_file.time())
+        } for _file in _items]
         _data = {}
         if restrictions is None or 'sys' in restrictions:
             _data['uptime'] = _capability.sys_uptime()
@@ -323,14 +323,17 @@ class Display(Singleton):
 
 
 class FrontendDevice(Singleton):
+    DATA_PATH = settings.FRAMARAMA['DATA_PATH']
+    FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
+    FILE_FORMAT = 'framarama-{:05d}.{:s}'
 
     def __init__(self):
         super().__init__()
         self._monitor = FrontendMonitoring()
         self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None, 'networks': None}
-        self._renderer = FilesystemFrontendRenderer()
         self._renderers = {
             DefaultFrontendRenderer(),
+            FilesystemFrontendRenderer(),
             VisualizeFrontendRenderer(),
             WebsiteFrontendRenderer(),
         }
@@ -363,26 +366,45 @@ class FrontendDevice(Singleton):
             _processor = finishing.Processor(_context)
             _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
             _result = _processor.process()
-            return FrontendItem(item, _result) if _result else None
+            if _result:
+                _files = Filesystem.file_rotate(
+                    self.DATA_PATH,
+                    self.FILE_PATTERN,
+                    self.FILE_FORMAT,
+                    _config.count_items_keep if _config.count_items_keep else 6,
+                    ['json', 'image', 'preview'])
 
-    def render(self, display, item):
-        self._renderer.process(display, item)
-        for _renderer in self._renderers:
-            _renderer.process(display, item)
-        self.activate(0)
+                _json = jsonpickle.encode({
+                  'item': item,
+                  'image_meta': _result.get_image_meta(),
+                  'preview_meta': _result.get_preview_meta(),
+                  'time': DateTime.utc(datetime.datetime.utcnow()),
+                })
+
+                Filesystem.file_write(_files['json'], _json.encode())
+                Filesystem.file_write(_files['image'], _result.get_image_data())
+                Filesystem.file_write(_files['preview'], _result.get_preview_data())
+
+                return self.get_files()[0]
 
     def activate(self, idx):
-        _idx = int(idx)
-        _items = self._renderer.files()
-        if _idx < 0 or _idx >= len(_items):
-            return
-        _item = _items[_idx]
-        self._renderer.activate(_item)
-        for _renderer in self._renderers:
-            _renderer.activate(_item)
+        _items = self.get_files(idx, 1)
+        if len(_items):
+            for _renderer in self._renderers:
+                _renderer.activate(_items[0])
 
-    def get_files(self):
-        return self._renderer.files()
+    def get_files(self, start=None, count=None):
+        _files = []
+        for (_file, _num, _ext) in Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN):
+            if start != None and start < len(_files):
+                continue
+            if count != None and count == len(_files):
+                return
+            _file_json = self.DATA_PATH + '/' + _file
+            _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'image')
+            _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'preview')
+            _files.append(FrontendItem(_file_json, _file_image, _file_preview))
+        return _files
 
     def network_connect(self, name):
         self.get_capability().net_profile_connect(name=name)
@@ -528,33 +550,52 @@ class FrontendMonitoring(threading.Thread):
 
 class FrontendItem:
 
-    def __init__(self, item, result):
-        self._item = item
-        self._result = result
+    def __init__(self, file_json, file_image, file_preview):
+        self._json = jsonpickle.decode(Filesystem.file_read(file_json))
+        self._image = None
+        self._image_file = file_image
+        self._preview = None
+        self._preview_file = file_preview
 
     def item(self):
-        return self._item
+        return self._json['item']
 
     def data(self):
-        return self._result.get_data()
+        if self._image is None:
+            self._image = Filesystem.file_read(self._image_file)
+        return self._image
 
     def preview(self):
-        return self._result.get_preview()
+        if self._preview is None:
+            self._preview = Filesystem.file_read(self._preview_file)
+        return self._preview
+
+    def time(self):
+        return DateTime.parse(self._json['time'])
+
+    def file(self):
+        return self._image_file
 
     def mime(self):
-        return self._result.get_mime()
+        return self._json['image_meta']['mime']
 
     def width(self):
-        return self._result.get_width()
+        return self._json['image_meta']['width']
 
     def height(self):
-        return self._result.get_height()
+        return self._json['image_meta']['width']
+
+    def preview_file(self):
+        return self._preview_file
+
+    def preview_mime(self):
+        return self._json['preview_meta']['mime']
 
     def preview_width(self):
-        return self._result.get_preview_width()
+        return self._json['preview_meta']['width']
 
     def preview_height(self):
-        return self._result.get_preview_height()
+        return self._json['preview_meta']['width']
 
 
 class BaseFrontendRenderer:
@@ -562,9 +603,6 @@ class BaseFrontendRenderer:
     COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
     IMG_CURRENT = DATA_PATH + '/framarama-current.image'
     FILE_LIST = DATA_PATH + '/framarama-current.csv'
-
-    def process(self, display, item):
-        pass
 
     def activate(self, item):
         pass
@@ -575,49 +613,10 @@ class DefaultFrontendRenderer(BaseFrontendRenderer):
 
 
 class FilesystemFrontendRenderer(BaseFrontendRenderer):
-    FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
-    FILE_FORMAT = 'framarama-{:05d}.{:s}'
-    FILE_CURRENT = BaseFrontendRenderer.DATA_PATH + '/' + 'framarama-current.image'
-
-    def _file(self, file_name):
-        return self.DATA_PATH + '/' + file_name
-
-    def process(self, display, item):
-        _config = Frontend.get().get_config().get_config()
-        _files = Filesystem.file_rotate(
-            self.DATA_PATH,
-            self.FILE_PATTERN,
-            self.FILE_FORMAT,
-            _config.count_items_keep if _config.count_items_keep else 6,
-            ['json', 'image', 'preview'])
-
-        _json = jsonpickle.encode({
-          'item': item.item(),
-          'mime': item.mime(),
-          'time': datetime.datetime.utcnow()
-        })
-
-        Filesystem.file_write(_files['json'], _json.encode())
-        Filesystem.file_write(_files['image'], item.data())
-        Filesystem.file_write(_files['preview'], item.preview())
+    FILE_CURRENT = settings.FRAMARAMA['DATA_PATH'] + '/' + 'framarama-current.image'
 
     def activate(self, item):
-        Filesystem.file_copy(item['image_file'], self.FILE_CURRENT)
-
-    def files(self):
-        _files = []
-        for (_file, _num, _ext) in Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN):
-            _file_json = self._file(_file)
-            _file_image = self._file(self.FILE_FORMAT.format(int(_num), 'image'))
-            _file_preview = self._file(self.FILE_FORMAT.format(int(_num), 'preview'))
-            _files.append({
-                'json': jsonpickle.decode(Filesystem.file_read(_file_json)),
-                'image': Filesystem.file_read(_file_image),
-                'image_file': _file_image,
-                'preview': Filesystem.file_read(_file_preview),
-                'preview_file': _file_preview,
-            })
-        return _files
+        pass
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
@@ -661,12 +660,9 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
     def update_magic(self):
         Process.exec_run(self.CMD_IMAGICK + [self.IMG_CURRENT])
 
-    def process(self, display, item):
-        pass
-
     def activate(self, item):
+        Filesystem.file_copy(item.file(), self.IMG_CURRENT)
         self.startup()
-
 
 class WebsiteFrontendRenderer(BaseFrontendRenderer):
     FILE_OUTPUT = BaseFrontendRenderer.DATA_PATH + '/framarama.html'
@@ -693,8 +689,5 @@ class WebsiteFrontendRenderer(BaseFrontendRenderer):
         _content = _context.evaluate(self.TEMPLATE)
         Filesystem.file_write(self.FILE_OUTPUT, _content.encode())
 
-    def process(self, display, item):
-        pass
-
     def activate(self, item):
-        self._update(item['json']['item'].url, item['json']['mime'], item['image'])
+        self._update(item.item().url, item.mime(), item.data())

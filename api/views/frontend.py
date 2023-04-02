@@ -119,11 +119,11 @@ class ItemsDisplayView(viewsets.GenericViewSet):
 
     def _files(self):
         _frontend_device = frontend.Frontend.get().get_device()
-        _files = list(_frontend_device.get_files().values())
+        _files = _frontend_device.get_files()
         _files = [{
             'id': _no,
-            'url': _file['json']['item'].url,
-            'mime': _file['json']['mime'],
+            'url': _file.item().url,
+            'mime': _file.mime(),
         } for _no, _file in enumerate(_files)]
         return _files
 
