@@ -481,7 +481,7 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 finishing.ImageProcessingAdapter.get_default())
             with _finishing_context:
                 _result = finishing.Processor(_finishing_context).process()
-                self.response(_context, _result.get_data(), _result.get_mime())
+                self.response(_context, _result.get_image_data(), _result.get_image_mime())
         else:
             self.response(_context, '', 'text/plain')
         return _context
