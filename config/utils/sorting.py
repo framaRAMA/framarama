@@ -4,6 +4,7 @@ import random
 from django.db import connections, models as Model
 from django.db.models import functions as Function
 
+from framarama.base import utils
 from config.plugins import SortingPluginRegistry
 
 
@@ -47,7 +48,7 @@ Item = models.Item.objects
             try:
                 _code = _code + ".annotate(rank=Model.F('rank')*Model.Value({}))".format(_sorting.weight)
                 _code = _code + ".values('id', 'rank')"
-                _queries.append(eval(_code, _data))
+                _queries.append(utils.Process.eval(_code, _data))
             except Exception as e:
                 _result['errors']['sorting{}'.format(_sorting.id)] = e
 
