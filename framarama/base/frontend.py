@@ -601,7 +601,6 @@ class FrontendItem:
 class BaseFrontendRenderer:
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
     COMMON_PATH = settings.FRAMARAMA['COMMON_PATH']
-    IMG_CURRENT = DATA_PATH + '/framarama-current.image'
     FILE_LIST = DATA_PATH + '/framarama-current.csv'
 
     def activate(self, item):
@@ -620,8 +619,7 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
-    CMD_FEH = ['feh', '--fullscreen', '--auto-zoom', '--stretch', '--auto-rotate', '--scale-down', '-bg-fill', BaseFrontendRenderer.DATA_PATH + '/picture-background.jpg', '-f', BaseFrontendRenderer.DATA_PATH + '/picture-current.csv', '--reload', '10']
-    CMD_IMAGICK = ['magick', 'display', '-window', 'root']
+    IMG_CURRENT = BaseFrontendRenderer.DATA_PATH + '/framarama-current.image'
 
     def __init__(self):
         self._update = None
