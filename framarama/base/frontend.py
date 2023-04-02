@@ -155,9 +155,9 @@ class Frontend(Singleton):
         _app_revision = _capability.app_revision()
         _files = _device.get_files()
         _latest_items = [{
-            'id': _files[_name]['json']['item'].id,
-            'time': DateTime.utc(_files[_name]['json']['time'])
-        } for _name in _files]
+            'id': _file['json']['item'].id,
+            'time': DateTime.utc(_file['json']['time'])
+        } for _file in _files]
         _data = {}
         if restrictions is None or 'sys' in restrictions:
             _data['uptime'] = _capability.sys_uptime()
@@ -597,18 +597,18 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
             Filesystem.file_copy(_files[_item]['image_file'], self.FILE_PATH + '/' + self.FILE_CURRENT)
 
     def files(self):
-        _files = {}
-        for (_file, _num, _ext) in Filesystem.file_match(self.FILE_PATH, self.FILE_PATTERN):
+        _files = []
+        for (_file, _num, _ext) in Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN):
             _file_json = self._file(_file)
             _file_image = self._file(self.FILE_FORMAT.format(int(_num), 'image'))
             _file_preview = self._file(self.FILE_FORMAT.format(int(_num), 'preview'))
-            _files[_file] = {
+            _files.append({
                 'json': jsonpickle.decode(Filesystem.file_read(_file_json)),
                 'image': Filesystem.file_read(_file_image),
                 'image_file': _file_image,
                 'preview': Filesystem.file_read(_file_preview),
                 'preview_file': _file_preview,
-            }
+            })
         return _files
 
 
