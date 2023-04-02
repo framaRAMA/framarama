@@ -724,7 +724,9 @@
 {% endmacro %}
 
 {% macro display_items(id, title, items, style='list') %}
-  <h6 class="card-subtitle mb-2 text-muted text-center">{{ title }}</h6>
+  {% if title != '' %}
+    <h6 class="card-subtitle mb-2 text-muted text-center">{{ title }}</h6>
+  {% endif %}
   {% if style == 'grid' %}
     <div class="row">
       {% for item in items %}
