@@ -333,7 +333,6 @@ class FrontendDevice(Singleton):
         self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None, 'networks': None}
         self._renderers = {
             DefaultFrontendRenderer(),
-            FilesystemFrontendRenderer(),
             VisualizeFrontendRenderer(),
             WebsiteFrontendRenderer(),
         }
@@ -609,13 +608,6 @@ class BaseFrontendRenderer:
 
 class DefaultFrontendRenderer(BaseFrontendRenderer):
     pass
-
-
-class FilesystemFrontendRenderer(BaseFrontendRenderer):
-    FILE_CURRENT = settings.FRAMARAMA['DATA_PATH'] + '/' + 'framarama-current.image'
-
-    def activate(self, item):
-        pass
 
 
 class VisualizeFrontendRenderer(BaseFrontendRenderer):
