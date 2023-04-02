@@ -327,13 +327,12 @@ class FrontendDevice(Singleton):
         super().__init__()
         self._monitor = FrontendMonitoring()
         self._network = {'started': None, 'connected': None, 'profile': None, 'previous': None, 'networks': None}
-        self._renderer_filesystem = FilesystemFrontendRenderer()
-        self._renderer_visualization = VisualizeFrontendRenderer()
-        self._renderers = [
+        self._renderer = FilesystemFrontendRenderer()
+        self._renderers = {
             DefaultFrontendRenderer(),
-            self._renderer_filesystem,
-            self._renderer_visualization,
-        ]
+            VisualizeFrontendRenderer(),
+            WebsiteFrontendRenderer(),
+        }
         self._capability = None
 
     def monitor(self):
@@ -366,15 +365,23 @@ class FrontendDevice(Singleton):
             return FrontendItem(item, _result) if _result else None
 
     def render(self, display, item):
-        for renderer in self._renderers:
-            renderer.process(display, item)
+        self._renderer.process(display, item)
+        for _renderer in self._renderers:
+            _renderer.process(display, item)
+        self.activate(0)
 
-    def activate(self, item):
-        self._renderer_filesystem.activate(item)
-        self._renderer_visualization.startup()
+    def activate(self, idx):
+        _idx = int(idx)
+        _items = self._renderer.files()
+        if _idx < 0 or _idx >= len(_items):
+            return
+        _item = _items[_idx]
+        self._renderer.activate(_item)
+        for _renderer in self._renderers:
+            _renderer.activate(_item)
 
     def get_files(self):
-        return self._renderer_filesystem.files()
+        return self._renderer.files()
 
     def network_connect(self, name):
         self.get_capability().net_profile_connect(name=name)
@@ -558,15 +565,15 @@ class BaseFrontendRenderer:
     def process(self, display, item):
         pass
 
-
-class DefaultFrontendRenderer(BaseFrontendRenderer):
-
-    def process(self, display, item):
+    def activate(self, item):
         pass
 
 
+class DefaultFrontendRenderer(BaseFrontendRenderer):
+    pass
+
+
 class FilesystemFrontendRenderer(BaseFrontendRenderer):
-    FILE_PATH = BaseFrontendRenderer.DATA_PATH
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
     FILE_FORMAT = 'framarama-{:05d}.{:s}'
     FILE_CURRENT = BaseFrontendRenderer.DATA_PATH + '/' + 'framarama-current.image'
@@ -592,13 +599,9 @@ class FilesystemFrontendRenderer(BaseFrontendRenderer):
         Filesystem.file_write(_files['json'], _json.encode())
         Filesystem.file_write(_files['image'], item.data())
         Filesystem.file_write(_files['preview'], item.preview())
-        self.activate(0)
 
     def activate(self, item):
-        _item = int(item)
-        _files = list(self.files().values())
-        if _item >=0 and _item < len(_files):
-            Filesystem.file_copy(_files[_item]['image_file'], self.FILE_CURRENT)
+        Filesystem.file_copy(item['image_file'], self.FILE_CURRENT)
 
     def files(self):
         _files = []
@@ -658,5 +661,8 @@ class VisualizeFrontendRenderer(BaseFrontendRenderer):
         Process.exec_run(self.CMD_IMAGICK + [self.IMG_CURRENT])
 
     def process(self, display, item):
+        pass
+
+    def activate(self, item):
         self.startup()
 
