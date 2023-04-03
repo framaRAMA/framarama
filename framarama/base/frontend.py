@@ -660,7 +660,16 @@ class WebsiteFrontendRenderer(BaseFrontendRenderer):
   <head>
     <title>framaRAMA - {item['title']}</title>
     <script type="text/javascript">
-      window.setTimeout(() => window.location.reload(), 60000);
+      const delay = 60000;
+      function reload() {{
+        fetch(window.location.href, {{method: 'HEAD'}}).then(r => {{
+          if (String(r.status).startsWith(2) || String(r.status).startsWith(3)) {{
+            window.location.reload();
+          }}
+        }});
+        window.setTimeout(() => reload(), delay);
+      }}
+      window.setTimeout(() => reload(), delay);
     </script>
   </head>
   <body>
