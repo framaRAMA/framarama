@@ -50,7 +50,7 @@ class ImageDisplayDashboardView(base.BaseFrontendView):
         if self.request.GET.get('type') == 'preview':
             self.response(_context, _item.preview(), _item.preview_mime())
         else:
-            self.response(_context, _item.image(), _item.mime())
+            self.response(_context, _item.data(), _item.mime())
         return _context
 
 
