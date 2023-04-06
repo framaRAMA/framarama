@@ -96,6 +96,9 @@
   'display.device' : 'display',
   'display.time' : 'clock',
   'display.access' : 'key',
+  'display.items.latest': 'clock',
+  'display.items.top': 'arrow-trend-up',
+  'display.items.least': 'arrow-trend-down'
 }
 %}
 
@@ -349,9 +352,12 @@
 
 {% macro nav_tabs(id, tabs, active='') %}
   <ul class="nav nav-tabs mb-3" id="{{ id }}" role="tablist">
-    {% for name in tabs %}
+    {% for id in tabs %}
       <li class="nav-item" role="presentation">
-        <a class="nav-link{% if loop.index0 == 0 %} active{% endif %}" id="{{ name }}" data-bs-toggle="tab" href="#{{ name }}Tab" role="tab" aria-controls="{{ name }}Tab" aria-selected="true">{{ tabs[name] }}</a>
+        <a class="nav-link p-3{% if loop.index0 == 0 %} active{% endif %}" id="{{ id }}" data-bs-toggle="tab" href="#{{ id }}Tab" role="tab" aria-controls="{{ id }}Tab" aria-selected="true">
+          {% if 'icon' in tabs[id] %}{{ icon(tabs[id]['icon']) }}{% endif %}
+          <span {% if 'icon' in tabs[id] %}class="d-none d-md-inline"{% endif %}>{{ tabs[id]['title'] }}</a>
+        </a>
       </li>
     {% endfor %}
   </ul>

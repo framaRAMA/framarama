@@ -43,9 +43,9 @@
     <div class="card mt-2">
       <div class="card-body">
         {{ lib.nav_tabs('displayImages', {
-            'displayImageLatest': 'Latest (%s)'|format(latest_items|count),
-            'displayImageTop': 'Top (%s)'|format(top_items|count),
-            'displayImageNewest': 'New (%s)'|format(newest_items|count),
+            'displayImageLatest': {'title':'Latest (%s)'|format(latest_items|count), 'icon':'display.items.latest'},
+            'displayImageTop': {'title':'Top (%s)'|format(top_items|count), 'icon':'display.items.top'},
+            'displayImageNewest': {'title':'New (%s)'|format(newest_items|count), 'icon':'display.items.least'},
         }) }}
         <div class="tab-content">
           <div id="displayImageLatestTab" role="tabpanel" aria-labelledby="displayImageLastest" class="tab-pane fade show active">
