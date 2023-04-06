@@ -667,7 +667,10 @@
   {% set stats_load = stats|map(attribute='cpu_load')|reverse|list %}
   {% set stats_temp = stats|map(attribute='cpu_temp')|reverse|list %}
   <h6 class="card-subtitle mb-2 text-muted">
-    {{ "CPU (%s - %s)"|format(stats_labels|map('date_format', '%d.%m. %H:%M')|first, stats_labels|reverse|map('date_format', '%d.%m. %H:%M')|first) }}
+    CPU
+    {% if stats_labels %}
+      {{ "(%s - %s)"|format(stats_labels|map('date_format', '%d.%m. %H:%M')|first, stats_labels|reverse|map('date_format', '%d.%m. %H:%M')|first) }}
+    {% endif %}
   </h6>
   {{ chart_line('cpu', stats_labels|map('date_format', '%H:%M')|list, {'Load': stats_load, 'Temp': stats_temp}, ['left', 'right']) }}
 {% endmacro %}
