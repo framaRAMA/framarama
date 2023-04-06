@@ -161,7 +161,7 @@
         <div class="card-header">{{ lib.icon('software') }} Software</div>
         <div class="card-body">
           <ul class="card-text">
-            <li>Software Version:<br/>- {{ system.app.revision }} - {{ system.app.date }}</li>
+            <li>Software Version:<br/>- {{ system.app.revision }} - {{ system.app.date|date_format('%d.%m.%Y') }}</li>
             <li>Available Versions:<br/>{% for revision in system.app.revisions %}- {{ revision }}<br/>{% endfor %}</li>
             <li>Environment: <strong>{% if config %}{{ config.mode }}{% else %}cloud{% endif %}</strong> setup</li>
           </ul>
