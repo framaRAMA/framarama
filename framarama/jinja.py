@@ -30,6 +30,8 @@ def nav(request, page, args={}):
 
 
 def date_format(value, format="%H:%M %d-%m-%y"):
+    if type(value) == str:
+        value = utils.DateTime.parse(value)
     return localtime(value).strftime(format)
 
 
