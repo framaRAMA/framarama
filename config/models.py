@@ -130,7 +130,7 @@ class Data(BaseModel):
     @classmethod
     def create(cls, json=None, data=None, mime=None, meta=None):
         if json:
-            _data = utils.Json.from_dict(json)
+            _data = utils.Json.from_dict(json).encode()
             _mime = 'application/json' if mime is None else mime
         elif data:
             _data = data
