@@ -94,14 +94,29 @@ class Filesystem:
         os.remove(filename)
 
     @staticmethod
-    def file_match(path, pattern):
+    def file_match(path, pattern, files=True, dirs=False, recurse=False, prefix=None):
+        _dirs = []
         _files = []
-        with os.scandir(path) as it:
-            _files = [entry for entry in it if entry.is_file()]
-            _files = [entry for entry in _files if re.match(pattern, entry.name)]
-            _files = [entry.name for entry in _files]
-            _files.sort(reverse=False)
-            _files = [(_file,) + re.match(pattern, _file).groups() for _file in _files]
+        _prefix = '' if prefix is None else prefix + '/'
+        with os.scandir(path + '/' + _prefix) as it:
+            for entry in it:
+                if entry.is_dir() and (dirs or recurse):
+                    _dirs.append(entry.name)
+                if entry.is_file() and files == True and re.match(pattern, entry.name):
+                    _files.append(entry.name)
+        _files.sort(reverse=False)
+        _files = [(_prefix + _file,) + re.match(pattern, _file).groups() for _file in _files]
+        if dirs:
+            _files.extend([(_prefix + _dir,) for _dir in _dirs])
+        if recurse:
+            for _dir in _dirs:
+                _files.extend(Filesystem.file_match(
+                    path,
+                    pattern=pattern,
+                    files=files,
+                    dirs=dirs,
+                    recurse=recurse,
+                    prefix=_prefix + _dir))
         return _files
 
     @staticmethod
