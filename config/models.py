@@ -73,7 +73,7 @@ SOURCE_UPDATE_INTERVAL_CHOICES = [
 class Data(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ['category', 'data_file']
 
-    def _path(instance, path):
+    def _upload(instance, path):
         _md5 = hashlib.md5()
         _md5.update("{}#{}".format(path, utils.DateTime.now().timestamp()).encode())
         _md5_hex = _md5.hexdigest()
@@ -92,7 +92,7 @@ class Data(BaseModel):
         max_length=64, blank=True, null=True,
         verbose_name='Mime type', help_text='The content type of this data item')
     data_file = models.FileField(
-        blank=True, null=True, editable=False, upload_to=_path,
+        blank=True, null=True, editable=False, upload_to=_upload,
         verbose_name='Save as file', help_text='Store content in the filesystem')
     meta = models.JSONField(
         blank=True, null=True, editable=False, default=dict,
