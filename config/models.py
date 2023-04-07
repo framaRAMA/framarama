@@ -7,6 +7,7 @@ import logging
 from django.db import models
 from django.conf import settings
 from django.core.files.base import File
+from django.dispatch import receiver
 
 from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel
@@ -121,6 +122,11 @@ class Data(BaseModel):
             logger.error("Can not load data file for {}: {}".format(self, e))
         return None
 
+    def delete(self, *args, **kwargs):
+        if self.data_file:
+            self.data_file.delete()
+        super(Data, self).delete(*args, **kwargs)
+
     @classmethod
     def create(cls, json=None, data=None, mime=None, meta=None):
         if json:
@@ -137,6 +143,12 @@ class Data(BaseModel):
         _instance.data_file = _file
         _instance.meta = meta if meta else {}
         return _instance
+
+    @classmethod
+    def post_delete(cls, sender, instance, entity, *args, **kwargs):
+        logger.debug("Delete from {} for {}: {}".format(sender, instance, entity))
+        if entity:
+            entity.delete()
 
 
 class BaseImageData(Data):
@@ -301,6 +313,11 @@ class Item(BaseModel):
 
     class Meta:
         ordering = ['-created']
+
+
+@receiver(models.signals.post_delete, sender=Item)
+def post_delete_item(sender, instance, *args, **kwargs):
+    Data.post_delete(sender, instance, instance.thumbnail, *args, **kwargs)
 
 
 class RankedItem(Item):
@@ -554,3 +571,7 @@ class DisplayItem(BaseModel):
         db_table = 'config_display_item'
         ordering = ['-created']
 
+
+@receiver(models.signals.post_delete, sender=DisplayItem)
+def post_delete_display_item(sender, instance, *args, **kwargs):
+    Data.post_delete(sender, instance, instance.thumbnail, *args, **kwargs)
