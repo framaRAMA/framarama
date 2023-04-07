@@ -215,4 +215,23 @@ class ClassesTestCase(TestCase):
         import datetime
         self.assertEqual(_datetime, datetime.datetime, 'Class is not a datetime')
 
+    def test_subclasses(self):
+        _classes = utils.Classes.subclasses(utils.Classes)
+        self.assertEqual([utils.Classes], _classes)
+
+    def test_subclasses_multi(self):
+        class Parent:
+            pass
+        class Child1(Parent):
+            pass
+        class Child2(Parent):
+            pass
+        class SubChild1(Child1):
+            pass
+        _classes = utils.Classes.subclasses(Parent)
+        self.assertEqual(4, len(_classes))
+        self.assertTrue(Parent in _classes)
+        self.assertTrue(Child1 in _classes)
+        self.assertTrue(Child2 in _classes)
+        self.assertTrue(SubChild1 in _classes)
 

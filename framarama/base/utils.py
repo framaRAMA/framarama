@@ -356,3 +356,9 @@ class Classes:
                 return Classes.load(fallback, fqcn)
             raise e
 
+    @staticmethod
+    def subclasses(clazz):
+        _classes = [clazz]
+        for _clazz in clazz.__subclasses__():
+            _classes.extend(Classes.subclasses(_clazz))
+        return _classes
