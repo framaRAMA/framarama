@@ -357,8 +357,8 @@ class Classes:
             raise e
 
     @staticmethod
-    def subclasses(clazz):
-        _classes = [clazz]
+    def subclasses(clazz, root=True):
+        _classes = [clazz] if root else []
         for _clazz in clazz.__subclasses__():
             _classes.extend(Classes.subclasses(_clazz))
         return _classes

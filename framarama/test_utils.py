@@ -234,4 +234,9 @@ class ClassesTestCase(TestCase):
         self.assertTrue(Child1 in _classes)
         self.assertTrue(Child2 in _classes)
         self.assertTrue(SubChild1 in _classes)
+        _classes_root = utils.Classes.subclasses(Parent, False)
+        self.assertEqual(3, len(_classes_root))
+        self.assertTrue(Child1 in _classes_root)
+        self.assertTrue(Child2 in _classes_root)
+        self.assertTrue(SubChild1 in _classes_root)
 
