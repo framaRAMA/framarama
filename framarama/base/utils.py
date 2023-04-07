@@ -90,6 +90,10 @@ class Filesystem:
         shutil.copyfile(source, target)
 
     @staticmethod
+    def file_delete(filename):
+        os.remove(filename)
+
+    @staticmethod
     def file_match(path, pattern):
         _files = []
         with os.scandir(path) as it:
