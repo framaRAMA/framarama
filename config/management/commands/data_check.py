@@ -38,12 +38,18 @@ class Command(BaseCommand):
     def _check_fs(self, remove=False):
         _skip = [models.Data, models.BaseImageData]
         _classes = utils.Classes.subclasses(models.Data)
-        _stats = {'total': 0, 'ok': 0, 'delete': 0}
+        _dirs = []
         for _clazz in [_clazz for _clazz in _classes if _clazz not in _skip]:
             _path = _clazz.path().replace('./', '')
-            _files = utils.Filesystem.file_match(_path, '.*', recurse=True)
-            _files = [_path + '/' + _file[0] for _file in _files]
-            self.stdout.write('Filesystem: Checking {} items in {}'.format(len(_files), _path))
+            _data_dirs = utils.Filesystem.file_match(_path, '.*', files=False, dirs=True, recurse=2)
+            _dirs.extend([_path + '/' + _dir[0] for _dir in _data_dirs])
+        _count = len(_dirs)
+        _chunk = int(_count/10) if _count > 100 else _count
+        self.stdout.write('Filesystem: Checking {} items'.format(_count))
+        _stats = {'total': 0, 'ok': 0, 'delete': 0, 'dirs': 0}
+        for _i, _dir in enumerate(_dirs):
+            _files = utils.Filesystem.file_match(_dir, '.*')
+            _files = [_dir + '/' + _file[0] for _file in _files]
             _items = models.Data.objects.filter(data_file__in=_files)
             _deletes = set(_files) - set([_item.data_file.name for _item in _items])
             for _delete in _deletes:
@@ -51,9 +57,12 @@ class Command(BaseCommand):
                 if remove:
                     utils.Filesystem.file_delete(_delete)
                     self.stdout.write('Filesystem: Deleted {}'.format(_delete))
+            _stats['dirs'] = _stats['dirs'] + 1
             _stats['total'] = _stats['total'] + len(_files)
             _stats['ok'] = _stats['ok'] + len(_items)
             _stats['delete'] = _stats['delete'] + len(_deletes)
+            if (_i % _chunk == 0) or (_stats['dirs'] == _count):
+                self.stdout.write('Filesystem: {:.0%}, checked {} items ...'.format(_stats['dirs']/_count, _stats['dirs']))
         return _stats
 
     def _report_status(self, prefix, stats, remove):
