@@ -72,15 +72,14 @@ SOURCE_UPDATE_INTERVAL_CHOICES = [
 
 class Data(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ['category', 'data_file']
+    PATH = [settings.FRAMARAMA['DATA_PATH'], 'config']
 
     def _upload(instance, path):
         _md5 = hashlib.md5()
         _md5.update("{}#{}".format(path, utils.DateTime.now().timestamp()).encode())
         _md5_hex = _md5.hexdigest()
-        _storage_path = [settings.FRAMARAMA['DATA_PATH'], 'config']
-        _storage_path.extend(instance.storage_path())
-        _storage_path.extend([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
-        return os.path.join(*_storage_path)
+        _path = Data.path([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
+        return _path
 
     category = models.CharField(
         max_length=255,
@@ -97,9 +96,6 @@ class Data(BaseModel):
     meta = models.JSONField(
         blank=True, null=True, editable=False, default=dict,
         verbose_name='Info', help_text='Meta information for data item')
-
-    def storage_path(self):
-        return []
 
     def update(self, existing):
         existing.data_mime = self.data_mime
@@ -126,6 +122,13 @@ class Data(BaseModel):
         if self.data_file:
             self.data_file.delete()
         super(Data, self).delete(*args, **kwargs)
+
+    @classmethod
+    def path(cls, additional=None):
+        _path = Data.PATH.copy()
+        if additional:
+            _path.extend(additional)
+        return os.path.join(*_path)
 
     @classmethod
     def create(cls, json=None, data=None, mime=None, meta=None):
@@ -174,8 +177,9 @@ class ItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    def storage_path(self):
-        return ['item', 'thumbnail']
+    @classmethod
+    def path(cls):
+        return super().path(['item', 'thumbnail'])
 
 
 class DisplayItemThumbnailData(BaseImageData):
@@ -183,8 +187,9 @@ class DisplayItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    def storage_path(self):
-        return ['display', 'thumbnail']
+    @classmethod
+    def path(cls):
+        return super().path(['display', 'thumbnail'])
 
 
 class Frame(BaseModel):
