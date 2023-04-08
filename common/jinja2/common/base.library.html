@@ -477,7 +477,7 @@
   <div class="row">
     <label class="col-sm-3 col-form-label">{{ name }}</label>
     <div class="col-sm-auto pt-2">
-      <span onclick="if (event.target.tagName != 'I') return; cssToggle(this.children[0], 'd-none'); cssToggle(this.children[1], 'd-none');">
+      <span onclick="if (event.target.tagName == 'I') { cssToggle(this.children[0], 'd-none'); cssToggle(this.children[1], 'd-none'); }">
         <span>******************** <span role="button">{{ icon('action.show') }}</span></span>
         <span class="d-none">{{ value or '(no value)'}} <span role="button">{{ icon('action.hide') }}</span></span>
       </span>
@@ -598,7 +598,7 @@
 {% endmacro %}
 
 {% macro card_item(title, body, actions=[], icon=None) %}
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 col-lg-4 mb-4">
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
