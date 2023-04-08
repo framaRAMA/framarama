@@ -73,6 +73,7 @@ SOURCE_UPDATE_INTERVAL_CHOICES = [
 class Data(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ['category', 'data_file']
     PATH = [settings.FRAMARAMA['DATA_PATH'], 'config']
+    NAME_NEW = '__NEW_DATA_FILE__'
 
     def _upload(instance, path):
         _md5 = hashlib.md5()
@@ -101,8 +102,7 @@ class Data(BaseModel):
         self.data_size = other.data_size
         self.data_mime = other.data_mime
         self.data_file.open('wb')
-        self.data_file.write(other.data_file.read())
-        self.data_file.close()
+        self.data_file.write(other.data())
         self.meta = other.meta
 
     def set_meta(self, name, value):
@@ -112,11 +112,10 @@ class Data(BaseModel):
         self.meta.get(name, None)
 
     def data(self):
-        try:
+        if self.data_file.name == Data.NAME_NEW:
+            return self.data_file.read()
+        else:
             return utils.Filesystem.file_read(self.data_file.path)
-        except FileNotFoundError as e:
-            logger.error("Can not load data file for {}: {}".format(self, e))
-        return None
 
     def delete(self, *args, **kwargs):
         if self.data_file:
@@ -139,7 +138,7 @@ class Data(BaseModel):
             _data = data
         else:
             raise Exception('Specify JSON or data to create a Data object')
-        _file = File(io.BytesIO(_data), name=cls.path())
+        _file = File(io.BytesIO(_data), name=Data.NAME_NEW)
         _instance = cls()
         _instance.data_mime = mime
         _instance.data_size = _file.size
