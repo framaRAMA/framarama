@@ -4,7 +4,7 @@ function cssRemove(el, clazz) {
 }
 
 function cssAdd(el, clazz) {
-  cssRemove(el, clazz)
+  cssRemove(el, clazz);
   el.className = el.className + ' ' + clazz;
 }
 
