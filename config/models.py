@@ -97,13 +97,14 @@ class Data(BaseModel):
         blank=True, null=True, editable=False, default=dict,
         verbose_name='Info', help_text='Meta information for data item')
 
-    def update(self, existing):
-        existing.data_mime = self.data_mime
-        existing.data_size = self.data_file.size
-        existing.meta = self.meta
-        existing.data_file.open('wb')
-        existing.data_file.write(self.data_file.read())
-        existing.data_file.close()
+    def update(self, other):
+        self.category = other.category
+        self.data_size = other.data_size
+        self.data_mime = other.data_mime
+        self.data_file.open('wb')
+        self.data_file.write(other.data_file.read())
+        self.data_file.close()
+        self.meta = other.meta
 
     def set_meta(self, name, value):
         self.meta[name] = value

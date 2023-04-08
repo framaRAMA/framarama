@@ -77,7 +77,7 @@ class Scheduler(jobs.Scheduler):
         _meta = _adapter.image_meta(_image)
         _thumbnail = models.ItemThumbnailData.create(data=_data, mime=_meta['mime'])
         if item.thumbnail:
-            _thumbnail.update(item.thumbnail)
+            item.thumbnail.update(_thumbnail)
         else:
             item.thumbnail = _thumbnail
         item.thumbnail.save()

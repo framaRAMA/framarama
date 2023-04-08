@@ -154,7 +154,7 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
         if _thumbnail != -1:
             if _thumbnail:
                 if _display_item.thumbnail:
-                    _thumbnail.update(_display_item.thumbnail)
+                    _display_item.thumbnail.update(_thumbnail)
                 else:
                     _display_item.thumbnail = _thumbnail
                 if 'width' not in _display_item.thumbnail.meta or 'height' not in _display_item.thumbnail.meta:
