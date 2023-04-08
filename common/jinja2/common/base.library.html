@@ -24,6 +24,8 @@
   'action.update' : 'download',
   'action.restart' : 'arrow-rotate-right',
   'action.shutdown' : 'power-off',
+  'action.hide' : 'eye-slash',
+  'action.show' : 'eye',
 
   'mapped': 'arrow-right-long',
 
@@ -467,6 +469,18 @@
     <label class="col-sm-3 col-form-label">{{ name }}</label>
     <div class="col-sm-auto pt-2">
       {{ value or '(no value)'}}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro field_password(name, value) %}
+  <div class="row">
+    <label class="col-sm-3 col-form-label">{{ name }}</label>
+    <div class="col-sm-auto pt-2">
+      <span onclick="if (event.target.tagName != 'I') return; cssToggle(this.children[0], 'd-none'); cssToggle(this.children[1], 'd-none');">
+        <span>******************** <span role="button">{{ icon('action.show') }}</span></span>
+        <span class="d-none">{{ value or '(no value)'}} <span role="button">{{ icon('action.hide') }}</span></span>
+      </span>
     </div>
   </div>
 {% endmacro %}
