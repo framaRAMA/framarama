@@ -637,13 +637,15 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         for _image in image.get_images():
             func(_image)
 
-    def image_open(self, url, background=None):
-        if url.startswith('http://') or url.startswith('https://'):
-            _image = self._wand_image.Image(blob=api.ApiClient.get().get_url(url, stream=True).raw)
-        elif Filesystem.file_exists(url):
-            _image = self._wand_image.Image(blob=Filesystem.file_read(url))
+    def image_open(self, source, background=None):
+        if type(source) == str and (source.startswith('http://') or source.startswith('https://')):
+            _image = self._wand_image.Image(blob=api.ApiClient.get().get_url(source, stream=True).raw)
+        elif type(source) == str and Filesystem.file_exists(source):
+            _image = self._wand_image.Image(blob=Filesystem.file_read(source))
+        elif type(source) == bytes:
+            _image = self._wand_image.Image(blob=source)
         else:
-            raise Exception('Only URLs and files are supported, not {}'.format(url))
+            raise Exception('Only URLs, filename or bytes are supported, not {}'.format(source))
         _image.auto_orient()
         if background:
             _bg = self._wand_image.Image(width=_image.width, height=_image.height, background=self._color(background))
