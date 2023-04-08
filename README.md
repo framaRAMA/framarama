@@ -50,17 +50,22 @@ Running both components on one system, set `MODES` in `framarama/settings.py`:
     ],
 ```
 
+To use an external database change `DATABASE` in `framarama/settings.py`:
+```
+  'default': {
+    'NAME': 'dbname',
+    'ENGINE': 'django.db.backends.mysql',
+    'USER': 'dbuser',
+    'PASSWORD': 'dbpassword',
+    'HOST': 'dbhost',
+  }
+```
+
 Initial setup:
 ```
 python manage.py createsuperuser
 python manage.py setup --set mode=local
 ```
-
-To use an external database additionally run:
-```
-python manage.py setup --set local_db_type=mysql --set local_db_host=dbhost --set local_db_name=framarama --set local_db_user=framarama --set local_db_pass=password
-```
-
 
 Start application:
 ```
