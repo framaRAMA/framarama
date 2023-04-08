@@ -19,9 +19,9 @@
   <li class="nav-item">
     <a class="nav-link p-3{{ lib.nav_active(request, 'frame_context_list', args=[frame.id]) }}" href="{{ url('frame_context_list', args=[frame.id]) }}">{{ lib.icon('frames.context') }}<span class="d-none d-lg-inline"> Context</span></a>
   </li>
-  <li class="nav-item">
+  <!-- li class="nav-item">
     <a class="nav-link p-3" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
-  </li>
+  </li -->
 </ul>
 
 {% block content_frame %}
