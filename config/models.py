@@ -78,8 +78,7 @@ class Data(BaseModel):
         _md5 = hashlib.md5()
         _md5.update("{}#{}".format(path, utils.DateTime.now().timestamp()).encode())
         _md5_hex = _md5.hexdigest()
-        _path = Data.path([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
-        return _path
+        return Data.path([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
 
     category = models.CharField(
         max_length=255,
