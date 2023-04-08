@@ -139,7 +139,7 @@ class Data(BaseModel):
             _data = data
         else:
             raise Exception('Specify JSON or data to create a Data object')
-        _file = File(io.BytesIO(_data), name='display_item_thumbnail')
+        _file = File(io.BytesIO(_data), name=cls.path())
         _instance = cls()
         _instance.data_mime = mime
         _instance.data_size = _file.size
