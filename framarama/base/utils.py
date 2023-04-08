@@ -94,7 +94,7 @@ class Filesystem:
         os.remove(filename)
 
     @staticmethod
-    def file_match(path, pattern, files=True, dirs=False, recurse=False, prefix=None):
+    def file_match(path, pattern, files=True, dirs=False, recurse=None, prefix=None):
         _dirs = []
         _files = []
         _prefix = '' if prefix is None else prefix + '/'
@@ -115,7 +115,7 @@ class Filesystem:
                     pattern=pattern,
                     files=files,
                     dirs=dirs,
-                    recurse=recurse,
+                    recurse=recurse-1 if type(recurse) == int else recurse,
                     prefix=_prefix + _dir))
         return _files
 
