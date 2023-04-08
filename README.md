@@ -50,6 +50,18 @@ Running both components on one system, set `MODES` in `framarama/settings.py`:
     ],
 ```
 
+Initial setup:
+```
+python manage.py createsuperuser
+python manage.py setup --set mode=local
+```
+
+To use an external database additionally run:
+```
+python manage.py setup --set local_db_type=mysql --set local_db_host=dbhost --set local_db_name=framarama --set local_db_user=framarama --set local_db_pass=password
+```
+
+
 Start application:
 ```
 python manage.py runserver 0.0.0.0:8000 --noreload
@@ -71,8 +83,8 @@ and assign them to different frames or displays.
 Checkout the project as mentioned before and adjust the configuration:
 ```
     'MODES': [
-        #'server',
-        'frontend'
+        'server',
+        #'frontend'
     ],
 ```
 
@@ -80,6 +92,11 @@ The server component depends on the following dependencies:
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
 * ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them an check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
+
+If only running the server component setup as follows:
+```
+python manage.py setup --set mode=cloud
+```
 
 After application startup you can open the server setup in the browser.
 
