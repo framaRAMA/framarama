@@ -19,10 +19,15 @@ The software consists of mainly two parts:
 * the **server** component, for administration and management
 * the **frontend** component, for displaying the photos
 
-Usually the server component is setup on a central device or server and
-the frontend component is runningo on a device attached to a display (e.g.
-a Raspberry Pi with a display connected). But it's also possible to run
-both components on the same device.
+In the standard setup both components will run on the same device. In this case
+the configuration and the display of photos will be handled by the this device.
+
+To be able to adminstrate and manage multiple devices centrally and only display
+the photos on several other devices, the server can be installed on a single
+central device and the frontend on the several other devices showing the images.
+
+This setup requires access from the frontend devices to the central device
+running the server component.
 
 ### ⚙ General setup
 
