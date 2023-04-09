@@ -8,6 +8,41 @@ from django.utils import timezone
 from framarama.base import utils
 
 
+class ProcessTestCase(TestCase):
+
+    def test_exec_run(self):
+        _result = utils.Process.exec_run('ls')
+        self.assertIsNotNone('', _result)
+
+    def test_exec_run_args(self):
+        _result = utils.Process.exec_run(['ls', '-l'])
+        self.assertIsNotNone('', _result)
+
+    def test_exec_run_error(self):
+        with self.assertRaises(FileNotFoundError):
+            _result = utils.Process.exec_run(['notfound'])
+
+    def test_exec_run_env(self):
+        _result = utils.Process.exec_run(['bash', '-c', 'echo -n ,$VAR1,$VAR2,'], env={'VAR1':'Hello'})
+        self.assertEqual(b',Hello,,', _result)
+
+    def test_exec_bg(self):
+        _result = utils.Process.exec_bg('ls')
+        self.assertIsNotNone(_result)
+
+    def test_exec_search(self):
+        _result = utils.Process.exec_search('ls')
+        self.assertIsNotNone(_result)
+
+    def test_exec_running(self):
+        _result = utils.Process.exec_search('python')
+        self.assertIsNotNone(_result)
+
+    def test_eval(self):
+        _result = utils.Process.eval('42')
+        self.assertEqual(42, _result)
+
+
 class JsonTestCase(TestCase):
 
     def test_from_dict(self):
