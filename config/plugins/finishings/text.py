@@ -61,7 +61,7 @@ WIDGETS = {
 class TextModel(Finishing, ColorStrokeFillAlpha):
     finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
     text = models.CharField(
-        max_length=256,
+        max_length=1024,
         verbose_name='Text', help_text='Text to show')
     font = models.CharField(
         max_length=64,
