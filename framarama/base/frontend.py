@@ -28,11 +28,21 @@ logger = logging.getLogger(__name__)
 
 class Frontend(Singleton):
     INIT_PHASE_START = 0
-    INIT_PHASE_DB_DEFAULT = 1   # Check if frontend/default DB is available
-    INIT_PHASE_CONFIGURED = 2   # Frontend configuration exists
-    INIT_PHASE_DB_CONFIG = 3    # Check if config DB is available
-    INIT_PHASE_SETUP = 4        # Setup configured
-    INIT_PHASE_API_ACCESS = 5   # API access possible
+    INIT_PHASE_DB_DEFAULT = 1
+    INIT_PHASE_CONFIGURED = 2
+    INIT_PHASE_DB_CONFIG = 3
+    INIT_PHASE_SETUP = 4
+    INIT_PHASE_API_ACCESS = 5
+    INIT_PHASE_ERROR = 100
+    phases = {
+        INIT_PHASE_START: "Started",
+        INIT_PHASE_DB_DEFAULT: "Checking frontend database",
+        INIT_PHASE_CONFIGURED: "Checking frontend configuration",
+        INIT_PHASE_DB_CONFIG: "Checking config in database",
+        INIT_PHASE_SETUP: "Checking setup configured",
+        INIT_PHASE_API_ACCESS: "Checking API access",
+        INIT_PHASE_ERROR: "Some error occurred, recovery mode"
+    }
 
     def __init__(self):
         super().__init__()
@@ -70,10 +80,16 @@ class Frontend(Singleton):
         logger.info("Admin user is {}".format(_users[0]))
 
     def initialize(self):
+        if self._init_phase >= Frontend.INIT_PHASE_ERROR:
+            return False
         if self._init_phase < Frontend.INIT_PHASE_DB_DEFAULT:
             self._init_connections()
-            self._init_migrations('default')
-            self._init_phase = Frontend.INIT_PHASE_DB_DEFAULT
+            try:
+                self._init_migrations('default')
+                self._init_phase = Frontend.INIT_PHASE_DB_DEFAULT
+            except Exception as e:
+                logger.error("Error running migrations: {}".format(e))
+                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_DB_DEFAULT
         if self._init_phase < Frontend.INIT_PHASE_CONFIGURED:
             _configs = list(models.Config.objects.all())
             if len(_configs) == 0:
@@ -86,10 +102,14 @@ class Frontend(Singleton):
         if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
             self._init_admin_user()
             if 'config' in connections:
-                self._init_migrations('config')
+                try:
+                    self._init_migrations('config')
+                    self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
+                except Exception as e:
+                    logger.error("Error running migrations: {}".format(e))
+                    self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_DB_CONFIG
             else:
                 logger.info("Skipping migration of config because default is used")
-            self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
         if self._init_phase < Frontend.INIT_PHASE_SETUP:
             _mode = self.get_config().get_config().mode
             if _mode != None and _mode.strip() != '':
@@ -123,6 +143,25 @@ class Frontend(Singleton):
 
     def api_access(self):
         return self.is_configured() and self._init_phase >= Frontend.INIT_PHASE_API_ACCESS
+
+    def get_init_status(self):
+        _init_phase = self._init_phase
+        if _init_phase >= Frontend.INIT_PHASE_ERROR:
+            _init_phase = _init_phase - Frontend.INIT_PHASE_ERROR
+            _status = 'Error '
+        else:
+            _status = 'Success'
+        if _init_phase in Frontend.phases:
+            _phase = Frontend.phases[_init_phase]
+        else:
+            _phase = 'Unknown'
+        return {
+            'phase': {
+                'code': _init_phase,
+                'status': _status,
+                'name': _phase
+            }
+        }
 
     def get_config(self):
         return Config.get(self)
