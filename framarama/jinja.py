@@ -1,4 +1,5 @@
 import base64
+import datetime
 
 from django.templatetags.static import static
 from django.utils.timezone import localtime
@@ -35,19 +36,26 @@ def date_format(value, format="%H:%M %d-%m-%y"):
     return localtime(value).strftime(format)
 
 
-def duration(value, parts=None):
+def duration(value, parts=None, short=False):
+    if type(value) == datetime.datetime:
+        value = utils.DateTime.now() - value
     _delta = utils.DateTime.delta_dict(value)
     _result = []
     for _part in ['days', 'hours', 'minutes']:
         if _delta[_part] and (parts is None or _part in parts):
-            _result.append('{} {}'.format(_delta[_part], _part))
+            if short:
+                _result.append('{} {}'.format(_delta[_part], _part))
+                break
+            else:
+                _result.append('{} {}'.format(_delta[_part], _part))
     if len(_result) == 0:
-        _result.append('{} seconds'.format(_delta['seconds']))
+        _part = 'seconds' if parts is None else parts[0]
+        _result.append('{} {}'.format(_delta[_part], _part))
     return ', '.join(_result)
 
 
 def b64decode(value):
-    return base64.b64decode(value).encode() if value else None
+    return base64.b64decode(value) if value else None
 
 
 def b64encode(value):
