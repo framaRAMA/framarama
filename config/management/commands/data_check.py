@@ -17,6 +17,7 @@ class Command(BaseCommand):
         _db = options['db']
         _fs = options['fs']
         if _db or not _fs:
+            self.stdout.write('Database: Reading items')
             _items = models.Data.objects.all()
             _status = self._check_items('Database', _items, _rm, self._check_db_item)
             self._report_status('Database', _status, _rm)
@@ -26,8 +27,9 @@ class Command(BaseCommand):
             _dirs = []
             for _clazz in [_clazz for _clazz in _classes if _clazz not in _skip]:
                 _path = _clazz.path().replace('./', '')
-                _data_dirs = utils.Filesystem.file_match(_path, '.*', files=False, dirs=True, recurse=2)
-                _dirs.extend([_path + '/' + _dir[0] for _dir in _data_dirs])
+                self.stdout.write('Filesystem: Reading items in {}'.format(_path))
+                _data_dirs = utils.Filesystem.file_match(_path, '.*', files=False, dirs=True, recurse=1)
+                _dirs.extend([_path + '/' + _dir[0] for _dir in _data_dirs if '/' in _dir[0]])
             _status = self._check_items('Filesystem', _dirs, _rm, self._check_fs_item)
             self._report_status('Filesystem', _status, _rm)
 
