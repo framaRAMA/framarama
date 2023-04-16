@@ -175,7 +175,7 @@ class ItemThumbnailData(BaseImageData):
         proxy = True
 
     @classmethod
-    def path(cls, additional):
+    def path(cls, additional=None):
         return super().path(['item', 'thumbnail'] + additional if additional else [])
 
 
@@ -185,7 +185,7 @@ class DisplayItemThumbnailData(BaseImageData):
         proxy = True
 
     @classmethod
-    def path(cls, additional):
+    def path(cls, additional=None):
         return super().path(['display', 'thumbnail'] + additional if additional else [])
 
 
