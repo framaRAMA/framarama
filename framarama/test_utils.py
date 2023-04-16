@@ -22,6 +22,11 @@ class ProcessTestCase(TestCase):
         with self.assertRaises(FileNotFoundError):
             _result = utils.Process.exec_run(['notfound'])
 
+    def test_exec_run_bytes_arg(self):
+        _user = utils.Process.exec_run(['whoami'])
+        _result = utils.Process.exec_run(['id', _user.strip()])
+        self.assertIsNotNone(_result)
+
     def test_exec_run_env(self):
         _result = utils.Process.exec_run(['bash', '-c', 'echo -n ,$VAR1,$VAR2,'], env={'VAR1':'Hello'})
         self.assertEqual(b',Hello,,', _result)
