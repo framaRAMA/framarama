@@ -13,6 +13,8 @@ Features:
 * 🪄 add make up to your photos (resize, write text, etc)
 * 🍿 enjoy your memories
 
+<img src="docs/en/assets/screenshots/config-display.png" alt="config display" style="width:100%"/>
+
 ## 🚀 How to start
 
 The software consists of mainly two parts:
