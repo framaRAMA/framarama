@@ -1,9 +1,12 @@
 site_name: framaRAMA
 docs_dir: docs/en
+repo_url: https://github.com/framaRAMA/framarama
 theme:
-  name: readthedocs
   logo: assets/logo.png
   favicon: assets/favicon.ico
+  name: material
+  features:
+    - navigation.tabs
 
 nav:
   - 'Introduction': 'index.md'
