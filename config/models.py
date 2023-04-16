@@ -79,7 +79,7 @@ class Data(BaseModel):
         _md5 = hashlib.md5()
         _md5.update("{}#{}".format(path, utils.DateTime.now().timestamp()).encode())
         _md5_hex = _md5.hexdigest()
-        return Data.path([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
+        return instance.path([_md5_hex[0:2], _md5_hex[2:4], _md5_hex])
 
     category = models.CharField(
         max_length=255,
@@ -122,11 +122,8 @@ class Data(BaseModel):
             self.data_file.delete()
         super(Data, self).delete(*args, **kwargs)
 
-    @classmethod
-    def path(cls, additional=None):
-        _path = Data.PATH.copy()
-        if additional:
-            _path.extend(additional)
+    def path(self, additional=None):
+        _path = Data.PATH.copy() + additional if additional else []
         return os.path.join(*_path)
 
     @classmethod
@@ -176,9 +173,8 @@ class ItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    @classmethod
-    def path(cls):
-        return super().path(['item', 'thumbnail'])
+    def path(self, additional):
+        return super().path(['item', 'thumbnail'] + additional if additional else [])
 
 
 class DisplayItemThumbnailData(BaseImageData):
@@ -186,9 +182,8 @@ class DisplayItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    @classmethod
-    def path(cls):
-        return super().path(['display', 'thumbnail'])
+    def path(self, additional):
+        return super().path(['display', 'thumbnail'] + additional if additional else [])
 
 
 class Frame(BaseModel):
