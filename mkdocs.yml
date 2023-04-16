@@ -1,0 +1,27 @@
+site_name: framaRAMA
+docs_dir: docs/en
+theme:
+  name: readthedocs
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+nav:
+  - 'Introduction': 'index.md'
+  - 'architecture.md'
+  - 'install.md'
+  - 'config.md'
+  - 'changelog.md'
+  - 'Server':
+    - 'server/index.md'
+    - 'server/dashboard.md'
+    - 'server/frames.md'
+    - 'server/displays.md'
+    - 'Plugins':
+      - 'server/plugins.md'
+      - 'server/plugins/source.md'
+      - 'server/plugins/sorting.md'
+      - 'server/plugins/finishing.md'
+      - 'server/plugins/context.md'
+  - 'Frontend':
+    - 'frontend/index.md'
+
