@@ -14,3 +14,6 @@ Wand==0.6.7
 requests==2.27.1
 jsonpath-python==1.0.6
 
+# docs
+mkdocs==1.4.2
+mkdocs-material==9.1.6
