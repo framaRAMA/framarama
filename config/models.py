@@ -122,7 +122,8 @@ class Data(BaseModel):
             self.data_file.delete()
         super(Data, self).delete(*args, **kwargs)
 
-    def path(self, additional=None):
+    @classmethod
+    def path(cls, additional=None):
         _path = Data.PATH.copy() + additional if additional else []
         return os.path.join(*_path)
 
@@ -173,7 +174,8 @@ class ItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    def path(self, additional):
+    @classmethod
+    def path(cls, additional):
         return super().path(['item', 'thumbnail'] + additional if additional else [])
 
 
@@ -182,7 +184,8 @@ class DisplayItemThumbnailData(BaseImageData):
     class Meta:
         proxy = True
 
-    def path(self, additional):
+    @classmethod
+    def path(cls, additional):
         return super().path(['display', 'thumbnail'] + additional if additional else [])
 
 
