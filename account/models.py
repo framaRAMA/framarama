@@ -31,6 +31,7 @@ from framarama.base.models import TIMEZONE_CHOICES
 
     Details see:
         https://www.caktusgroup.com/blog/2019/04/26/how-switch-custom-django-user-model-mid-project/
+        https://ericswpark.com/blog/2021/2021-07-13-django-switch-to-custom-user-model-mid-project/
     
     Migration in code:
         * check if third party applications are also accessing User model direclty (they should change it)
