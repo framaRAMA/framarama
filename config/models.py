@@ -124,7 +124,7 @@ class Data(BaseModel):
 
     @classmethod
     def path(cls, additional=None):
-        _path = Data.PATH.copy() + additional if additional else []
+        _path = Data.PATH.copy() + (additional if additional else [])
         return os.path.join(*_path)
 
     @classmethod
@@ -176,7 +176,7 @@ class ItemThumbnailData(BaseImageData):
 
     @classmethod
     def path(cls, additional=None):
-        return super().path(['item', 'thumbnail'] + additional if additional else [])
+        return super().path(['item', 'thumbnail'] + (additional if additional else []))
 
 
 class DisplayItemThumbnailData(BaseImageData):
@@ -186,7 +186,7 @@ class DisplayItemThumbnailData(BaseImageData):
 
     @classmethod
     def path(cls, additional=None):
-        return super().path(['display', 'thumbnail'] + additional if additional else [])
+        return super().path(['display', 'thumbnail'] + (additional if additional else []))
 
 
 class Frame(BaseModel):
