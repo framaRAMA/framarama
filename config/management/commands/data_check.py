@@ -11,64 +11,78 @@ class Command(BaseCommand):
         parser.add_argument('--cleanup', action='store_true', help='Delete models without files or files without model')
         parser.add_argument('--db', action='store_true', help='If given only check database')
         parser.add_argument('--fs', action='store_true', help='If given only check filesystem')
+        parser.add_argument('--chunk', type=int, default=100, help='Process with given chunk size (default 100)')
 
     def handle(self, *args, **options):
         _rm = options['cleanup']
         _db = options['db']
         _fs = options['fs']
+        _chunk = options['chunk']
+        _processes = []
         if _db or not _fs:
-            self.stdout.write('Database: Reading items')
-            _items = models.Data.objects.all()
-            _status = self._check_items('Database', _items, _rm, self._check_db_item)
-            self._report_status('Database', _status, _rm)
+            _processes.append([
+                'Database',
+                self._db_items,
+                lambda items: [_item for _item in items if _item.data_file and utils.Filesystem.file_exists(_item.data_file.path)],
+                lambda item: item.delete()
+            ])
         if _fs or not _db:
-            _skip = [models.Data, models.BaseImageData]
-            _classes = utils.Classes.subclasses(models.Data)
-            _dirs = []
-            for _clazz in [_clazz for _clazz in _classes if _clazz not in _skip]:
-                _path = _clazz.path().replace('./', '')
-                self.stdout.write('Filesystem: Reading items in {}'.format(_path))
-                _data_dirs = utils.Filesystem.file_match(_path, '.*', files=False, dirs=True, recurse=1)
-                _dirs.extend([_path + '/' + _dir[0] for _dir in _data_dirs if '/' in _dir[0]])
-            _status = self._check_items('Filesystem', _dirs, _rm, self._check_fs_item)
-            self._report_status('Filesystem', _status, _rm)
+            _processes.append([
+                'Filesystem',
+                self._fs_items,
+                lambda items: [_item.data_file.name for _item in models.Data.objects.filter(data_file__in=items)],
+                lambda item: utils.Filesystem.file_delete(item)
+            ])
+        for _name, _generator, _check, _delete in _processes:
+            _status = self._check_items(_name, _generator, _rm, _chunk, _check, _delete)
+            self._report_status(_name, _status, _rm)
 
-    def _check_db_item(self, item, remove):
-        if item.data_file and utils.Filesystem.file_exists(item.data_file.path):
-            return (1, 1, 0)
-        else:
-            self.stdout.write('Database: Missing file for {}'.format(item))
-            if remove:
-                item.delete()
-                self.stdout.write('Database: Deleted {}'.format(item))
-            return (1, 0, 1)
+    def _db_items(self):
+        for _item in models.Data.objects.all():
+            yield _item
 
-    def _check_fs_item(self, item, remove):
-        _files = utils.Filesystem.file_match(item, '.*')
-        _files = [item + '/' + _file[0] for _file in _files]
-        _items = models.Data.objects.filter(data_file__in=_files)
-        _deletes = set(_files) - set([_item.data_file.name for _item in _items])
-        for _delete in _deletes:
-            self.stdout.write('Filesystem: Missing model for {}'.format(_delete))
-            if remove:
-                utils.Filesystem.file_delete(_delete)
-                self.stdout.write('Filesystem: Deleted {}'.format(_delete))
-        return (len(_files), len(_files) - len(_deletes), len(_deletes))
+    def _fs_items(self):
+        _skip = [models.Data, models.BaseImageData]
+        _classes = utils.Classes.subclasses(models.Data)
+        for _clazz in [_clazz for _clazz in _classes if _clazz not in _skip]:
+            _path = _clazz.path().replace('./', '')
+            self.stdout.write('Filesystem: Reading items in {}'.format(_path))
+            _dirs = utils.Filesystem.file_match(_path, '.*', files=False, dirs=True, recurse=1)
+            for _dir in [_dir[0] for _dir in _dirs if '/' in _dir[0]]:
+                for _item in utils.Filesystem.file_match(_path + '/' + _dir, '.*'):
+                    yield _path + '/' + _dir + '/' + _item[0]
 
-    def _check_items(self, prefix, items, remove, check_item):
-        _count = len(items)
-        _chunk = int(_count/10) if _count > 100 else _count
-        self.stdout.write('{}: Checking {} items'.format(prefix, _count))
-        _stats = {'total': 0, 'ok': 0, 'delete': 0, 'items': 0}
-        for _i, _item in enumerate(items):
-            _total, _ok, _deletes = check_item(_item, remove)
-            _stats['items'] = _stats['items'] + 1
-            _stats['total'] = _stats['total'] + _total
-            _stats['ok'] = _stats['ok'] + _ok
-            _stats['delete'] = _stats['delete'] + _deletes
-            if (_i % _chunk == 0) or (_stats['items'] == _count):
-                self.stdout.write('{}: {:.0%}, checked {} items ...'.format(prefix, _stats['items']/_count, _stats['items']))
+    def _check_items(self, prefix, items, remove, size, check_items, delete_item):
+        self.stdout.write('{}: Checking items'.format(prefix))
+        _stats = {'total': 0, 'ok': 0, 'delete': 0}
+        for _items in self._chunked(items, size):
+            _existing = check_items(_items)
+            _deletes = set(_items) - set(_existing)
+            for _delete in _deletes:
+                self.stdout.write('{}: Missing {}'.format(prefix, _delete))
+                if remove:
+                    delete_item(_delete)
+                    self.stdout.write('{}: Deleted {}'.format(prefix, _delete))
+            _stats['total'] = _stats['total'] + len(_items)
+            _stats['ok'] = _stats['ok'] + len(_existing)
+            _stats['delete'] = _stats['delete'] + len(_deletes)
+            self.stdout.write('{}: Checked {} items (last {} items: {} ok, {} delete)'.format(
+                prefix,
+                _stats['total'],
+                len(_items),
+                len(_existing),
+                len(_deletes)))
         return _stats
+
+    def _chunked(self, items, size):
+        _result = []
+        for _item in items():
+            _result.append(_item)
+            if len(_result) == size:
+                yield _result
+                _result[:] = []
+        else:
+            yield _result
 
     def _report_status(self, prefix, stats, remove):
         self.stdout.write('{}: {}, checked {} items ({} ok, {} delete)'.format(
