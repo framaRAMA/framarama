@@ -725,7 +725,7 @@
 {% endmacro %}
 
 {% macro display_info_device(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|date_format('%d.%m.%Y %H:%M') if status else 'not available' }})</h6>
+  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})</h6>
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
@@ -749,7 +749,7 @@
 {% endmacro %}
 
 {% macro display_info_media(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">Media information ({{ status.created|date_format('%d.%m.%Y %H:%M') if status else 'not available' }})</h6>
+  <h6 class="card-subtitle mb-2 text-muted">Media information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})</h6>
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
