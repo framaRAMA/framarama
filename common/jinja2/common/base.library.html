@@ -363,7 +363,7 @@
     {% for action in actions|reverse %}
       {% set classes = 'btn-floating btn-lg' %}
       {% if loop.index != 0 %}{% set classes = classes + ' mb-3' %}{% endif %}
-      {{ nav_action_btn(action, 'btn', classes) }}
+      {{ nav_action_btn(action, 'btn-', classes) }}
     {% endfor %}
   </div>
 {% endmacro %}
