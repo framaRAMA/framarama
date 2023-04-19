@@ -1,3 +1,5 @@
+import logging
+
 from django.apps import apps
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -7,6 +9,9 @@ from django.db.models import F
 from framarama.base import utils
 from framarama.base.views import BaseAuthenticatedView
 from config import forms, models, plugins
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseConfigView(BaseAuthenticatedView):
@@ -41,11 +46,15 @@ class BaseConfigView(BaseAuthenticatedView):
         return _context
 
     def response_thumbnail(self, context, data):
-        _thumbnail_data = data.data() if data else None
-        if _thumbnail_data:
-            self.response(context, _thumbnail_data, data.data_mime)
-        else:
-            self.response(context, BaseConfigView.DEFAULT_THUMBNAIL, BaseConfigView.DEFAULT_THUMBNAIL_MIME)
+        _thumbnail_data = BaseConfigView.DEFAULT_THUMBNAIL
+        _thumbnail_mime = BaseConfigView.DEFAULT_THUMBNAIL_MIME
+        try:
+            if data:
+                _thumbnail_data = data.data()
+                _thumbnail_mime = data.data_mime
+        except Exception as e:
+            logger.error("Can not load thumbnail data #{}: {}".format(data.id, e))
+        self.response(context, _thumbnail_data, _thumbnail_mime)
 
 
 class BaseFrameConfigView(BaseConfigView):
