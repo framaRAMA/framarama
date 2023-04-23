@@ -143,6 +143,7 @@ class Processor:
         _frame = self._context.get_frame()
         _time_zone = self._context.get_time_zone()
         _existing = {_item.url: _item for _item in source.items.all()}
+        _processed = []
         _fields = self._item_mapping(source)
         _stats = {'cnt': 0, 'create': 0, 'update': 0, 'delete': 0, 'errors': []}
 
@@ -175,6 +176,9 @@ class Processor:
                 if _item_date_creation is None:
                     raise Exception("Item skipped, missing creation date: {}".format(_values))
 
+                if _item_url in _processed:
+                    raise Exception("Item skipped, duplicate: {}".format(_item_url))
+
                 if _item_url in _existing:
                     _item = _existing[_item_url]
                     _item.version = _item.version + 1
@@ -193,6 +197,7 @@ class Processor:
                 _item.updated = utils.DateTime.now()
                 _item.save()
 
+                _processed.append(_item_url)
                 if _stats_type == 'update':
                     _existing.pop(_item_url)
                 _stats[_stats_type] = _stats[_stats_type] + 1
