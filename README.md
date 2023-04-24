@@ -12,6 +12,7 @@ Features:
 * 🎯 priorize the photos to show by meta data (e.g. date taken)
 * 🪄 add make up to your photos (resize, write text, etc)
 * 🍿 enjoy your memories
+* ... and more - checkout the [documentation](https://framarama.github.io/framarama/)!
 
 <img src="docs/en/assets/screenshots/config-display.png" alt="config display" style="width:100%"/>
 
