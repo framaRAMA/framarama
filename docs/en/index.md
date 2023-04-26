@@ -18,6 +18,7 @@ Features:
 ## How to start
 
 The software consists of mainly two parts:
+
 * the **server** component, for administration and management
 * the **frontend** component, for displaying the photos
 
