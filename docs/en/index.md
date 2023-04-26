@@ -59,6 +59,7 @@ python manage.py runserver 0.0.0.0:8000 --noreload
 ```
 
 ... and navigate browser to
+
 * http://server:8000/config/ for server setup or
 * http://server:8000/frontend/ for frontend setup
 
@@ -80,6 +81,7 @@ Checkout the project as mentioned before and adjust the configuration:
 ```
 
 The server component depends on the following dependencies:
+
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
 * ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them an check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
@@ -101,6 +103,7 @@ Checkout the project as mentioned before and adjust the configuration:
 ```
 
 The frontend component depends on the following dependencies:
+
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
 * 💡 `network-manager`, `dnsmasq-base` - configuring and setting up networking
 * 💡 `plymouth`, `plymouth-themes`, `plymouth-x11` - create startup booting screen
