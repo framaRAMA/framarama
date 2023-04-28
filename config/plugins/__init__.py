@@ -1,8 +1,12 @@
 import pkgutil
+import logging
 
 from framarama.base import utils
 from config import models
 from config.plugins import sources, sortings, finishings, contexts
+
+
+logger = logging.getLogger(__name__)
 
 
 class Plugin:
