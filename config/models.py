@@ -204,6 +204,10 @@ class Frame(BaseModel):
         default=0,
         verbose_name='Update version', help_text='The version number increasing on each update')
 
+    def get_last_update(self):
+        _max = self.sources.aggregate(models.Max('update_date_start'))
+        return _max['update_date_start__max'] if _max else None
+
 
 class Source(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["name"]

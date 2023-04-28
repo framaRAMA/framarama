@@ -753,7 +753,8 @@
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
-    <li>items updated on <strong>{{ status.items_updated|date_format('%d.%m.%Y %H:%M') if status else 'unknown'}}</strong></li>
+    <li>items refreshed <strong>{{ status.items_updated|duration(short=True) + ' ago' if status else 'unknown'}}</strong></li>
+    <li>last items update <strong>{{ display.frame.get_last_update()|duration + ' ago' if display.frame else 'unknown' }}</strong></li>
     <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
   </ul>
 {% endmacro %}
