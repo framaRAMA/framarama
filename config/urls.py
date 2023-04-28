@@ -38,6 +38,7 @@ urlpatterns = [
     path('frames/<int:frame_id>/sortings/<int:sorting_id>/action', frame.ActionSortingFrameView.as_view(), name='frame_sorting_action'),
 
     path('frames/<int:frame_id>/finishings', frame.ListFinishingFrameView.as_view(), name='frame_finishing_list'),
+    path('frames/<int:frame_id>/finishings/export', frame.ExportFinishingFrameView.as_view(), name='frame_finishing_export'),
     path('frames/<int:frame_id>/finishings/create?plugin=<str:plugin>', frame.CreateFinishingFrameView.as_view(), name='frame_finishing_create'),
     path('frames/<int:frame_id>/finishings/<int:finishing_id>/edit', frame.UpdateFinishingFrameView.as_view(), name='frame_finishing_edit'),
     path('frames/<int:frame_id>/finishings/<int:finishing_id>/action', frame.ActionFinishingFrameView.as_view(), name='frame_finishing_action'),

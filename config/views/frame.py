@@ -10,6 +10,7 @@ from config.views import base
 from config.utils import source
 from config.utils import sorting
 from config.utils import finishing
+from api.views.config import FinishingSerializer
 
 
 class CreateFrameView(base.BaseConfigView):
@@ -454,6 +455,20 @@ class ActionFinishingFrameView(base.BaseFinishingFrameConfigView):
         elif _action == 'up' or _action == 'down':
             self._item_order_move(_action, _finishing, _frame.finishings)
         self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+        return _context
+
+
+class ExportFinishingFrameView(base.BaseFrameConfigView):
+
+    def _get(self, request, frame_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _export = plugins.PluginRegistry.export(
+            'export.frame.{}.finishings'.format(frame_id),
+            'Finishing export of frame #{}'.format(frame_id),
+            FinishingSerializer,
+            _frame.finishings.all())
+        self.response(_context, _export, 'application/json')
         return _context
 
 
