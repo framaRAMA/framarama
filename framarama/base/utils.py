@@ -383,3 +383,41 @@ class Classes:
         for _clazz in clazz.__subclasses__():
             _classes.extend(Classes.subclasses(_clazz))
         return _classes
+
+
+class Lists:
+
+    @staticmethod
+    def chunked(source, size):
+        _result = []
+        for _sid, _sval in source:
+            _result.append((_sid, _sval))
+            if len(_result) == size:
+                yield _result
+                _result[:] = []
+        else:
+            if len(_result):
+                yield _result
+
+    @staticmethod
+    def process(source, target, source_match, target_match, size, create_func, update_func, delete_func):
+        for _svalues in Lists.chunked(source, size):
+            _smap = {_id: _val for _id, _val in _svalues}
+            _sids = set(_smap.keys())
+            _tvalues = target_match(_sids)
+            _tmap = {_id: _val for _id, _val in _tvalues}
+            _tids = set(_tmap.keys())
+            for _id in set.difference(_sids, _tids):
+                create_func(_id, _smap[_id])
+            for _id in set.difference(_tids, _sids):
+                delete_func(_id, _tmap[_id])
+            for _id in set.intersection(_sids, _tids):
+                update_func(_id, _smap[_id], _tmap[_id])
+        for _tvalues in Lists.chunked(target, size):
+            _tmap = {_id: _val for _id, _val in _tvalues}
+            _tids = set(_tmap.keys())
+            _svalues = source_match(_tids)
+            _smap = {_id: _val for _id, _val in _svalues}
+            _sids = set(_smap.keys())
+            for _id in set.difference(_tids, _sids):
+                delete_func(_id, _tmap[_id])

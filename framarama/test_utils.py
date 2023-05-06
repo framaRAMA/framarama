@@ -280,3 +280,48 @@ class ClassesTestCase(TestCase):
         self.assertTrue(Child2 in _classes_root)
         self.assertTrue(SubChild1 in _classes_root)
 
+
+class ListTestCase(TestCase):
+
+    def test_chunked_list(self):
+        _data = [('k' + str(_i), 'v' + str(_i)) for _i in range(1, 51)]
+        for _result in utils.Lists.chunked(_data, 1):
+            self.assertEqual(1, len(_result))
+        for _result in utils.Lists.chunked(_data, 10):
+            self.assertEqual(10, len(_result))
+
+    def test_chunked_generator(self):
+        _data = (('k' + str(_i), 'v' + str(_i)) for _i in range(1, 51))
+        for _result in utils.Lists.chunked(_data, 1):
+            self.assertEqual(1, len(_result))
+        for _result in utils.Lists.chunked(_data, 10):
+            self.assertEqual(10, len(_result))
+
+    def test_process(self):
+        for sstart, send, tstart, tend, ccnt, ucnt, dcnt in [
+            (1, 51,  1, 51,  0, 50,  0),
+            (1, 51,  1, 41, 10, 40,  0),
+            (1, 41,  1, 51,  0, 40, 10),
+            (1, 51, 41, 71, 40, 10, 20),
+        ]:
+            create = []
+            update = []
+            delete = []
+            _sdata = [('k' + str(_i), 'v' + str(_i)) for _i in range(sstart, send)]
+            _sids = [_id for _id, _val in _sdata]
+            _tdata = [('k' + str(_i), 'v' + str(_i)) for _i in range(tstart, tend)]
+            _tids = [_id for _id, _val in _tdata]
+            with self.subTest("sstart={}, send={}, tstart={}, send={}".format(sstart, send, tstart, tend)):
+                utils.Lists.process(
+                    _sdata,
+                    _tdata,
+                    lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _sids],
+                    lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _tids],
+                    10,
+                    lambda id, val: create.append(val),
+                    lambda id, sval, tval: update.append(sval),
+                    lambda id, val: delete.append(val))
+                self.assertEqual(ccnt, len(create))
+                self.assertEqual(ucnt, len(update))
+                self.assertEqual(dcnt, len(delete))
+
