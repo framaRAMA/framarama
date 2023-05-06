@@ -312,7 +312,7 @@ class ListTestCase(TestCase):
             _tdata = [('k' + str(_i), 'v' + str(_i)) for _i in range(tstart, tend)]
             _tids = [_id for _id, _val in _tdata]
             with self.subTest("sstart={}, send={}, tstart={}, send={}".format(sstart, send, tstart, tend)):
-                utils.Lists.process(
+                _stats = utils.Lists.process(
                     source=_sdata,
                     target_match=lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _tids],
                     target=_tdata,
@@ -324,4 +324,7 @@ class ListTestCase(TestCase):
                 self.assertEqual(ccnt, len(create))
                 self.assertEqual(ucnt, len(update))
                 self.assertEqual(dcnt, len(delete))
-
+                self.assertEqual(ccnt+ucnt+dcnt, _stats['total'])
+                self.assertEqual(ccnt, _stats['create'])
+                self.assertEqual(ucnt, _stats['update'])
+                self.assertEqual(dcnt, _stats['delete'])

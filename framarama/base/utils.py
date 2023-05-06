@@ -401,20 +401,27 @@ class Lists:
 
     @staticmethod
     def process(source, target_match, target=None, source_match=None, size=100, create_func=None, update_func=None, delete_func=None):
+        _stats = {'total': 0, 'create': 0, 'update': 0, 'delete': 0}
         for _svalues in Lists.chunked(source, size) if source else []:
             _smap = {_id: _val for _id, _val in _svalues}
             _sids = set(_smap.keys())
             _tvalues = target_match(_sids)
             _tmap = {_id: _val for _id, _val in _tvalues}
             _tids = set(_tmap.keys())
-            if create_func:
-                for _id in set.difference(_sids, _tids):
+            for _id in set.difference(_sids, _tids):
+                _stats['total'] = _stats['total'] + 1
+                _stats['create'] = _stats['create'] + 1
+                if create_func:
                     create_func(_id, _smap[_id])
-            if delete_func:
-                for _id in set.difference(_tids, _sids):
+            for _id in set.difference(_tids, _sids):
+                _stats['total'] = _stats['total'] + 1
+                _stats['delete'] = _stats['delete'] + 1
+                if delete_func:
                     delete_func(_id, _tmap[_id])
-            if update_func:
-                for _id in set.intersection(_sids, _tids):
+            for _id in set.intersection(_sids, _tids):
+                _stats['total'] = _stats['total'] + 1
+                _stats['update'] = _stats['update'] + 1
+                if update_func:
                     update_func(_id, _smap[_id], _tmap[_id])
         for _tvalues in Lists.chunked(target, size) if target else []:
             _tmap = {_id: _val for _id, _val in _tvalues}
@@ -422,6 +429,9 @@ class Lists:
             _svalues = source_match(_tids) if source_match else []
             _smap = {_id: _val for _id, _val in _svalues}
             _sids = set(_smap.keys())
-            if delete_func:
-                for _id in set.difference(_tids, _sids):
+            for _id in set.difference(_tids, _sids):
+                _stats['total'] = _stats['total'] + 1
+                _stats['delete'] = _stats['delete'] + 1
+                if delete_func:
                     delete_func(_id, _tmap[_id])
+        return _stats
