@@ -313,14 +313,14 @@ class ListTestCase(TestCase):
             _tids = [_id for _id, _val in _tdata]
             with self.subTest("sstart={}, send={}, tstart={}, send={}".format(sstart, send, tstart, tend)):
                 utils.Lists.process(
-                    _sdata,
-                    _tdata,
-                    lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _sids],
-                    lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _tids],
-                    10,
-                    lambda id, val: create.append(val),
-                    lambda id, sval, tval: update.append(sval),
-                    lambda id, val: delete.append(val))
+                    source=_sdata,
+                    target_match=lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _tids],
+                    target=_tdata,
+                    source_match=lambda ids: [(_i, 'v' + str(_i)) for _i in ids if _i in _sids],
+                    size=10,
+                    create_func=lambda id, val: create.append(val),
+                    update_func=lambda id, sval, tval: update.append(sval),
+                    delete_func=lambda id, val: delete.append(val))
                 self.assertEqual(ccnt, len(create))
                 self.assertEqual(ucnt, len(update))
                 self.assertEqual(dcnt, len(delete))

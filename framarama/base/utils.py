@@ -400,24 +400,28 @@ class Lists:
                 yield _result
 
     @staticmethod
-    def process(source, target, source_match, target_match, size, create_func, update_func, delete_func):
+    def process(source, target_match, target=None, source_match=None, size=100, create_func=None, update_func=None, delete_func=None):
         for _svalues in Lists.chunked(source, size):
             _smap = {_id: _val for _id, _val in _svalues}
             _sids = set(_smap.keys())
             _tvalues = target_match(_sids)
             _tmap = {_id: _val for _id, _val in _tvalues}
             _tids = set(_tmap.keys())
-            for _id in set.difference(_sids, _tids):
-                create_func(_id, _smap[_id])
-            for _id in set.difference(_tids, _sids):
-                delete_func(_id, _tmap[_id])
-            for _id in set.intersection(_sids, _tids):
-                update_func(_id, _smap[_id], _tmap[_id])
+            if create_func:
+                for _id in set.difference(_sids, _tids):
+                    create_func(_id, _smap[_id])
+            if delete_func:
+                for _id in set.difference(_tids, _sids):
+                    delete_func(_id, _tmap[_id])
+            if update_func:
+                for _id in set.intersection(_sids, _tids):
+                    update_func(_id, _smap[_id], _tmap[_id])
         for _tvalues in Lists.chunked(target, size):
             _tmap = {_id: _val for _id, _val in _tvalues}
             _tids = set(_tmap.keys())
-            _svalues = source_match(_tids)
+            _svalues = source_match(_tids) if source_match else []
             _smap = {_id: _val for _id, _val in _svalues}
             _sids = set(_smap.keys())
-            for _id in set.difference(_tids, _sids):
-                delete_func(_id, _tmap[_id])
+            if delete_func:
+                for _id in set.difference(_tids, _sids):
+                    delete_func(_id, _tmap[_id])
