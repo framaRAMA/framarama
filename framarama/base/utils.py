@@ -401,7 +401,7 @@ class Lists:
 
     @staticmethod
     def process(source, target_match, target=None, source_match=None, size=100, create_func=None, update_func=None, delete_func=None):
-        for _svalues in Lists.chunked(source, size):
+        for _svalues in Lists.chunked(source, size) if source else []:
             _smap = {_id: _val for _id, _val in _svalues}
             _sids = set(_smap.keys())
             _tvalues = target_match(_sids)
@@ -416,7 +416,7 @@ class Lists:
             if update_func:
                 for _id in set.intersection(_sids, _tids):
                     update_func(_id, _smap[_id], _tmap[_id])
-        for _tvalues in Lists.chunked(target, size):
+        for _tvalues in Lists.chunked(target, size) if target else []:
             _tmap = {_id: _val for _id, _val in _tvalues}
             _tids = set(_tmap.keys())
             _svalues = source_match(_tids) if source_match else []
