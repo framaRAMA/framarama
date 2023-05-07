@@ -359,7 +359,7 @@
 {% endmacro %}
 
 {% macro nav_actions(actions) %}
-  <div class="fixed-action-btn" style="height:{{ actions|length * 50 + 50 }}px;">
+  <div class="fixed-action-btn" style="height:{{ actions|length * 55 + 50 }}px;">
     {% for action in actions|reverse %}
       {% set classes = 'btn-floating btn-lg' %}
       {% if loop.index != 0 %}{% set classes = classes + ' mb-3' %}{% endif %}
