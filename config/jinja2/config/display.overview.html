@@ -34,6 +34,14 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body text-center">
+        {{ lib.display_chart_resources(stats) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mt-2">
+      <div class="card-body text-center">
         {{ lib.display_items('displayImageLatestCarousel', 'Latest items', latest_items, 'carousel') }}
       </div>
     </div>
