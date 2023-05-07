@@ -468,7 +468,7 @@ class ExportFinishingFrameView(base.BaseFrameConfigView):
             'Finishing export of frame #{}'.format(frame_id),
             FinishingSerializer,
             _frame.finishings.all())
-        self.response(_context, _export, 'application/json')
+        self.response_download(_context, _export, 'application/json')
         return _context
 
 

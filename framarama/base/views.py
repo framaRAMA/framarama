@@ -1,3 +1,4 @@
+import mimetypes
 
 from django.conf import settings
 from django.shortcuts import render
@@ -56,6 +57,16 @@ class BaseView(TemplateView):
 
     def response(self, context, data, mime=None):
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
+
+    def response_download(self, context, data, mime=None, filename=None):
+        _ext = mimetypes.guess_extension(mime) if mime else ''
+        if filename:
+          _filename = filename
+        else:
+          _ts = utils.DateTime.utc(utils.DateTime.now(), True)
+          _filename = 'download-{}'.format(str(_ts).split('.')[0])
+        context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
+        context['_response']['Content-Disposition'] = 'attachment; filename={}{}'.format(_filename, _ext)
 
 
 class BaseQuerySetMixin:
