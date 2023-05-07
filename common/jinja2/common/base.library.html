@@ -724,6 +724,19 @@
   {{ chart_line('cpu', stats_labels|map('date_format', '%H:%M')|list, {'Load': stats_load, 'Temp': stats_temp}, ['left', 'right']) }}
 {% endmacro %}
 
+{% macro display_chart_resources(stats) %}
+  {% set stats_labels = stats|map(attribute='created')|reverse %}
+  {% set stats_disk = stats|map(attribute='disk_data_free')|reverse|list %}
+  {% set stats_mem = stats|map(attribute='memory_used')|reverse|list %}
+  <h6 class="card-subtitle mb-2 text-muted">
+    Resources
+    {% if stats_labels %}
+      {{ "(%s - %s)"|format(stats_labels|map('date_format', '%d.%m. %H:%M')|first, stats_labels|reverse|map('date_format', '%d.%m. %H:%M')|first) }}
+    {% endif %}
+  </h6>
+  {{ chart_line('resources', stats_labels|map('date_format', '%H:%M')|list, {'Disk': stats_disk, 'Memory': stats_mem}, ['left', 'right']) }}
+{% endmacro %}
+
 {% macro display_info_device(display, status) %}
   <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})</h6>
   <ul class="card-text">
