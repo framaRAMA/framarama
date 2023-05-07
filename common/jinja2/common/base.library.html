@@ -870,7 +870,10 @@
         {% endfor %}
         ]
       }, options: {
-        scales: { left: { position: 'left', min: 0 }, right: { position: 'right', min: 0 } }
+        scales: {
+          left: { position: 'left', min: 0, ticks: { format: { notation: 'compact' } } },
+          right: { position: 'right', min: 0, ticks: { format: { notation: 'compact' } } }
+        }
       }
     });
   </script>
