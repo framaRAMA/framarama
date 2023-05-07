@@ -329,12 +329,14 @@ class DateTime:
         return _deltas[_reached] if _reached is not None else None
 
     @staticmethod
-    def utc(dt):
-        if dt and dt.tzinfo:
-            return dt.astimezone(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z'
-        elif dt:
-            return dt.isoformat() + 'Z'
-        return None
+    def utc(dt, timestamp=False):
+        if dt is None:
+            return None
+        if dt.tzinfo:
+          _dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        else:
+          _dt = dt
+        return _dt.timestamp() if timestamp else _dt.isoformat() + 'Z'
 
     @staticmethod
     def parse(date):

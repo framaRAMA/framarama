@@ -199,11 +199,21 @@ class DateTimeTestCase(TestCase):
         _result = utils.DateTime.in_range(utils.DateTime.now(sub='00:20:00'), _range)
         self.assertEqual('second', _result)
 
+    def test_utc_none(self):
+        _utc = utils.DateTime.utc(None)
+        self.assertIsNone(_utc)
+
     def test_utc(self):
         _time = utils.DateTime.now()
         _time_utc = _time - datetime.timedelta(seconds=_time.utcoffset().total_seconds())
         _utc = utils.DateTime.utc(_time)
         self.assertEqual(_time_utc.replace(tzinfo=None).isoformat() + 'Z', _utc)
+
+    def test_utc_timestamp(self):
+        _time = utils.DateTime.now()
+        _time_utc = _time - datetime.timedelta(seconds=_time.utcoffset().total_seconds())
+        _utc = utils.DateTime.utc(_time, True)
+        self.assertEqual(_time_utc.replace(tzinfo=None).timestamp(), _utc)
 
     def test_parse(self):
         _time = utils.DateTime.parse('2023-01-01T15:45:10')
