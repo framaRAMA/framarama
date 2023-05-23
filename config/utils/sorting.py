@@ -65,7 +65,7 @@ Item = models.Item.objects
         _conn_name = 'config' if 'config' in connections else 'default'
         (_query_sql, _query_params) = _query.query.get_compiler(_conn_name).as_sql()
 
-        _items = self._context.get_frame().items
+        _items = _data['Item']
         try:
             _query = (
                 "SELECT i.*, rank FROM config_item i, ("
@@ -77,8 +77,9 @@ Item = models.Item.objects
                 _query = _query + " AND result.rank <= " + str(random.randint(1, _rank_max))
                 _limit = " LIMIT 1"
             _items = _items.raw(_query + " ORDER BY result.rank DESC" + _limit, _query_params)
+            len(_items)
         except Exception as e:
-            _items = _items.order_by('id').annotate(rank=Model.F('id'))
+            _items = _data['Item'].order_by('id').annotate(rank=Model.F('id'))
             _result['errors']['list'] = e
 
         _result['items'] = _items
