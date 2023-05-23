@@ -63,8 +63,7 @@ Item = models.Item.objects
         # this defaults to "default" connection and not "config" connection:
         # https://github.com/django/django/blob/6654289f5b350dfca3dc4f6abab777459b906756/django/db/models/sql/query.py#L293
         _conn_name = 'config' if 'config' in connections else 'default'
-        (_query_stmt, _query_params) = _query.query.get_compiler(_conn_name).as_sql()
-        _query_sql = _query_stmt % _query_params
+        (_query_sql, _query_params) = _query.query.get_compiler(_conn_name).as_sql()
 
         _items = self._context.get_frame().items
         try:
@@ -72,13 +71,12 @@ Item = models.Item.objects
                 "SELECT i.*, rank FROM config_item i, ("
                 "  SELECT id, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.id"
                 ") AS result WHERE result.id=i.id" )
-            _where = ""
             _limit = ""
             if self._context.get_random_item():
-                _rank_max = _items.raw(_query + _where + " ORDER BY result.rank DESC LIMIT 1")[0].rank
-                _where = " AND result.rank <= " + str(random.randint(1, _rank_max))
+                _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1")[0].rank
+                _query = _query + " AND result.rank <= " + str(random.randint(1, _rank_max))
                 _limit = " LIMIT 1"
-            _items = _items.raw(_query + _where + " ORDER BY result.rank DESC" + _limit)
+            _items = _items.raw(_query + " ORDER BY result.rank DESC" + _limit, _query_params)
         except Exception as e:
             _items = _items.order_by('id').annotate(rank=Model.F('id'))
             _result['errors']['list'] = e
