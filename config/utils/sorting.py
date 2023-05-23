@@ -73,7 +73,7 @@ Item = models.Item.objects
                 ") AS result WHERE result.id=i.id" )
             _limit = ""
             if self._context.get_random_item():
-                _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1")[0].rank
+                _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1", _query_params)[0].rank
                 _query = _query + " AND result.rank <= " + str(random.randint(1, _rank_max))
                 _limit = " LIMIT 1"
             _items = _items.raw(_query + " ORDER BY result.rank DESC" + _limit, _query_params)
