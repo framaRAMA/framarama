@@ -71,12 +71,13 @@ Item = models.Item.objects
                 "SELECT i.*, rank FROM config_item i, ("
                 "  SELECT id, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.id"
                 ") AS result WHERE result.id=i.id" )
-            _limit = ""
             if self._context.get_random_item():
                 _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1", _query_params)[0].rank
-                _query = _query + " AND result.rank <= " + str(random.randint(1, _rank_max))
-                _limit = " LIMIT 1"
-            _items = _items.raw(_query + " ORDER BY result.rank DESC" + _limit, _query_params)
+                _query = _query + " AND result.rank >= " + str(random.randint(0, _rank_max))
+                _query = _query + " ORDER BY result.rank ASC LIMIT 1"
+            else:
+                _query = _query + " ORDER BY result.rank DESC"
+            _items = _items.raw(_query, _query_params)
             len(_items)
         except Exception as e:
             _items = _data['Item'].order_by('id').annotate(rank=Model.F('id'))
