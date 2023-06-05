@@ -104,9 +104,16 @@ class ApiClient(Singleton):
         _response.raise_for_status()
         return _response.json()
 
-    def _list(self, mapper):
-        _data = ApiResultList()
-        return _data
+    def _map(self, data, model, keys_ignore=None):
+        _keys_ignore = keys_ignore if keys_ignore != None else []
+        return model(**{k: v for k, v in data.items() if k not in _keys_ignore})
+
+    def _list(self, data, model, keys_ignore=None):
+        return ApiResultList(data, lambda d: self._map(d, model, keys_ignore))
+
+    def _item(self, data, model, keys_ignore=None):
+        _keys_ignore = keys_ignore if keys_ignore != None else []
+        return ApiResultItem(data, lambda d: self._map(d, model, keys_ignore))
 
     def get_url(self, url, method=METHOD_GET, data=None, headers={}, **kwargs):
         return self._http(url, method, data, headers, **kwargs)
@@ -114,20 +121,18 @@ class ApiClient(Singleton):
     def get_display(self):
         _data = self._request('/displays')
         if _data and 'results' in _data and len(_data['results']):
-            return ApiResultItem(
-                _data['results'][0],
-                lambda d: config_models.Display(**{k: v for k, v in d.items() if k not in ['device_type_name', 'frame']}))
+            return self._item(_data['results'][0], config_models.Display, ['device_type_name', 'frame'])
         return None
 
     def get_items_list(self, display_id):
-        return ApiResultList(
+        return self._list(
             self._request('/displays/{}/items/all'.format(display_id)),
-            lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
+            config_models.Item,
+            ['rank'])
 
     def get_items_next(self, display_id, hit=False):
-        _result = ApiResultList(
-            self._request('/displays/{}/items/next?hit={}'.format(display_id, int(hit))),
-            lambda d: config_models.Item(**{k: v for k, v in d.items() if k not in ['rank']}))
+        _data = self._request('/displays/{}/items/next?hit={}'.format(display_id, int(hit)))
+        _result = self._list(_data, config_models.Item, ['rank'])
         return _result.get(0) if _result.count() > 0 else None
 
     def submit_item_hit(self, display_id, item_id, thumbnail=None, mime=None, meta=None):
@@ -144,14 +149,14 @@ class ApiClient(Singleton):
         self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, _data)
 
     def get_contexts(self, display_id):
-        return ApiResultList(
+        return self._list(
             self._request('/displays/{}/contexts'.format(display_id)),
-            lambda d: config_models.FrameContext(**d))
+            config_models.FrameContext)
 
     def get_finishings(self, display_id):
-        return ApiResultList(
+        return self._list(
             self._request('/displays/{}/finishings'.format(display_id)),
-            lambda d: config_models.Finishing(**d))
+            config_models.Finishing)
 
     def submit_status(self, display_id, status):
         return self._request('/displays/{}/status'.format(display_id), ApiClient.METHOD_POST, status)
