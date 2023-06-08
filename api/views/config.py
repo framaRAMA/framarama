@@ -22,6 +22,12 @@ class FrameSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'description', 'enabled']
 
 
+class SourceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Source
+        fields = ['id', 'name']
+
+
 class DisplaySerializer(serializers.HyperlinkedModelSerializer):
     enabled = serializers.SerializerMethodField()
     device_type_name = serializers.SerializerMethodField()
@@ -80,9 +86,10 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
+    source = SourceSerializer()
     class Meta:
         model = models.RankedItem
-        fields = ['rank', 'id', 'url']
+        fields = ['rank', 'id', 'url', 'source']
         abstract = True
 
 

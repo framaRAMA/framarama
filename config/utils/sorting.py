@@ -77,7 +77,7 @@ Item = models.Item.objects
                 _query = _query + " ORDER BY result.rank ASC LIMIT 1"
             else:
                 _query = _query + " ORDER BY result.rank DESC"
-            _items = _items.raw(_query, _query_params)
+            _items = _items.prefetch_related('source').raw(_query, _query_params)
             len(_items)
         except Exception as e:
             _items = _data['Item'].order_by('id').annotate(rank=Model.F('id'))
