@@ -13,6 +13,20 @@ class ResultValue:
     def __init__(self, value):
         self._value = value
 
+    def __repr__(self):
+        return '<ResultValue: ' + str(self._value) + '>'
+
+    def __eq__(self, other):
+        if other is self._value:
+            return True
+        return False
+
+    def __getitem__(self, name):
+        return ResultValue(None)
+
+    def __getattr__(self, name):
+        return ResultValue(None)
+
     def as_str(self):
         if self._value is None:
             return None
@@ -36,30 +50,7 @@ class ResultValue:
         return str(self._value).lower() in ['true', '1', 't', 'y', 'yes']
 
 
-class NoneContextValue:
-
-    def __str__(self):
-        return ''
-
-    def __repr__(self):
-        return ''
-
-    def __eq__(self, other):
-        if other is None:
-            return True
-        if other == '':
-            return True
-        return False
-
-    def __add__(self, other):
-        return other
-
-    def __radd__(self, other):
-        return other
-
-
 class Context:
-    NONE_VALUE = NoneContextValue()
 
     def __init__(self):
         self._resolver = ChainedResolver()
@@ -87,6 +78,9 @@ class Context:
 class ContextResolver:
 
     def __getitem__(self, key):
+        return self._resolve(key)
+
+    def __getattr__(self, key):
         return self._resolve(key)
 
     def _resolve(self, name):
@@ -118,7 +112,7 @@ class MapResolver(ContextResolver):
         self._map = variables
 
     def _resolve(self, name):
-        return self._map[name] if name in self._map else Context.NONE_VALUE
+        return self._map[name] if name in self._map else ResultValue(None)
 
 
 class EnvironmentResolver(ContextResolver):
@@ -128,7 +122,7 @@ class EnvironmentResolver(ContextResolver):
         self._env = os.environ
 
     def _resolve(self, name):
-        return self._env[name] if name in self._env else Context.NONE_VALUE
+        return self._env[name] if name in self._env else ResultValue(None)
 
 
 class ObjectResolver(ContextResolver):
@@ -139,5 +133,5 @@ class ObjectResolver(ContextResolver):
     def _resolve(self, name):
         if hasattr(self._instance, name):
             return getattr(self._instance, name)
-        return Context.NONE_VALUE
+        return ResultValue(None)
 
