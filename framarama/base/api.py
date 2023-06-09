@@ -112,7 +112,6 @@ class ApiClient(Singleton):
         return ApiResultList(data, lambda d: self._map(d, model, keys_ignore))
 
     def _item(self, data, model, keys_ignore=None):
-        _keys_ignore = keys_ignore if keys_ignore != None else []
         return ApiResultItem(data, lambda d: self._map(d, model, keys_ignore))
 
     def get_url(self, url, method=METHOD_GET, data=None, headers={}, **kwargs):
