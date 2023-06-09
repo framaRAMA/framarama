@@ -390,9 +390,9 @@
   </ul>
 {% endmacro %}
 
-{% macro form_start(form, csrf, title) %}
+{% macro form_start(form, csrf, title, submit_click=None) %}
   {% if title %}<h5 class="pt-2">{{ title }}</h5>{% endif %}
-  <form class="pt-2" method="post">
+  <form class="pt-2" method="post"{% if submit_click %}onclick="return {{ submit_click }};"{% endif %}>
     {{ csrf }}
     {% if form.is_bound and not form.is_valid() %}
       {{ note_start('The following errors occurred', 'danger') }}
@@ -474,8 +474,8 @@
   </form>
 {% endmacro %}
 
-{% macro form(form, csrf_input, submit_title='Create', submit_class='btn-primary', cancel=None, cancel_title='Cancel') %}
-  {{ form_start(form, csrf_input) }}
+{% macro form(form, csrf_input, submit_title='Create', submit_click=None, submit_class='btn-primary', cancel=None, cancel_title='Cancel') %}
+  {{ form_start(form, csrf_input, submit_click=submit_click) }}
   {% for field in form %}{{ form_field(form, field) }}{% endfor %}
   {{ form_end(form, submit_title=submit_title, submit_class=submit_class, cancel=cancel, cancel_title=cancel_title) }}
 {% endmacro %}
