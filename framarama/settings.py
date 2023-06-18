@@ -102,7 +102,7 @@ LOGGING = {
     },
     'loggers': {
         'django.db.backends': {
-            'level': 'INFO',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'handlers': ['console'],
             'propagate': False,
         },
@@ -114,7 +114,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',
+        'level': 'DEBUG' if DEBUG else 'INFO',
     },
 }
 
