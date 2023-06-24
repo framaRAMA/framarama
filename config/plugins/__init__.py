@@ -117,10 +117,12 @@ class PluginRegistry:
 
     @classmethod
     def get_enabled(cls, models):
+        return cls.get_all([_model for _model in models if _model.enabled])
+
+    @classmethod
+    def get_all(cls, models):
         _plugins = []
         for _model in models:
-            if not _model.enabled:
-                continue
             _plugin = cls.get(_model.plugin)
             if not _plugin:
                 logger.warn("Unknown {} plugin {} - skipping.".format(cls.__name__, _model.plugin))
