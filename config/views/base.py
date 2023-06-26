@@ -80,6 +80,11 @@ class BaseFrameConfigView(BaseConfigView):
         _context['frame'] = self.get_frames().get(id=frame_id)
         return _context
 
+    def _post(self, request, frame_id, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _context['frame'] = self.get_frames().get(id=frame_id)
+        return _context
+
 
 class BaseSourceFrameConfigView(BaseFrameConfigView):
 
