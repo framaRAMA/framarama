@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Plugin:
+    _plugin_field = 'plugin'
     _plugin_config_field = 'plugin_config'
     _attrs_required = {
       'CAT': 'Implementation is missing category identifier (CAT)',
@@ -31,11 +32,14 @@ class Plugin:
         self.cat = self.impl.CAT
         self.title = self.impl.TITLE
         self.descr = self.impl.DESCR
-        self._base_model = self._find_base_model(self.impl.Model)
+        self._model = self.impl.Model
+        self._model_fields = [_field.name for _field in self._model().get_fields()]
+        self._base_model = self._find_base_model(self._model)
+        self._base_model_fields = [_field.name for _field in self._base_model().get_fields()]
         self._instances = {}
 
     def _find_base_model(self, cls):
-        if Plugin._plugin_config_field in [_name for _name, _value in vars(cls).items()]:
+        if Plugin._plugin_config_field in vars(cls).keys():
             return cls
         for _base_cls in cls.__bases__:
             _cls = self._find_base_model(_base_cls)
@@ -47,27 +51,36 @@ class Plugin:
         _values = instance.get_field_values()
         _plugin_config = _values.pop(Plugin._plugin_config_field)
         if _plugin_config:
-            _fields = [_field.name for _field in self.impl.Model._meta.fields]
-            _values.update({_n: _v for _n, _v in _plugin_config.items() if _n in _fields})
-        _model = self.impl.Model(**_values)
+            _values.update({_n: _v for _n, _v in _plugin_config.items() if _n in self._model_fields})
+        _model = self._model(**_values)
         _model._base = instance
         return _model
 
     def load_model(self, identifier):
         return self.create_model(self._base_model.objects.filter(pk=identifier).get())
 
+    def update_model(self, instance, values, base_values=False):
+        _values = values.copy()
+        _values[Plugin._plugin_field] = self.name
+        if base_values:
+            for _name in [_name for _name in values if _name not in self._base_model_fields]:
+                del _values[_name]
+            for _name in [_name for _name in values.get(Plugin._plugin_config_field, {}) if _name not in self._model_fields]:
+                del _values[Plugin._plugin_config_field][_name]
+        else:
+            _values[Plugin._plugin_config_field] = {}
+            for _name in [_name for _name in values.keys() if _name in self._model_fields]:
+                _values[Plugin._plugin_config_field][_name] = values[_name]
+        for _name in [_name for _name in _values.keys() if _name in self._base_model_fields]:
+            setattr(instance, _name, _values[_name])
+
     def save_model(self, model):
         _values = model.get_field_values()
-        _values[Plugin._plugin_config_field] = {}
-        _model_fields = [_field.name for _field in model.get_fields()]
-        for _name in [_name for _name in _values.keys() if _name in _model_fields]:
-            _values[Plugin._plugin_config_field][_name] = _values.pop(_name)
         if model.id:
             _instance = self._base_model.objects.filter(pk=model.id).get()
-            for _name, _value in _values.items():
-                setattr(_instance, _name, _value)
         else:
-            _instance = self._base_model(**_values)
+            _instance = self._base_model()
+        self.update_model(_instance, _values)
         _instance.save()
 
     def delete_model(self, model):
@@ -75,7 +88,7 @@ class Plugin:
         _instance.delete();
 
     def get_create_form(self, *args, **kwargs):
-        kwargs['instance'] = self.impl.Model()
+        kwargs['instance'] = self._model()
         return self.impl.CreateForm(*args, **kwargs)
 
     def get_update_form(self, *args, **kwargs):
