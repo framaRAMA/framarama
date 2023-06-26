@@ -149,9 +149,31 @@
       </div>
     </div>
     <div id="exImImportTab" role="tabpanel" aria-labelledby="exImImport" class="tab-pane fade">
-      Some other content
+      <div class="pb-3">
+        Import JSON file to replace the current configuration.
+      </div>
+      <div id="exImImportError" class="d-none">
+        {{ lib.note('Error importing configuration', 'danger') }}
+      </div>
+      <div class="pb-3">
+        {{ lib.form_upload('file_upload_eximport', form_import, csrf_input, url('frame_finishing_import', args=[frame.id]), 'file_upload_eximport', submit_title='Import') }}
+      </div>
     </div>
+    <script type="text/javascript">
+      function file_upload_eximport(response) {
+        if (response.status == 200) {
+          window.document.location.reload();
+        } else {
+          const elNote = document.getElementById('exImImportError');
+          const elMessage = elNote.querySelector('p');
+          const msg = response.status + ' ' + response.statusText;
+          if (elMessage.children.length < 3) elMessage.innerHTML += '<span>' + msg + '</span>';
+          else elMessage.children[2].innerHTML = msg;
+          cssRemove(elNote, 'd-none');
+        }
+      }
+    </script>
   </div>
-{{ lib.modal_end() }}
+{{ lib.modal_end(cancel_title=None) }}
 
 {% endblock %}

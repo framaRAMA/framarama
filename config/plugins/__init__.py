@@ -158,6 +158,40 @@ class PluginRegistry:
           'data': serializer(models, many=True).data
         })
 
+    @classmethod
+    def import_config(cls, config, serializer, models):
+        def _create_model(ordering, item):
+            _plugin = cls.get(item['plugin'])
+            _model = _plugin.create_model()
+            _plugin.update_model(_model, item, True)
+            _model.ordering = ordering
+            _plugin.save_model(_model)
+        def _update_model(ordering, sitem, titem):
+            _plugin = cls.get(sitem['plugin'])
+            _model = titem[1]
+            _plugin.update_model(_model, sitem, True)
+            _model.id = titem[1].id
+            _model.ordering = ordering
+            _plugin.save_model(_model)
+        def _delete_model(ordering, item):
+            item[0].delete_model(item[1])
+        _import = {}
+        for _item in config['data']:
+            _s = serializer(data=_item)
+            if _s.is_valid():
+                _import[len(_import)] = _s.validated_data
+        _models = {}
+        for _model in cls.get_all(models):
+            _models[len(_models)] = _model
+        utils.Lists.process(
+            _import.items(),
+            lambda items: [(_ordering, _models[_ordering]) for _ordering in items if _ordering in _models],
+            _models.items(),
+            lambda items: [(_ordering, _import[_ordering]) for _ordering in items if _ordering in _import],
+            create_func=_create_model,
+            update_func=_update_model,
+            delete_func=_delete_model)
+
 
 class PluginImplementation:
 

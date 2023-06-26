@@ -1,7 +1,10 @@
 
 from django.views.generic import RedirectView
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
 
+from framarama.base import utils
+from framarama.base.forms import UploadFieldForm
 from config import jobs
 from config import models
 from config import plugins
@@ -386,6 +389,7 @@ class ListFinishingFrameView(base.BaseFrameConfigView):
             _finishings.append(_plugin.create_model(_finishing))
         _context['finishings'] = _finishings
         _context['finishing_plugins'] = plugins.FinishingPluginRegistry.all()
+        _context['form_import'] = UploadFieldForm()
         return _context
 
 
@@ -468,7 +472,29 @@ class ExportFinishingFrameView(base.BaseFrameConfigView):
             'Finishing export of frame #{}'.format(frame_id),
             FinishingSerializer,
             _frame.finishings.all())
-        self.response_download(_context, _export, 'application/json')
+        self.response_download(_context, _config, 'application/json')
+        return _context
+
+
+class ImportFinishingFrameView(base.BaseFrameConfigView):
+
+    def _post(self, request, frame_id, *args, **kwargs):
+        _context = super()._post(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _form = UploadFieldForm(request.POST, request.FILES)
+        if _form.is_valid():
+            _upload = request.FILES['upload']
+            if _upload.size > 1024*1024:
+                raise ValidationError('Upload too large (limit 1 MB)')
+            try:
+                _config = utils.Json.to_dict(_upload.read())
+            except Exception as e:
+                raise ValidationError('Can not parse JSON: ' + str(e))
+            plugins.FinishingPluginRegistry.import_config(
+                _config,
+                FinishingSerializer,
+                _frame.finishings.all())
+        self.response_json(_context, {})
         return _context
 
 
