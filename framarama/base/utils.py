@@ -197,6 +197,9 @@ class Process:
 
     @staticmethod
     def eval(code, global_vars={}, local_vars={}):
+        _global_vars = global_vars.copy()
+        _global_vars['__builtins__'] = None
+        _global_vars['__import__'] = None
         return eval(code, global_vars, local_vars)
 
 
