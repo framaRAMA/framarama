@@ -415,6 +415,7 @@
   {% set class_map = {
     'Checkbox' : 'form-check',
     'CheckboxSelectMultiple' : 'form-check-multiple',
+    'ClearableFileInput' : 'form-field',
   } %}
   {% set field_class = field.field.widget.__class__.__name__ %}
   {% set input_class = class_map[field_class] if field_class in class_map else 'form-floating' %}
@@ -423,11 +424,11 @@
     {{ field }}
   {% else %}
     <div class="mb-3 {{ input_class }} {{ input_error_class }}">
-        {% if field_class != 'CheckboxSelectMultiple' %}
+        {% if field_class != 'CheckboxSelectMultiple' and field_class != 'ClearableFileInput' %}
           {{ field }}
         {% endif %}
         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {% if field_class == 'CheckboxSelectMultiple' %}
+        {% if field_class == 'CheckboxSelectMultiple' or field_class == 'ClearableFileInput' %}
           {{ field }}
         {% endif %}
         {% if field_class == 'GenerateKeyTextInput' %}

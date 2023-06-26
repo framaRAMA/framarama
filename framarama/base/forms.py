@@ -33,6 +33,10 @@ def passwordFieldWidget(*args, **kwargs):
     return forms.PasswordInput(attrs={'class':'form-control'}, *args, **kwargs)
 
 
+def fileWidget(*args, **kwargs):
+    return forms.ClearableFileInput(attrs={'class':'form-control'}, *args, **kwargs)
+
+
 def generatedKeyCharFieldWidget(length=32, *args, **kwargs):
     class GenerateKeyTextInput(forms.TextInput):
         pass
