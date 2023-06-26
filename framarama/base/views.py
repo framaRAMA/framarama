@@ -58,6 +58,9 @@ class BaseView(TemplateView):
     def response(self, context, data, mime=None):
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
 
+    def response_json(self, context, data):
+        self.response(context, utils.Json.from_dict(data), 'application/json')
+
     def response_download(self, context, data, mime=None, filename=None):
         _ext = mimetypes.guess_extension(mime) if mime else ''
         if filename:
