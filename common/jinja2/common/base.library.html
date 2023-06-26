@@ -392,7 +392,7 @@
 
 {% macro form_start(form, csrf, title, submit_click=None) %}
   {% if title %}<h5 class="pt-2">{{ title }}</h5>{% endif %}
-  <form class="pt-2" method="post"{% if submit_click %}onclick="return {{ submit_click }};"{% endif %}>
+  <form class="pt-2" method="post"{% if submit_click %} onsubmit="return {{ submit_click }};"{% endif %}>
     {{ csrf }}
     {% if form.is_bound and not form.is_valid() %}
       {{ note_start('The following errors occurred', 'danger') }}
