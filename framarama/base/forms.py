@@ -64,3 +64,6 @@ class BaseModelForm(forms.ModelForm, BaseForm):
         return widgets
 
 
+class UploadFieldForm(forms.Form):
+    upload = forms.FileField(label='File', widget=fileWidget())
+

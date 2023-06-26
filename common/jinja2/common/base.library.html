@@ -481,6 +481,25 @@
   {{ form_end(form, submit_title=submit_title, submit_class=submit_class, cancel=cancel, cancel_title=cancel_title) }}
 {% endmacro %}
 
+{% macro form_upload(id, form_upload, csrf, url, callback, submit_title='Upload') %}
+  {{ form(form_upload, csrf, submit_title=submit_title, submit_click='form_upload_%s()'|format(id)) }}
+  <script type="text/javascript">
+    function form_upload_{{ id }}() {
+      var formdata = new FormData();
+      formdata.append('upload', document.querySelector('input[id="id_upload"]').files[0]);
+      fetch(new Request('{{ url }}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value},
+        mode: 'same-origin',
+        body: formdata
+      })).then(response => {
+        {{ callback }}(response);
+      });
+      return false;
+    }
+  </script>
+{% endmacro %}
+
 {% macro field_text(name, value) %}
   <div class="row">
     <label class="col-sm-3 col-form-label">{{ name }}</label>
