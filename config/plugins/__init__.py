@@ -135,7 +135,7 @@ class PluginRegistry:
         return cls._get_instance()._registry
 
     @classmethod
-    def export(cls, name, title, serializer, models):
+    def export_config(cls, name, title, serializer, models):
         return utils.Json.from_dict({
           'version': 1,
           'name': name,

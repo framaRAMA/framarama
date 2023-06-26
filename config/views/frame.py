@@ -463,7 +463,7 @@ class ExportFinishingFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _export = plugins.PluginRegistry.export(
+        _config = plugins.FinishingPluginRegistry.export_config(
             'export.frame.{}.finishings'.format(frame_id),
             'Finishing export of frame #{}'.format(frame_id),
             FinishingSerializer,
