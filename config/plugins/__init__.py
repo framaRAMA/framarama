@@ -47,7 +47,8 @@ class Plugin:
                 return _cls
         return None
 
-    def create_model(self, instance):
+    def create_model(self, instance=None):
+        instance = instance if instance else self._model()
         _values = instance.get_field_values()
         _plugin_config = _values.pop(Plugin._plugin_config_field)
         if _plugin_config:
