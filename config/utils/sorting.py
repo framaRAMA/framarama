@@ -10,9 +10,10 @@ from config.plugins import SortingPluginRegistry
 
 class Context:
 
-    def __init__(self, frame, random_item=False):
+    def __init__(self, frame, random_item=False, sortings=None):
         self._frame = frame
         self._random_item = random_item
+        self._sortings = sortings
         self._data = {'Item': self._frame.items.order_by(), 'Model': Model, 'Function': Function}
     
     def get_frame(self):
@@ -20,7 +21,10 @@ class Context:
 
     def get_random_item(self):
         return self._random_item
-    
+
+    def get_sortings(self):
+        return self._sortings
+
     def get_data(self):
         return self._data
 
@@ -42,7 +46,10 @@ Item = models.Item.objects
         _result = {'errors':{}}
         _queries = []
         _data = self._context.get_data()
-        for _plugin, _sorting in SortingPluginRegistry.get_enabled(self._context.get_frame().sortings.all()):
+        _sortings = self._context.get_sortings()
+        if not _sortings:
+            _sortings = self._context.get_frame().sortings.all()
+        for _plugin, _sorting in SortingPluginRegistry.get_enabled(_sortings):
             _code = _plugin.run(_sorting, self._context)
             _code = re.sub(r"[\r\n]+\s*", "", _code)  # fix indent by removing newline/whitespaces
             try:
