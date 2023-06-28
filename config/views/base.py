@@ -121,6 +121,13 @@ class BaseSortingFrameConfigView(BaseFrameConfigView):
         _context['sorting'] = _sorting
         return _context
 
+    def _post(self, request, frame_id, sorting_id, *args, **kwargs):
+        _context = super()._post(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _sorting = _frame.sortings.get(pk=sorting_id)
+        _context['sorting'] = _sorting
+        return _context
+
 
 class BaseFinishingFrameConfigView(BaseFrameConfigView):
 
