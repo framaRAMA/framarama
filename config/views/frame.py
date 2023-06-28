@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.views.generic import RedirectView
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
@@ -382,7 +383,7 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
         _context = super()._post(request, frame_id, sorting_id, *args, **kwargs)
         _frame = _context['frame']
         _code= request.POST.get('code')
-        if _code:
+        if settings.FRAMARAMA['CONFIG_SORTING_EVAL_QUERY'] and _code:
             _plugin = plugins.SortingPluginRegistry.get('custom')
             _custom = _plugin.create_model()
             _custom.code = _code
@@ -403,7 +404,7 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
                 'items': _items
             })
         else:
-            self.response_json(_context, {})
+            self.response_json(_context, {'items': []})
         return _context
 
 

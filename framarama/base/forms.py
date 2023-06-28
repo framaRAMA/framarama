@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 
 
 def hiddenFieldWidget(*args, **kwargs):
@@ -44,9 +45,12 @@ def generatedKeyCharFieldWidget(length=32, *args, **kwargs):
 
 
 def customSortingQueryFieldWidget(*args, **kwargs):
-    class CustomSortingQueryTextInput(forms.Textarea):
-        pass
-    return CustomSortingQueryTextInput(attrs={'class':'form-control', 'style':'height:15em;'}, *args, **kwargs)
+    if settings.FRAMARAMA['CONFIG_SORTING_EVAL_QUERY']:
+        class CustomSortingQueryTextInput(forms.Textarea):
+            pass
+        return CustomSortingQueryTextInput(attrs={'class':'form-control', 'style':'height:15em;'}, *args, **kwargs)
+    else:
+        return textareaFieldWidget(*args, **kwargs)
 
 
 class BaseForm(forms.Form):
