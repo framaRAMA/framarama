@@ -89,7 +89,7 @@ class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
     source = SourceSerializer()
     class Meta:
         model = models.RankedItem
-        fields = ['rank', 'id', 'url', 'source']
+        fields = ['rank', 'id', 'url', 'date_creation', 'source']
         abstract = True
 
 
