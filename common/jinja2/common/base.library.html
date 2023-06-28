@@ -444,6 +444,53 @@
               field.value = gen;
             }
           </script>
+        {% elif field_class == 'CustomSortingQueryTextInput' %}
+          <button id="{{ field.id_for_label }}sortqueryeval" tabindex="0" type="button" class="sort-query-eval-button" data-bs-toggle="modal" data-bs-target="#{{ field.id_for_label }}sortqueryevalmodal">
+            {{ icon('action.run') }}
+          </button>
+          <script type="text/javascript">
+            window.document.getElementById('{{ field.id_for_label }}sortqueryeval').onclick = function () {
+              const value = this.parentElement.querySelector('[id="{{ field.id_for_label }}"]').value;
+              const codeField = this.parentElement.querySelector('[id="{{ field.id_for_label }}sortqueryevalcode"]');
+              codeField.value = value;
+            }
+          </script>
+          {{ modal_start(field.id_for_label + 'sortqueryevalmodal', 'Query evaluation', 'modal-fullscreen h-100') }}
+            <div class="mb-3 form-floating vh-25">
+              <textarea id="{{ field.id_for_label }}sortqueryevalcode" cols="40" rows="10" class="form-control h-100" required="" id="id_code"></textarea>
+              <label for="{{ field.id_for_label }}sortqueryevalcode" class="form-label">Query</label>
+            </div>
+            <button id="{{ field.id_for_label }}sortqueryevalbtn" type="button" class="btn btn-primary w-100">Run</button>
+            <div id="{{ field.id_for_label }}sortqueryevalresult" class="overflow-auto h-50">
+            </div>
+            <script type="text/javascript">
+              window.document.getElementById('{{ field.id_for_label }}sortqueryevalbtn').onclick = function () {
+                const field = window.document.getElementById('{{ field.id_for_label }}sortqueryevalcode');
+                const formdata = new FormData();
+                formdata.append('code', field.value);
+                fetch(new Request('eval', {
+                  method: 'POST',
+                  headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value},
+                  mode: 'same-origin',
+                  body: formdata
+                }))
+                .then(response => response.json())
+                .then(data => {
+                  var html = '<h5 class="pt-2">Results</h5>';
+                  data.items.forEach(item => {
+                    html += '<div class="row">';
+                    html += '<div class="col-2">' + item.id + '</div>';
+                    html += '<div class="col-6">' + item.url+ '</div>';
+                    html += '<div class="col-4">' + item.date_creation + '</div>';
+                    html += '</div>';
+                    window.console.log(item);
+                  });
+                  const result = window.document.getElementById('{{ field.id_for_label }}sortqueryevalresult');
+                  result.innerHTML = html;
+                });
+              }
+            </script>
+          {{ modal_end() }}
         {% endif %}
         {% if field.help_text %}
           <div id="help{{ field.id_for_label }}" class="form-text">{{ field.help_text|safe }}</div>

@@ -14,7 +14,7 @@ FIELDS = [
     'code',
 ]
 WIDGETS = {
-    'code': base.textareaFieldWidget(),
+    'code': base.customSortingQueryFieldWidget(),
 }
 
 class CustomModel(Sorting):

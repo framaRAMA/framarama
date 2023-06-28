@@ -13,7 +13,7 @@ from config.views import base
 from config.utils import source
 from config.utils import sorting
 from config.utils import finishing
-from api.views.config import FinishingSerializer
+from api.views.config import FinishingSerializer, RankedItemSerializer
 
 
 class CreateFrameView(base.BaseConfigView):
@@ -374,6 +374,36 @@ class ActionSortingFrameView(base.BaseSortingFrameConfigView):
         if _action == 'delete':
             self._item_order_delete(_sorting.pk, _frame.sortings)
         self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
+        return _context
+
+class EvalSortingFrameView(base.BaseSortingFrameConfigView):
+
+    def _post(self, request, frame_id, sorting_id, *args, **kwargs):
+        _context = super()._post(request, frame_id, sorting_id, *args, **kwargs)
+        _frame = _context['frame']
+        _code= request.POST.get('code')
+        if _code:
+            _plugin = plugins.SortingPluginRegistry.get('custom')
+            _custom = _plugin.create_model()
+            _custom.code = _code
+
+            _page = request.GET.get('page', 0)
+            _page_size = request.GET.get('page_size', 20)
+            _processor = sorting.Processor(sorting.Context(_frame, sortings=[_custom]))
+            _result = _processor.process()
+            _result['items'] = Paginator(_result['items'], _page_size).get_page(_page)
+            _items = []
+            for _item in _result['items']:
+                _serializer = RankedItemSerializer(_item)
+                _items.append(_serializer.data)
+            self.response_json(_context, {
+                'start': _result['items'].start_index(),
+                'end': _result['items'].end_index(),
+                'page': _page,
+                'items': _items
+            })
+        else:
+            self.response_json(_context, {})
         return _context
 
 

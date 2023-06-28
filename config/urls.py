@@ -36,6 +36,7 @@ urlpatterns = [
     path('frames/<int:frame_id>/sortings/create?plugin=<str:plugin>', frame.CreateSortingFrameView.as_view(), name='frame_sorting_create'),
     path('frames/<int:frame_id>/sortings/<int:sorting_id>/edit', frame.UpdateSortingFrameView.as_view(), name='frame_sorting_edit'),
     path('frames/<int:frame_id>/sortings/<int:sorting_id>/action', frame.ActionSortingFrameView.as_view(), name='frame_sorting_action'),
+    path('frames/<int:frame_id>/sortings/<int:sorting_id>/eval', frame.EvalSortingFrameView.as_view(), name='frame_sorting_eval'),
 
     path('frames/<int:frame_id>/finishings', frame.ListFinishingFrameView.as_view(), name='frame_finishing_list'),
     path('frames/<int:frame_id>/finishings/export', frame.ExportFinishingFrameView.as_view(), name='frame_finishing_export'),

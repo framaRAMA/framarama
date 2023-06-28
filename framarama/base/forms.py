@@ -43,6 +43,12 @@ def generatedKeyCharFieldWidget(length=32, *args, **kwargs):
     return GenerateKeyTextInput(attrs={'class':'form-control', 'generate-length':length}, *args, **kwargs)
 
 
+def customSortingQueryFieldWidget(*args, **kwargs):
+    class CustomSortingQueryTextInput(forms.Textarea):
+        pass
+    return CustomSortingQueryTextInput(attrs={'class':'form-control', 'style':'height:15em;'}, *args, **kwargs)
+
+
 class BaseForm(forms.Form):
 
     def field_groups(self):
