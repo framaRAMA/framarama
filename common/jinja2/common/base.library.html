@@ -460,14 +460,26 @@
               <textarea id="{{ field.id_for_label }}sortqueryevalcode" cols="40" rows="10" class="form-control h-100" required="" id="id_code"></textarea>
               <label for="{{ field.id_for_label }}sortqueryevalcode" class="form-label">Query</label>
             </div>
+            <div class="mb-3 form-floating vh-25">
+              <input id="{{ field.id_for_label }}sortqueryevalpage" class="form-control" required="" id="id_page"/>
+              <label for="{{ field.id_for_label }}sortqueryevalpage" class="form-label">Page</label>
+            </div>
+            <div class="mb-3 form-floating vh-25">
+              <input id="{{ field.id_for_label }}sortqueryevalsize" class="form-control" required="" id="id_code"/>
+              <label for="{{ field.id_for_label }}sortqueryevalsize" class="form-label">Page size</label>
+            </div>
             <button id="{{ field.id_for_label }}sortqueryevalbtn" type="button" class="btn btn-primary w-100">Run</button>
             <div id="{{ field.id_for_label }}sortqueryevalresult" class="overflow-auto h-50">
             </div>
             <script type="text/javascript">
               window.document.getElementById('{{ field.id_for_label }}sortqueryevalbtn').onclick = function () {
-                const field = window.document.getElementById('{{ field.id_for_label }}sortqueryevalcode');
+                const queryField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalcode');
+                const pageField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalpage');
+                const pageSizeField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalsize');
                 const formdata = new FormData();
-                formdata.append('code', field.value);
+                formdata.append('code', queryField.value);
+                formdata.append('page', pageField.value);
+                formdata.append('page_size', pageSizeField.value);
                 fetch(new Request('eval', {
                   method: 'POST',
                   headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value},

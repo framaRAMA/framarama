@@ -383,13 +383,16 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
         _context = super()._post(request, frame_id, sorting_id, *args, **kwargs)
         _frame = _context['frame']
         _code= request.POST.get('code')
+        _page= request.POST.get('page') or 0
+        _page_size = request.POST.get('page_size') or 20
         if settings.FRAMARAMA['CONFIG_SORTING_EVAL_QUERY'] and _code:
             _plugin = plugins.SortingPluginRegistry.get('custom')
             _custom = _plugin.create_model()
             _custom.code = _code
 
-            _page = request.GET.get('page', 0)
-            _page_size = request.GET.get('page_size', 20)
+            if int(_page_size) > 100:
+                _page_size = 100
+
             _processor = sorting.Processor(sorting.Context(_frame, sortings=[_custom]))
             _result = _processor.process()
             _result['items'] = Paginator(_result['items'], _page_size).get_page(_page)
