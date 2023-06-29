@@ -386,26 +386,29 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
         _page= request.POST.get('page') or 0
         _page_size = request.POST.get('page_size') or 20
         if settings.FRAMARAMA['CONFIG_SORTING_EVAL_QUERY'] and _code:
-            _plugin = plugins.SortingPluginRegistry.get('custom')
-            _custom = _plugin.create_model()
-            _custom.code = _code
+            try:
+                _plugin = plugins.SortingPluginRegistry.get('custom')
+                _custom = _plugin.create_model()
+                _custom.code = _code
 
-            if int(_page_size) > 100:
-                _page_size = 100
+                if int(_page_size) > 100:
+                    _page_size = 100
 
-            _processor = sorting.Processor(sorting.Context(_frame, sortings=[_custom]))
-            _result = _processor.process()
-            _result['items'] = Paginator(_result['items'], _page_size).get_page(_page)
-            _items = []
-            for _item in _result['items']:
-                _serializer = RankedItemSerializer(_item)
-                _items.append(_serializer.data)
-            self.response_json(_context, {
-                'start': _result['items'].start_index(),
-                'end': _result['items'].end_index(),
-                'page': _page,
-                'items': _items
-            })
+                _processor = sorting.Processor(sorting.Context(_frame, sortings=[_custom]))
+                _result = _processor.process()
+                _result['items'] = Paginator(_result['items'], _page_size).get_page(_page)
+                _items = []
+                for _item in _result['items']:
+                    _serializer = RankedItemSerializer(_item)
+                    _items.append(_serializer.data)
+                self.response_json(_context, {
+                    'start': _result['items'].start_index(),
+                    'end': _result['items'].end_index(),
+                    'page': _page,
+                    'items': _items
+                })
+            except Exception as e:
+                self.response_json(_context, {'items': [], 'error': str(e)})
         else:
             self.response_json(_context, {'items': []})
         return _context

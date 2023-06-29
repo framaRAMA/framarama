@@ -497,6 +497,9 @@
                     html += '</div>';
                     window.console.log(item);
                   });
+                  if (data.error != undefined) {
+                    html += '<span class="text-danger">Error: ' + data.error + '</span>';
+                  }
                   const result = window.document.getElementById('{{ field.id_for_label }}sortqueryevalresult');
                   result.innerHTML = html;
                 });
