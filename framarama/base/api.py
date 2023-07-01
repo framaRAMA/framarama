@@ -4,7 +4,7 @@ import requests
 from django.conf import settings
 
 from config import models as config_models
-from framarama.base.utils import Singleton, Config
+from framarama.base.utils import Singleton, Config, Network
 
 class ApiResult:
 
@@ -54,10 +54,10 @@ class ApiResultList(ApiResult):
 
 
 class ApiClient(Singleton):
-    METHOD_GET = 'GET'
-    METHOD_POST = 'POST'
-    METHOD_PUT = 'PUT'
-    METHOD_HEAD = 'HEAD'
+    METHOD_GET = Network.METHOD_GET
+    METHOD_POST = Network.METHOD_POST
+    METHOD_PUT = Network.METHOD_PUT
+    METHOD_HEAD = Network.METHOD_HEAD
 
     def __init__(self):
         super().__init__()
@@ -80,22 +80,7 @@ class ApiClient(Singleton):
         return self._base_url != None and self._display_access_key != None
 
     def _http(self, url, method, data=None, headers={}, **kwargs):
-        _headers = {}
-        _headers['Connection'] = 'close'
-        _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in self._user_agent.items() if _v])
-        _headers.update(headers.copy())
-        if method == ApiClient.METHOD_GET:
-            _response = requests.get(url, timeout=(15, 30), headers=_headers, **kwargs)
-        elif method == ApiClient.METHOD_POST:
-            if 'Content-Type' not in _headers:
-                _headers['Content-Type'] = 'application/json; charset=utf-8'
-                kwargs['json'] = data
-            else:
-                kwargs['data'] = data
-            _response = requests.post(url, timeout=(15, 30), headers=_headers, **kwargs)
-        else:
-            raise Exception("Can not handle HTTP method {}".format(method))
-        return _response
+        return Network.get_url(url, method, data, headers, self._user_agent, **kwargs)
 
     def _request(self, path, method=METHOD_GET, data=None):
         if not self.configured():

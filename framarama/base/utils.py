@@ -10,6 +10,7 @@ import signal
 import logging
 import json
 import importlib
+import requests
 
 from django.utils import dateparse, timezone
 
@@ -440,3 +441,29 @@ class Lists:
                 if delete_func:
                     delete_func(_id, _tmap[_id])
         return _stats
+
+
+class Network:
+    METHOD_GET = 'GET'
+    METHOD_POST = 'POST'
+    METHOD_PUT = 'PUT'
+    METHOD_HEAD = 'HEAD'
+
+    @staticmethod
+    def get_url(url, method, data=None, headers={}, user_agent={}, **kwargs):
+        _headers = {}
+        _headers['Connection'] = 'close'
+        _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in user_agent.items() if _v])
+        _headers.update(headers)
+        if method == Network.METHOD_GET:
+            _response = requests.get(url, timeout=(15, 30), headers=_headers, **kwargs)
+        elif method == Network.METHOD_POST:
+            if 'Content-Type' not in _headers:
+                _headers['Content-Type'] = 'application/json; charset=utf-8'
+                kwargs['json'] = data
+            else:
+                kwargs['data'] = data
+            _response = requests.post(url, timeout=(15, 30), headers=_headers, **kwargs)
+        else:
+            raise Exception("Can not handle HTTP method {}".format(method))
+        return _response
