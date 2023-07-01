@@ -4,6 +4,7 @@ import mimetypes
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Q
+from django.http import StreamingHttpResponse
 from rest_framework import generics, viewsets, mixins, permissions, serializers, decorators, response
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
@@ -269,6 +270,14 @@ class ItemDisplayViewSet(BaseViewSet):
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
         return self.qs().items.filter(frame__display__id=_display_id)
+
+    @decorators.action(detail=True, url_path='download', url_name='display_item_all_download')
+    def download(self, request, display_id, pk):
+        _item = self.get_object()
+        _response = utils.Network.get_url(_item.url, utils.Network.METHOD_GET, stream=True)
+        return StreamingHttpResponse(
+            (_chunk for _chunk in _response.iter_content(1024*64)),
+            content_type=_response.headers['content-type'] or 'application/octet-stream')
 
 
 class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
