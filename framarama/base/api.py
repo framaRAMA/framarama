@@ -82,12 +82,12 @@ class ApiClient(Singleton):
     def _http(self, url, method, data=None, headers={}, **kwargs):
         return Network.get_url(url, method, data, headers, self._user_agent, **kwargs)
 
-    def _request(self, path, method=METHOD_GET, data=None):
+    def _request(self, path, method=METHOD_GET, data=None, raw=False):
         if not self.configured():
             raise Exception("API client not configured")
         _response = self._http(self._base_url + path, method, data, {'X-Display': self._display_access_key})
         _response.raise_for_status()
-        return _response.json()
+        return _response if raw else _response.json()
 
     def _map(self, data, model, keys_ignore=None):
         _keys_ignore = keys_ignore if keys_ignore != None else []
@@ -107,6 +107,14 @@ class ApiClient(Singleton):
         if _data and 'results' in _data and len(_data['results']):
             return self._item(_data['results'][0], config_models.Display, ['device_type_name', 'frame'])
         return None
+
+    def get_item(self, display_id, item_id):
+        return self._item(
+            self._request('/displays/{}/items/all/{}'.format(display_id, item_id)),
+            config_models.Item)
+
+    def get_item_download(self, display_id, item_id):
+        return self._request('/displays/{}/items/all/{}/download'.format(display_id, item_id), raw=True).content
 
     def get_items_list(self, display_id):
         return self._list(
