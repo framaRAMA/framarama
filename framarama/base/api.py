@@ -122,8 +122,8 @@ class ApiClient(Singleton):
             config_models.Item,
             ['rank'])
 
-    def get_items_next(self, display_id, hit=False):
-        _data = self._request('/displays/{}/items/next?hit={}'.format(display_id, int(hit)))
+    def get_items_next(self, display_id):
+        _data = self._request('/displays/{}/items/next'.format(display_id))
         _result = self._list(_data, config_models.Item, ['rank'])
         return _result.get(0) if _result.count() > 0 else None
 

@@ -345,9 +345,9 @@ class Display(Singleton):
         else:
             self._client.submit_item_hit(self.get_id(), _item.id)
 
-    def get_next_item(self, refresh=False, hit=False):
+    def get_next_item(self, refresh=False):
         if self._next is None or refresh:
-            self._next = self._client.get_items_next(self.get_id(), hit)
+            self._next = self._client.get_items_next(self.get_id())
         return self._next
 
     def get_contexts(self, refresh=False):
