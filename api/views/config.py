@@ -30,10 +30,14 @@ class BaseSerializer:
         return reverse(view_name, args=args, request=self.get_request())
 
 
-class FrameSerializer(serializers.HyperlinkedModelSerializer):
+class FrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+    url_items = serializers.SerializerMethodField()
     class Meta:
         model = models.Frame
-        fields = ['id', 'name', 'description', 'enabled', 'url']
+        fields = ['id', 'name', 'description', 'enabled', 'url', 'url_items']
+
+    def get_url_items(self, obj):
+        return self.reverse('frame_item-list', [obj.id])
 
 
 class SourceSerializer(serializers.HyperlinkedModelSerializer):
@@ -48,10 +52,13 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     frame = FrameSerializer()
     url_items_all = serializers.SerializerMethodField()
     url_items_next = serializers.SerializerMethodField()
+    url_finishings = serializers.SerializerMethodField()
+    url_contexts = serializers.SerializerMethodField()
+    url_status = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Display
-        fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'url', 'url_items_all', 'url_items_next']
+        fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'url', 'url_items_all', 'url_items_next', 'url_finishings', 'url_contexts', 'url_status']
 
     def get_enabled(self, obj):
         return obj.enabled and (obj.frame is None or obj.frame.enabled)
@@ -64,8 +71,16 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
         return self.reverse('display_item_all-list', args=[obj.id])
 
     def get_url_items_next(self, obj):
-        _kwargs = self.get_kwargs()
         return self.reverse('display_item_next-list', args=[obj.id])
+
+    def get_url_finishings(self, obj):
+        return self.reverse('display_finishing-list', [obj.id])
+
+    def get_url_contexts(self, obj):
+        return self.reverse('display_context-list', [obj.id])
+
+    def get_url_status(self, obj):
+        return self.reverse('display_status-list', [obj.id])
 
 
 class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
@@ -102,22 +117,36 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
         return _status
 
 
-class ItemSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class ItemFrameSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Item
+        fields = ('id', 'url')
+
+
+class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     url_download = serializers.SerializerMethodField()
     class Meta:
         model = models.Item
-        fields = ['id', 'url', 'url_download']
+        fields = ('id', 'url', 'url_download')
 
     def get_url_download(self, obj):
         _kwargs = self.get_kwargs()
         return self.reverse('display_item_all-display_item_all_download', [_kwargs['display_id'], obj.id])
 
 
-class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
+class RankedItemFrameSerializer(ItemFrameSerializer):
     source = SourceSerializer()
     class Meta:
         model = models.RankedItem
-        fields = ['rank', 'id', 'url', 'date_creation', 'source']
+        fields = ItemFrameSerializer.Meta.fields + ('rank', 'date_creation', 'source')
+        abstract = True
+
+
+class RankedItemDisplaySerializer(ItemDisplaySerializer):
+    source = SourceSerializer()
+    class Meta:
+        model = models.RankedItem
+        fields = ItemDisplaySerializer.Meta.fields + ('rank', 'id', 'url', 'date_creation', 'source')
         abstract = True
 
 
@@ -214,22 +243,30 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
         return _result
 
 
-class FinishingSerializer(serializers.HyperlinkedModelSerializer):
+class FinishingSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+    url = serializers.SerializerMethodField()
     class Meta:
         model = models.Finishing
         fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'url']
 
+    def get_url(self, obj):
+        _kwargs = self.get_kwargs()
+        return self.reverse('display_finishing-detail', [_kwargs['display_id'], obj.id])
 
-class ContextSerializer(serializers.HyperlinkedModelSerializer):
+
+class ContextSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+    url = serializers.SerializerMethodField()
     class Meta:
         model = models.FrameContext
         fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config', 'url']
 
+    def get_url(self, obj):
+        _kwargs = self.get_kwargs()
+        return self.reverse('display_context-detail', [_kwargs['display_id'], obj.id])
 
-class NextItemSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = models.Item
-        fields = ['id', 'url']
+
+class NextItemSerializer(RankedItemDisplaySerializer):
+    pass
 
 
 class BaseListView(generics.GenericAPIView):
@@ -255,7 +292,7 @@ class FrameViewSet(BaseViewSet):
 
 
 class FrameItemViewSet(BaseViewSet):
-    serializer_class = ItemSerializer
+    serializer_class = ItemFrameSerializer
     
     def get_queryset(self):
         _frame_id = self.kwargs.get('frame_id')
@@ -292,7 +329,7 @@ class StatusDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
 
 
 class ItemDisplayViewSet(BaseViewSet):
-    serializer_class = ItemSerializer
+    serializer_class = ItemDisplaySerializer
     
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
@@ -308,7 +345,7 @@ class ItemDisplayViewSet(BaseViewSet):
 
 
 class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
-    serializer_class = DisplayItemSerializer
+    serializer_class = ItemDisplaySerializer
 
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
@@ -334,7 +371,7 @@ class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
 
 
 class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
-    serializer_class = RankedItemSerializer
+    serializer_class = RankedItemDisplaySerializer
 
     def get_queryset(self, *args, **kwargs):
         _display_id = self.kwargs.get('display_id')

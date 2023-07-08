@@ -14,7 +14,7 @@ from config.views import base
 from config.utils import source
 from config.utils import sorting
 from config.utils import finishing
-from api.views.config import FinishingSerializer, RankedItemSerializer
+from api.views.config import FinishingSerializer, RankedItemFrameSerializer
 
 
 class CreateFrameView(base.BaseConfigView):
@@ -399,7 +399,7 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
                 _result['items'] = Paginator(_result['items'], _page_size).get_page(_page)
                 _items = []
                 for _item in _result['items']:
-                    _serializer = RankedItemSerializer(_item)
+                    _serializer = RankedItemFrameSerializer(_item)
                     _items.append(_serializer.data)
                 self.response_json(_context, {
                     'start': _result['items'].start_index(),
