@@ -33,7 +33,7 @@ class BaseSerializer:
 class FrameSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Frame
-        fields = ['id', 'name', 'description', 'enabled']
+        fields = ['id', 'name', 'description', 'enabled', 'url']
 
 
 class SourceSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,14 +42,16 @@ class SourceSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name']
 
 
-class DisplaySerializer(serializers.HyperlinkedModelSerializer):
+class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     enabled = serializers.SerializerMethodField()
     device_type_name = serializers.SerializerMethodField()
     frame = FrameSerializer()
+    url_items_all = serializers.SerializerMethodField()
+    url_items_next = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Display
-        fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame']
+        fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'url', 'url_items_all', 'url_items_next']
 
     def get_enabled(self, obj):
         return obj.enabled and (obj.frame is None or obj.frame.enabled)
@@ -57,6 +59,14 @@ class DisplaySerializer(serializers.HyperlinkedModelSerializer):
     def get_device_type_name(self, obj):
         choice = [value for value in models.DEVICE_CHOICES if value[0] == obj.device_type]
         return choice[0][1] if choice else None
+
+    def get_url_items_all(self, obj):
+        _kwargs = self.get_kwargs()
+        return self.reverse('display_item_all-list', args=[_kwargs['pk']])
+
+    def get_url_items_next(self, obj):
+        _kwargs = self.get_kwargs()
+        return self.reverse('display_item_next-list', args=[_kwargs['pk']])
 
 
 class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
@@ -93,10 +103,15 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
         return _status
 
 
-class ItemSerializer(serializers.HyperlinkedModelSerializer):
+class ItemSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+    url_download = serializers.SerializerMethodField()
     class Meta:
         model = models.Item
-        fields = ['id', 'url']
+        fields = ['id', 'url', 'url_download']
+
+    def get_url_download(self, obj):
+        _kwargs = self.get_kwargs()
+        return self.reverse('display_item_all-display_item_all_download', [_kwargs['display_id'], obj.id])
 
 
 class RankedItemSerializer(serializers.HyperlinkedModelSerializer):
@@ -147,7 +162,7 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.DisplayItem
         fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail']
-        read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit']
+        read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit', 'url']
 
     def create(self, validated_data):
         _view = self.context['view']
@@ -203,13 +218,13 @@ class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
 class FinishingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Finishing
-        fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config']
+        fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'url']
 
 
 class ContextSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.FrameContext
-        fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config']
+        fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config', 'url']
 
 
 class NextItemSerializer(serializers.HyperlinkedModelSerializer):
