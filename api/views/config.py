@@ -9,12 +9,25 @@ from rest_framework import generics, viewsets, mixins, permissions, serializers,
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.reverse import reverse
 
 from framarama.base import utils
 from framarama.base.views import BaseQuerySetMixin
 from config import models
 from config.utils import sorting, finishing
 from api import auth
+
+
+class BaseSerializer:
+
+    def get_request(self):
+        return self.context.get('request')
+
+    def get_kwargs(self):
+        return self.get_request().parser_context['kwargs']
+
+    def reverse(self, view_name, args):
+        return reverse(view_name, args=args, request=self.get_request())
 
 
 class FrameSerializer(serializers.HyperlinkedModelSerializer):
