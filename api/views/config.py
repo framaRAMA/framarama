@@ -61,12 +61,11 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
         return choice[0][1] if choice else None
 
     def get_url_items_all(self, obj):
-        _kwargs = self.get_kwargs()
-        return self.reverse('display_item_all-list', args=[_kwargs['pk']])
+        return self.reverse('display_item_all-list', args=[obj.id])
 
     def get_url_items_next(self, obj):
         _kwargs = self.get_kwargs()
-        return self.reverse('display_item_next-list', args=[_kwargs['pk']])
+        return self.reverse('display_item_next-list', args=[obj.id])
 
 
 class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
