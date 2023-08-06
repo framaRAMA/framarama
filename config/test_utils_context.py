@@ -67,6 +67,16 @@ class ResultValueTestCase(TestCase):
         self.assertEqual(True, context.ResultValue('y').as_bool())
         self.assertEqual(False, context.ResultValue('n').as_bool())
 
+    def test_str_concat(self):
+        self.assertEqual("Test string", "Test " + context.ResultValue('string'))
+
+    def test_str_concat_none(self):
+        self.assertEqual("Test ", "Test " + context.ResultValue(None))
+
+    def test_none(self):
+        self.assertTrue(context.ResultValue(None) == None)
+        #self.assertIsNone(context.ResultValue(None))
+
 
 class ContextTestCase(TestCase):
 

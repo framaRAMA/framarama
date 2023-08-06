@@ -21,6 +21,12 @@ class ResultValue:
             return True
         return False
 
+    def __add__(self, other):
+        return other if self._value is None else self._value + other
+
+    def __radd__(self, other):
+        return other if self._value is None else other + self._value
+
     def __getitem__(self, name):
         return ResultValue(None)
 
