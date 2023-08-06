@@ -457,15 +457,15 @@
           </script>
           {{ modal_start(field.id_for_label + 'sortqueryevalmodal', 'Query evaluation', 'modal-fullscreen h-100') }}
             <div class="mb-3 form-floating vh-25">
-              <textarea id="{{ field.id_for_label }}sortqueryevalcode" cols="40" rows="10" class="form-control h-100" required="" id="id_code"></textarea>
+              <textarea id="{{ field.id_for_label }}sortqueryevalcode" cols="40" rows="10" class="form-control h-100" id="id_code"></textarea>
               <label for="{{ field.id_for_label }}sortqueryevalcode" class="form-label">Query</label>
             </div>
             <div class="mb-3 form-floating vh-25">
-              <input id="{{ field.id_for_label }}sortqueryevalpage" class="form-control" required="" id="id_page"/>
+              <input id="{{ field.id_for_label }}sortqueryevalpage" class="form-control" id="id_page"/>
               <label for="{{ field.id_for_label }}sortqueryevalpage" class="form-label">Page</label>
             </div>
             <div class="mb-3 form-floating vh-25">
-              <input id="{{ field.id_for_label }}sortqueryevalsize" class="form-control" required="" id="id_code"/>
+              <input id="{{ field.id_for_label }}sortqueryevalsize" class="form-control" id="id_code"/>
               <label for="{{ field.id_for_label }}sortqueryevalsize" class="form-label">Page size</label>
             </div>
             <button id="{{ field.id_for_label }}sortqueryevalbtn" type="button" class="btn btn-primary w-100">Run</button>
