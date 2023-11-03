@@ -286,6 +286,8 @@ class DateTime:
             return time
         if type(time) == int or type(time) == float:
             return datetime.timedelta(seconds=time)
+        if type(time) == datetime.time:
+            return datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
         if time != None:
             _time = datetime.time.fromisoformat(time)
             return datetime.timedelta(hours=_time.hour, minutes=_time.minute, seconds=_time.second)
