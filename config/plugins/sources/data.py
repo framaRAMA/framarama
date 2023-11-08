@@ -1,7 +1,8 @@
 import logging
 
 from django.db import models
-from django.template import Context, Template
+from django.template import Context
+from jinja2 import Template
 
 from framarama.base import forms as base
 from config.models import SourceStep
@@ -78,7 +79,7 @@ class Implementation(SourcePluginImplementation):
         if model.template_out:
             _template = Template(model.template_out)
             _data_out_dict = _data_out.get_as_dict()
-            _output = _template.render(Context({'data': _data_out_dict.get() if _data_out_dict else {}}))
+            _output = _template.render(data=_data_out_dict.get() if _data_out_dict else {})
             
             _data_out = data.DataContainer(data=_output, data_type=data.DataType(data.DataType.MIME, model.mime_out))
         
