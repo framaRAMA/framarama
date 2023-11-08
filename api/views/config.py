@@ -29,21 +29,42 @@ class BaseSerializer:
     def reverse(self, view_name, args):
         return reverse(view_name, args=args, request=self.get_request())
 
+    def map(self, data, validated_data):
+        _instance = self.Meta.model(**validated_data)
+        if hasattr(self.Meta, 'map_fields'):
+            for _name in [_name for _name in self.Meta.map_fields if _name in data]:
+                setattr(_instance, _name, data.get(_name))
+        return _instance
+
+    def map_fields(self, data, validated_data, fields):
+        for _name, _field in self.fields.items():
+            if _name not in fields:
+                continue
+            if isinstance(_field, BaseSerializer):
+                serializer = type(_field)(data=validated_data.get(_name, {}))
+                serializer.is_valid()
+                validated_data[_name] = serializer.map(data.get(_name, None), serializer.validated_data)
+            else:
+                validated_data[_name] = data.get(_name, None)
+        return validated_data
+
 
 class FrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     url_items = serializers.SerializerMethodField()
     class Meta:
         model = models.Frame
         fields = ['id', 'name', 'description', 'enabled', 'url', 'url_items']
+        map_fields = ['id']
 
     def get_url_items(self, obj):
         return self.reverse('frame_item-list', [obj.id])
 
 
-class SourceSerializer(serializers.HyperlinkedModelSerializer):
+class SourceSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Source
         fields = ['id', 'name']
+        map_fields = ['id']
 
 
 class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
@@ -59,6 +80,7 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Display
         fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'url', 'url_items_all', 'url_items_next', 'url_finishings', 'url_contexts', 'url_status']
+        map_fields = ['id', 'enabled']
 
     def get_enabled(self, obj):
         return obj.enabled and (obj.frame is None or obj.frame.enabled)
@@ -81,6 +103,9 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
 
     def get_url_status(self, obj):
         return self.reverse('display_status-list', [obj.id])
+
+    def map(self, data, validated_data):
+        return super().map(data, self.map_fields(data, validated_data, ['frame']))
 
 
 class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
@@ -117,10 +142,11 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
         return _status
 
 
-class ItemFrameSerializer(serializers.HyperlinkedModelSerializer):
+class ItemFrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Item
         fields = ('id', 'date_creation', 'url')
+        map_fields = ['id']
 
 
 class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
@@ -128,6 +154,7 @@ class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializ
     class Meta:
         model = models.Item
         fields = ('id', 'date_creation', 'url', 'url_download')
+        map_fields = ['id']
 
     def get_url_download(self, obj):
         _kwargs = self.get_kwargs()
@@ -139,7 +166,11 @@ class RankedItemFrameSerializer(ItemFrameSerializer):
     class Meta:
         model = models.RankedItem
         fields = ItemFrameSerializer.Meta.fields + ('rank', 'source')
+        map_fields = ItemFrameSerializer.Meta.map_fields
         abstract = True
+
+    def map(self, data, validated_data):
+        return super().map(data, self.map_fields(data, validated_data, ['source']))
 
 
 class RankedItemDisplaySerializer(ItemDisplaySerializer):
@@ -147,7 +178,11 @@ class RankedItemDisplaySerializer(ItemDisplaySerializer):
     class Meta:
         model = models.RankedItem
         fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
+        map_fields = ItemFrameSerializer.Meta.map_fields
         abstract = True
+
+    def map(self, data, validated_data):
+        return super().map(data, self.map_fields(data, validated_data, ['source']))
 
 
 class DataFieldSerializer(serializers.Field):
@@ -248,6 +283,7 @@ class FinishingSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer
     class Meta:
         model = models.Finishing
         fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'url']
+        map_fields = ['id']
 
     def get_url(self, obj):
         _kwargs = self.get_kwargs()
@@ -259,6 +295,7 @@ class ContextSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.FrameContext
         fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config', 'url']
+        map_fields = ['id']
 
     def get_url(self, obj):
         _kwargs = self.get_kwargs()
