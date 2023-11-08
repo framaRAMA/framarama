@@ -346,8 +346,8 @@ class DisplayViewSet(BaseViewSet):
         return self.qs().displays
 
     @decorators.action(detail='frame/detail', methods=['get'])
-    def frame(self, *args, **kwargs):
-        return response.Response(FrameSerializer(self.get_object().frame).data)
+    def frame(self, request, *args, **kwargs):
+        return response.Response(FrameSerializer(self.get_object().frame, context={'request': request}).data)
 
 
 class StatusDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
