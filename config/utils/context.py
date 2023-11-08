@@ -75,9 +75,12 @@ class Context:
     def evaluate_model(self, model):
         _result = Result()
         for field in model.get_fields():
-            _value = getattr(model, field.name)
-            _evaluated = ResultValue(self.evaluate(_value))
-            setattr(_result, field.name, _evaluated)
+            try:
+                _value = getattr(model, field.name)
+                _evaluated = self.evaluate(_value)
+                setattr(_result, field.name, ResultValue(_evaluated))
+            except e:
+                raise Exception('Evaluation of model {} field {} failed: {}'.format(type(model), field.name, _value)) from e
         return _result
 
 
