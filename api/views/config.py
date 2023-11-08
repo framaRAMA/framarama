@@ -146,7 +146,7 @@ class ItemFrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer
     class Meta:
         model = models.Item
         fields = ('id', 'date_creation', 'url')
-        map_fields = ['id']
+        map_fields = ['id', 'url']
 
 
 class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
@@ -154,7 +154,7 @@ class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializ
     class Meta:
         model = models.Item
         fields = ('id', 'date_creation', 'url', 'url_download')
-        map_fields = ['id']
+        map_fields = ['id', 'url', 'url_download']
 
     def get_url_download(self, obj):
         _kwargs = self.get_kwargs()
@@ -178,7 +178,7 @@ class RankedItemDisplaySerializer(ItemDisplaySerializer):
     class Meta:
         model = models.RankedItem
         fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
-        map_fields = ItemFrameSerializer.Meta.map_fields
+        map_fields = ItemDisplaySerializer.Meta.map_fields
         abstract = True
 
     def map(self, data, validated_data):
