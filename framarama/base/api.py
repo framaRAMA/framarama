@@ -98,8 +98,6 @@ class ApiClient(Singleton):
         if serializer:
             _serializer = serializer(data=_model_fields)
             _serializer.is_valid()
-            print(_model_fields)
-            print(_serializer.validated_data)
             _model = _serializer.map(_model_fields, _serializer.validated_data)
         else:
             _model = model(**_model_fields)  # doesnt work w/ serializer for nested fields (field must contain object directly, no dict)
