@@ -281,9 +281,7 @@ class Display(Singleton):
         return self._data.item()
 
     def frame(self):
-        return ApiResultItem(
-            self._data.get('frame'),
-            lambda d: config_models.Frame(**d)).item()
+        return self._data.item().frame
 
     def get_id(self):
         return self._data.item().id
