@@ -43,9 +43,9 @@ class BaseSerializer:
             if isinstance(_field, BaseSerializer):
                 serializer = type(_field)(data=validated_data.get(_name, {}))
                 serializer.is_valid()
-                validated_data[_name] = serializer.map(data.get(_name, None), serializer.validated_data)
-            else:
-                validated_data[_name] = data.get(_name, None)
+                validated_data[_name] = serializer.map(data.get(_name, {}), serializer.validated_data)
+            elif _name in data:
+                validated_data[_name] = data.get(_name)
         return validated_data
 
 
