@@ -120,14 +120,14 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
 class ItemFrameSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Item
-        fields = ('id', 'url')
+        fields = ('id', 'date_creation', 'url')
 
 
 class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     url_download = serializers.SerializerMethodField()
     class Meta:
         model = models.Item
-        fields = ('id', 'url', 'url_download')
+        fields = ('id', 'date_creation', 'url', 'url_download')
 
     def get_url_download(self, obj):
         _kwargs = self.get_kwargs()
@@ -138,7 +138,7 @@ class RankedItemFrameSerializer(ItemFrameSerializer):
     source = SourceSerializer()
     class Meta:
         model = models.RankedItem
-        fields = ItemFrameSerializer.Meta.fields + ('rank', 'date_creation', 'source')
+        fields = ItemFrameSerializer.Meta.fields + ('rank', 'source')
         abstract = True
 
 
@@ -146,7 +146,7 @@ class RankedItemDisplaySerializer(ItemDisplaySerializer):
     source = SourceSerializer()
     class Meta:
         model = models.RankedItem
-        fields = ItemDisplaySerializer.Meta.fields + ('rank', 'id', 'url', 'date_creation', 'source')
+        fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
         abstract = True
 
 
