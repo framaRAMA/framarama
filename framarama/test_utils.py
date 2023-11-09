@@ -76,6 +76,33 @@ class FilesystemTestCase(TestCase):
         os.remove('test')
         self.assertEquals(12, _size)
 
+    def test_file_rotate(self):
+        open('test-1.txt', 'w').close()
+        open('test-2.txt', 'w').close()
+        open('test-3.txt', 'w').close()
+        open('test-4.txt', 'w').close()
+        _result = utils.Filesystem.file_rotate('./', 'test-(.*)\.(.*)', 'test-{}.{}', 3, ['txt'])
+        os.remove('test-2.txt')
+        os.remove('test-3.txt')
+
+    def test_file_rotate_start(self):
+        open('test-1.txt', 'w').close()
+        open('test-2.txt', 'w').close()
+        open('test-3.txt', 'w').close()
+        open('test-4.txt', 'w').close()
+        _result = utils.Filesystem.file_rotate('./', 'test-(.*)\.(.*)', 'test-{}.{}', 3, ['txt'], start=1)
+        os.remove('test-1.txt')
+        os.remove('test-3.txt')
+
+    def test_file_rotate_start_rev(self):
+        open('test-1.txt', 'w').close()
+        open('test-2.txt', 'w').close()
+        open('test-3.txt', 'w').close()
+        open('test-4.txt', 'w').close()
+        _result = utils.Filesystem.file_rotate('./', 'test-(.*)\.(.*)', 'test-{}.{}', 3, ['txt'], start=1, reverse=True)
+        os.remove('test-1.txt')
+        os.remove('test-2.txt')
+
 
 class ProcessTestCase(TestCase):
 

@@ -129,20 +129,26 @@ class Filesystem:
         return os.path.getsize(filename)
 
     @staticmethod
-    def file_rotate(path, pattern, fmt, count, extensions=[]):
+    def file_rotate(path, pattern, fmt, count, extensions=[], start=0, reverse=False):
         _files = Filesystem.file_match(path, pattern)
-        _files.reverse()
-        _leftovers = _files[0:-count]
-        _files = _files[-count:]
+        _leftovers = _files[count:]
+        _files = _files[start:count]
+        if not reverse:
+            _files.reverse()
+        else:
+            _files.pop(0)
 
         for _i, (_name, _num, _ext) in enumerate(_files):
-            _new_num = len(_files)-_i+1
+            if not reverse:
+                _new_num = start+len(_files)-_i+1
+            else:
+                _new_num = start+_i+1
 
             for _ext in extensions:
                 _old_name = path + fmt.format(int(_num), _ext)
                 _new_name = path + fmt.format(_new_num, _ext)
                 os.rename(_old_name, _new_name)
-        
+
         for _i, (_name, _num, _ext) in enumerate(_leftovers):
             for _ext in extensions:
                 _current_name = path + fmt.format(int(_num), _ext)
