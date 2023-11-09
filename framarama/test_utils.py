@@ -1,3 +1,4 @@
+import os
 import datetime
 import zoneinfo
 
@@ -6,6 +7,74 @@ from unittest import TestCase
 from django.utils import timezone
 
 from framarama.base import utils
+
+
+class FilesystemTestCase(TestCase):
+
+    def test_file_wrte(self):
+        utils.Filesystem.file_write('test', b'Hello World!');
+        self.assertTrue(os.path.exists('test'))
+        os.remove('test')
+
+    def test_file_read(self):
+        with open('test', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        _result = utils.Filesystem.file_read('test');
+        os.remove('test')
+        self.assertEquals(b'Hello World!', _result)
+
+    def test_file_copy(self):
+        with open('test1', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        utils.Filesystem.file_copy('test1', 'test2')
+        _exists1 = os.path.exists('test1')
+        _exists2 = os.path.exists('test2');
+        os.remove('test1')
+        os.remove('test2')
+        self.assertTrue(_exists1)
+        self.assertTrue(_exists2)
+
+    def test_file_delete(self):
+        with open('test', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        utils.Filesystem.file_delete('test')
+        _exists = os.path.exists('test')
+        if _exists:
+            os.remove('test')
+        self.assertFalse(_exists)
+
+    def test_file_match(self):
+        open('test-1', 'w').close()
+        open('test-2', 'w').close()
+        open('test-3', 'w').close()
+        open('test-4', 'w').close()
+        _result_files_all = utils.Filesystem.file_match('.', 'test-(.*)')
+        _result_files_restricted = utils.Filesystem.file_match('.', 'test-([12])')
+        os.remove('test-1')
+        os.remove('test-2')
+        os.remove('test-3')
+        os.remove('test-4')
+        self.assertEqual([('test-1', '1'), ('test-2', '2'), ('test-3', '3'), ('test-4', '4')], _result_files_all)
+        self.assertEqual([('test-1', '1'), ('test-2', '2')], _result_files_restricted)
+
+    def test_file_exists(self):
+        with open('test', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        _exists = utils.Filesystem.file_exists('test')
+        os.remove('test')
+        self.assertTrue(_exists)
+
+    def test_file_size(self):
+        with open('test', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        _size = utils.Filesystem.file_size('test')
+        os.remove('test')
+        self.assertEquals(12, _size)
 
 
 class ProcessTestCase(TestCase):
