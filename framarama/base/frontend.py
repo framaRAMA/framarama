@@ -375,6 +375,15 @@ class FrontendDevice(Singleton):
         }
         self._capability = None
 
+    def _items_rotate(self, count_items_keep=None, start=0, reverse=False):
+        return Filesystem.file_rotate(
+            self.DATA_PATH,
+            self.FILE_PATTERN,
+            self.FILE_FORMAT,
+            count_items_keep if count_items_keep else 6,
+            ['json', 'image', 'preview'],
+            start=start, reverse=reverse)
+
     def monitor(self):
         return self._monitor
 
@@ -403,18 +412,12 @@ class FrontendDevice(Singleton):
             _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
             _result = _processor.process()
             if _result:
-                _files = Filesystem.file_rotate(
-                    self.DATA_PATH,
-                    self.FILE_PATTERN,
-                    self.FILE_FORMAT,
-                    _config.count_items_keep if _config.count_items_keep else 6,
-                    ['json', 'image', 'preview'])
-
+                _files = self._items_rotate(_config.count_items_keep)
                 _json = jsonpickle.encode({
                   'item': item,
                   'image_meta': _result.get_image_meta(),
                   'preview_meta': _result.get_preview_meta(),
-                  'time': DateTime.utc(datetime.datetime.utcnow()),
+                  'time': DateTime.utc(DateTime.now()),
                 })
 
                 Filesystem.file_write(_files['json'], _json.encode())
@@ -430,16 +433,28 @@ class FrontendDevice(Singleton):
                 _renderer.activate(_items[0])
 
     def get_items(self, start=None, count=None):
+        _config = Frontend.get().get_config().get_config()
         _files = []
-        for (_file, _num, _ext) in Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN):
-            if start != None and start < len(_files):
-                continue
-            if count != None and count == len(_files):
-                return
-            _file_json = self.DATA_PATH + '/' + _file
-            _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'image')
-            _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'preview')
-            _files.append(FrontendItem(_file_json, _file_image, _file_preview))
+        _items = None
+        while _items is None:
+            _items = Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN)[len(_files):]
+            for _i, (_file, _num, _ext) in enumerate(_items):
+                if start != None and start < len(_items):
+                    continue
+                if count != None and count == len(_files):
+                    _items = []
+                    break
+                _file_json = self.DATA_PATH + '/' + _file
+                _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'image')
+                _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'preview')
+                try:
+                    _files.append(FrontendItem(_file_json, _file_image, _file_preview))
+                except Exception as e:
+                    logger.warn('Removing non-readable item {}: {}'.format(_file_json, e))
+                    self._items_rotate(_config.count_items_keep, start=_i, reverse=True)
+                    _items = None
+                    break;
+            _items = []
         return _files
 
     def network_connect(self, name):
