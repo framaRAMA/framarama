@@ -135,7 +135,7 @@ class Filesystem:
         _files = _files[start:count]
         if not reverse:
             _files.reverse()
-        else:
+        elif len(_files):
             _files.pop(0)
 
         for _i, (_name, _num, _ext) in enumerate(_files):
@@ -154,7 +154,7 @@ class Filesystem:
                 _current_name = path + fmt.format(int(_num), _ext)
                 os.unlink(_current_name)
 
-        return {_ext: path + fmt.format(1, _ext) for _ext in extensions}
+        return {_ext: path + fmt.format(start+1, _ext) for _ext in extensions}
 
 
 class Process:
