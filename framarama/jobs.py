@@ -40,9 +40,10 @@ class Scheduler:
     def _job_id(self, job_id, instance=None, suffix=None):
         _id = job_id
         for _info in [instance, suffix]:
-            _info = '' if _info is None else _info
             _info = _info if type(_info) == list else [_info]
-            _id = _id + '_' + '_'.join([str(v) for v in _info])
+            _info = [str(v).strip() for v in _info if v != None and str(v).strip() != '']
+            if len(_info):
+                _id = _id + '_' + '_'.join([v for v in _info])
         return _id
 
     def run_job(self, job_id, func, delay=None, *args, **kwargs):
