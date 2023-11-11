@@ -54,12 +54,12 @@ class Scheduler(jobs.Scheduler):
 
         for _source in models.Source.objects.filter(_criteria).order_by('-update_date_start'):
             _frame = _source.frame
-            _job_id = Scheduler.CFG_SOURCE_UPDATE + '_' + str(_frame.id)
-            if self.running_jobs(_job_id, True) > 1:
+            _job_id = Scheduler.CFG_SOURCE_UPDATE
+            if self.running_jobs(_job_id, instance=_frame.id, starts_with=True) > 1:
                 logger.info('Skipping update {} {} - already running for frame'.format(_frame, _source))
             else:
                 logger.info("Updating {} {}".format(_frame, _source))
-                self.run_job(_job_id + '_' + str(_source.id), self.run_source_update, name='Updating {} {}'.format(_frame, _source), func_kwargs={'source': _source})
+                self.run_job(_job_id, self.run_source_update, instance=[_frame.id, _source.id], name='Updating {} {}'.format(_frame, _source), func_kwargs={'source': _source})
                 break
 
     def run_source_update(self, source):

@@ -46,12 +46,13 @@ class Scheduler:
                 _id = _id + '_' + '_'.join([v for v in _info])
         return _id
 
-    def run_job(self, job_id, func, delay=None, *args, **kwargs):
+    def run_job(self, job_id, func, instance=None, delay=None, *args, **kwargs):
+        _job_id = self._job_id(job_id, instance)
         if delay:
             _run_date = timezone.now() + datetime.timedelta(seconds=delay)
-            self._add_job(job_id, func, trigger='date', run_date=_run_date, *args, **kwargs)
+            self._add_job(_job_id, func, trigger='date', run_date=_run_date, *args, **kwargs)
         else:
-            self._add_job(job_id, func, *args, **kwargs)
+            self._add_job(_job_id, func, *args, **kwargs)
 
     def add_job(self, job_id, func, trigger='interval', *args, **kwargs):
         self._add_job(job_id, func, trigger=trigger, *args, **kwargs)
