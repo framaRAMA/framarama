@@ -157,12 +157,15 @@ class SoftwareDashboardView(base.BaseFrontendView):
         })
         _form_update = forms.SoftwareDashboardUpdateForm()
         _form_update.fields['revision'].widget.choices = [(_rev, _rev) for _rev in _revisions['revisions']]
+        _config = _context['config']
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
             'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
+            'app_update_check' : _config.app_update_check,
+            'app_update_install' : _config.app_update_install,
         })
         return _context
 
@@ -185,12 +188,15 @@ class SoftwareDashboardView(base.BaseFrontendView):
             _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _capability.app_update(
                 revision=_form_update.cleaned_data['revision']))
             self.redirect_startup(_context, 'fe_dashboard_software', message='app.update', negate=True)
+        _config = _context['config']
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
             'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
+            'app_update_check' : _config.app_update_check,
+            'app_update_install' : _config.app_update_install,
         })
         return _context
 

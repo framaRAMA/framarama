@@ -62,6 +62,17 @@ class DisplaySetupForm(base.BaseModelForm):
         }
 
 
+class SoftwareSetupForm(base.BaseModelForm):
+    class Meta:
+        model = models.Config
+        fields = ['app_update_check', 'app_update_install']
+
+        widgets = {
+            'app_update_check': base.selectFieldWidget(choices=models.APP_UPDATE_CHECK_CHOICES),
+            'app_update_install': base.booleanFieldWidget(),
+        }
+
+
 class SoftwareDashboardCheckForm(base.BaseForm):
     url = forms.CharField(widget=base.charFieldWidget(),
         label='Remote URL', help_text='The address to fetch updates from (empty uses default)')

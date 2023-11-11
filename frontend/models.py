@@ -1,6 +1,7 @@
 
 from django.db import models
 
+from framarama.base import utils
 from framarama.base.models import BaseModel, TIMEZONE_CHOICES
 
 
@@ -28,6 +29,13 @@ WATERMARKTYPE_CHOICES = [
   ('ribbon', 'Show ribbon at the corners'),
   ('hbars', 'Draw horizontal bars (top & botton)'),
   ('vbars', 'Draw vertical bars (left & right)'),
+]
+APP_UPDATE_CHECK_CHOICES = [
+  (None, 'disabled'),
+  (utils.DateTime.delta(0), 'use defaults'),
+  (utils.DateTime.delta(days=1), 'daily'),
+  (utils.DateTime.delta(days=7), 'weekly'),
+  (utils.DateTime.delta(days=30), 'monthly'),
 ]
 
 
@@ -94,4 +102,11 @@ class Config(BaseModel):
     watermark_scale = models.IntegerField(
         blank=True, null=True,
         verbose_name='Watermark scale', help_text='Make watermark larger or smaller (default 2)')
+
+    app_update_check = models.DurationField(
+        blank=True, null=True, choices=APP_UPDATE_CHECK_CHOICES,
+        verbose_name='Update check', help_text='Time interval for update check')
+    app_update_install = models.BooleanField(
+        default=False,
+        verbose_name='Install updates')
 

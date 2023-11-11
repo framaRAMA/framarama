@@ -41,6 +41,9 @@
     {% if lib.nav_active(request, 'fe_dashboard_display') %}
       <a href="{{ url('fe_setup_display') }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Display settings">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
     {% endif %}
+    {% if lib.nav_active(request, 'fe_dashboard_software') %}
+      <a href="{{ url('fe_setup_software') }}" class="ms-1 mt-2 btn btn-sm btn-outline-gray float-end" title="Software settings">{{ lib.icon('action.edit', 'p-0 m-0') }}</a>
+    {% endif %}
   </li>
 </ul>
 

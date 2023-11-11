@@ -8,6 +8,7 @@ urlpatterns = [
     path('setup/mode/local', setup.LocalModeSetupView.as_view(), name='fe_setup_mode_local'),
     path('setup/mode/cloud', setup.CloudModeSetupView.as_view(), name='fe_setup_mode_cloud'),
     path('setup/display', setup.DisplaySetupView.as_view(), name='fe_setup_display'),
+    path('setup/software', setup.SoftwareSetupView.as_view(), name='fe_setup_software'),
     path('dashboard/overview', dashboard.OverviewDashboardView.as_view(), name='fe_dashboard'),
     path('dashboard/device', dashboard.DeviceDashboardView.as_view(), name='fe_dashboard_device'),
     path('dashboard/display', dashboard.DisplayDashboardView.as_view(), name='fe_dashboard_display'),

@@ -103,3 +103,23 @@ class DisplaySetupView(base.BaseSetupView):
         _context['form'] = _form
         return _context
 
+class SoftwareSetupView(base.BaseSetupView):
+    template_name = 'frontend/setup.software.html'
+
+    def _get(self, request, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
+        _config = _context['config']
+        _context['form'] = forms.SoftwareSetupForm(instance=_config)
+        return _context
+
+    def _post(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _config = _context['config']
+        _form = forms.SoftwareSetupForm(request.POST, instance=_config)
+        if _form.is_valid():
+            _form.save()
+            frontend.Singleton.clear()
+            self.redirect_startup(_context, 'fe_dashboard_software', message='config.save')
+        _context['form'] = _form
+        return _context
+
