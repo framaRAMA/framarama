@@ -156,7 +156,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'password': '',
         })
         _form_update = forms.SoftwareDashboardUpdateForm()
-        _form_update.fields['revision'].widget.choices = [(_rev, _rev.replace(SoftwareDashboardView.REMOTE_NAME + '/', '')) for _rev in _revisions['revisions']]
+        _form_update.fields['revision'].widget.choices = [(_rev, _rev) for _rev in _revisions['revisions']]
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
@@ -184,7 +184,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         if _form_update.is_valid():
             _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _capability.app_update(
                 revision=_form_update.cleaned_data['revision']))
-            self.redirect(_context)
+            self.redirect_startup(_context, 'fe_dashboard_software', message='app.update', negate=True)
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,

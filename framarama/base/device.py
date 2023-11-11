@@ -397,14 +397,15 @@ class Capabilities:
 
     def _git_revisions():
         _revisions = []
-        _out = Process.exec_run(['git', 'branch', '-r'])
-        if _out:
-            _out = [_line.strip() for _line in _out.decode().split('\n')]
-            _revisions.extend(_out)
-        _out = Process.exec_run(['git', 'tag', '-l'])
+        _out = Process.exec_run(['git', 'tag', '-l', '--sort=-v:refname'])
         if _out:
             _out = [_line for _line in _out.decode().split('\n')]
             _revisions.extend(_out)
+        _revisions.append('master')
+        #_out = Process.exec_run(['git', 'branch', '-r'])
+        #if _out:
+        #    _out = [_line.strip() for _line in _out.decode().split('\n')]
+        #    _revisions.extend(_out)
         return [_rev for _rev in _revisions if len(_rev)]
 
     def _git_current_ref(refs):
@@ -465,7 +466,7 @@ class Capabilities:
 
     def app_update(revision):
         logger.info("Check version update ...")
-        _revisions = Capability._git_revisions()
+        _revisions = Capabilities._git_revisions()
         if revision not in _revisions:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return
@@ -476,12 +477,11 @@ class Capabilities:
         logger.info("Changes stashed!")
         _pull = Process.exec_run(['git', 'checkout', revision])
         if _pull is None:
-            logger.error("Can checkout revision!")
+            logger.error("Can not checkout revision!")
         else:
             logger.info("Revision checked out!")
         _pop = Process.exec_run(['git', 'stash', 'pop'])
         if _pop is None:
-            logger.error("Can pop stash again!")
-
-
+            logger.error("Can not pop stash again!")
+        Capabilities.app_restart_systemd()
 
