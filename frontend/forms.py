@@ -64,11 +64,13 @@ class DisplaySetupForm(base.BaseModelForm):
 
 class SoftwareDashboardCheckForm(base.BaseForm):
     url = forms.CharField(widget=base.charFieldWidget(),
-        label='Remote URL', help_text='The remote address to fetch updates from')
+        label='Remote URL', help_text='The address to fetch updates from (empty uses default)')
     username = forms.CharField(widget=base.charFieldWidget(),
-        label='Username', help_text='Username to access remote URL')
+        required=False,
+        label='Username', help_text='Username to access URL if required')
     password = forms.CharField(widget=base.passwordFieldWidget(),
-        label='Password', help_text='Password to access remote URL')
+        required=False,
+        label='Password', help_text='Password to access URL if required')
 
 
 class SoftwareDashboardUpdateForm(base.BaseForm):
