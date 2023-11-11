@@ -34,7 +34,7 @@ class DisplayDashboardView(base.BaseFrontendView):
         _context['display'] = {
             'status': _capability.display_status(),
             'size': _capability.display_size(),
-            'refresh': _scheduler.running_jobs(jobs.Scheduler.FE_NEXT_ITEM, True),
+            'refresh': _scheduler.running_jobs(jobs.Scheduler.FE_NEXT_ITEM, starts_with=True),
             'set': _scheduler.running_jobs(jobs.Scheduler.FE_ACTIVATE_ITEM),
         }
         return _context
