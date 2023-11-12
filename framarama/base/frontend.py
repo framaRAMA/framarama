@@ -427,7 +427,7 @@ class FrontendDevice(Singleton):
                 return self.get_items()[0]
 
     def activate(self, idx):
-        _items = self.get_items(idx, 1)
+        _items = self.get_items(idx, count=1)
         if len(_items):
             for _renderer in self._renderers:
                 _renderer.activate(_items[0])
@@ -439,7 +439,7 @@ class FrontendDevice(Singleton):
         while _items is None:
             _items = Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN)[len(_files):]
             for _i, (_file, _num, _ext) in enumerate(_items):
-                if start != None and start < len(_items):
+                if start != None and start < _i:
                     continue
                 if count != None and count == len(_files):
                     _items = []
@@ -453,8 +453,8 @@ class FrontendDevice(Singleton):
                     logger.warn('Removing non-readable item {}: {}'.format(_file_json, e))
                     self._items_rotate(_config.count_items_keep, start=_i, reverse=True)
                     _items = None
+                    start = _i
                     break;
-            _items = []
         return _files
 
     def network_connect(self, name):
