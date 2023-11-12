@@ -159,7 +159,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
-            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
+            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK, starts_with=True),
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
             'app_update_check' : _config.app_update_check,
@@ -175,11 +175,12 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _scheduler = self.get_scheduler()
         _form_check = forms.SoftwareDashboardCheckForm(request.POST)
         if _form_check.is_valid():
-            _scheduler.run_job(jobs.Scheduler.FE_APP_CHECK, lambda: _capability.app_check(
-                jobs.Scheduler.APP_UPDATE_REMOTE_NAME,
+            _scheduler.trigger_job(jobs.Scheduler.FE_APP_CHECK, 
+                remote=jobs.Scheduler.APP_UPDATE_REMOTE_NAME,
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
-                password=_form_check.cleaned_data['password']))
+                password=_form_check.cleaned_data['password'],
+                force=True)
             self.redirect(_context)
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
@@ -190,7 +191,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _context.update({
             'app': { 'revision': _revisions },
             'form_check': _form_check,
-            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK),
+            'check': _scheduler.running_jobs(jobs.Scheduler.FE_APP_CHECK, starts_with=True),
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
             'app_update_check' : _config.app_update_check,

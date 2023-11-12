@@ -176,7 +176,7 @@ class Scheduler(jobs.Scheduler):
             return
         frontend.Frontend.get().submit_status()
 
-    def app_check(self, force=False):
+    def app_check(self, remote=None, url=None, username=None, password=None, force=False):
         _config = frontend.Frontend.get().get_config().get_config()
         if _config.app_update_check is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['FRONTEND_APP_UPDATE_INTERVAL'])
@@ -184,22 +184,23 @@ class Scheduler(jobs.Scheduler):
             _interval = None
         else:
             _interval = _config.app_update_check
-        if _interval is None:
+        if force is False and _interval is None:
             return
-        if _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
+        if force is False and _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
             return
         _device = frontend.Frontend.get().get_device()
         _config.app_update_check_date = utils.DateTime.now()
         _capability = _device.get_capability()
         _revisions = _capability.app_revision()
         _remotes = _revisions['remotes'] if _revisions else {}
-        _url = _remotes[Scheduler.APP_UPDATE_REMOTE_NAME]
-        logger.info("Starting update check from {}".format(_url))
+        _remote = remote if remote else Scheduler.APP_UPDATE_REMOTE_NAME
+        _url = url if url else _remotes[_remote]
+        logger.info("Starting update check from {} ({})".format(_url, _remote))
         _capability.app_check(
-            Scheduler.APP_UPDATE_REMOTE_NAME,
+            _remote,
             url=_url,
-            username=None,
-            password=None)
+            username=username,
+            password=password)
 
     def tick(self):
         _frontend = frontend.Frontend.get()
