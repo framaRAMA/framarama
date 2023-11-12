@@ -438,40 +438,47 @@ class Capabilities:
     def app_revision():
         _logs = Capabilities._git_log(['-1'])
         if _logs:
-            #_commit, _date, _values = _log.decode().split(maxsplit=2)
-            #_refs, _comment = _values[1:].split(') ', maxsplit=1)
+            _remote = settings.FRAMARAMA['GIT_REMOTE']
             _branch = Process.exec_run(['git', 'branch', '--show-current'])
             _branch = _branch.decode().strip() if _branch else None
-            _logs_update = Capabilities._git_log(['-1', '{0}..origin/{0}'.format(_branch)])
+            _revisions = Capabilities._git_revisions()
+            if _branch == 'master':
+                _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_branch, _remote)])
+            elif len(_revisions):
+                _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _revisions[0])])
+            else:
+                _logs_update = None
             _rev = _logs[0]
             _rev.update({
                 'branch': _branch,
-                'remotes': Capabilities._git_remotes(),
-                'revisions': Capabilities._git_revisions(),
+                'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
+                'revisions': _revisions,
                 'current': Capabilities._git_current_ref(_rev['refs']),
                 'update': _logs_update[0] if _logs_update else None
             })
             return _rev
         return None
 
-    def app_check(remote, url, username=None, password=None):
+    def app_check(url=None, username=None, password=None):
+        _remote = settings.FRAMARAMA['GIT_REMOTE']
+        _remotes = Capabilities._git_remotes()
+        _url = url if url else _remotes[_remote]
         _username_pattern = r'^(.*://)([^@]+@)?(.*)'
         if username is not None:
-            _url = re.sub(_username_pattern, '\\1' + re.escape(username) + '@\\3', url)
+            _url = re.sub(_username_pattern, '\\1' + re.escape(username) + '@\\3', _url)
         else:
-            _url = re.sub(_username_pattern, '\\1\\3', url)
-        logger.info("Check version update from {} using {} ...".format(remote, _url))
-        _remotes = Capabilities._git_remotes()
-        if remote in _remotes:
-            logger.info("Update remote {} to {}".format(remote, _url))
-            _remote_update = Process.exec_run(['git', 'remote', 'set-url', remote, _url])
+            _url = re.sub(_username_pattern, '\\1\\3', _url)
+        logger.info("Check version update from {} using {} ...".format(_remote, _url))
+        if _remote in _remotes:
+            logger.info("Update remote {} to {}".format(_remote, _url))
+            _remote_update = Process.exec_run(['git', 'remote', 'set-url', _remote, _url])
         else:
             logger.info("Adding remote {} to {}".format(name, _url))
             _remote_update = Process.exec_run(['git', 'remote', 'add', name, _url])
         if _remote_update is None:
             logger.error("Can not setup remote {} with {}".format(name, _url))
             return
-        _fetch = Process.exec_run(['git', 'fetch', remote], env={
+        _fetch = Process.exec_run(['git', 'fetch', _remote], env={
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
             'GIT_PASSWORD': password if password is not None else '',
         })
@@ -479,9 +486,10 @@ class Capabilities:
             logger.error("Can not fetch updates!")
         else:
             logger.info("Updates fetched!")
-        Process.exec_run(['git', 'remote', 'set-url', remote, url])
+        Process.exec_run(['git', 'remote', 'set-url', _remote, url])
 
     def app_update(revision):
+        _remote = settings.FRAMARAMA['GIT_REMOTE']
         logger.info("Check version update ...")
         _revisions = Capabilities._git_revisions()
         if revision not in _revisions:
@@ -492,8 +500,11 @@ class Capabilities:
             logger.error("Can not stash changes!")
             return
         logger.info("Changes stashed!")
-        _pull = Process.exec_run(['git', 'checkout', revision])
-        if _pull is None:
+        if revision == 'master':
+            _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
+        else:
+            _update = Process.exec_run(['git', 'checkout', revision])
+        if _update is None:
             logger.error("Can not checkout revision!")
         else:
             logger.info("Revision checked out!")

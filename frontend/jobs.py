@@ -32,8 +32,6 @@ class Scheduler(jobs.Scheduler):
     FE_WIFI_CONNECT = 'fe_wifi_connect'
     FE_WIFI_AP = 'fe_wifi_ap'
 
-    APP_UPDATE_REMOTE_NAME = 'origin'
-
     def configure(self):
         self._display = None
         self._items = None
@@ -176,7 +174,7 @@ class Scheduler(jobs.Scheduler):
             return
         frontend.Frontend.get().submit_status()
 
-    def app_check(self, remote=None, url=None, username=None, password=None, force=False):
+    def app_check(self, url=None, username=None, password=None, force=False):
         _config = frontend.Frontend.get().get_config().get_config()
         if _config.app_update_check is None:
             _interval = utils.DateTime.delta(settings.FRAMARAMA['FRONTEND_APP_UPDATE_INTERVAL'])
@@ -188,17 +186,11 @@ class Scheduler(jobs.Scheduler):
             return
         if force is False and _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
             return
-        _device = frontend.Frontend.get().get_device()
         _config.app_update_check_date = utils.DateTime.now()
-        _capability = _device.get_capability()
-        _revisions = _capability.app_revision()
-        _remotes = _revisions['remotes'] if _revisions else {}
-        _remote = remote if remote else Scheduler.APP_UPDATE_REMOTE_NAME
-        _url = url if url else _remotes[_remote]
-        logger.info("Starting update check from {} ({})".format(_url, _remote))
-        _capability.app_check(
-            _remote,
-            url=_url,
+        _config.save()
+        _device = frontend.Frontend.get().get_device()
+        _device.get_capability().app_check(
+            url=url,
             username=username,
             password=password)
 
