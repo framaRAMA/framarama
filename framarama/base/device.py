@@ -417,24 +417,40 @@ class Capabilities:
             _refs.remove('HEAD')
         return _refs[0] if len(_refs) else None
 
-    def app_revision():
-        _log = Process.exec_run(['git', 'log', '-1', '--pretty=format:%h %aI %d %s', '--decorate'])
-        # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
-        # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
-        if _log:
-            _commit, _date, _values = _log.decode().split(maxsplit=2)
+    def _git_log(args):
+        _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
+        _args.extend(args)
+        _log = Process.exec_run(_args)
+        _logs = []
+        for _line in [_line for _line in _log.decode().split("\n")] if _log else []:
+            # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
+            # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
+            _commit, _date, _values = _line.split(maxsplit=2)
             _refs, _comment = _values[1:].split(') ', maxsplit=1)
-            _branch = Process.exec_run(['git', 'branch', '--show-current'])
-            _branch = _branch.decode().strip() if _branch else None
-            _rev = {
+            _logs.append({
                 'hash': _commit,
                 'date': DateTime.parse(_date),
                 'comment': _comment,
+                'refs': _refs
+            })
+        return _logs
+
+    def app_revision():
+        _logs = Capabilities._git_log(['-1'])
+        if _logs:
+            #_commit, _date, _values = _log.decode().split(maxsplit=2)
+            #_refs, _comment = _values[1:].split(') ', maxsplit=1)
+            _branch = Process.exec_run(['git', 'branch', '--show-current'])
+            _branch = _branch.decode().strip() if _branch else None
+            _logs_update = Capabilities._git_log(['-1', '{0}..origin/{0}'.format(_branch)])
+            _rev = _logs[0]
+            _rev.update({
                 'branch': _branch,
                 'remotes': Capabilities._git_remotes(),
                 'revisions': Capabilities._git_revisions(),
-                'current': Capabilities._git_current_ref(_refs),
-            }
+                'current': Capabilities._git_current_ref(_rev['refs']),
+                'update': _logs_update[0] if _logs_update else None
+            })
             return _rev
         return None
 
