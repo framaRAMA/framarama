@@ -181,8 +181,9 @@ class SoftwareDashboardView(base.BaseFrontendView):
             self.redirect(_context)
         _form_update = forms.SoftwareDashboardUpdateForm(request.POST)
         if _form_update.is_valid():
-            _scheduler.run_job(jobs.Scheduler.FE_APP_UPDATE, lambda: _capability.app_update(
-                revision=_form_update.cleaned_data['revision']))
+            _scheduler.trigger_job(jobs.Scheduler.FE_APP_UPDATE,
+                revision=_form_update.cleaned_data['revision'],
+                force=True)
             self.redirect_startup(_context, 'fe_dashboard_software', message='app.update', negate=True)
         _config = _context['config']
         _context.update({

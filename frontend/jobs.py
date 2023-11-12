@@ -52,6 +52,7 @@ class Scheduler(jobs.Scheduler):
         self.register_job(Scheduler.FE_REFRESH_ITEM, self.refresh_items, minutes=15, name='Frontend refresh items')
         self.register_job(Scheduler.FE_SUBMIT_STATUS, self.submit_status, minutes=5, name='Frontend status submission')
         self.register_job(Scheduler.FE_APP_CHECK, self.app_check, hours=1, minutes=15, name='Frontend update check')
+        self.register_job(Scheduler.FE_APP_UPDATE, self.app_update, hours=2, minutes=30, name='Frontend update install')
         self.add_job(Scheduler.FE_INIT, self.tick, seconds=5, name='Frontend timer')
 
     def _setup_start(self):
@@ -193,6 +194,17 @@ class Scheduler(jobs.Scheduler):
             url=url,
             username=username,
             password=password)
+
+    def app_update(self, revision=None, force=False):
+        _config = frontend.Frontend.get().get_config().get_config()
+        if force is false and (_config.app_update_install is not None or _config.app_update_install is False):
+            return
+        _config.app_update_check_date = None
+        _config.app_update_install_date = utils.DateTime.now()
+        _config.save()
+        _device = frontend.Frontend.get().get_device()
+        _device.get_capability().app_update(
+            revision=revision)
 
     def tick(self):
         _frontend = frontend.Frontend.get()
