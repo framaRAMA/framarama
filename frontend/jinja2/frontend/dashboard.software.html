@@ -4,9 +4,9 @@
 
 <div class="pt-2">
   {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.branch, app.revision.hash, app.revision.date|date_format('%d.%m.%Y'))) }}
-  {{ lib.field_text('Updates', 'check for updates, each %s'|format(app_update_check|duration) if app_update_install else 'do not check') }}
+  {{ lib.field_text('Update check', 'each %s'|format(app_update_check|duration) if app_update_install else 'disabled') }}
   {% if app.revision['update'] %}
-    {{ lib.field_text('', 'New version available (%s, %s)'|format(app.revision['update'].hash, app.revision['update'].date|date_format('%d.%m.%Y'))) }}
+    {{ lib.field_text('Update', 'Available: %s from %s (%s)'|format(app.revision['update'].refs, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)) }}
   {% endif %}
   {{ lib.field_list('Available', app.revision.revisions[0:8]) }}
 </div>
