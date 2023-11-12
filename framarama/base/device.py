@@ -410,12 +410,9 @@ class Capabilities:
         return [_rev for _rev in _revisions if len(_rev)]
 
     def _git_current_ref(refs):
-        _refs = [_ref.strip() for _ref in refs.split(',')]        # separate tags
-        _refs = [_ref.replace('HEAD -> ', '') for _ref in _refs]  # remove HEAD pointer
-        _refs = [_ref.replace('tag: ', '') for _ref in _refs]     # remove tag: prefix
-        if 'HEAD' in _refs:
-            _refs.remove('HEAD')
-        return _refs[0] if len(_refs) else None
+        if 'HEAD' in refs:
+            refs.remove('HEAD')
+        return refs[0] if len(refs) else None
 
     def _git_log(args):
         _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
@@ -427,6 +424,10 @@ class Capabilities:
             # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
             _commit, _date, _values = _line.split(maxsplit=2)
             _refs, _comment = _values[1:].split(') ', maxsplit=1)
+            _refs = [_ref.strip() for _ref in _refs.split(',')]       # separate tags
+            _refs = [_ref.replace('HEAD -> ', '') for _ref in _refs]  # remove HEAD pointer
+            _refs = [_ref.replace('tag: ', '') for _ref in _refs]     # remove tag: prefix
+            _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
             _logs.append({
                 'hash': _commit,
                 'date': DateTime.parse(_date),
