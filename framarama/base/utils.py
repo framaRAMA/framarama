@@ -14,8 +14,6 @@ import requests
 
 from django.utils import dateparse, timezone
 
-from frontend import models
-
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +63,7 @@ class Config(Singleton):
 
     def get_config(self):
         if self._config is None:
+            from frontend import models
             _configs = list(models.Config.objects.all())
             self._config = _configs[0] if len(_configs) else None
         return self._config
