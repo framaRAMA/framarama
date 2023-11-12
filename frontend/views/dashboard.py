@@ -140,8 +140,6 @@ class DeviceDashboardView(base.BaseFrontendView):
 class SoftwareDashboardView(base.BaseFrontendView):
     template_name = 'frontend/dashboard.software.html'
 
-    REMOTE_NAME = 'origin'
-
     def _get(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _frontend_device = _context['frontend'].get_device()
@@ -150,7 +148,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _scheduler = self.get_scheduler()
         _remotes = _revisions['remotes'] if _revisions else {}
         _form_check = forms.SoftwareDashboardCheckForm(initial={
-            'url': _remotes[SoftwareDashboardView.REMOTE_NAME],
+            'url': _remotes[utils.Scheduler.APP_UPDATE_REMOTE_NAME],
             'remotes': _remotes,
             'username': '',
             'password': '',
@@ -178,7 +176,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _form_check = forms.SoftwareDashboardCheckForm(request.POST)
         if _form_check.is_valid():
             _scheduler.run_job(jobs.Scheduler.FE_APP_CHECK, lambda: _capability.app_check(
-                SoftwareDashboardView.REMOTE_NAME,
+                jobs.Scheduler.APP_UPDATE_REMOTE_NAME,
                 url=_form_check.cleaned_data['url'],
                 username=_form_check.cleaned_data['username'],
                 password=_form_check.cleaned_data['password']))

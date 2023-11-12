@@ -32,6 +32,8 @@ class Scheduler(jobs.Scheduler):
     FE_WIFI_CONNECT = 'fe_wifi_connect'
     FE_WIFI_AP = 'fe_wifi_ap'
 
+    APP_UPDATE_REMOTE_NAME = 'origin'
+
     def configure(self):
         self._display = None
         self._items = None
@@ -51,6 +53,7 @@ class Scheduler(jobs.Scheduler):
         self.register_job(Scheduler.FE_NEXT_ITEM, self.next_item, minutes=1, name='Frontend next item')
         self.register_job(Scheduler.FE_REFRESH_ITEM, self.refresh_items, minutes=15, name='Frontend refresh items')
         self.register_job(Scheduler.FE_SUBMIT_STATUS, self.submit_status, minutes=5, name='Frontend status submission')
+        self.register_job(Scheduler.FE_APP_CHECK, self.app_check, hours=1, minutes=15, name='Frontend update check')
         self.add_job(Scheduler.FE_INIT, self.tick, seconds=5, name='Frontend timer')
 
     def _setup_start(self):
@@ -172,6 +175,31 @@ class Scheduler(jobs.Scheduler):
         if self._display is None:
             return
         frontend.Frontend.get().submit_status()
+
+    def app_check(self, force=False):
+        _config = frontend.Frontend.get().get_config().get_config()
+        if _config.app_update_check is None:
+            _interval = utils.DateTime.delta(settings.FRAMARAMA['FRONTEND_APP_UPDATE_INTERVAL'])
+        elif _config.app_update_check is utils.DateTime.delta(0):
+            _interval = None
+        else:
+            _interval = _config.app_update_check
+        if _interval is None:
+            return
+        if _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
+            return
+        _device = frontend.Frontend.get().get_device()
+        _config.app_update_check_date = utils.DateTime.now()
+        _capability = _device.get_capability()
+        _revisions = _capability.app_revision()
+        _remotes = _revisions['remotes'] if _revisions else {}
+        _url = _remotes[Scheduler.APP_UPDATE_REMOTE_NAME]
+        logger.info("Starting update check from {}".format(_url))
+        _capability.app_check(
+            Scheduler.APP_UPDATE_REMOTE_NAME,
+            url=_url,
+            username=None,
+            password=None)
 
     def tick(self):
         _frontend = frontend.Frontend.get()

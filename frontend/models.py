@@ -106,7 +106,13 @@ class Config(BaseModel):
     app_update_check = models.DurationField(
         blank=True, null=True, choices=APP_UPDATE_CHECK_CHOICES,
         verbose_name='Update check', help_text='Time interval for update check')
+    app_update_check_date = models.DateTimeField(
+        null=True,
+        verbose_name='Update check date', help_text='The date of the last update check')
     app_update_install = models.BooleanField(
         default=False,
         verbose_name='Install updates')
+    app_update_install_date = models.DateTimeField(
+        null=True,
+        verbose_name='Install updates date', help_text='The date of the last update install')
 
