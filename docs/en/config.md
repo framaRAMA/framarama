@@ -35,7 +35,7 @@ Only start frontend component:
 ],
 ```
 
-Only start both components:
+Start both components:
 
 ```
 'MODES': [
