@@ -109,3 +109,10 @@ This defines the resolution to use when generating a thumbnail of the
 photos displayed on the frontend. It is used in the frontend application
 and - when activated - when sumbmitting them to the server.
 
+#### `FRAMARAMA.FRONTEND_APP_UPDATE_INTERVAL`
+
+Default: `23:00:00`
+
+Default the interval for the update check. This will only fetch the updates
+but does not install them.
+
