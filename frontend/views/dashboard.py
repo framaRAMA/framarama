@@ -148,7 +148,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
         _scheduler = self.get_scheduler()
         _remotes = _revisions['remotes'] if _revisions else {}
         _form_check = forms.SoftwareDashboardCheckForm(initial={
-            'url': _remotes[utils.Scheduler.APP_UPDATE_REMOTE_NAME],
+            'url': _remotes[jobs.Scheduler.APP_UPDATE_REMOTE_NAME],
             'remotes': _remotes,
             'username': '',
             'password': '',
