@@ -209,10 +209,13 @@ class Scheduler(jobs.Scheduler):
     def tick(self):
         _frontend = frontend.Frontend.get()
         _network = _frontend.get_device().network_verify()
-        if not _frontend.initialize() or not _frontend.api_access():
+        if not _frontend.is_initialized() or not _frontend.api_access():
             self._setup_start()
-        elif _network and (self._display is None or self._items is None):
-            self._setup_completed()
+            self._display = None
+            self._items = None
         elif not _network:
             self._setup_start()
+        elif self._display is None or self._items is None:
+            self._setup_completed()
+        _frontend.initialize()
 
