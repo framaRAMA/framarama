@@ -415,6 +415,7 @@ class Capabilities:
         return refs[0] if len(refs) else None
 
     def _git_log(args):
+        _remote = settings.FRAMARAMA['GIT_REMOTE']
         _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
         _args.extend(args)
         _log = Process.exec_run(_args)
@@ -427,7 +428,9 @@ class Capabilities:
             _refs = [_ref.strip() for _ref in _refs.split(',')]       # separate tags
             _refs = [_ref.replace('HEAD -> ', '') for _ref in _refs]  # remove HEAD pointer
             _refs = [_ref.replace('tag: ', '') for _ref in _refs]     # remove tag: prefix
+            _refs = [_ref.replace(_remote+'/', '') for _ref in _refs] # remove remote name
             _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
+            _refs = [_ref for _ref in _refs if _ref not in ['HEAD']]  # remove special names (HEAD)
             _logs.append({
                 'hash': _commit,
                 'date': DateTime.parse(_date),
@@ -445,17 +448,20 @@ class Capabilities:
             _revisions = Capabilities._git_revisions()
             if _branch == 'master':
                 _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_branch, _remote)])
+                _update_rev = _branch
             elif len(_revisions):
                 _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _revisions[0])])
+                _update_rev = _revisions[0]
             else:
                 _logs_update = None
+                _update_rev = None
             _rev = _logs[0]
             _rev.update({
                 'branch': _branch,
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
                 'current': Capabilities._git_current_ref(_rev['refs']),
-                'update': _logs_update[0] if _logs_update else None
+                'update': _logs_update[0]|{'revision':_update_rev} if _logs_update else None
             })
             return _rev
         return None
