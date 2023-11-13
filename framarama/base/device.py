@@ -448,20 +448,20 @@ class Capabilities:
             _revisions = Capabilities._git_revisions()
             if _branch == 'master':
                 _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_branch, _remote)])
-                _update_rev = _branch
+                _update_ref = _branch
             elif len(_revisions):
                 _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _revisions[0])])
-                _update_rev = _revisions[0]
+                _update_ref = _revisions[0]
             else:
                 _logs_update = None
-                _update_rev = None
+                _update_ref = None
             _rev = _logs[0]
             _rev.update({
                 'branch': _branch,
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
                 'current': Capabilities._git_current_ref(_rev['refs']),
-                'update': _logs_update[0]|{'revision':_update_rev} if _logs_update else None
+                'update': _logs_update[0]|{'ref':_update_ref} if _logs_update else None
             })
             return _rev
         return None
