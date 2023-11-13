@@ -551,6 +551,12 @@ class DisplayStatus(BaseModel):
     app_branch = models.CharField(
         max_length=64, blank=True, null=True,
         verbose_name='Application branch', help_text='Branch of current version in use')
+    app_checked = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='Application update check', help_text='Date of last update check')
+    app_installed = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='Application installation', help_text='Date of last update installation')
 
     class Meta:
         db_table = 'config_display_status'
