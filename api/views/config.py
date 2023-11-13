@@ -283,7 +283,7 @@ class FinishingSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer
     class Meta:
         model = models.Finishing
         fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'url']
-        map_fields = ['id']
+        map_fields = ['id', 'plugin_config']
 
     def get_url(self, obj):
         _kwargs = self.get_kwargs()
@@ -295,7 +295,7 @@ class ContextSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.FrameContext
         fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config', 'url']
-        map_fields = ['id']
+        map_fields = ['id', 'plugin_config']
 
     def get_url(self, obj):
         _kwargs = self.get_kwargs()
