@@ -161,7 +161,9 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
             'app_update_check' : _config.app_update_check,
+            'app_update_check_date' : _config.app_update_check_date,
             'app_update_install' : _config.app_update_install,
+            'app_update_install_date' : _config.app_update_install_date,
         })
         return _context
 
@@ -193,7 +195,9 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'form_update': _form_update,
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE),
             'app_update_check' : _config.app_update_check,
+            'app_update_check_date' : _config.app_update_check_date,
             'app_update_install' : _config.app_update_install,
+            'app_update_install_date' : _config.app_update_install_date,
         })
         return _context
 
