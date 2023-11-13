@@ -480,10 +480,10 @@ class Capabilities:
             logger.info("Update remote {} to {}".format(_remote, _url))
             _remote_update = Process.exec_run(['git', 'remote', 'set-url', _remote, _url])
         else:
-            logger.info("Adding remote {} to {}".format(name, _url))
-            _remote_update = Process.exec_run(['git', 'remote', 'add', name, _url])
+            logger.info("Adding remote {} to {}".format(_remote, _url))
+            _remote_update = Process.exec_run(['git', 'remote', 'add', _remote, _url])
         if _remote_update is None:
-            logger.error("Can not setup remote {} with {}".format(name, _url))
+            logger.error("Can not setup remote {} with {}".format(_remote, _url))
             return
         _fetch = Process.exec_run(['git', 'fetch', _remote], env={
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
