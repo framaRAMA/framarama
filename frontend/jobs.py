@@ -197,7 +197,7 @@ class Scheduler(jobs.Scheduler):
 
     def app_update(self, revision=None, force=False):
         _config = frontend.Frontend.get().get_config().get_config()
-        if force is false and (_config.app_update_install is not None or _config.app_update_install is False):
+        if force is False and (_config.app_update_install is not None or _config.app_update_install is False):
             return
         _config.app_update_check_date = None
         _config.app_update_install_date = utils.DateTime.now()
