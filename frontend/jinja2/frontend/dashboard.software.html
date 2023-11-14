@@ -6,7 +6,7 @@
   {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.branch, app.revision.date|date_format('%d.%m.%Y'), app.revision.hash)) }}
   {{ lib.field_text('Update check', '%s (%s)'|format(
     'each %s%s'|format(app_update_check|duration, ' and install them' if app_update_install else '') if app_update_check else 'manually',
-    'last %s ago'|format(app_update_check_date|duration(short=true) if app_update_check_date else 'not checked')
+    'checked %s ago'|format(app_update_check_date|duration(short=true) if app_update_check_date else 'not checked')
   )) }}
   {% if app.revision['update'] %}
     {{ lib.field_text('New version', '%s (%s, %s)'|format(app.revision['update'].ref, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)) }}
