@@ -18,6 +18,14 @@
   <div class="col">
     <div class="card mt-2">
       <div class="card-body">
+        {{ lib.display_info_software(display, stats|first if stats else null) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mt-2">
+      <div class="card-body">
         {{ lib.display_info_media(display, stats|first if stats else null) }}
       </div>
     </div>

@@ -821,7 +821,10 @@
 {% endmacro %}
 
 {% macro display_info_device(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">Runtime information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})</h6>
+  <h6 class="card-subtitle mb-2 text-muted">
+    <i class="fa fa-server text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
+    Runtime information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
+  </h6>
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
@@ -833,19 +836,37 @@
       {% endif %}
     </li>
     <li>
-      running software version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
-      {% if status and status['app_hash'] and status['app_date'] %}
-        ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
-      {% endif %}
-    </li>
-    <li>
       up since <strong>{{ status['uptime']|duration if status else 'unknown' }}</strong>
     </li>
   </ul>
 {% endmacro %}
 
+{% macro display_info_software(display, status) %}
+  <h6 class="card-subtitle mb-2 text-muted">
+    <i class="fa fa-cubes text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
+    Software information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
+  </h6>
+  <ul class="card-text">
+    <li>
+      running version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
+      {% if status and status['app_hash'] and status['app_date'] %}
+        ({{ status['app_hash']}}, {{ status['app_date']|date_format('%d.%m.%Y') }})
+      {% endif %}
+    </li>
+    <li>
+      checked for latest update <strong>{{ status.app_checked|duration(short=true) if status.app_checked else 'unknown'}}</strong>
+    </li>
+    <li>
+      last update install <strong>{{ status.app_installed|duration(short=true) if status.app_checked else 'unknown'}}</strong>
+    </li>
+  </ul>
+{% endmacro %}
+
 {% macro display_info_media(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">Media information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})</h6>
+  <h6 class="card-subtitle mb-2 text-muted">
+    <i class="fa fa-images text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
+    Media information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
+  </h6>
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
