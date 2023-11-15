@@ -820,11 +820,15 @@
   {{ chart_line('resources', stats_labels|map('date_format', '%H:%M')|list, {'Disk': stats_disk, 'Memory': stats_mem}, ['left', 'right']) }}
 {% endmacro %}
 
-{% macro display_info_device(display, status) %}
+{% macro display_info_header(title, icon) %}
   <h6 class="card-subtitle mb-2 text-muted">
-    <i class="fa fa-server text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
-    Runtime information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
+    <i class="fa {{ icon }} text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
+    {{ title }}
   </h6>
+{% endmacro %}
+
+{% macro display_info_device(display, status) %}
+  {{ display_info_header('Runtime information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-server') }}
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
@@ -842,10 +846,7 @@
 {% endmacro %}
 
 {% macro display_info_software(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">
-    <i class="fa fa-cubes text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
-    Software information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
-  </h6>
+  {{ display_info_header('Software information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-cubes') }}
   <ul class="card-text">
     <li>
       running version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
@@ -863,10 +864,7 @@
 {% endmacro %}
 
 {% macro display_info_media(display, status) %}
-  <h6 class="card-subtitle mb-2 text-muted">
-    <i class="fa fa-images text-warning opacity-25 position-absolute end-0 mx-3" style="font-size: 5em;"></i>
-    Media information ({{ status.created|duration(short=true) + ' ago' if status else 'not available' }})
-  </h6>
+  {{ display_info_header('Media information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-images') }}
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
