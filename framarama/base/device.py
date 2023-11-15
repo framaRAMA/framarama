@@ -484,16 +484,18 @@ class Capabilities:
             _remote_update = Process.exec_run(['git', 'remote', 'add', _remote, _url])
         if _remote_update is None:
             logger.error("Can not setup remote {} with {}".format(_remote, _url))
-            return
+            return 'Error: Can not prepare update source'
         _fetch = Process.exec_run(['git', 'fetch', _remote], env={
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
             'GIT_PASSWORD': password if password is not None else '',
         })
+        Process.exec_run(['git', 'remote', 'set-url', _remote, url])
         if _fetch is None:
             logger.error("Can not fetch updates!")
+            return 'Error: Fetching updates'
         else:
             logger.info("Updates fetched!")
-        Process.exec_run(['git', 'remote', 'set-url', _remote, url])
+        return None
 
     def app_update(revision):
         _remote = settings.FRAMARAMA['GIT_REMOTE']
@@ -501,22 +503,26 @@ class Capabilities:
         _revisions = Capabilities._git_revisions()
         if revision not in _revisions:
             logger.error("Can not update to non-existant revision {}".format(revision))
-            return
+            return 'Error: Version {} is unknown'.format(revision)
         _stash = Process.exec_run(['git', 'stash'])
         if _stash is None:
             logger.error("Can not stash changes!")
-            return
+            return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
         if revision == 'master':
             _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
         else:
             _update = Process.exec_run(['git', 'checkout', revision])
+        _msg = []
         if _update is None:
             logger.error("Can not checkout revision!")
+            _msg.append('Updating to version {}'.format(revision))
         else:
             logger.info("Revision checked out!")
         _pop = Process.exec_run(['git', 'stash', 'pop'])
         if _pop is None:
             logger.error("Can not pop stash again!")
+            _msg.append('Error: Applying configuration')
         Capabilities.app_restart_systemd()
+        return 'Error: {}'.format(' / '.join(_msg)) if len(_msg) else None
 

@@ -8,6 +8,11 @@
     'each %s%s'|format(app_update_check|duration, ' and install them' if app_update_install else '') if app_update_check else 'manually',
     'checked %s ago'|format(app_update_check_date|duration(short=true)) if app_update_check_date else 'not checked'
   )) }}
+  {% if app_update_check_status and 'Error' in app_update_check_status %}
+    {{ lib.field_text('', '<span class="text-danger">'|safe ~ app_update_check_status ~ '</span>'|safe) }}
+  {% elif app_update_check_status %}
+    {{ lib.field_text('', app_update_check_status) }}
+  {% endif %}
   {% if app.revision['update'] %}
     {{ lib.field_text('New version', '%s (%s, %s)'|format(app.revision['update'].ref, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)) }}
   {% endif %}

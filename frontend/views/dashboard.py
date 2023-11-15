@@ -162,8 +162,10 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE, starts_with=True),
             'app_update_check' : _config.app_update_check,
             'app_update_check_date' : _config.app_update_check_date,
+            'app_update_check_status' : _config.app_update_check_status,
             'app_update_install' : _config.app_update_install,
             'app_update_install_date' : _config.app_update_install_date,
+            'app_update_install_status' : _config.app_update_install_status,
         })
         return _context
 
@@ -196,8 +198,10 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'update': _scheduler.running_jobs(jobs.Scheduler.FE_APP_UPDATE, starts_with=True),
             'app_update_check' : _config.app_update_check,
             'app_update_check_date' : _config.app_update_check_date,
+            'app_update_check_status' : _config.app_update_check_status,
             'app_update_install' : _config.app_update_install,
             'app_update_install_date' : _config.app_update_install_date,
+            'app_update_install_status' : _config.app_update_install_status,
         })
         return _context
 

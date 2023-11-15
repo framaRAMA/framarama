@@ -109,10 +109,16 @@ class Config(BaseModel):
     app_update_check_date = models.DateTimeField(
         null=True,
         verbose_name='Update check date', help_text='The date of the last update check')
+    app_update_check_status = models.CharField(
+        max_length=256, null=True,
+        verbose_name='Update status', help_text='Status of last update check')
     app_update_install = models.BooleanField(
         default=False,
         verbose_name='Install updates')
     app_update_install_date = models.DateTimeField(
         null=True,
         verbose_name='Install updates date', help_text='The date of the last update install')
+    app_update_install_status = models.CharField(
+        max_length=256, null=True,
+        verbose_name='Install update status', help_text='Status of last update install')
 
