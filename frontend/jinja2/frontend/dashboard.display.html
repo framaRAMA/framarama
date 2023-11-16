@@ -37,7 +37,7 @@
       <span class="visually-hidden">Next</span>
     </button>
     {% for _item_data in items %}
-      {{ lib.modal_image('displayItem%s'|format(loop.index), 'Item %s'|format(loop.index+1), url('fe_dashboard_display_item', args=[loop.index0])) }}
+      {{ lib.modal_image('displayItem%s'|format(loop.index), 'Item %s'|format(loop.index), url('fe_dashboard_display_item', args=[loop.index0])) }}
     {% endfor %}
   </div>
 {% else %}
