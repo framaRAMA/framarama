@@ -499,7 +499,7 @@ class Capabilities:
 
     def app_update(revision):
         _remote = settings.FRAMARAMA['GIT_REMOTE']
-        logger.info("Check version update ...")
+        logger.info("Installing update ...")
         _revisions = Capabilities._git_revisions()
         if revision not in _revisions:
             logger.error("Can not update to non-existant revision {}".format(revision))
