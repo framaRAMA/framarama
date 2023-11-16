@@ -17,14 +17,17 @@ class SetupStatusView(viewsets.ViewSet):
 
     def list(self, request, format=None):
         try:
-            if frontend.Frontend.get().is_initialized():
+            _frontend = frontend.Frontend.get()
+            if _frontend.is_initialized():
                 return Response({
                     'status': 'success',
-                    'message': 'Configuration setup completed'
+                    'message': 'Configuration setup completed',
+                    'init': _frontend.get_init_status()
                 })
             return Response({
                 'status': 'testing',
-                'message': 'Configuration setup not available'
+                'message': 'Configuration setup not available',
+                'init': _frontend.get_init_status()
             })
         except Exception as e:
             return Response({
