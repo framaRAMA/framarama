@@ -28,14 +28,18 @@ logger = logging.getLogger(__name__)
 
 class Frontend(Singleton):
     INIT_PHASE_START = 0
-    INIT_PHASE_DB_DEFAULT = 1
-    INIT_PHASE_CONFIGURED = 2
-    INIT_PHASE_DB_CONFIG = 3
-    INIT_PHASE_SETUP = 4
-    INIT_PHASE_API_ACCESS = 5
+    INIT_PHASE_REQ_CHECK = 1
+    INIT_PHASE_REQ_INSTALL = 2
+    INIT_PHASE_DB_DEFAULT = 3
+    INIT_PHASE_CONFIGURED = 4
+    INIT_PHASE_DB_CONFIG = 5
+    INIT_PHASE_SETUP = 6
+    INIT_PHASE_API_ACCESS = 7
     INIT_PHASE_ERROR = 100
     phases = {
         INIT_PHASE_START: "Started",
+        INIT_PHASE_REQ_CHECK: "Checking requirements",
+        INIT_PHASE_REQ_INSTALL: "Installing requirements",
         INIT_PHASE_DB_DEFAULT: "Checking frontend database",
         INIT_PHASE_CONFIGURED: "Checking frontend configuration",
         INIT_PHASE_DB_CONFIG: "Checking config in database",
@@ -82,6 +86,32 @@ class Frontend(Singleton):
     def initialize(self):
         if self._init_phase >= Frontend.INIT_PHASE_ERROR:
             return False
+        if self._init_phase < Frontend.INIT_PHASE_REQ_CHECK:
+            import pkg_resources
+            try:
+                _requirements = pkg_resources.require(open('requirements.txt', 'r'))
+                logger.info("{} requirements fullfilled".format(len(_requirements)))
+                self._init_phase = Frontend.INIT_PHASE_REQ_INSTALL
+            except pkg_resources.VersionConflict as e:
+                logger.error("Installing requirements: {}".format(e))
+                self._init_phase = Frontend.INIT_PHASE_REQ_CHECK
+            except pkg_resources.DistributionNotFound as e:
+                logger.error("Missing requirements: {}".format(e))
+                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_CHECK
+            except Exception as e:
+                logger.error("Error checking requirements: {}".format(e))
+                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_CHECK
+        if self._init_phase < Frontend.INIT_PHASE_REQ_INSTALL:
+            try:
+                _pip= Process.exec_run(['pip', 'install', '-r', 'requirements.txt'])
+                if _pip:
+                    logger.info("Requirements installed!")
+                else:
+                    self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_INSTALL
+                    logger.error("Error installing requirements")
+            except Exception as e:
+                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_INSTALL
+                logger.error("Error installing requirements: {}".format(e))
         if self._init_phase < Frontend.INIT_PHASE_DB_DEFAULT:
             self._init_connections()
             try:
