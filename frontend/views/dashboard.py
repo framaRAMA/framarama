@@ -84,7 +84,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             _lines = _capability.app_log()
             _context['log'] = _lines
         elif _action == 'device.restart':
-            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _capability.app_restart(), delay=2)
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _capability.app_restart(), delay=2, errors=False)
             self.redirect_startup(_context, message='device.restart', wait=3)
         elif _action == 'device.shutdown':
             _scheduler.run_job(jobs.Scheduler.FE_DEVICE_SHUTDOWN, lambda: _capability.app_shutdown(), delay=2)
@@ -188,7 +188,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
             _scheduler.trigger_job(jobs.Scheduler.FE_APP_UPDATE,
                 revision=_form_update.cleaned_data['revision'],
                 force=True)
-            self.redirect_startup(_context, 'fe_dashboard_software', message='app.update', wait=10)
+            self.redirect_startup(_context, 'fe_dashboard_software', message='app.update', wait=10, errors=False)
         _config = _context['config']
         _context.update({
             'app': { 'revision': _revision },
