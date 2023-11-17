@@ -187,30 +187,26 @@ class Scheduler(jobs.Scheduler):
             return
         if force is False and _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
             return
+        _capability = frontend.Frontend.get().get_device().get_capability()
         _config.app_update_check_date = utils.DateTime.now()
         _config.app_update_check_status = 'Checking for updates...'
         _config.save()
-        _device = frontend.Frontend.get().get_device()
-        _config.app_update_check_status = _device.get_capability().app_check(
-            url=url,
-            username=username,
-            password=password)
+        _config.app_update_check_status = _capability.app_check(url=url, username=username, password=password)
         _config.save()
 
     def app_update(self, revision=None, force=False):
         _config = frontend.Frontend.get().get_config().get_config()
         if force is False and (_config.app_update_install is not None or _config.app_update_install is False):
             return
+        _capability = frontend.Frontend.get().get_device().get_capability()
         _config.app_update_check_date = None
         _config.app_update_install_date = utils.DateTime.now()
         _config.app_update_install_status = 'Update in progress...'
         _config.save()
-        _device = frontend.Frontend.get().get_device()
-        _config.app_update_install_status = _device.get_capability().app_update(
-            revision=revision)
+        _config.app_update_install_status = _capability.app_update(revision=revision)
         _config.save()
         if _config.app_update_install_status is None:
-            _device.get_capability().app_restart_systemd()
+            _capability.app_restart_systemd()
 
     def tick(self):
         _frontend = frontend.Frontend.get()
