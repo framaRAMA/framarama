@@ -206,7 +206,7 @@ class Scheduler(jobs.Scheduler):
         _config.app_update_install_status = _capability.app_update(revision=revision)
         _config.save()
         if _config.app_update_install_status is None:
-            _capability.app_restart_systemd()
+            _capability.app_restart()
 
     def tick(self):
         _frontend = frontend.Frontend.get()
