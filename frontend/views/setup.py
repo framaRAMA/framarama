@@ -18,6 +18,8 @@ class StartupView(base.BaseSetupView):
             _context['wait'] = int(request.GET['wait'])*1000
         if request.GET.get('negate', None):
             _context['negate'] = int(request.GET['negate'])
+        if request.GET.get('errors', None):
+            _context['errors'] = int(request.GET['errors'])
         return _context
 
 

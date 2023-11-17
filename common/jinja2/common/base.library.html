@@ -278,7 +278,7 @@
   <div class="status-success mt-2 text-success d-none {{ classes }}">{{ icon('enabled') }}</div>
 {% endmacro %}
 
-{% macro status_script(name, callback, wait=null, negate=false) %}
+{% macro status_script(name, callback, wait=null, negate=false, errors=null) %}
 <script type="text/javascript">
   let statusCount_{{ name}} = 0;
   function status_fetch_{{ name }}() {
@@ -286,6 +286,13 @@
       .then(function (res) {
         if (res.ok) {
           return res.json();
+        {% if errors != null and errors == false %}
+        } else {
+          return {
+            status: "testing",
+            message: "Status endpoint not available, ignoring"
+          }
+        {% endif %}
         }
         return {
           status: 'error',
