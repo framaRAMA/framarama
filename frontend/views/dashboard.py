@@ -84,8 +84,8 @@ class DeviceDashboardView(base.BaseFrontendView):
             _lines = _capability.app_log()
             _context['log'] = _lines
         elif _action == 'device.restart':
-            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _capability.app_restart(), delay=2, errors=False)
-            self.redirect_startup(_context, message='device.restart', wait=3)
+            _scheduler.run_job(jobs.Scheduler.FE_DEVICE_RESTART, lambda: _capability.app_restart(), delay=2)
+            self.redirect_startup(_context, message='device.restart', wait=3, errors=False)
         elif _action == 'device.shutdown':
             _scheduler.run_job(jobs.Scheduler.FE_DEVICE_SHUTDOWN, lambda: _capability.app_shutdown(), delay=2)
             self.redirect_startup(_context, message='device.shutdown', negate=True)
