@@ -209,6 +209,8 @@ class Scheduler(jobs.Scheduler):
         _config.app_update_install_status = _device.get_capability().app_update(
             revision=revision)
         _config.save()
+        if _config.app_update_install_status is None:
+            _device.get_capability().app_restart_systemd()
 
     def tick(self):
         _frontend = frontend.Frontend.get()

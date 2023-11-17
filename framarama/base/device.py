@@ -523,6 +523,5 @@ class Capabilities:
         if _pop is None:
             logger.error("Can not pop stash again!")
             _msg.append('Error: Applying configuration')
-        Capabilities.app_restart_systemd()
         return 'Error: {}'.format(' / '.join(_msg)) if len(_msg) else None
 
