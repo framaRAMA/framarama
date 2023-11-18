@@ -218,7 +218,7 @@ class DataFieldSerializer(serializers.Field):
         return self._cls.create(data=_data, mime=_mime, meta=_meta)
 
 
-class DisplayItemSerializer(serializers.HyperlinkedModelSerializer):
+class HitItemDisplaySerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField()
     thumbnail = DataFieldSerializer(models.DisplayItemThumbnailData, required=False, allow_null=True)
 
@@ -382,7 +382,7 @@ class ItemDisplayViewSet(BaseViewSet):
 
 
 class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
-    serializer_class = ItemDisplaySerializer
+    serializer_class = HitItemDisplaySerializer
 
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
