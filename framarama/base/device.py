@@ -475,7 +475,7 @@ class Capabilities:
             _url = re.sub(_username_pattern, '\\1' + re.escape(username) + '@\\3', _url)
         else:
             _url = re.sub(_username_pattern, '\\1\\3', _url)
-        logger.info("Check version update from {} using {} ...".format(_remote, _url))
+        logger.info("Check version update from {} using {} ...".format(_url, _remote))
         if _remote in _remotes:
             logger.info("Update remote {} to {}".format(_remote, _url))
             _remote_update = Process.exec_run(['git', 'remote', 'set-url', _remote, _url])
