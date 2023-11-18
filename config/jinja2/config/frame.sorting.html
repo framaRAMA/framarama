@@ -2,55 +2,48 @@
 
 {% block content_frame_sorting %}
 
-
-<ul class="list-group list-group-light">
+<div class="row pt-3">
 {% for sorting in sortings %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="w-100">
-      <div class="fw-bold {% if not sorting.enabled %}text-muted{% endif %}">
-        <div class="d-inline-block col-auto col-12 col-md-auto">
-          {{ loop.index }}. {{ sorting.title }}
-          {% if 'sorting%d'|format(sorting.id) in errors %}
-            <span title="{{ errors['sorting%d'|format(sorting.id)] }}" class="text-danger">
-              {{ lib.icon('error') }}
-            </span>
-          {% endif %}
-        </div>
-        <span class="badge rounded-pill badge-success">
-          {{ lib.icon('sorting.plugin.'+sorting_plugins[sorting.plugin].cat) }}
-          {{ sorting.plugin }}
-        </span>
-        <span class="badge rounded-pill badge-warning">
-          Weight {{ sorting.weight }}
-        </span>
-      </div>
-      <div class="text-muted smaller font-monospace">
-        {% if sorting.code_template %}
-          Template:
-          {{ templates[sorting.code_template]['title'] }} - {{ templates[sorting.code_template]['desc'] }}
-        {% else %}
-          {% for field_name, field_value in sorting.get_field_values().items() %}
-            {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
-              <strong>{{ sorting.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
-            {% endif %}
-          {% endfor %}
+  {% set error_marker %}
+    {% if 'sorting%d'|format(sorting.id) in errors %}
+      <span title="{{ errors['sorting%d'|format(sorting.id)] }}" class="text-danger">
+        {{ lib.icon('error') }}
+      </span>
+    {% endif %}
+  {% endset %}
+  {% set body %}
+    {% if sorting.code_template %}
+      Template:
+      {{ templates[sorting.code_template]['title'] }} - {{ templates[sorting.code_template]['desc'] }}
+    {% else %}
+      {% for field_name, field_value in sorting.get_field_values().items() %}
+        {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+          <strong>{{ sorting.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
         {% endif %}
-      </div>
-    </div>
-    <div class="ms-0 pt-2 pb-2">
-      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
-        <a href="{{ url('frame_sorting_edit', args=[frame.id, sorting.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit') }}</a>
-        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteSorting%s'|format(sorting.id) }}">{{ lib.icon('action.delete') }}</a>
-      </div>
-    </div>
-    {{ lib.modal_delete('deleteSorting%s'|format(sorting.id), 'Delete sorting', 'Do you really want to delete the selected sorting "%s"?'|format(sorting.title), url('frame_sorting_action', args=[frame.id, sorting.id])+'?action=delete') }}
-  </li>
+      {% endfor %}
+    {% endif %}
+  {% endset %}
+  {{ lib.card_list_item(
+    loop.index ~ '. ' ~ sorting.title ~ error_marker,
+    body,
+    [
+      {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_sorting_edit', args=[frame.id, sorting.id])},
+      {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteSorting%s'|format(sorting.id), 'classes': 'text-danger'}
+    ],
+    null,
+    [
+      {'title': sorting.plugin, 'type': 'success', 'icon': 'sorting.plugin.'+sorting_plugins[sorting.plugin].cat},
+      {'title': 'Weight', 'type': 'warning'},
+      {'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger')}
+    ]
+  ) }}
+  {{ lib.modal_delete('deleteSorting%s'|format(sorting.id), 'Delete sorting', 'Do you really want to delete the selected sorting "%s"?'|format(sorting.title), url('frame_sorting_action', args=[frame.id, sorting.id])+'?action=delete') }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No sorting defined. Click on the add button to create a new one.', 'info') }}
   </div>
 {% endfor %}
-</ul>
+</div>
 
 {{ lib.nav_actions([
   {'icon': 'action.add', 'modal': 'createSorting', 'type': 'success'},
