@@ -52,7 +52,7 @@ class Scheduler(jobs.Scheduler):
         self.register_job(Scheduler.FE_REFRESH_ITEM, self.refresh_items, minutes=15, name='Frontend refresh items')
         self.register_job(Scheduler.FE_SUBMIT_STATUS, self.submit_status, minutes=5, name='Frontend status submission')
         self.register_job(Scheduler.FE_APP_CHECK, self.app_check, hours=1, minutes=15, name='Frontend update check')
-        self.register_job(Scheduler.FE_APP_UPDATE, self.app_update, hours=2, minutes=30, name='Frontend update install')
+        self.register_job(Scheduler.FE_APP_UPDATE, self.app_update, hours=1, minutes=30, name='Frontend update install')
         self.add_job(Scheduler.FE_INIT, self.tick, seconds=5, name='Frontend timer')
 
     def _setup_start(self):
