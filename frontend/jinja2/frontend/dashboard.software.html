@@ -18,7 +18,7 @@
   {% endif %}
   {{ lib.field_text('Update install', '%s%s'|format(
     'automatically' if app_update_install else 'manually',
-    '%s'|format(', automatically' if app_update_install_hour == 0 else ', between %d and %d o\'clock'|format(app_update_install_hour.seconds/60/60, 2+app_update_install_hour.seconds/60/60)) if app_update_install else ''
+    '%s'|format(', automatically' if app_update_install_hour == 0 else ', between %d and %d o\'clock'|format(app_update_install_hour.seconds/60/60, 2+app_update_install_hour.seconds/60/60)) if app_update_install_hour else ''
   )) }}
   {{ lib.field_list('Available', app.revision.revisions[0:8]) }}
 </div>
