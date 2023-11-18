@@ -498,12 +498,17 @@ class Capabilities:
         return None
 
     def app_update(revision):
-        _remote = settings.FRAMARAMA['GIT_REMOTE']
         logger.info("Installing update ...")
-        _revisions = Capabilities._git_revisions()
-        if revision not in _revisions:
+        _revision = Capabilities.app_revision()
+        if _revision is None:
+            return 'Error: Can not identify current version'
+        _remote = _revision['remote']['name']
+        if revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
+        if _revision['update'] is None and _revision['branch'] == revision:
+            logger.info("No new version available for {}!".format(revision))
+            return False
         _stash = Process.exec_run(['git', 'stash'])
         if _stash is None:
             logger.error("Can not stash changes!")
@@ -523,5 +528,5 @@ class Capabilities:
         if _pop is None:
             logger.error("Can not pop stash again!")
             _msg.append('Error: Applying configuration')
-        return 'Error: {}'.format(' / '.join(_msg)) if len(_msg) else None
+        return 'Error: {}'.format(' / '.join(_msg)) if len(_msg) else True
 
