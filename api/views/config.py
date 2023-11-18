@@ -307,10 +307,6 @@ class ContextSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
         return self.reverse('display_context-detail', [_kwargs['display_id'], obj.id])
 
 
-class NextItemSerializer(RankedItemDisplaySerializer):
-    pass
-
-
 class BaseListView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
