@@ -97,7 +97,7 @@ class Frontend(Singleton):
                 self._init_phase = Frontend.INIT_PHASE_REQ_CHECK
             except pkg_resources.DistributionNotFound as e:
                 logger.error("Missing requirements: {}".format(e))
-                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_CHECK
+                self._init_phase = Frontend.INIT_PHASE_REQ_CHECK
             except Exception as e:
                 logger.error("Error checking requirements: {}".format(e))
                 self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_CHECK
