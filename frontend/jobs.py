@@ -210,7 +210,7 @@ class Scheduler(jobs.Scheduler):
         _config.app_update_install_status = 'Update in progress...'
         _config.save()
         _app_update = _capability.app_update(revision=revision)
-        _config.app_update_install_status = _app_update if type(_app_update) is bool else None
+        _config.app_update_install_status = _app_update if type(_app_update) is not bool else None
         _config.save()
         if _config.app_update_install_status is None:
             _capability.app_restart()
