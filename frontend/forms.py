@@ -65,11 +65,12 @@ class DisplaySetupForm(base.BaseModelForm):
 class SoftwareSetupForm(base.BaseModelForm):
     class Meta:
         model = models.Config
-        fields = ['app_update_check', 'app_update_install']
+        fields = ['app_update_check', 'app_update_install', 'app_update_install_hour']
 
         widgets = {
             'app_update_check': base.selectFieldWidget(choices=models.APP_UPDATE_CHECK_CHOICES),
             'app_update_install': base.booleanFieldWidget(),
+            'app_update_install_hour': base.selectFieldWidget(choices=models.APP_UPDATE_INSTALL_HOUR_CHOICES),
         }
 
 

@@ -164,6 +164,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'app_update_check_date' : _config.app_update_check_date,
             'app_update_check_status' : _config.app_update_check_status,
             'app_update_install' : _config.app_update_install,
+            'app_update_install_hour' : _config.app_update_install_hour,
             'app_update_install_date' : _config.app_update_install_date,
             'app_update_install_status' : _config.app_update_install_status,
         })
@@ -200,6 +201,7 @@ class SoftwareDashboardView(base.BaseFrontendView):
             'app_update_check_date' : _config.app_update_check_date,
             'app_update_check_status' : _config.app_update_check_status,
             'app_update_install' : _config.app_update_install,
+            'app_update_install_hour' : _config.app_update_install_hour,
             'app_update_install_date' : _config.app_update_install_date,
             'app_update_install_status' : _config.app_update_install_status,
         })

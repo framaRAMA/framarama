@@ -37,6 +37,21 @@ APP_UPDATE_CHECK_CHOICES = [
   (utils.DateTime.delta(days=7), 'weekly'),
   (utils.DateTime.delta(days=30), 'monthly'),
 ]
+APP_UPDATE_INSTALL_HOUR_CHOICES = [
+  (None, 'anytime'),
+  (utils.DateTime.delta(hours=0), '00:00 - 01:59'),
+  (utils.DateTime.delta(hours=2), '02:00 - 03:59'),
+  (utils.DateTime.delta(hours=4), '04:00 - 05:59'),
+  (utils.DateTime.delta(hours=6), '06:00 - 07:59'),
+  (utils.DateTime.delta(hours=8), '08:00 - 09:59'),
+  (utils.DateTime.delta(hours=10), '10:00 - 11:59'),
+  (utils.DateTime.delta(hours=12), '12:00 - 13:59'),
+  (utils.DateTime.delta(hours=14), '14:00 - 15:59'),
+  (utils.DateTime.delta(hours=16), '16:00 - 17:59'),
+  (utils.DateTime.delta(hours=18), '18:00 - 19:59'),
+  (utils.DateTime.delta(hours=20), '20:00 - 21:59'),
+  (utils.DateTime.delta(hours=22), '22:00 - 23:59'),
+]
 
 
 class Config(BaseModel):
@@ -115,6 +130,9 @@ class Config(BaseModel):
     app_update_install = models.BooleanField(
         default=False,
         verbose_name='Install updates')
+    app_update_install_hour = models.DurationField(
+        blank=True, null=True, choices=APP_UPDATE_INSTALL_HOUR_CHOICES,
+        verbose_name='Install hour', help_text='Installation time range for updates')
     app_update_install_date = models.DateTimeField(
         null=True,
         verbose_name='Install updates date', help_text='The date of the last update install')
