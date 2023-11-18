@@ -227,21 +227,20 @@ class HitItemDisplaySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail']
         read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit', 'url']
 
-    def create(self, validated_data):
+    def _save(self, item_id, validated_data):
         _view = self.context['view']
-        _item_id = validated_data.get('id')
         _thumbnail = validated_data.get('thumbnail', -1)
         _display_id = _view.kwargs.get('display_id')
-        _items = _view.get_queryset().filter(pk=_item_id)
+        _items = _view.get_queryset().filter(pk=item_id)
         if len(_items) == 0:
             raise serializers.ValidationError({"id": "no such item"})
 
         _now = utils.DateTime.now()
-        _display_items = _view.qs().displayitems.filter(display__id=_display_id, item__id=_item_id)
+        _display_items = _view.qs().displayitems.filter(display__id=_display_id, item__id=item_id)
         if len(_display_items) == 0:
             _display_item = models.DisplayItem(
                 display=_view.qs().displays.get(pk=_display_id),
-                item=_view.qs().items.get(pk=_item_id),
+                item=_view.qs().items.get(pk=item_id),
                 date_first_seen=_now,
                 date_last_seen=_now,
                 count_hit=1)
@@ -271,6 +270,12 @@ class HitItemDisplaySerializer(serializers.HyperlinkedModelSerializer):
 
         _display_item.save()
         return _display_item
+
+    def create(self, validated_data):
+        return self._save(validated_data.get('id'), validated_data)
+
+    def update(self, instance, validated_data):
+        return self._save(instance.id, validated_data)
 
     def to_representation(self, instance):
         _result = super().to_representation(instance)
@@ -381,7 +386,7 @@ class ItemDisplayViewSet(BaseViewSet):
             content_type=_response.headers['content-type'] or 'application/octet-stream')
 
 
-class HitItemDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
+class HitItemDisplayViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, BaseViewSet):
     serializer_class = HitItemDisplaySerializer
 
     def get_queryset(self):
