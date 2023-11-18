@@ -323,9 +323,6 @@ class FrameViewSet(BaseViewSet):
     serializer_class = FrameSerializer
     
     def get_queryset(self):
-        _pk = self.kwargs.get('pk', None)
-        if _pk:
-            return self.qs().frames.filter(pk=_pk)
         return self.qs().frames
 
 
@@ -341,9 +338,6 @@ class DisplayViewSet(BaseViewSet):
     serializer_class = DisplaySerializer
     
     def get_queryset(self):
-        _pk = self.kwargs.get('pk', None)
-        if _pk:
-            return self.qs().displays.filter(pk=_pk)
         return self.qs().displays
 
     @decorators.action(detail='frame/detail', methods=['get'])
