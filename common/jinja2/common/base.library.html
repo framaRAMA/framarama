@@ -722,14 +722,7 @@
           </div>
         </div>
       </div>
-      {% if actions %}
-        <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
-          {% for action in actions %}
-            <a class="btn btn-link m-0 text-reset" href="{{ action['url'] }}"
-              role="button" data-ripple-color="primary">{{ action['title'] }}</a>
-          {% endfor %}
-        </div>
-      {% endif %}
+      {{ card_actions(actions) }}
     </div>
   </div>
 {% endmacro %}
