@@ -16,7 +16,7 @@
                 {% if frame.description != '' %}{{ frame.description }}{% else %}(no description){% endif %}</p>
               </div>
             </div>
-            {{ lib.badge_group([{'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger')}]) }}
+            {{ lib.badge_group([{'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger'), 'classes': 'float-end'}]) }}
           </div>
         </div>
         <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
