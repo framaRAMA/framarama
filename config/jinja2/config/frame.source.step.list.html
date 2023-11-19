@@ -2,59 +2,46 @@
 
 {% block content_frame_source %}
 
-<ul class="list-group list-group-light">
+<div class="row pt-3">
 {% for source_step in source.steps.all() %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="w-100">
-      <div class="position-absolute">
-        <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
-        <a href="{{ url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
-      </div>
-      <div class="ms-5 fw-bold">
-        <div class="d-inline-block col-auto col-12 col-md-auto">
-          {{ loop.index }}. {{ source_step.title }}
-          {% if source_step.merge_in %}
-            {{ lib.icon('source.mergein', '') }}
-          {% endif %}
-          {% if source_step.loop_out %}
-            {{ lib.icon('source.loopout', '') }}
-          {% endif %}
-        </div>
-        <span class="badge rounded-pill badge-success">
-          {{ lib.icon('source.plugin.'+source_plugins[source_step.plugin].cat) }}
-          {{ source_step.plugin }}
-        </span>
-        {% if source_step.instance %}
-          <span class="badge rounded-pill badge-info">
-            {{ lib.icon('source.instance') }}
-            {{ source_step.instance }}
-          </span>
-        {% endif %}
-        {% if source_step.data_in %}
-          <span class="badge rounded-pill badge-warning">{{ lib.icon('source.input') }} {{ source_step.data_in }}</span>
-        {% endif %}
-        {% if source_step.data_out %}
-          <span class="badge rounded-pill badge-warning">{{ lib.icon('source.output') }} {{ source_step.data_out }}</span>
-        {% endif %}
-      </div>
-      <div class="ms-5 text-muted">
-        {{ source_step.description }}
-      </div>
-    </div>
-    <div class="ms-0 pt-2 pb-2">
-      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
-        <a href="{{ url('frame_source_step_edit', args=[frame.id, source.id, source_step.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit') }}</a>
-        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteStep%s'|format(source_step.id) }}">{{ lib.icon('action.delete') }}</a>
-      </div>
-    </div>
-    {{ lib.modal_delete('deleteStep%s'|format(source_step.id), 'Delete step', 'Do you really want to delete the selected step "%s"?'|format(source_step.title), url('frame_source_step_action', args=[frame.id, source.id, source_step.id])+'?action=delete') }}
-  </li>
+  {% set title %}
+    {{ loop.index }}. {{ source_step.title }}
+    {% if source_step.merge_in %}
+      {{ lib.icon('source.mergein', '') }}
+    {% endif %}
+    {% if source_step.loop_out %}
+      {{ lib.icon('source.loopout', '') }}
+    {% endif %}
+  {% endset %}
+  {% set badges = [{'title': source_step.plugin, 'type': 'success', 'icon': 'source.plugin.'+source_plugins[source_step.plugin].cat}] %}
+  {% if source_step.instance %}
+    {% set badges = badges + [{'title': source_step.instance, 'type': 'info', 'icon': 'source.instance'}] %}
+  {% endif %}
+  {% if source_step.data_in %}
+    {% set badges = badges + [{'title': source_step.data_in, 'type': 'warning', 'icon': 'source.input'}] %}
+  {% endif %}
+  {% if source_step.data_out %}
+    {% set badges = badges + [{'title': source_step.data_out, 'type': 'warning', 'icon': 'source.output'}] %}
+  {% endif %}
+
+  {{ lib.card_list_item(
+    title,
+    source_step.description,
+    [
+      {'title': '', 'icon': 'action.up', 'url': url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) ~ '?action=up', 'classes': 'btn-outline-primary position-static', 'align': 'left'},
+      {'title': '', 'icon': 'action.down', 'url': url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) ~ '?action=down','classes': 'btn-outline-primary position-static', 'align': 'left'},
+      {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_source_step_edit', args=[frame.id, source.id, source_step.id])},
+      {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteStep%s'|format(source_step.id), 'classes': 'text-danger'}
+    ],
+    badges
+  ) }}
+  {{ lib.modal_delete('deleteStep%s'|format(source_step.id), 'Delete step', 'Do you really want to delete the selected step "%s"?'|format(source_step.title), url('frame_source_step_action', args=[frame.id, source.id, source_step.id])+'?action=delete') }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No step defined in this source. Click on the add button to create a new one.', 'info') }}
   </div>
 {% endfor %}
-</ul>
+</div>
 
 {{ lib.nav_actions([
   {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary', 'classes': 'disabled' if source_running else ''},

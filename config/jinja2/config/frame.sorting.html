@@ -25,7 +25,7 @@
   {% endset %}
   {{ lib.card_list_item(
     loop.index ~ '. ' ~ sorting.title ~ error_marker,
-    body,
+    '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_sorting_edit', args=[frame.id, sorting.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteSorting%s'|format(sorting.id), 'classes': 'text-danger'}

@@ -2,45 +2,36 @@
 
 {% block content_frame %}
 
-<ul class="list-group list-group-light">
+<div class="row pt-3">
 {% for context in contexts %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="w-100">
-      <div class="position-absolute">
-        <a href="{{ url('frame_context_action', args=[frame.id, context.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
-        <a href="{{ url('frame_context_action', args=[frame.id, context.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
-      </div>
-      <div class="ms-5 fw-bold {% if not context.enabled %}text-muted{% endif %}">
-        <div class="d-inline-block col-auto col-12 col-md-auto">
-          {{ loop.index }}. {{ context.name }}
-        </div>
-        <span class="badge rounded-pill badge-success">
-          {{ lib.icon('context.plugin.'+context_plugins[context.plugin].cat) }}
-          {{ context.plugin }}
-        </span>
-      </div>
-      <div class="ms-5 text-muted smaller font-monospace">
-        {% for field_name, field_value in context.get_field_values().items() %}
-          {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
-            <strong>{{ context.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    <div class="ms-0 pt-2 pb-2">
-      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
-        <a href="{{ url('frame_context_edit', args=[frame.id, context.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit', '') }}</a>
-        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteFinishingContext%s'|format(context.id) }}">{{ lib.icon('action.delete', '') }}</a>
-      </div>
-    </div>
-    {{ lib.modal_delete('deleteFinishingContext%s'|format(context.id), 'Delete context', 'Do you really want to delete the selected context "%s"?'|format(context.name), url('frame_context_action', args=[frame.id, context.id])+'?action=delete') }}
-  </li>
+  {% set body %}
+    {% for field_name, field_value in context.get_field_values().items() %}
+      {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+        <strong>{{ context.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
+      {% endif %}
+    {% endfor %}
+  {% endset %}
+  {{ lib.card_list_item(
+    loop.index ~ '. ' ~ context.name,
+    '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
+    [
+      {'title': '', 'icon': 'action.up', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=up', 'classes': 'btn-outline-primary position-static'},
+      {'title': '', 'icon': 'action.down', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=down','classes': 'btn-outline-primary position-static'},
+      {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_context_edit', args=[frame.id, context.id])},
+      {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishingContext%s'|format(context.id), 'classes': 'text-danger'}
+    ],
+    [
+      {'title': context.plugin, 'type': 'success', 'icon': 'context.plugin.'+context_plugins[context.plugin].cat},
+    ],
+    '' if context.enabled else 'text-muted'
+  ) }}
+  {{ lib.modal_delete('deleteFinishingContext%s'|format(context.id), 'Delete context', 'Do you really want to delete the selected context "%s"?'|format(context.name), url('frame_context_action', args=[frame.id, context.id])+'?action=delete') }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No context defined. Click on the add button to create a new one.', 'info') }}
   </div>
 {% endfor %}
-</ul>
+</div>
 
 {{ lib.nav_actions([
   {'icon': 'action.add', 'modal': 'createFinishingContext', 'type': 'success'},

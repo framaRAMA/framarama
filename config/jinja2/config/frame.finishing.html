@@ -2,51 +2,42 @@
 
 {% block content_frame %}
 
-<ul class="list-group list-group-light">
+<div class="row pt-3">
 {% for finishing in finishings %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div class="w-100">
-      <div class="position-absolute">
-        <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=up" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.up', '') }}</a><br/>
-        <a href="{{ url('frame_finishing_action', args=[frame.id, finishing.id]) }}?action=down" class="btn btn-sm btn-xs btn-outline-primary mb-1">{{ lib.icon('action.down', '') }}</a>
-      </div>
-      <div class="ms-5 fw-bold {% if not finishing.enabled %}text-muted{% endif %}">
-        <div class="d-inline-block col-auto col-12 col-md-auto">
-          {{ loop.index }}. {{ finishing.title }}
-        </div>
-        <span class="badge rounded-pill badge-success">
-          {{ lib.icon('finishing.plugin.'+finishing_plugins[finishing.plugin].cat) }}
-          {{ finishing.plugin }}
-        </span>
-        {% if finishing.image_in %}
-          <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.input') }} {{ finishing.image_in }}</span>
-        {% endif %}
-        {% if finishing.image_out %}
-          <span class="badge rounded-pill badge-warning">{{ lib.icon('finishing.output') }} {{ finishing.image_out }}</span>
-        {% endif %}
-      </div>
-      <div class="ms-5 text-muted smaller font-monospace">
-        {% for field_name, field_value in finishing.get_field_values().items() %}
-          {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
-            <strong>{{ finishing.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    <div class="ms-0 pt-2 pb-2">
-      <div class="btn-group-vertical h-100" role="group" aria-label="Vertical button group">
-        <a href="{{ url('frame_finishing_edit', args=[frame.id, finishing.id]) }}" class="btn btn-sm btn-xs btn-secondary">{{ lib.icon('action.edit') }}</a>
-        <a href="#" class="btn btn-sm btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#{{ 'deleteFinishing%s'|format(finishing.id) }}">{{ lib.icon('action.delete') }}</a>
-      </div>
-    </div>
-    {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
-  </li>
+  {% set badges = [{'title': finishing.plugin, 'type': 'success', 'icon': 'finishing.plugin.'+finishing_plugins[finishing.plugin].cat}] %}
+  {% if finishing.image_in %}
+    {% set badges = badges + [{'title': finishing.image_in, 'type': 'warning', 'icon': 'finishing.input'}] %}
+  {% endif %}
+  {% if finishing.image_out %}
+    {% set badges = badges + [{'title': finishing.image_out, 'type': 'warning', 'icon': 'finishing.output'}] %}
+  {% endif %}
+
+  {% set body %}
+    {% for field_name, field_value in finishing.get_field_values().items() %}
+      {% if field_name not in ['id', 'created', 'updated', 'frame', 'plugin', 'plugin_config', 'ordering'] and field_value != None %}
+        <strong>{{ finishing.get_field(field_name).verbose_name }}:</strong> {{ field_value }}{{ "\n" }}<br/>
+      {% endif %}
+    {% endfor %}
+  {% endset %}
+  {{ lib.card_list_item(
+    loop.index ~ '. ' ~ finishing.title,
+    '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
+    [
+      {'title': '', 'icon': 'action.up', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align':'left'},
+      {'title': '', 'icon': 'action.down', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=down','classes': 'btn-outline-primary', 'align':'left'},
+      {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_finishing_edit', args=[frame.id, finishing.id])},
+      {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishing%s'|format(finishing.id), 'classes': 'text-danger'}
+    ],
+    badges,
+    '' if finishing.enabled else 'text-muted'
+  ) }}
+  {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No finishings defined. Click on the add button to create a new one.', 'info') }}
   </div>
 {% endfor %}
-</ul>
+</div>
 
 {{ lib.nav_actions([
   {'icon': 'action.eximport', 'modal': 'exportImport', 'type': 'primary'},

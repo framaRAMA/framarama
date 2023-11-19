@@ -730,12 +730,12 @@
 {% macro card_list_item(title, body, actions=[], badges=[], classes=null) %}
   <div class="col-12 mb-4{%if classes %} {{ classes }}{% endif %}">
     <div class="card border rounded-5">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <p class="fw-bold mb-1">{{ title }}</p>
+      <div class="card-body p-0">
+        <div class="p-2 d-flex align-items-center border-bottom bg-light">
+          <p class="fw-bold m-0">{{ title }}</p>
           {{ badge_group(badges) }}
         </div>
-        <div class="text-muted smaller font-monospace">{{ body }}</div>
+        <div class="p-2 text-muted">{{ body }}</div>
       </div>
       {{ card_actions(actions) }}
     </div>
