@@ -727,8 +727,8 @@
   </div>
 {% endmacro %}
 
-{% macro card_list_item(title, body, actions=[], icon=None, badges=[]) %}
-  <div class="col-12 mb-4">
+{% macro card_list_item(title, body, actions=[], badges=[], classes=null) %}
+  <div class="col-12 mb-4{%if classes %} {{ classes }}{% endif %}">
     <div class="card border rounded-5">
       <div class="card-body">
         <div class="d-flex align-items-center">

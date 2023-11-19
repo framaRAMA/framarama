@@ -30,7 +30,6 @@
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_sorting_edit', args=[frame.id, sorting.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteSorting%s'|format(sorting.id), 'classes': 'text-danger'}
     ],
-    null,
     [
       {'title': sorting.plugin, 'type': 'success', 'icon': 'sorting.plugin.'+sorting_plugins[sorting.plugin].cat},
       {'title': 'Weight', 'type': 'warning'},
