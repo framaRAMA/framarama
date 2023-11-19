@@ -744,14 +744,25 @@
 
 {% macro card_actions(actions) %}
   {% if actions %}
-    <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
-      {% for action in actions %}
-        <a
-         class="btn btn-link m-0 {% if 'classes' in action %}{{ action['classes'] }}{% else %}text-reset{% endif %}"
-         role="button" data-ripple-color="primary"
-         {% if 'url' in action %}href="{{ action['url'] }}"{% endif %}
-         {% if 'target' in action %}href="#" data-bs-toggle="modal" data-bs-target="#{{ action['target'] }}"{% endif %}
-        >{{ action['title'] }}{% if 'icon' in action %}{{ icon(action['icon'], 'ms-2') }}{% endif %}</a>
+    {% set actions_left = actions|selectattr('align', 'equalto', 'left')|list %}
+    {% set actions_right = actions|selectattr('align', 'equalto', 'right')|list %}
+    {% set actions_center = actions|reject('in', actions_left + actions_right)|list %}
+    <div class="card-footer border-0 bg-light p-2 d-flex">
+      {% for config in [
+        {'actions': actions_left, 'classes': 'col-auto'},
+        {'actions': actions_center, 'classes': 'd-flex justify-content-around w-100'},
+        {'actions': actions_right, 'classes': 'col-auto'}
+      ] %}
+        <div class="{{ config['classes'] }}">
+          {% for action in config['actions'] %}
+            <a
+             class="btn btn-link m-0 {% if 'classes' in action %}{{ action['classes'] }}{% else %}text-reset{% endif %}"
+             role="button" data-ripple-color="primary"
+             {% if 'url' in action %}href="{{ action['url'] }}"{% endif %}
+             {% if 'target' in action %}href="#" data-bs-toggle="modal" data-bs-target="#{{ action['target'] }}"{% endif %}
+            >{{ action['title'] }}{% if 'icon' in action %}{{ icon(action['icon'], 'ms-2' if action['title'] else '') }}{% endif %}</a>
+          {% endfor %}
+        </div>
       {% endfor %}
     </div>
   {% endif %}
