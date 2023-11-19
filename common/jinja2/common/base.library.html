@@ -711,15 +711,21 @@
   </table>    
 {% endmacro %}
 
-{% macro card_item(title, body, actions=[], icon=None) %}
+{% macro card_item(title, body, actions=[], icon=None, badges=[], image=None) %}
   <div class="col-md-6 col-lg-4 mb-4">
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <div class="ms-3">
-            <p class="fw-bold mb-1">{% if icon %}{{ icon }}{% endif %}{{ title }}</p>
-            <p class="text-muted mb-0">{{ body }}</p>
+          <div class="d-flex">
+            {% if image %}
+              <img src="{{ image }}" alt="Thumbnail" style="object-fit: cover; width: 45px; height: 45px" class="rounded"/>
+            {% endif %}
+            <div class="ms-3">
+              <p class="fw-bold mb-1">{% if icon %}{{ icon }}{% endif %}{{ title }}</p>
+              <p class="text-muted mb-0">{{ body }}</p>
+            </div>
           </div>
+          {{ badge_group(badges) }}
         </div>
       </div>
       {{ card_actions(actions) }}

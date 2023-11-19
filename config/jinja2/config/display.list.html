@@ -4,26 +4,11 @@
 <div class="row pt-3">
 
   {% for display in displays %}
-    <div class="col-md-6 mb-4">
-      <div class="card  border rounded-5">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img src="{{ url('display_thumbnail', args=[display.id]) }}" alt="Thumbnail" style="object-fit: cover; width: 45px; height: 45px" class="rounded">
-              <div class="ms-3">
-                <p class="fw-bold mb-1">{{ display.name }}</p>
-                <p class="text-muted mb-0">
-                {% if display.description != '' %}{{ display.description }}{% else %}(no description){% endif %}</p>
-              </div>
-            </div>
-            {{ lib.badge_group([{'title': ('enabled' if display.enabled else 'disabled'), 'type': ('success' if display.enabled else 'danger'), 'classes': 'float-end'}]) }}
-          </div>
-        </div>
-        <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
-          <a class="btn btn-link m-0 text-reset" href="{{ url('display_overview', args=[display.id]) }}" role="button" data-ripple-color="primary">View{{ lib.icon('action.view', 'ms-2') }}</a>
-        </div>
-      </div>
-    </div>
+    {{ lib.card_item(display.name, display.description if display.description else '(no description)', [
+      {'title': 'View', 'icon': 'action.view', 'url': url('display_overview', args=[display.id]) }
+    ], null, [
+      {'title': ('enabled' if display.enabled else 'disabled'), 'type': ('success' if display.enabled else 'danger'), 'classes': 'float-end'}
+    ], url('display_thumbnail', args=[display.id])) }}
   {% else %}
     <div class="col-12">
       {{ lib.note('There is not display defined. Click on add button to create a new display.', 'info') }}
