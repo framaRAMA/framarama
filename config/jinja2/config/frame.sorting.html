@@ -32,8 +32,7 @@
     ],
     [
       {'title': sorting.plugin, 'type': 'success', 'icon': 'sorting.plugin.'+sorting_plugins[sorting.plugin].cat},
-      {'title': 'Weight', 'type': 'warning'},
-      {'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger')}
+      {'title': 'Weight %d'|format(sorting.weight), 'type': 'warning'}
     ]
   ) }}
   {{ lib.modal_delete('deleteSorting%s'|format(sorting.id), 'Delete sorting', 'Do you really want to delete the selected sorting "%s"?'|format(sorting.title), url('frame_sorting_action', args=[frame.id, sorting.id])+'?action=delete') }}
