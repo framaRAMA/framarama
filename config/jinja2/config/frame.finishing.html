@@ -55,12 +55,20 @@
 ]) }}
 
 {{ lib.modal_start('createFinishing', 'Select finishing to create', classes='modal-fullscreen-lg-down modal-xl') }}
-  <div class="row">
-  {% for name, finishing_plugin in finishing_plugins.items() %}
-    {{ lib.card_item(finishing_plugin.title, finishing_plugin.descr, actions=[
-        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_finishing_create', args=[frame.id, name])}
-    ], icon=lib.icon('finishing.plugin.' + finishing_plugin.cat)) }}
-  {% endfor %}
+  {{ lib.nav_tabs('finishingTabs', {'customFinishings':{'title':'Custom'}, 'predefinedFinishings':{'title':'Predefined'}}) }}
+  <div class="tab-content">
+    <div id="customFinishingsTab" role="tabpanel" aria-labelledby="customFinishings" class="tab-pane fade show active">
+      <div class="row">
+      {% for name, finishing_plugin in finishing_plugins.items() %}
+        {{ lib.card_item(finishing_plugin.title, finishing_plugin.descr, actions=[
+            {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_finishing_create', args=[frame.id, name])}
+        ], icon=lib.icon('finishing.plugin.' + finishing_plugin.cat)) }}
+      {% endfor %}
+      </div>
+    </div>
+    <div id="predefinedFinishingsTab" role="tabpanel" aria-labelledby="predefinedFinishings" class="tab-pane fade">
+      Some other content
+    </div>
   </div>
 {{ lib.modal_end() }}
 

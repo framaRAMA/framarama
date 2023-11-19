@@ -64,26 +64,9 @@
 {{ lib.modal_start('createStepType', 'Select type to add', classes='modal-fullscreen-lg-down modal-xl') }}
   <div class="row">
   {% for name, plugin in source_plugins.items() %}
-    <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="">
-              <p class="fw-bold mb-1">
-                {{ lib.icon('source.plugin.'+plugin.cat) }}
-                {{ plugin.title }}
-              </p>
-              <p class="text-muted mb-0">{{ plugin.descr }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
-          <a class="btn btn-link m-0 text-reset" href="{{ url('frame_source_step_create', args=[frame.id, source.id, plugin.name]) }}"
-            role="button" data-ripple-color="primary">Add {{ lib.icon('action.add', 'ms-2') }}</a>
-        </div>
-        
-      </div>
-    </div>
+    {{ lib.card_item(plugin.title, plugin.descr, actions=[
+        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_source_step_create', args=[frame.id, source.id, plugin.name])}
+    ], icon=lib.icon('source.plugin.'+plugin.cat)) }}
   {% endfor %}
   </div>
 {{ lib.modal_end() }}
