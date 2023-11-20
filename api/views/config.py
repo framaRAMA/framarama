@@ -123,7 +123,7 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
             'network_profile', 'network_connected', 'network_address_ip', 'network_address_gateway',
             'screen_on', 'screen_width', 'screen_height',
             'items_total', 'items_shown', 'items_error', 'items_updated',
-            'app_date', 'app_branch', 'app_hash', 'app_checked', 'app_updated',
+            'app_date', 'app_branch', 'app_hash', 'app_checked', 'app_installed',
         ]
 
     def to_representation(self, instance):
