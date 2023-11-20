@@ -198,10 +198,10 @@ class Scheduler(jobs.Scheduler):
         _config = frontend.Frontend.get().get_config().get_config()
         if force is False and _config.app_update_install is not None and _config.app_update_install is False:
             return
-        if _config.app_update_install_hour:
+        if _config.app_update_install_hour is not None:
             _diff = utils.DateTime.midnight()-utils.DateTime.now(sub=_config.app_update_install_hour)
         else:
-            _diff = -1
+            _diff = 0
         if force is False and _diff and (_diff < 0 or _diff > 2*60*60):
             return
         _capability = frontend.Frontend.get().get_device().get_capability()
