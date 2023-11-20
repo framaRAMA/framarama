@@ -8,7 +8,8 @@
       {'title': 'View', 'icon': 'action.view', 'url': url('display_overview', args=[display.id]) }
     ], null, [
       {'title': ('enabled' if display.enabled else 'disabled'), 'type': ('success' if display.enabled else 'danger'), 'classes': 'float-end'}
-    ], url('display_thumbnail', args=[display.id])) }}
+    ], url('display_thumbnail', args=[display.id]),
+    'col-12 col-md-6') }}
   {% else %}
     <div class="col-12">
       {{ lib.note('There is not display defined. Click on add button to create a new display.', 'info') }}

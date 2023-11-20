@@ -8,7 +8,8 @@
       {'title': 'View', 'icon': 'action.view', 'url': url('frame_info', args=[frame.id])}
     ], null, [
       {'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger'), 'classes': 'float-end'}
-    ], url('frame_thumbnail', args=[frame.id])) }}
+    ], url('frame_thumbnail', args=[frame.id]),
+    'col-12 col-md-6') }}
   {% else %}
     <div class="col-12">
       {{ lib.note('There is not frame defined. Click on add button to create a new frame.', 'info') }}

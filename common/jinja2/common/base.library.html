@@ -711,8 +711,8 @@
   </table>    
 {% endmacro %}
 
-{% macro card_item(title, body, actions=[], icon=None, badges=[], image=None) %}
-  <div class="col-md-6 col-lg-4 mb-4">
+{% macro card_item(title, body, actions=[], icon=None, badges=[], image=None, classes=null) %}
+  <div class="{% if classes %}{{ classes }}{% else %}col-md-6 col-lg-4{% endif %} mb-4">
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
