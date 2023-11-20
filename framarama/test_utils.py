@@ -328,6 +328,18 @@ class DateTimeTestCase(TestCase):
         self.assertNotEqual(_time_utc.tzinfo.key, _time_europe.tzinfo.key)
 
 
+class ExceptionsTestCase(TestCase):
+
+    def test_traceback(self):
+        try:
+            raise Exception("Raise test exception to verify")
+        except Exception as e:
+            _msg = utils.Exceptions.traceback()
+        self.assertIsNotNone(_msg)
+        self.assertIn('Raise test exception to verify', _msg)
+        self.assertIn('Traceback', _msg)
+
+
 class ClassesTestCase(TestCase):
 
     def test_load_python_module(self):

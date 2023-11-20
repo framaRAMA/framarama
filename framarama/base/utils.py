@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import time
 import datetime
 import zoneinfo
@@ -10,6 +11,7 @@ import signal
 import logging
 import json
 import importlib
+import traceback
 import requests
 
 from django.utils import dateparse, timezone
@@ -367,6 +369,15 @@ class DateTime:
                 if self._changed:
                     timezone.deactivate()
         return Zoned(tz)
+
+
+class Exceptions:
+
+    @staticmethod
+    def traceback():
+        ex_type, ex_value, ex_trace = sys.exc_info()
+        _traceback = traceback.format_exception(ex_type, ex_value, ex_trace)
+        return _traceback[-1] + ''.join(_traceback[:-1])
 
 
 class Classes:
