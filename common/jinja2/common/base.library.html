@@ -906,7 +906,7 @@
       checked for latest update <strong>{{ status.app_checked|duration(short=true) if status.app_checked else 'unknown'}}</strong>
     </li>
     <li>
-      last update install <strong>{{ status.app_installed|duration(short=true) if status.app_checked else 'unknown'}}</strong>
+      last update install <strong>{{ status.app_installed|duration(short=true) if status.app_installed else 'unknown'}}</strong>
     </li>
   </ul>
 {% endmacro %}
