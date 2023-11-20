@@ -753,6 +753,7 @@
     {% set actions_left = actions|selectattr('align', 'equalto', 'left')|list %}
     {% set actions_right = actions|selectattr('align', 'equalto', 'right')|list %}
     {% set actions_center = actions|reject('in', actions_left + actions_right)|list %}
+    {% set default_classes = 'btn-white' %}
     <div class="card-footer border-0 bg-light p-2 d-flex">
       {% for config in [
         {'actions': actions_left, 'classes': 'col-auto'},
@@ -762,7 +763,7 @@
         <div class="{{ config['classes'] }}">
           {% for action in config['actions'] %}
             <a
-             class="btn btn-link m-0 {% if 'classes' in action %}{{ action['classes'] }}{% else %}text-reset{% endif %}"
+             class="btn btn-link m-0 px-3 px-md-4 {% if 'classes' in action %}{{ action['classes'] }}{% if 'btn-' not in action['classes'] %} {{ default_classes }}{% endif %}{% else %}text-reset {{ default_classes }}{% endif %}"
              role="button" data-ripple-color="primary"
              {% if 'url' in action %}href="{{ action['url'] }}"{% endif %}
              {% if 'target' in action %}href="#" data-bs-toggle="modal" data-bs-target="#{{ action['target'] }}"{% endif %}
