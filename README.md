@@ -103,7 +103,7 @@ Checkout the project as mentioned before and adjust the configuration:
 
 The server component depends on the following dependencies:
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
-* ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them an check via `convert -list font`)
+* ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them and check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
 
 If only running the server component setup as follows:
