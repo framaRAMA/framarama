@@ -9,12 +9,12 @@
     'checked %s ago'|format(app_update_check_date|duration(short=true)) if app_update_check_date else 'not checked'
   )) }}
   {% if app_update_check_status and 'Error' in app_update_check_status %}
-    {{ lib.field_text('', '<span class="text-danger">'|safe ~ app_update_check_status ~ '</span>'|safe) }}
+    {{ lib.field_text('', '<span class="text-danger">%s</span>'|format(app_update_check_status)|safe) }}
   {% elif app_update_check_status %}
     {{ lib.field_text('', app_update_check_status) }}
   {% endif %}
   {% if app.revision['update'] %}
-    {{ lib.field_text('New version', '%s (%s, %s)'|format(app.revision['update'].ref, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)) }}
+    {{ lib.field_text('New version', '<span class="text-success">%s (%s, %s)</span>'|format(app.revision['update'].ref, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)|safe) }}
   {% endif %}
   {{ lib.field_text('Update install', '%s%s'|format(
     'automatically' if app_update_install else 'manually',
