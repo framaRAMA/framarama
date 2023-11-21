@@ -206,7 +206,6 @@ class Scheduler(jobs.Scheduler):
         if force is False and _diff and (_diff < 0 or _diff > 2*60*60):
             return
         _capability = frontend.Frontend.get().get_device().get_capability()
-        _config.app_update_check_date = None
         _config.app_update_install_date = utils.DateTime.now()
         _config.app_update_install_status = 'Update in progress...'
         _config.save()
