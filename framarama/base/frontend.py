@@ -439,6 +439,7 @@ class FrontendDevice(Singleton):
             finishings.items(),
             _adapter)
         with _context:
+            _start = DateTime.now()
             _config = Frontend.get().get_config().get_config()
             _processor = finishing.Processor(_context)
             _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
@@ -450,6 +451,7 @@ class FrontendDevice(Singleton):
                   'image_meta': _result.get_image_meta(),
                   'preview_meta': _result.get_preview_meta(),
                   'time': DateTime.utc(DateTime.now()),
+                  'usage_time': (DateTime.now() - _start).seconds,
                 })
 
                 Filesystem.file_write(_files['json'], _json.encode())
@@ -655,6 +657,9 @@ class FrontendItem:
 
     def time(self):
         return DateTime.parse(self._json['time'])
+
+    def usage_time(self):
+        return DateTime.parse(self._json['usage_time'])
 
     def file(self):
         return self._image_file
