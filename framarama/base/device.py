@@ -489,7 +489,7 @@ class Capabilities:
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
             'GIT_PASSWORD': password if password is not None else '',
         })
-        Process.exec_run(['git', 'remote', 'set-url', _remote, url])
+        Process.exec_run(['git', 'remote', 'set-url', _remote, _remotes[_remote]])
         if _fetch is None:
             logger.error("Can not fetch updates!")
             return 'Error: Fetching updates'
