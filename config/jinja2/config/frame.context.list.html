@@ -15,8 +15,8 @@
     loop.index ~ '. ' ~ context.name,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
-      {'title': '', 'icon': 'action.up', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=up', 'classes': 'btn-outline-primary position-static'},
-      {'title': '', 'icon': 'action.down', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=down','classes': 'btn-outline-primary position-static'},
+      {'title': '', 'icon': 'action.up', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align': 'left'},
+      {'title': '', 'icon': 'action.down', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=down','classes': 'btn-outline-primary', 'align': 'left'},
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_context_edit', args=[frame.id, context.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishingContext%s'|format(context.id), 'classes': 'text-danger'}
     ],
