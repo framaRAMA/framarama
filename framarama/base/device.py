@@ -497,12 +497,13 @@ class Capabilities:
             logger.info("Updates fetched!")
         return None
 
-    def app_update(revision):
+    def app_update(revision=None):
         logger.info("Installing update ...")
         _revision = Capabilities.app_revision()
         if _revision is None:
             return 'Error: Can not identify current version'
-        _remote = _revision['remote']['name']
+        if revision is None:
+            revision = _revision['branch']
         if revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
@@ -515,6 +516,7 @@ class Capabilities:
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
         if revision == 'master':
+            _remote = _revision['remote']['name']
             _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
         else:
             _update = Process.exec_run(['git', 'checkout', revision])
