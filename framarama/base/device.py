@@ -63,9 +63,6 @@ class Capability:
     def disk_tmp_free(self):
         return self._none()
 
-    def sys_uptime(self):
-        return self._none()
-
     def net_config(self):
         return self._none()
 
