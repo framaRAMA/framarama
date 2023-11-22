@@ -59,7 +59,7 @@ class Scheduler(jobs.Scheduler):
         if self._startup is None:
             self._startup = utils.DateTime.now()
             _config = frontend.Frontend.get().get_config()
-            _config.get_config().date_app_startup = utils.DateTime.now()
+            _config.get_config().date_app_startup = self._startup
             _config.get_config().save()
         self.disable_jobs()
     
