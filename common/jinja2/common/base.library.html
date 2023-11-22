@@ -992,7 +992,10 @@
 {% macro badge_group(items) %}
   <div>
     {% for item in items %}
-      <span class="badge rounded-pill badge-{{ item['type']|default('success') }}{% if 'classes' in item %} {{ item['classes'] }}{% endif %} m-1">
+      <span
+       class="badge rounded-pill badge-{{ item['type']|default('success') }}{% if 'classes' in item %} {{ item['classes'] }}{% endif %} m-1"
+       title="{% if 'tooltip' in item %}{{ item['tooltip'] }}{% endif %}"
+      >
         {% if 'icon' in item %}{{ icon(item['icon']) }}{% endif %}
         {{ item['title'] }}
       </span>
