@@ -4,13 +4,6 @@
 
 <div class="row pt-3">
 {% for sorting in sortings %}
-  {% set error_marker %}
-    {% if 'sorting%d'|format(sorting.id) in errors %}
-      <span title="{{ errors['sorting%d'|format(sorting.id)] }}" class="text-danger">
-        {{ lib.icon('error') }}
-      </span>
-    {% endif %}
-  {% endset %}
   {% set body %}
     {% if sorting.code_template %}
       Template:
@@ -23,17 +16,21 @@
       {% endfor %}
     {% endif %}
   {% endset %}
+  {% set badges = [
+    {'title': 'error', 'type': 'danger', 'icon': 'error', 'tooltip': errors['sorting%d'|format(sorting.id)] },
+  ] if 'sorting%d'|format(sorting.id) in errors else [] %}
+  {% set badges = badges + [
+    {'title': sorting.plugin, 'type': 'success', 'icon': 'sorting.plugin.'+sorting_plugins[sorting.plugin].cat},
+    {'title': 'Weight %d'|format(sorting.weight), 'type': 'warning'}
+  ] %}
   {{ lib.card_list_item(
-    loop.index ~ '. ' ~ sorting.title ~ error_marker,
+    loop.index ~ '. ' ~ sorting.title,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_sorting_edit', args=[frame.id, sorting.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteSorting%s'|format(sorting.id), 'classes': 'text-danger'}
     ],
-    [
-      {'title': sorting.plugin, 'type': 'success', 'icon': 'sorting.plugin.'+sorting_plugins[sorting.plugin].cat},
-      {'title': 'Weight %d'|format(sorting.weight), 'type': 'warning'}
-    ]
+    badges
   ) }}
   {{ lib.modal_delete('deleteSorting%s'|format(sorting.id), 'Delete sorting', 'Do you really want to delete the selected sorting "%s"?'|format(sorting.title), url('frame_sorting_action', args=[frame.id, sorting.id])+'?action=delete') }}
 {% else %}
