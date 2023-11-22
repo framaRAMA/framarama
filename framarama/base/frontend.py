@@ -273,6 +273,7 @@ class Frontend(Singleton):
             }
         if restrictions is None  or 'app' in restrictions:
             _data['app'] = {
+                'uptime': (DateTime.now() - _config.date_app_startup).seconds if _config.date_app_startup else None,
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['branch'] if _app_revision else None,

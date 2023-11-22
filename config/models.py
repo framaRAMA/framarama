@@ -490,7 +490,7 @@ class DisplayStatus(BaseModel):
     display = models.ForeignKey(Display, on_delete=models.CASCADE, related_name='status')
     uptime = models.BigIntegerField(
         blank=True, null=True,
-        verbose_name='Update', help_text='The uptime of the device in milli seconds')
+        verbose_name='Uptime', help_text='The uptime of the device in seconds')
     memory_used = models.BigIntegerField(
         blank=True, null=True,
         verbose_name='Memory used', help_text='Amount of memory currently in use')
@@ -542,6 +542,9 @@ class DisplayStatus(BaseModel):
     items_updated = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Items updated', help_text='Time of the last item list update')
+    app_uptime = models.BigIntegerField(
+        blank=True, null=True,
+        verbose_name='Application uptime', help_text='The uptime of the application in seconds')
     app_date = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Application date', help_text='Date of current version in use')
