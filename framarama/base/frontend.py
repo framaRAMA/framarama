@@ -659,7 +659,7 @@ class FrontendItem:
         return DateTime.parse(self._json['time'])
 
     def usage_time(self):
-        return DateTime.parse(self._json['usage_time'])
+        return self._json['usage_time']
 
     def file(self):
         return self._image_file
