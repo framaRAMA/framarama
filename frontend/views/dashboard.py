@@ -117,14 +117,14 @@ class DeviceDashboardView(base.BaseFrontendView):
           'usage': int((_mem_total - _mem_free) / _mem_total * 100)
         }
         _uptime = _capability.sys_uptime()
-        _disk_tmp = _capability.disk_data_free()
-        _disk_data = _capability.disk_tmp_free()
+        _disk_tmp = _capability.disk_tmp_free()
+        _disk_data = _capability.disk_data_free()
         _context['sys'] = {
           'uptime' : _uptime
         }
         _context['disk'] = {
-          'datafree': _disk_data[0],
-          'tmpfree': _disk_tmp[0],
+          'datafree': _disk_data[1],
+          'tmpfree': _disk_tmp[1],
         }
         _context['cpu'] = {
           'load': _capability.cpu_load(),
