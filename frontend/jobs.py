@@ -157,7 +157,7 @@ class Scheduler(jobs.Scheduler):
                 _frontend_item = _device.finish(self._display, _contexts, _next_item, _finishings)
                 _device.activate(0)
                 logger.info("Image updated in {} seconds ({} bytes, {}x{} pixels, mime {})!".format(
-                    _frontend_item.usage_time(),
+                    (utils.DateTime.now() - self._last_update).seconds,
                     len(_frontend_item.data()),
                     _frontend_item.width(),
                     _frontend_item.height(),
