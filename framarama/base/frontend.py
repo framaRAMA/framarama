@@ -426,9 +426,9 @@ class FrontendDevice(Singleton):
         _context = finishing.Context(
             display.display(),
             display.frame(),
-            contexts.items(),
+            contexts,
             item,
-            finishings.items(),
+            finishings,
             _adapter)
         with _context:
             _start = DateTime.now()

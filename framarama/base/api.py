@@ -121,7 +121,7 @@ class ApiClient(Singleton):
     def get_item(self, display_id, item_id):
         return self._item(
             self._request('/displays/{}/items/all/{}'.format(display_id, item_id)),
-            config_models.Item, config_views.ItemDisplaySerializer)
+            config_models.Item, config_views.ItemDisplaySerializer).item()
 
     def get_item_download(self, display_id, item_id):
         return self._request('/displays/{}/items/all/{}/download'.format(display_id, item_id), raw=True).content
@@ -152,12 +152,12 @@ class ApiClient(Singleton):
     def get_contexts(self, display_id):
         return self._list(
             self._request('/displays/{}/contexts'.format(display_id)),
-            config_models.FrameContext, config_views.ContextSerializer)
+            config_models.FrameContext, config_views.ContextSerializer).items()
 
     def get_finishings(self, display_id):
         return self._list(
             self._request('/displays/{}/finishings'.format(display_id)),
-            config_models.Finishing, config_views.FinishingSerializer)
+            config_models.Finishing, config_views.FinishingSerializer).items()
 
     def submit_status(self, display_id, status):
         return self._request('/displays/{}/status'.format(display_id), ApiClient.METHOD_POST, status)
