@@ -18,7 +18,7 @@ from config.utils import sorting, finishing
 from api import auth
 
 
-class BaseSerializer:
+class BaseSerializer(serializers.ModelSerializer):
 
     def get_request(self):
         return self.context.get('request')
@@ -49,8 +49,9 @@ class BaseSerializer:
         return validated_data
 
 
-class FrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class FrameSerializer(BaseSerializer):
     url_items = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Frame
         fields = ['id', 'name', 'description', 'enabled', 'url', 'url_items']
@@ -60,14 +61,14 @@ class FrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
         return self.reverse('frame_item-list', [obj.id])
 
 
-class SourceSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class SourceSerializer(BaseSerializer):
     class Meta:
         model = models.Source
         fields = ['id', 'name']
         map_fields = ['id']
 
 
-class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class DisplaySerializer(BaseSerializer):
     enabled = serializers.SerializerMethodField()
     device_type_name = serializers.SerializerMethodField()
     frame = FrameSerializer()
@@ -108,7 +109,7 @@ class DisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
         return super().map(data, self.map_fields(data, validated_data, ['frame']))
 
 
-class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
+class DisplayStatusSerializer(BaseSerializer):
     _json_renderer = JSONRenderer()
     _json_parser = JSONParser()
 
@@ -142,14 +143,14 @@ class DisplayStatusSerializer(serializers.HyperlinkedModelSerializer):
         return _status
 
 
-class ItemFrameSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class ItemFrameSerializer(BaseSerializer):
     class Meta:
         model = models.Item
         fields = ('id', 'date_creation', 'url')
         map_fields = ['id', 'url']
 
 
-class ItemDisplaySerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class ItemDisplaySerializer(BaseSerializer):
     url_download = serializers.SerializerMethodField()
     class Meta:
         model = models.Item
@@ -218,7 +219,7 @@ class DataFieldSerializer(serializers.Field):
         return self._cls.create(data=_data, mime=_mime, meta=_meta)
 
 
-class HitItemDisplaySerializer(serializers.HyperlinkedModelSerializer):
+class HitItemDisplaySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     thumbnail = DataFieldSerializer(models.DisplayItemThumbnailData, required=False, allow_null=True)
 
@@ -283,7 +284,7 @@ class HitItemDisplaySerializer(serializers.HyperlinkedModelSerializer):
         return _result
 
 
-class FinishingSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class FinishingSerializer(BaseSerializer):
     url = serializers.SerializerMethodField()
     class Meta:
         model = models.Finishing
@@ -295,7 +296,7 @@ class FinishingSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer
         return self.reverse('display_finishing-detail', [_kwargs['display_id'], obj.id])
 
 
-class ContextSerializer(BaseSerializer, serializers.HyperlinkedModelSerializer):
+class ContextSerializer(BaseSerializer):
     url = serializers.SerializerMethodField()
     class Meta:
         model = models.FrameContext
