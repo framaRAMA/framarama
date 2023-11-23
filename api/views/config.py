@@ -19,6 +19,30 @@ from api import auth
 
 
 class BaseSerializer(serializers.ModelSerializer):
+    links = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = ('links',)
+
+    def _link(self, name, href=None, template=None):
+        # Examples:
+        # { "rel": "action", "href": "http://domain/entity/1/action" },
+        # { "rel": "self", "href": "http://domain/entities/1" },
+        # { "rel": "others", "href": "http://domain/entitie/1/others" },
+        # { "rel": "search", "template": "http://domain/search?keyword={query}" },
+        # { "rel": "add", "target": "http://domain/entities/add", "template": { "name" : ..., "state": ... } }
+        _link = {'rel': name}
+        if href:
+          _link['href'] = href
+        if template:
+          _link['template'] = template
+        return _link
+
+    def _link_view(self, name, view, args):
+        return self._link(name, href=self.reverse(view, args))
+
+    def get_links(self, obj):
+        return ()
 
     def get_request(self):
         return self.context.get('request')
@@ -50,38 +74,46 @@ class BaseSerializer(serializers.ModelSerializer):
 
 
 class FrameSerializer(BaseSerializer):
-    url_items = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Frame
-        fields = ['id', 'name', 'description', 'enabled', 'url', 'url_items']
-        map_fields = ['id']
+        fields = BaseSerializer.Meta.fields + ('id', 'name', 'description', 'enabled', 'links')
+        map_fields = ['id', 'links']
 
-    def get_url_items(self, obj):
-        return self.reverse('frame_item-list', [obj.id])
+    def get_links(self, obj):
+        return super().get_links(obj) + (
+            self._link_view('self', 'frame-detail', [obj.id]),
+            self._link_view('items', 'frame_item-list', [obj.id]),
+        )
 
 
 class SourceSerializer(BaseSerializer):
+
     class Meta:
         model = models.Source
-        fields = ['id', 'name']
-        map_fields = ['id']
+        fields = BaseSerializer.Meta.fields + ('id', 'name', 'links')
+        map_fields = ['id', 'links']
 
 
 class DisplaySerializer(BaseSerializer):
     enabled = serializers.SerializerMethodField()
     device_type_name = serializers.SerializerMethodField()
     frame = FrameSerializer()
-    url_items_all = serializers.SerializerMethodField()
-    url_items_next = serializers.SerializerMethodField()
-    url_finishings = serializers.SerializerMethodField()
-    url_contexts = serializers.SerializerMethodField()
-    url_status = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Display
-        fields = ['id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'url', 'url_items_all', 'url_items_next', 'url_finishings', 'url_contexts', 'url_status']
-        map_fields = ['id', 'enabled']
+        fields = BaseSerializer.Meta.fields + ('id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'links')
+        map_fields = ['id', 'enabled', 'links']
+
+    def get_links(self, obj):
+        return super().get_links(obj) + (
+            self._link_view('self', 'display-detail', [obj.id]),
+            self._link_view('item-list', 'display_item_all-list', [obj.id]),
+            self._link_view('item-next', 'display_item_next-list', [obj.id]),
+            self._link_view('finishing-list', 'display_finishing-list', [obj.id]),
+            self._link_view('context-list', 'display_context-list', [obj.id]),
+            self._link_view('status-list', 'display_status-list', [obj.id]),
+        )
 
     def get_enabled(self, obj):
         return obj.enabled and (obj.frame is None or obj.frame.enabled)
@@ -89,21 +121,6 @@ class DisplaySerializer(BaseSerializer):
     def get_device_type_name(self, obj):
         choice = [value for value in models.DEVICE_CHOICES if value[0] == obj.device_type]
         return choice[0][1] if choice else None
-
-    def get_url_items_all(self, obj):
-        return self.reverse('display_item_all-list', args=[obj.id])
-
-    def get_url_items_next(self, obj):
-        return self.reverse('display_item_next-list', args=[obj.id])
-
-    def get_url_finishings(self, obj):
-        return self.reverse('display_finishing-list', [obj.id])
-
-    def get_url_contexts(self, obj):
-        return self.reverse('display_context-list', [obj.id])
-
-    def get_url_status(self, obj):
-        return self.reverse('display_status-list', [obj.id])
 
     def map(self, data, validated_data):
         return super().map(data, self.map_fields(data, validated_data, ['frame']))
@@ -115,7 +132,7 @@ class DisplayStatusSerializer(BaseSerializer):
 
     class Meta:
         model = models.DisplayStatus
-        fields = [
+        fields = BaseSerializer.Meta.fields + (
             'id',
             'uptime',
             'memory_used', 'memory_free',
@@ -125,7 +142,15 @@ class DisplayStatusSerializer(BaseSerializer):
             'screen_on', 'screen_width', 'screen_height',
             'items_total', 'items_shown', 'items_error', 'items_updated',
             'app_uptime', 'app_date', 'app_branch', 'app_hash', 'app_checked', 'app_installed',
-        ]
+            'links',
+        )
+        map_fields = ['id', 'links']
+
+    def get_links(self, obj):
+        _display_id = self.get_kwargs().get('display_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'display_status-detail', [_display_id, obj.id]),
+        )
 
     def to_representation(self, instance):
         _result = super().to_representation(instance)
@@ -144,26 +169,39 @@ class DisplayStatusSerializer(BaseSerializer):
 
 
 class ItemFrameSerializer(BaseSerializer):
+
     class Meta:
         model = models.Item
-        fields = ('id', 'date_creation', 'url')
-        map_fields = ['id', 'url']
+        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'links')
+        map_fields = ['id', 'links']
+
+    def get_links(self, obj):
+        _frame_id = self.get_kwargs().get('frame_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'frame_item-detail', [_frame_id, obj.id]),
+            self._link_view('frame', 'frame-detail', [_frame_id]),
+        )
 
 
 class ItemDisplaySerializer(BaseSerializer):
-    url_download = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Item
-        fields = ('id', 'date_creation', 'url', 'url_download')
-        map_fields = ['id', 'url', 'url_download']
+        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'links')
+        map_fields = ['id', 'links']
 
-    def get_url_download(self, obj):
-        _kwargs = self.get_kwargs()
-        return self.reverse('display_item_all-display_item_all_download', [_kwargs['display_id'], obj.id])
+    def get_links(self, obj):
+        _display_id = self.get_kwargs().get('display_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'display_item_all-detail', [_display_id, obj.id]),
+            self._link_view('display', 'display-detail', [_display_id]),
+            self._link_view('download', 'display_item_all-display_item_all_download', [_display_id, obj.id]),
+        )
 
 
 class RankedItemFrameSerializer(ItemFrameSerializer):
     source = SourceSerializer()
+
     class Meta:
         model = models.RankedItem
         fields = ItemFrameSerializer.Meta.fields + ('rank', 'source')
@@ -176,6 +214,7 @@ class RankedItemFrameSerializer(ItemFrameSerializer):
 
 class RankedItemDisplaySerializer(ItemDisplaySerializer):
     source = SourceSerializer()
+
     class Meta:
         model = models.RankedItem
         fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
@@ -225,8 +264,14 @@ class HitItemDisplaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.DisplayItem
-        fields = ['id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail']
-        read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit', 'url']
+        fields = BaseSerializer.Meta.fields + ('id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail')
+        read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit', 'links']
+
+    def get_links(self, obj):
+        _display_id = self.get_kwargs().get('display_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'display_item_hit-detail', [_display_id, obj.id]),
+        )
 
     def _save(self, item_id, validated_data):
         _view = self.context['view']
@@ -285,27 +330,35 @@ class HitItemDisplaySerializer(serializers.ModelSerializer):
 
 
 class FinishingSerializer(BaseSerializer):
-    url = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Finishing
-        fields = ['id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'url']
-        map_fields = ['id', 'plugin_config']
+        fields = BaseSerializer.Meta.fields + ('id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'links')
+        map_fields = ['id', 'plugin_config', 'links']
 
-    def get_url(self, obj):
-        _kwargs = self.get_kwargs()
-        return self.reverse('display_finishing-detail', [_kwargs['display_id'], obj.id])
+    def get_links(self, obj):
+        _display_id = self.get_kwargs().get('display_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'display_finishing-detail', [_display_id, obj.id]),
+            self._link_view('display', 'display-detail', [_display_id]),
+            self._link_view('finishing-list', 'display_finishing-list', [_display_id]),
+        )
 
 
 class ContextSerializer(BaseSerializer):
-    url = serializers.SerializerMethodField()
+
     class Meta:
         model = models.FrameContext
-        fields = ['id', 'name', 'enabled', 'plugin', 'plugin_config', 'url']
-        map_fields = ['id', 'plugin_config']
+        fields = BaseSerializer.Meta.fields + ('id', 'name', 'enabled', 'plugin', 'plugin_config', 'links')
+        map_fields = ['id', 'plugin_config', 'links']
 
-    def get_url(self, obj):
-        _kwargs = self.get_kwargs()
-        return self.reverse('display_context-detail', [_kwargs['display_id'], obj.id])
+    def get_links(self, obj):
+        _display_id = self.get_kwargs().get('display_id')
+        return super().get_links(obj) + (
+            self._link_view('self', 'display_context-detail', [_display_id, obj.id]),
+            self._link_view('display', 'display-detail', [_display_id]),
+            self._link_view('context-list', 'display_context-list', [_display_id]),
+        )
 
 
 class BaseListView(generics.GenericAPIView):
