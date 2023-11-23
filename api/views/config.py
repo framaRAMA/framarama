@@ -172,7 +172,7 @@ class ItemFrameSerializer(BaseSerializer):
 
     class Meta:
         model = models.Item
-        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'links')
+        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'url', 'links')
         map_fields = ['id', 'links']
 
     def get_links(self, obj):
@@ -187,7 +187,7 @@ class ItemDisplaySerializer(BaseSerializer):
 
     class Meta:
         model = models.Item
-        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'links')
+        fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'url', 'links')
         map_fields = ['id', 'links']
 
     def get_links(self, obj):
