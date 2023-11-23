@@ -121,7 +121,7 @@ class ApiClient(Singleton):
     def get_item(self, display_id, item_id):
         return self._item(
             self._request('/displays/{}/items/all/{}'.format(display_id, item_id)),
-            config_models.Item, [], config_views.ItemDisplaySerializer)
+            config_models.Item, config_views.ItemDisplaySerializer)
 
     def get_item_download(self, display_id, item_id):
         return self._request('/displays/{}/items/all/{}/download'.format(display_id, item_id), raw=True).content
