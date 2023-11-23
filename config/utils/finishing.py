@@ -540,6 +540,9 @@ class ImageProcessingAdapter:
         _adapter = Classes.load(settings.FRAMARAMA['IMAGE_PROCESSING_ADAPTER'], fqcn=True)
         return _adapter()
 
+    def prepare(self, device):
+        raise NotImplementedException()
+
     def image_open(self, url, background=None):
         raise NotImplementedException()
 
@@ -636,6 +639,14 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
     def _apply(self, image, func):
         for _image in image.get_images():
             func(_image)
+
+    def prepare(self, device):
+        _capability = device.get_capability()
+        _restrictions = {'memory': _capability.mem_free(), 'disk': _capability.disk_tmp_free()[1]}
+        for _type, _free in _restrictions.items():
+            _free_max = round(1024 * _free * 0.8)
+            logger.info("Restricting {} usage to {:.0f} MB".format(_type, _free_max/1024/1024))
+            self._wand_resource.limits[_type] = _free_max
 
     def image_open(self, source, background=None):
         if type(source) == str and (source.startswith('http://') or source.startswith('https://')):

@@ -421,17 +421,8 @@ class FrontendDevice(Singleton):
         return self._monitor
 
     def finish(self, display, contexts, item, finishings):
-        _capability = self.get_capability()
-        _mem_total = _capability.mem_total()
-        _mem_free = _capability.mem_free()
-        _mem_max = round(1024 * _mem_free * 0.8)
-        logger.info("Restricting memory usage to {:.0f} MB".format(_mem_max/1024/1024))
-        _disk_free_tmp = _capability.disk_tmp_free()
-        _disk_free_tmp_max = round(1024 * _disk_free_tmp[1] * 0.8)
-        logger.info("Restricting disk usage to {:.0f} MB".format(_disk_free_tmp_max/1024/1024))
         _adapter = finishing.ImageProcessingAdapter.get_default()
-        _adapter._wand_resource.limits['memory'] = _mem_max
-        _adapter._wand_resource.limits['disk'] = _disk_free_tmp_max
+        _adapter.prepare(self)
         _context = finishing.Context(
             display.display(),
             display.frame(),
