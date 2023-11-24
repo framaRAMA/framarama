@@ -13,14 +13,24 @@
   {% elif app_update_check_status %}
     {{ lib.field_text('', app_update_check_status) }}
   {% endif %}
-  {% if app.revision['update'] %}
-    {{ lib.field_text('New version', '<span class="text-success">%s (%s, %s)</span>'|format(app.revision['update'].ref, app.revision['update'].date|date_format('%d.%m.%Y'), app.revision['update'].hash)|safe) }}
-  {% endif %}
   {{ lib.field_text('Update install', '%s%s'|format(
     'automatically' if app_update_install else 'manually',
     '%s'|format(', anytime' if not app_update_install_hour else ', between %d and %d o\'clock'|format(app_update_install_hour.seconds/60/60, 2+app_update_install_hour.seconds/60/60)) if app_update_install else ''
   )) }}
-  {{ lib.field_list('Available', app.revision.revisions[0:8]) }}
+  {% set app_updates = namespace(items = []) %}
+  {% for app_rev in app.revision.revisions[0:8] %}
+    {% if app_rev in app.revision.updates %}
+      {% set app_update = app.revision.updates[app_rev] %}
+      {% set app_updates.items = app_updates.items + ['<span class="text-success">%s (%s, %s)</span><br/>'|format(
+        app_rev, app_update['date']|date_format('%d.%m.%Y'), app_update['hash']
+      )|safe] %}
+    {% else %}
+      {% set app_updates.items = app_updates.items + ['<span class="text-muted">%s</span><br/>'|format(
+        app_rev
+      )|safe] %}
+    {% endif %}
+  {% endfor %}
+  {{ lib.field_list('Versions', app_updates.items) }}
 </div>
 
 <div class="pt-4 text-center">

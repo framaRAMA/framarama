@@ -444,22 +444,21 @@ class Capabilities:
             _branch = Process.exec_run(['git', 'branch', '--show-current'])
             _branch = _branch.decode().strip() if _branch else None
             _revisions = Capabilities._git_revisions()
-            if _branch == 'master':
-                _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_branch, _remote)])
-                _update_ref = _branch
-            elif len(_revisions):
-                _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _revisions[0])])
-                _update_ref = _revisions[0]
-            else:
-                _logs_update = None
-                _update_ref = None
+            _update_revs = {}
+            for _i, _rev in enumerate(_revisions):
+                if _rev == 'master':
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_rev, _remote)])
+                elif _i == 0 or _logs_update:
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _rev)])
+                if _logs_update:
+                    _update_revs[_rev] = _logs_update[0]|{'ref': _rev}
             _rev = _logs[0]
             _rev.update({
                 'branch': _branch,
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
                 'current': Capabilities._git_current_ref(_rev['refs']),
-                'update': _logs_update[0]|{'ref':_update_ref} if _logs_update else None
+                'updates': _update_revs
             })
             return _rev
         return None
