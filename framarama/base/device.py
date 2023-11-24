@@ -441,20 +441,18 @@ class Capabilities:
         _logs = Capabilities._git_log(['-1'])
         if _logs:
             _remote = settings.FRAMARAMA['GIT_REMOTE']
-            _branch = Process.exec_run(['git', 'branch', '--show-current'])
-            _branch = _branch.decode().strip() if _branch else None
             _revisions = Capabilities._git_revisions()
             _update_revs = {}
             for _i, _rev in enumerate(_revisions):
                 if _rev == 'master':
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_rev, _remote)])
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_logs[0]['hash'], _remote)])
                 elif _i == 0 or _logs_update:
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_branch, _rev)])
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)])
                 if _logs_update:
                     _update_revs[_rev] = _logs_update[0]|{'ref': _rev}
             _rev = _logs[0]
             _rev.update({
-                'branch': _branch,
+                'branch': _rev['refs'][0],
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
                 'current': Capabilities._git_current_ref(_rev['refs']),
