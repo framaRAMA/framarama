@@ -184,10 +184,11 @@ class Scheduler(jobs.Scheduler):
             _interval = None
         else:
             _interval = _config.app_update_check
-        if force is False and _interval is None:
-            return
-        if force is False and _config.app_update_check_date is not None and _config.app_update_check_date + _interval > utils.DateTime.now():
-            return
+        if force is False:
+            if _interval is None:
+                return
+            if _config.app_update_check_date + _interval > utils.DateTime.now():
+                return
         _capability = frontend.Frontend.get().get_device().get_capability()
         _config.app_update_check_date = utils.DateTime.now()
         _config.app_update_check_status = 'Checking for updates...'
