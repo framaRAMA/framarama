@@ -398,14 +398,14 @@ class Capabilities:
         _revisions = []
         _out = Process.exec_run(['git', 'tag', '-l', '--sort=-v:refname'])
         if _out:
-            _out = [_line for _line in _out.decode().split('\n')]
+            _out = [_line for _line in _out.decode().split('\n') if _line != '']
             _revisions.extend(_out)
         _revisions.append('master')
         #_out = Process.exec_run(['git', 'branch', '-r'])
         #if _out:
         #    _out = [_line.strip() for _line in _out.decode().split('\n')]
         #    _revisions.extend(_out)
-        return [_rev for _rev in _revisions if len(_rev)]
+        return _revisions
 
     def _git_current_ref(refs):
         if 'HEAD' in refs:
