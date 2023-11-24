@@ -258,7 +258,7 @@ class DataFieldSerializer(serializers.Field):
         return self._cls.create(data=_data, mime=_mime, meta=_meta)
 
 
-class HitItemDisplaySerializer(serializers.ModelSerializer):
+class HitItemDisplaySerializer(BaseSerializer):
     id = serializers.IntegerField()
     thumbnail = DataFieldSerializer(models.DisplayItemThumbnailData, required=False, allow_null=True)
 
