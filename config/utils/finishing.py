@@ -659,8 +659,12 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             self._wand_resource.limits[_type] = _free_max
 
     def cleanup(self, device):
-        _files = Filesystem.file_match(device.get_capability().PATH_TMP, 'magic-.+')
-        logger.info("Cleaning up temporary files: {}".format(_files))
+        _path = device.get_capability().PATH_TMP
+        _files = Filesystem.file_match(_path, 'magick-.+')
+        if _files:
+            logger.info("Cleaning up temporary files: {}".format(_files))
+            for _file in _files:
+                Filesystem.file_delete(_path + '/' + _file[0])
 
     def image_open(self, source, background=None):
         if type(source) == str and (source.startswith('http://') or source.startswith('https://')):
