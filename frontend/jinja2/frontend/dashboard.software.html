@@ -35,7 +35,7 @@
 
 <div class="pt-4 text-center">
   <a data-bs-toggle="modal" data-bs-target="#appCheck" class="btn btn-{% if not check and not update %}outline-{% endif %}primary btn-floating btn-lg{% if check or update %} disabled{% endif %}" title="Check for updates">{{ lib.icon('action.refresh') }}</a>
-  <a data-bs-toggle="modal" data-bs-target="#appUpdate" class="btn btn-{% if not check and not update %}outline-{% endif %}primary btn-floating btn-lg{% if check or update %} disabled{% endif %}" title="Update to revision">{{ lib.icon('action.update') }}</a>
+  <a data-bs-toggle="modal" data-bs-target="#appUpdate" class="btn btn-{% if not check and not update and app.revision.updates %}outline-{% endif %}primary btn-floating btn-lg{% if check or update or not app.revision.updates %} disabled{% endif %}" title="Update to revision">{{ lib.icon('action.update') }}</a>
 </div>
 
 {{ lib.modal_start('appCheck', 'Check for updates') }}
