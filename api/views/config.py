@@ -23,6 +23,7 @@ class BaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('links',)
+        read_only_fields = ('links',)
 
     def _link(self, name, href=None, template=None):
         # Examples:
@@ -78,7 +79,8 @@ class FrameSerializer(BaseSerializer):
     class Meta:
         model = models.Frame
         fields = BaseSerializer.Meta.fields + ('id', 'name', 'description', 'enabled', 'links')
-        map_fields = ['id', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
     def get_links(self, obj):
         return super().get_links(obj) + (
@@ -92,7 +94,8 @@ class SourceSerializer(BaseSerializer):
     class Meta:
         model = models.Source
         fields = BaseSerializer.Meta.fields + ('id', 'name', 'links')
-        map_fields = ['id', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
 
 class DisplaySerializer(BaseSerializer):
@@ -103,7 +106,8 @@ class DisplaySerializer(BaseSerializer):
     class Meta:
         model = models.Display
         fields = BaseSerializer.Meta.fields + ('id', 'name', 'description', 'enabled', 'device_type', 'device_type_name', 'device_width', 'device_height', 'time_on', 'time_off', 'time_change', 'frame', 'links')
-        map_fields = ['id', 'enabled', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id', 'enabled')
 
     def get_links(self, obj):
         return super().get_links(obj) + (
@@ -144,7 +148,8 @@ class DisplayStatusSerializer(BaseSerializer):
             'app_uptime', 'app_date', 'app_branch', 'app_hash', 'app_checked', 'app_installed',
             'links',
         )
-        map_fields = ['id', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
     def get_links(self, obj):
         _display_id = self.get_kwargs().get('display_id')
@@ -173,7 +178,8 @@ class ItemFrameSerializer(BaseSerializer):
     class Meta:
         model = models.Item
         fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'url', 'links')
-        map_fields = ['id', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
     def get_links(self, obj):
         _frame_id = self.get_kwargs().get('frame_id')
@@ -188,7 +194,8 @@ class ItemDisplaySerializer(BaseSerializer):
     class Meta:
         model = models.Item
         fields = BaseSerializer.Meta.fields + ('id', 'date_creation', 'url', 'links')
-        map_fields = ['id', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
     def get_links(self, obj):
         _display_id = self.get_kwargs().get('display_id')
@@ -205,6 +212,7 @@ class RankedItemFrameSerializer(ItemFrameSerializer):
     class Meta:
         model = models.RankedItem
         fields = ItemFrameSerializer.Meta.fields + ('rank', 'source')
+        read_only_fields = ItemFrameSerializer.Meta.read_only_fields
         map_fields = ItemFrameSerializer.Meta.map_fields
         abstract = True
 
@@ -218,6 +226,7 @@ class RankedItemDisplaySerializer(ItemDisplaySerializer):
     class Meta:
         model = models.RankedItem
         fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
+        read_only_fields = ItemDisplaySerializer.Meta.read_only_fields
         map_fields = ItemDisplaySerializer.Meta.map_fields
         abstract = True
 
@@ -265,7 +274,8 @@ class HitItemDisplaySerializer(BaseSerializer):
     class Meta:
         model = models.DisplayItem
         fields = BaseSerializer.Meta.fields + ('id', 'date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail')
-        read_only_fields = ['date_first_see', 'date_last_seen', 'count_hit', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields + ('date_first_see', 'date_last_seen', 'count_hit')
+        map_fields = BaseSerializer.Meta.fields + ('id',)
 
     def get_links(self, obj):
         _display_id = self.get_kwargs().get('display_id')
@@ -334,7 +344,8 @@ class FinishingSerializer(BaseSerializer):
     class Meta:
         model = models.Finishing
         fields = BaseSerializer.Meta.fields + ('id', 'ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'links')
-        map_fields = ['id', 'plugin_config', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id', 'plugin_config')
 
     def get_links(self, obj):
         _display_id = self.get_kwargs().get('display_id')
@@ -350,7 +361,8 @@ class ContextSerializer(BaseSerializer):
     class Meta:
         model = models.FrameContext
         fields = BaseSerializer.Meta.fields + ('id', 'name', 'enabled', 'plugin', 'plugin_config', 'links')
-        map_fields = ['id', 'plugin_config', 'links']
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('id', 'plugin_config')
 
     def get_links(self, obj):
         _display_id = self.get_kwargs().get('display_id')
