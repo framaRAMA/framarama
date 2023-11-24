@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class Context:
     DEFAULT_IMAGE_NAME = 'default'
 
-    def __init__(self, display, frame, contexts, item, finishings, adapter):
+    def __init__(self, display, frame, contexts, item, finishings, adapter, device=None):
         self._display = display
         self._frame = frame
         self._contexts = contexts
@@ -27,12 +27,16 @@ class Context:
         self._image_data = {}
         self._adapter = adapter
         self._context = context.Context()
+        self._device = device
 
     def __enter__(self):
-        pass
+        if self._device:
+            self._adapter.prepare(self._device)
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+        if self._device:
+            self._adapter.cleanup(self._device)
 
     def get_display(self):
         return self._display
@@ -543,6 +547,12 @@ class ImageProcessingAdapter:
     def prepare(self, device):
         raise NotImplementedException()
 
+    def cleanup(self, device):
+        raise NotImplementedException()
+
+    def get_font(self, name):
+        raise NotImplementedException()
+
     def image_open(self, url, background=None):
         raise NotImplementedException()
 
@@ -647,6 +657,10 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             _free_max = round(1024 * _free * 0.8)
             logger.info("Restricting {} usage to {:.0f} MB".format(_type, _free_max/1024/1024))
             self._wand_resource.limits[_type] = _free_max
+
+    def cleanup(self, device):
+        _files = Filesystem.file_match(device.get_capability().PATH_TMP, 'magic-.+')
+        logger.info("Cleaning up temporary files: {}".format(_files))
 
     def image_open(self, source, background=None):
         if type(source) == str and (source.startswith('http://') or source.startswith('https://')):

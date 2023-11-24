@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Capability:
+    PATH_TMP = '/tmp'
 
     def _noop(self):
         return
@@ -228,7 +229,7 @@ class Capabilities:
         return Capabilities._df(settings.FRAMARAMA['DATA_PATH'])
 
     def df_tmp():
-        return Capabilities._df('/tmp')
+        return Capabilities._df(Capability.PATH_TMP)
 
     def uptime_loadavg():
         _info = Process.exec_run(['uptime'])
