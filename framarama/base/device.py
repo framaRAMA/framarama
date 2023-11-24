@@ -504,7 +504,7 @@ class Capabilities:
         if revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
-        if _revision['update'] is None and _revision['branch'] == revision:
+        if len(_revision['updates']) == 0 and _revision['branch'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
         _stash = Process.exec_run(['git', 'stash'])
