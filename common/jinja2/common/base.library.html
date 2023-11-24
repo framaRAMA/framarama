@@ -340,8 +340,8 @@
 {% endmacro %}
 
 {% macro note_start(title, type) %}
-  <p class="note note-{{ type }}">
-    <b>{{ title }}</b><br/>
+  <p class="note note-{{ type }} border-top border-bottom border-end border-{{ type }}">
+    {{ title }}<br/>
 {% endmacro %}
 
 {% macro note_end() %}
