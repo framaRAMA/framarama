@@ -79,8 +79,8 @@ class Context:
                 _value = getattr(model, field.name)
                 _evaluated = self.evaluate(_value)
                 setattr(_result, field.name, ResultValue(_evaluated))
-            except e:
-                raise Exception('Evaluation of model {} field {} failed: {}'.format(type(model), field.name, _value)) from e
+            except Exception as e:
+                raise Exception('Evaluation of \"{}\" in {}.{} failed: {}'.format(_value, type(model).__name__, field.name, e)) from e
         return _result
 
 
