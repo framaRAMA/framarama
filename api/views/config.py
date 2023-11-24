@@ -202,6 +202,7 @@ class ItemDisplaySerializer(BaseSerializer):
         return super().get_links(obj) + (
             self._link_view('self', 'display_item_all-detail', [_display_id, obj.id]),
             self._link_view('display', 'display-detail', [_display_id]),
+            self._link_view('hit', 'display_item_hit-detail', [_display_id, obj.id]),
             self._link_view('download', 'display_item_all-display_item_all_download', [_display_id, obj.id]),
         )
 
@@ -281,6 +282,7 @@ class HitItemDisplaySerializer(BaseSerializer):
         _display_id = self.get_kwargs().get('display_id')
         return super().get_links(obj) + (
             self._link_view('self', 'display_item_hit-detail', [_display_id, obj.id]),
+            self._link_view('item', 'display_item_all-detail', [_display_id, obj.id]),
         )
 
     def _save(self, item_id, validated_data):
