@@ -511,6 +511,8 @@ class Capabilities:
         if _revision['updates'][revision]['type'] == 'branch':
             if _revision['current']['name'] != revision:
                 _update = Process.exec_run(['git', 'checkout', revision])
+            else:
+                _update = True
             if _update:
                 _remote = _revision['remote']['name']
                 _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
