@@ -407,11 +407,6 @@ class Capabilities:
         #    _revisions.extend(_out)
         return _revisions
 
-    def _git_current_ref(refs):
-        if 'HEAD' in refs:
-            refs.remove('HEAD')
-        return refs[0] if len(refs) else None
-
     def _git_log(args):
         _remote = settings.FRAMARAMA['GIT_REMOTE']
         _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
@@ -452,10 +447,9 @@ class Capabilities:
                     _update_revs[_rev] = _logs_update[0]|{'ref': _rev}
             _rev = _logs[0]
             _rev.update({
-                'branch': _rev['refs'][0],
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
-                'current': Capabilities._git_current_ref(_rev['refs']),
+                'current': _rev['refs'][0],
                 'updates': _update_revs
             })
             return _rev
@@ -498,11 +492,11 @@ class Capabilities:
         if _revision is None:
             return 'Error: Can not identify current version'
         if revision is None:
-            revision = _revision['branch']
+            revision = _revision['current']
         if revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
-        if len(_revision['updates']) == 0 and _revision['branch'] == revision:
+        if len(_revision['updates']) == 0 or _revision['current'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
         _stash = Process.exec_run(['git', 'stash'])
@@ -511,8 +505,11 @@ class Capabilities:
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
         if revision == 'master':
-            _remote = _revision['remote']['name']
-            _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
+            if _revision['current'] != revision:
+                _update = Process.exec_run(['git', 'checkout', revision])
+            if _update:
+                _remote = _revision['remote']['name']
+                _update = Process.exec_run(['git', 'merge', '--ff-only', '{}/{}'.format(_remote, revision)])
         else:
             _update = Process.exec_run(['git', 'checkout', revision])
         _msg = []
