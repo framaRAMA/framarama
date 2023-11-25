@@ -3,7 +3,7 @@
 {% block content_dashboard %}
 
 <div class="pt-2">
-  {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.current, app.revision.date|date_format('%d.%m.%Y'), app.revision.hash)) }}
+  {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.current['name'], app.revision.date|date_format('%d.%m.%Y'), app.revision.hash)) }}
   {{ lib.field_text('Update check', '%s (%s)'|format(
     'each %s'|format(app_update_check|duration) if app_update_check else 'manually',
     'checked %s ago'|format(app_update_check_date|duration(short=true)) if app_update_check_date else 'not checked'

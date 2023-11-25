@@ -419,16 +419,17 @@ class Capabilities:
             _commit, _date, _values = _line.split(maxsplit=2)
             _refs, _comment = _values[1:].split(') ', maxsplit=1)
             _refs = [_ref.strip() for _ref in _refs.split(',')]       # separate tags
-            _refs = [_ref.replace('HEAD -> ', '') for _ref in _refs]  # remove HEAD pointer
-            _refs = [_ref.replace('tag: ', '') for _ref in _refs]     # remove tag: prefix
-            _refs = [_ref.replace(_remote+'/', '') for _ref in _refs] # remove remote name
+            _refs = [_ref.replace('HEAD -> ', 'branch:') for _ref in _refs]  # remove HEAD pointer
+            _refs = [_ref.replace('tag: ', 'tag:') for _ref in _refs]     # remove tag: prefix
+            _refs = [_ref.replace(_remote+'/', 'branch:') for _ref in _refs] # remove remote name
             _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
             _refs = [_ref for _ref in _refs if _ref not in ['HEAD']]  # remove special names (HEAD)
+            _refs = [_ref.split(':') for _ref in _refs]              # split in type and name
             _logs.append({
                 'hash': _commit,
                 'date': DateTime.parse(_date),
                 'comment': _comment,
-                'refs': _refs
+                'refs': [{'type': _ref[0], 'name': _ref[1]} for _ref in _refs]
             })
         return _logs
 
@@ -492,14 +493,14 @@ class Capabilities:
         if _revision is None:
             return 'Error: Can not identify current version'
         if revision is None:
-            if _revision['current'] == 'master' or len(_revision['updates']) == 0:
-                revision = _revision['current']
+            if _revision['current']['type'] == 'branch' or len(_revision['updates']) == 0:
+                revision = _revision['current']['name']
             else:
                 revision = _revision['updates'].keys()[0]
         elif revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
-        if len(_revision['updates']) == 0 and _revision['current'] == revision:
+        if len(_revision['updates']) == 0 and _revision['current']['name'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
         _stash = Process.exec_run(['git', 'stash'])
@@ -507,8 +508,8 @@ class Capabilities:
             logger.error("Can not stash changes!")
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
-        if revision == 'master':
-            if _revision['current'] != revision:
+        if _revision['updates'][revision]['type'] == 'branch':
+            if _revision['current']['name'] != revision:
                 _update = Process.exec_run(['git', 'checkout', revision])
             if _update:
                 _remote = _revision['remote']['name']

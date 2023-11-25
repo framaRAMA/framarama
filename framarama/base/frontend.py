@@ -165,7 +165,7 @@ class Frontend(Singleton):
                 _revision = self.get_device().get_capability().app_revision()
                 _version = []
                 if _revision and 'current' in _revision:
-                    _version.append(_revision['current'])
+                    _version.append(_revision['current']['name'])
                 if _revision and 'hash' in _revision:
                     _version.append(_revision['hash'])
                 if len(_version):
@@ -289,7 +289,7 @@ class Frontend(Singleton):
                 'uptime': (DateTime.now() - _config.date_app_startup).seconds if _config.date_app_startup else None,
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
-                'branch': _app_revision['current'] if _app_revision else None,
+                'branch': _app_revision['current']['name'] if _app_revision else None,
                 'revisions': _app_revision['revisions'] if _app_revision else None,
                 'checked': DateTime.utc(_config.app_update_check_date) if _config.app_update_check_date else None,
                 'installed': DateTime.utc(_config.app_update_install_date) if _config.app_update_install_date else None,
