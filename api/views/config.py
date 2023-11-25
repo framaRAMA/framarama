@@ -213,7 +213,7 @@ class RankedItemFrameSerializer(ItemFrameSerializer):
         model = models.RankedItem
         fields = ItemFrameSerializer.Meta.fields + ('rank', 'source')
         read_only_fields = ItemFrameSerializer.Meta.read_only_fields
-        map_fields = ItemFrameSerializer.Meta.map_fields + ('rank', 'source',)
+        map_fields = ItemFrameSerializer.Meta.map_fields + ('rank',)
         abstract = True
 
     def map(self, data, validated_data):
@@ -227,7 +227,7 @@ class RankedItemDisplaySerializer(ItemDisplaySerializer):
         model = models.RankedItem
         fields = ItemDisplaySerializer.Meta.fields + ('rank', 'source')
         read_only_fields = ItemDisplaySerializer.Meta.read_only_fields
-        map_fields = ItemDisplaySerializer.Meta.map_fields + ('rank', 'source',)
+        map_fields = ItemDisplaySerializer.Meta.map_fields + ('rank',)
         abstract = True
 
     def map(self, data, validated_data):
