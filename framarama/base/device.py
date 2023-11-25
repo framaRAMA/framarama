@@ -492,11 +492,14 @@ class Capabilities:
         if _revision is None:
             return 'Error: Can not identify current version'
         if revision is None:
-            revision = _revision['current']
-        if revision not in _revision['revisions']:
+            if _revision['current'] == 'master' or len(_revision['updates']) == 0:
+                revision = _revision['current']
+            else:
+                revision = _revision['updates'].keys()[0]
+        elif revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
-        if len(_revision['updates']) == 0 or _revision['current'] == revision:
+        if len(_revision['updates']) == 0 and _revision['current'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
         _stash = Process.exec_run(['git', 'stash'])
