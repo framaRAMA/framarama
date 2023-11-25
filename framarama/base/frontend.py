@@ -17,7 +17,7 @@ from django.db import connections
 
 from frontend import models
 from framarama.base import device
-from framarama.base.utils import Singleton, Config, Filesystem, Process, DateTime
+from framarama.base.utils import Singleton, Config, Filesystem, Process, DateTime, Json
 from framarama.base.api import ApiClient, ApiResultItem
 from config.utils import context, finishing
 from config import models as config_models
@@ -47,6 +47,7 @@ class Frontend(Singleton):
         INIT_PHASE_API_ACCESS: "Checking API access",
         INIT_PHASE_ERROR: "Some error occurred, recovery mode"
     }
+    INIT_FILE = settings.FRAMARAMA['DATA_PATH'] + '/framarama-init.json'
 
     def __init__(self):
         super().__init__()
@@ -58,9 +59,37 @@ class Frontend(Singleton):
         management.call_command(*args, **kwargs, stdout=_out, stderr=_err)
         return _out.getvalue().rstrip("\n").split("\n")
 
-    def _init_connections(self):
+    def _init_requirements_check(self):
+        import pkg_resources
+        try:
+            _requirements = pkg_resources.require(open('requirements.txt', 'r'))
+            logger.info("{} requirements fullfilled".format(len(_requirements)))
+            return Frontend.INIT_PHASE_REQ_INSTALL
+        except pkg_resources.VersionConflict as e:
+            logger.error("Installing requirements: {}".format(e))
+        except pkg_resources.DistributionNotFound as e:
+            logger.error("Missing requirements: {}".format(e))
+
+    def _init_requirements_install(self):
+        _pip= Process.exec_run(['pip', 'install', '-r', 'requirements.txt'])
+        if _pip:
+            logger.info("Requirements installed!")
+        else:
+            raise Exception("Installation via pip reported no output")
+
+    def _init_database(self):
         from framarama import settings
         settings_db = settings.configure_databases()
+        self._init_migrations('default')
+
+    def _init_configuration(self):
+        _configs = list(models.Config.objects.all())
+        if len(_configs) == 0:
+            logger.info("Creating default configuration")
+            _config = models.Config()
+            _config.save()
+            _configs.append(_config)
+            Singleton.clear()
 
     def _init_migrations(self, database):
         _migrations = self._mgmt_cmd('showmigrations', '--plan', no_color=True, database=database)
@@ -70,6 +99,13 @@ class Frontend(Singleton):
             logger.info("Applying {} missing migrations to {}".format(len(_migrations), database))
             management.call_command('migrate', database=database)
         logger.info("Migrations for {} complete!".format(database))
+
+    def _init_data(self):
+        self._init_admin_user()
+        if 'config' in connections:
+            self._init_migrations('config')
+        else:
+            logger.info("Skipping migration of config because default is used")
 
     def _init_admin_user(self):
         _users = get_user_model().objects.filter(is_superuser=True).all()
@@ -83,63 +119,40 @@ class Frontend(Singleton):
             _users = get_user_model().objects.filter(username=settings.FRAMARAMA['ADMIN_USERNAME']).all()
         logger.info("Admin user is {}".format(_users[0]))
 
+    def init_get(self):
+        _init_file = Filesystem.file_exists(Frontend.INIT_FILE)
+        return Json.to_dict(Filesystem.file_read(Frontend.INIT_FILE)) if _init_file else None
+
+    def init_set(self, data):
+        _init_file = Filesystem.file_exists(Frontend.INIT_FILE)
+        if _init_file and data is None:
+            Filesystem.file_delete(Frontend.INIT_FILE)
+        elif data:
+            Filesystem.file_write(Frontend.INIT_FILE, Json.from_dict(data).encode())
+
     def initialize(self):
         if self._init_phase >= Frontend.INIT_PHASE_ERROR:
             return False
-        if self._init_phase < Frontend.INIT_PHASE_REQ_CHECK:
-            import pkg_resources
-            try:
-                _requirements = pkg_resources.require(open('requirements.txt', 'r'))
-                logger.info("{} requirements fullfilled".format(len(_requirements)))
-                self._init_phase = Frontend.INIT_PHASE_REQ_INSTALL
-            except pkg_resources.VersionConflict as e:
-                logger.error("Installing requirements: {}".format(e))
-                self._init_phase = Frontend.INIT_PHASE_REQ_CHECK
-            except pkg_resources.DistributionNotFound as e:
-                logger.error("Missing requirements: {}".format(e))
-                self._init_phase = Frontend.INIT_PHASE_REQ_CHECK
-            except Exception as e:
-                logger.error("Error checking requirements: {}".format(e))
-                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_CHECK
-        if self._init_phase < Frontend.INIT_PHASE_REQ_INSTALL:
-            try:
-                _pip= Process.exec_run(['pip', 'install', '-r', 'requirements.txt'])
-                if _pip:
-                    logger.info("Requirements installed!")
-                else:
-                    self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_INSTALL
-                    logger.error("Error installing requirements")
-            except Exception as e:
-                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_REQ_INSTALL
-                logger.error("Error installing requirements: {}".format(e))
-        if self._init_phase < Frontend.INIT_PHASE_DB_DEFAULT:
-            self._init_connections()
-            try:
-                self._init_migrations('default')
-                self._init_phase = Frontend.INIT_PHASE_DB_DEFAULT
-            except Exception as e:
-                logger.error("Error running migrations: {}".format(e))
-                self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_DB_DEFAULT
-        if self._init_phase < Frontend.INIT_PHASE_CONFIGURED:
-            _configs = list(models.Config.objects.all())
-            if len(_configs) == 0:
-                logger.info("Creating default configuration")
-                _config = models.Config()
-                _config.save()
-                _configs.append(_config)
-                Singleton.clear()
-            self._init_phase = Frontend.INIT_PHASE_CONFIGURED
-        if self._init_phase < Frontend.INIT_PHASE_DB_CONFIG:
-            self._init_admin_user()
-            if 'config' in connections:
-                try:
-                    self._init_migrations('config')
-                    self._init_phase = Frontend.INIT_PHASE_DB_CONFIG
-                except Exception as e:
-                    logger.error("Error running migrations: {}".format(e))
-                    self._init_phase = Frontend.INIT_PHASE_ERROR + Frontend.INIT_PHASE_DB_CONFIG
-            else:
-                logger.info("Skipping migration of config because default is used")
+        if not self.init_get():
+            logger.info("Starting system setup")
+            _phases = {
+              Frontend.INIT_PHASE_REQ_CHECK: self._init_requirements_check,
+              Frontend.INIT_PHASE_REQ_INSTALL: self._init_requirements_install,
+              Frontend.INIT_PHASE_DB_DEFAULT: self._init_database,
+              Frontend.INIT_PHASE_CONFIGURED: self._init_configuration,
+              Frontend.INIT_PHASE_DB_CONFIG: self._init_data,
+            }
+            for _phase, _method in _phases.items():
+                if self._init_phase < _phase:
+                    try:
+                        _result = _method()
+                        self._init_phase = _phase if _result is None else _result
+                    except Exception as e:
+                        logger.error("Error: initialization failed (phase {}): {}".format(_phase, e))
+                        self._init_phase = Frontend.INIT_PHASE_ERROR + _phase
+            if self._init_phase == list(_phases.keys())[-1]:
+                logger.info("System environment setup completed!")
+                self.init_set(self.get_status())
         if self._init_phase < Frontend.INIT_PHASE_SETUP:
             _mode = self.get_config().get_config().mode
             if _mode != None and _mode.strip() != '':
