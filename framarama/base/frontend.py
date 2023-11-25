@@ -36,7 +36,7 @@ class Frontend(Singleton):
     INIT_PHASE_SETUP = 6
     INIT_PHASE_API_ACCESS = 7
     INIT_PHASE_ERROR = 100
-    phases = {
+    INIT_PHASES = {
         INIT_PHASE_START: "Started",
         INIT_PHASE_REQ_CHECK: "Checking requirements",
         INIT_PHASE_REQ_INSTALL: "Installing requirements",
@@ -181,8 +181,8 @@ class Frontend(Singleton):
             _status = 'Error '
         else:
             _status = 'Success'
-        if _init_phase in Frontend.phases:
-            _phase = Frontend.phases[_init_phase]
+        if _init_phase in Frontend.INIT_PHASES:
+            _phase = Frontend.INIT_PHASES[_init_phase]
         else:
             _phase = 'Unknown'
         return {
