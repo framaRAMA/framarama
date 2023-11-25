@@ -28,12 +28,15 @@
 
   <div class="btn-group mt-3" role="group">
     {% for link in [
-      (lib.icon('action.view')+' Info', 'frame_source_info', [frame.id, source.id]),
-      (lib.icon('action.list')+' Queue', 'frame_source_step_list', [frame.id, source.id]),
-      (lib.icon('action.view')+' Items', 'frame_source_images', [frame.id, source.id]),
+      (lib.icon('action.view'), 'Info', 'frame_source_info', [frame.id, source.id]),
+      (lib.icon('action.list'), 'Queue', 'frame_source_step_list', [frame.id, source.id]),
+      (lib.icon('action.view'), 'Items', 'frame_source_images', [frame.id, source.id]),
     ] %}
-      {% set active = lib.nav_active(request, link[1], args=link[2]) %}
-      <a href="{{ url(link[1], args=link[2]) }}" class="btn btn-{% if not active %}outline-{% endif %}primary">{{ link[0] }}</a>
+      {% set active = lib.nav_active(request, link[2], args=link[3]) %}
+      <a href="{{ url(link[2], args=link[3]) }}" class="btn btn-{% if not active %}outline-{% endif %}primary">
+        {{ link[0] }}
+        <span class="d-none d-md-inline">{{ link[1] }}</span>
+      </a>
     {% endfor %}
   </div>
 {% endif %}
