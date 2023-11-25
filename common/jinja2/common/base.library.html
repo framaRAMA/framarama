@@ -738,7 +738,7 @@
     <div class="card border rounded-5">
       <div class="card-body p-0">
         <div class="p-2 d-flex flex-wrap border-bottom bg-light">
-          <p class="col-auto fw-bold m-0">{{ title }}</p>
+          <p class="col-auto fw-bold m-0 me-2">{{ title }}</p>
           {{ badge_group(badges) }}
         </div>
         <div class="p-2 text-muted">{{ body }}</div>
@@ -993,7 +993,7 @@
   <div>
     {% for item in items %}
       <span
-       class="badge rounded-pill badge-{{ item['type']|default('success') }}{% if 'classes' in item %} {{ item['classes'] }}{% endif %} m-1"
+       class="badge rounded-pill badge-{{ item['type']|default('success') }}{% if 'classes' in item %} {{ item['classes'] }}{% endif %} ms-0 m-1"
        title="{% if 'tooltip' in item %}{{ item['tooltip'] }}{% endif %}"
       >
         {% if 'icon' in item %}{{ icon(item['icon']) }}{% endif %}
