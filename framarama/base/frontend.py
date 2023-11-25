@@ -277,7 +277,6 @@ class Frontend(Singleton):
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
                 'hash': _app_revision['hash'] if _app_revision else None,
                 'branch': _app_revision['current'] if _app_revision else None,
-                'revision': _app_revision['current'] if _app_revision else None,
                 'revisions': _app_revision['revisions'] if _app_revision else None,
                 'checked': DateTime.utc(_config.app_update_check_date) if _config.app_update_check_date else None,
                 'installed': DateTime.utc(_config.app_update_install_date) if _config.app_update_install_date else None,
