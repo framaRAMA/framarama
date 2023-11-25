@@ -445,7 +445,7 @@ class Capabilities:
             _update_revs = {}
             for _i, _rev in enumerate(_revisions):
                 if _rev == 'master':
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}/{0}'.format(_logs[0]['hash'], _remote)])
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{2}/{1}'.format(_logs[0]['hash'], _rev, _remote)])
                 elif _i == 0 or _logs_update:
                     _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)])
                 if _logs_update:
