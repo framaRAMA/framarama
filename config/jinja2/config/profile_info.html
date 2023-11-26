@@ -9,7 +9,7 @@
 {{ lib.field_text('Registered', user.date_joined|date_format('%d.%m.%Y')) }}
 
 {{ lib.nav_actions([
-  {'icon': 'action.edit', 'url': url('profile_edit'), 'type': 'primary'},
+  {'icon': 'action.edit', 'url': url('profile_edit'), 'type': 'primary', 'title': 'Edit profile'},
 ]) }}
 
 {% endblock %}

@@ -44,8 +44,8 @@
 </div>
 
 {{ lib.nav_actions([
-  {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary', 'classes': 'disabled' if source_running else ''},
-  {'icon': 'action.add', 'modal': 'createStepType', 'type': 'success'},
+  {'icon': 'action.run', 'modal': 'updateSteps', 'type': 'primary', 'classes': 'disabled' if source_running else '', 'title': 'Run queue'},
+  {'icon': 'action.add', 'modal': 'createStepType', 'type': 'success', 'title': 'Add step'},
 ]) }}
 
 {{ lib.modal_start('createStepType', 'Select type to add', classes='modal-fullscreen-lg-down modal-xl') }}

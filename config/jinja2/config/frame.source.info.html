@@ -31,8 +31,8 @@
 </div>
 
 {{ lib.nav_actions([
-  {'icon': 'action.delete', 'modal': 'deleteSource', 'type': 'danger'},
-  {'icon': 'action.edit', 'url': url('frame_source_edit', args=[frame.id, source.id]), 'type': 'primary'},
+  {'icon': 'action.delete', 'modal': 'deleteSource', 'type': 'danger', 'title': 'Delete this source'},
+  {'icon': 'action.edit', 'url': url('frame_source_edit', args=[frame.id, source.id]), 'type': 'primary', 'title': 'Edit source'},
 ]) }}
 
 {% endblock %}

@@ -13,8 +13,8 @@
 </div>
 
 {{ lib.nav_actions([
-  {'icon': 'action.delete', 'modal': 'deleteDisplay', 'type': 'danger'},
-  {'icon': 'action.edit', 'url': url('display_edit', args=[display.id]), 'type': 'primary'},
+  {'icon': 'action.delete', 'modal': 'deleteDisplay', 'type': 'danger', 'title': 'Delete this display'},
+  {'icon': 'action.edit', 'url': url('display_edit', args=[display.id]), 'type': 'primary', 'title': 'Edit display'},
 ]) }}
 
 {% endblock %}

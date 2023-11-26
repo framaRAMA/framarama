@@ -14,8 +14,8 @@
 </div>
 
 {{ lib.nav_actions([
-  {'icon': 'action.delete', 'modal': 'deleteFrame', 'type': 'danger'},
-  {'icon': 'action.edit', 'url': url('frame_edit', args=[frame.id]), 'type': 'primary'},
+  {'icon': 'action.delete', 'modal': 'deleteFrame', 'type': 'danger', 'title': 'Delete this frame'},
+  {'icon': 'action.edit', 'url': url('frame_edit', args=[frame.id]), 'type': 'primary', 'title': 'Edit frame'},
 ]) }}
 
 {% endblock %}
