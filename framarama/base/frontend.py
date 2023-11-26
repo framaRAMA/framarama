@@ -30,16 +30,18 @@ class Frontend(Singleton):
     INIT_PHASE_START = 0
     INIT_PHASE_REQ_CHECK = 1
     INIT_PHASE_REQ_INSTALL = 2
-    INIT_PHASE_DB_DEFAULT = 3
-    INIT_PHASE_CONFIGURED = 4
-    INIT_PHASE_DB_CONFIG = 5
-    INIT_PHASE_SETUP = 6
-    INIT_PHASE_API_ACCESS = 7
+    INIT_PHASE_STATIC = 3
+    INIT_PHASE_DB_DEFAULT = 4
+    INIT_PHASE_CONFIGURED = 5
+    INIT_PHASE_DB_CONFIG = 6
+    INIT_PHASE_SETUP = 7
+    INIT_PHASE_API_ACCESS = 8
     INIT_PHASE_ERROR = 100
     INIT_PHASES = {
         INIT_PHASE_START: "Started",
         INIT_PHASE_REQ_CHECK: "Checking requirements",
         INIT_PHASE_REQ_INSTALL: "Installing requirements",
+        INIT_PHASE_STATIC: "Collect statics",
         INIT_PHASE_DB_DEFAULT: "Checking frontend database",
         INIT_PHASE_CONFIGURED: "Checking frontend configuration",
         INIT_PHASE_DB_CONFIG: "Checking config in database",
@@ -76,6 +78,10 @@ class Frontend(Singleton):
             logger.info("Requirements installed!")
         else:
             raise Exception("Installation via pip reported no output")
+
+    def _init_statics(self):
+        _statics = self._mgmt_cmd('collectstatic', '--no-input')
+        logger.info("Collect static executed: {}".format(_statics))
 
     def _init_database(self):
         from framarama import settings
@@ -138,6 +144,7 @@ class Frontend(Singleton):
             _phases = {
               Frontend.INIT_PHASE_REQ_CHECK: self._init_requirements_check,
               Frontend.INIT_PHASE_REQ_INSTALL: self._init_requirements_install,
+              Frontend.INIT_PHASE_STATIC: self._init_statics,
               Frontend.INIT_PHASE_DB_DEFAULT: self._init_database,
               Frontend.INIT_PHASE_CONFIGURED: self._init_configuration,
               Frontend.INIT_PHASE_DB_CONFIG: self._init_data,
