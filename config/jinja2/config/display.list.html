@@ -18,7 +18,7 @@
 
 </div>
 
-<div class="fixed-action-btn" style="height:80px;">
-  <a class="btn btn-success btn-floating btn-lg" href="{{ url('display_create') }}">{{ lib.icon('action.add', '') }}</a>
-</div>
+{{ lib.nav_actions([
+  {'icon': 'action.add', 'url': url('display_create'), 'type': 'success', 'title': 'Add display'},
+]) }}
 {% endblock %}
