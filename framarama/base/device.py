@@ -448,7 +448,7 @@ class Capabilities:
                 elif _i == 0 or _logs_update:
                     _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)], _rev)
                 if _logs_update:
-                    _update_revs[_rev] = _logs_update[0]|{'ref': _rev}
+                    _update_revs[_rev] = _logs_update[0]
             _rev = _logs[0]
             _rev.update({
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
