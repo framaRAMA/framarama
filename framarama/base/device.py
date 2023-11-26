@@ -407,7 +407,7 @@ class Capabilities:
         #    _revisions.extend(_out)
         return _revisions
 
-    def _git_log(args):
+    def _git_log(args, ref=None):
         _remote = settings.FRAMARAMA['GIT_REMOTE']
         _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
         _args.extend(args)
@@ -424,12 +424,15 @@ class Capabilities:
             _refs = [_ref.replace(_remote+'/', 'branch:') for _ref in _refs] # remove remote name
             _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
             _refs = [_ref for _ref in _refs if _ref not in ['HEAD']]  # remove special names (HEAD)
-            _refs = [_ref.split(':') for _ref in _refs]              # split in type and name
+            _refs = [_ref.split(':') for _ref in _refs]               # split in type and name
+            _refs = [{'type': _ref[0], 'name': _ref[1]} for _ref in _refs] # convert to map with type and name
+            _ref = [_ref for _ref in _refs if _ref['name'] == ref]    # filter out for given ref to check
             _logs.append({
                 'hash': _commit,
                 'date': DateTime.parse(_date),
                 'comment': _comment,
-                'refs': [{'type': _ref[0], 'name': _ref[1]} for _ref in _refs]
+                'ref': _ref[0] if len(_ref) else _refs[0],
+                'refs': _refs
             })
         return _logs
 
@@ -441,16 +444,15 @@ class Capabilities:
             _update_revs = {}
             for _i, _rev in enumerate(_revisions):
                 if _rev == 'master':
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{2}/{1}'.format(_logs[0]['hash'], _rev, _remote)])
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{2}/{1}'.format(_logs[0]['hash'], _rev, _remote)], _rev)
                 elif _i == 0 or _logs_update:
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)])
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)], _rev)
                 if _logs_update:
                     _update_revs[_rev] = _logs_update[0]|{'ref': _rev}
             _rev = _logs[0]
             _rev.update({
                 'remote': {'name': _remote, 'url': Capabilities._git_remotes()[_remote]},
                 'revisions': _revisions,
-                'current': _rev['refs'][0],
                 'updates': _update_revs
             })
             return _rev
@@ -493,14 +495,14 @@ class Capabilities:
         if _revision is None:
             return 'Error: Can not identify current version'
         if revision is None:
-            if _revision['current']['type'] == 'branch' or len(_revision['updates']) == 0:
-                revision = _revision['current']['name']
+            if _revision['ref']['type'] == 'branch' or len(_revision['updates']) == 0:
+                revision = _revision['ref']['name']
             else:
                 revision = _revision['updates'].keys()[0]
         elif revision not in _revision['revisions']:
             logger.error("Can not update to non-existant revision {}".format(revision))
             return 'Error: Version {} is unknown'.format(revision)
-        if len(_revision['updates']) == 0 and _revision['current']['name'] == revision:
+        if len(_revision['updates']) == 0 and _revision['ref']['name'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
         _stash = Process.exec_run(['git', 'stash'])
@@ -509,7 +511,7 @@ class Capabilities:
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
         if _revision['updates'][revision]['type'] == 'branch':
-            if _revision['current']['name'] != revision:
+            if _revision['ref']['name'] != revision:
                 _update = Process.exec_run(['git', 'checkout', revision])
             else:
                 _update = True
