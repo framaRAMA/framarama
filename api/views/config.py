@@ -306,7 +306,7 @@ class HitItemDisplaySerializer(BaseSerializer):
         else:
             _display_item = _display_items[0]
             _display_item.date_last_seen = _now
-            _display_item.duraiton_download = validated_data.get('duration_download')
+            _display_item.duration_download = validated_data.get('duration_download')
             _display_item.duration_finishing = validated_data.get('duration_finishing')
             _display_item.count_hit = _display_item.count_hit + 1
 
