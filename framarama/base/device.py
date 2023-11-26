@@ -510,7 +510,7 @@ class Capabilities:
             logger.error("Can not stash changes!")
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
-        if _revision['updates'][revision]['type'] == 'branch':
+        if _revision['updates'][revision]['ref']['type'] == 'branch':
             if _revision['ref']['name'] != revision:
                 _update = Process.exec_run(['git', 'checkout', revision])
             else:
