@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 from framarama.base import api
-from framarama.base.utils import Filesystem, Classes
+from framarama.base.utils import Filesystem, Classes, DateTime
 from config import models
 from config.plugins import FinishingPluginRegistry, ContextPluginRegistry
 from config.utils import context
@@ -275,8 +275,11 @@ class Processor:
         })])
         _finishings.extend(list(self._context.get_finishings()))
         _finishings.extend(self._watermark)
+        _meta = {'duration': None, 'steps': []}
+        _start = DateTime.now()
         for _plugin, _finishing in FinishingPluginRegistry.get_enabled(_finishings):
             logger.info("Processing finishing {}".format(_finishing))
+            _start_finishing = DateTime.now()
 
             _images_in = _finishing.get_image_names_in([Context.DEFAULT_IMAGE_NAME])
             _images_out = _finishing.get_image_names_out([Context.DEFAULT_IMAGE_NAME])
@@ -313,6 +316,10 @@ class Processor:
             for _name_out in _images_out:
                 self._context.set_image_data(_name_out, _image_out)
 
+            _meta['steps'].append({
+              'duration': (DateTime.now() - _start_finishing).seconds,
+            })
+
         _image = self._context.get_image()
         _image_data = _adapter.image_data(_image)
         _image_meta = _adapter.image_meta(_image)
@@ -322,21 +329,24 @@ class Processor:
         _preview_data = _adapter.image_data(_image)
         _preview_meta = _adapter.image_meta(_image)
 
+        _meta['duration'] = (DateTime.now() - _start).seconds
+
         logger.info("Result: {}x{} pixels, {} bytes".format(
             _image_meta['width'],
             _image_meta['height'],
             len(_image_data)))
 
-        return ProcessingResult(_image_meta, _image_data, _preview_meta, _preview_data)
+        return ProcessingResult(_image_meta, _image_data, _preview_meta, _preview_data, _meta)
 
 
 class ProcessingResult:
 
-    def __init__(self, image_meta, image_data, preview_meta, preview_data):
+    def __init__(self, image_meta, image_data, preview_meta, preview_data, meta):
         self._image_meta = image_meta
         self._image_data = image_data
         self._preview_meta = preview_meta
         self._preview_data = preview_data
+        self._meta = meta
 
     def get_image_data(self):
         return self._image_data
@@ -367,6 +377,9 @@ class ProcessingResult:
 
     def get_preview_height(self):
         return self._preview_meta['height']
+
+    def get_meta(self):
+        return self._meta
 
 
 class Color:

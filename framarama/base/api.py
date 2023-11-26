@@ -136,8 +136,7 @@ class ApiClient(Singleton):
         _result = self._list(_data, config_models.RankedItem, config_views.RankedItemDisplaySerializer)
         return _result.get(0) if _result.count() > 0 else None
 
-    def submit_item_hit(self, display_id, item_id, thumbnail=None, mime=None, meta=None):
-        _data = {'id': item_id}
+    def submit_item_hit(self, display_id, data, thumbnail=None, mime=None, meta=None):
         if thumbnail or mime:
             _thumbnail = {}
             if thumbnail:
@@ -146,8 +145,8 @@ class ApiClient(Singleton):
                 _thumbnail['mime'] = mime
             if meta:
                 _thumbnail['meta'] = meta
-            _data['thumbnail'] = _thumbnail
-        self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, _data)
+            data['thumbnail'] = _thumbnail
+        self._request('/displays/{}/items/hits'.format(display_id), ApiClient.METHOD_POST, data)
 
     def get_contexts(self, display_id):
         return self._list(

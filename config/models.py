@@ -577,6 +577,12 @@ class DisplayItem(BaseModel):
     date_last_seen = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Last seen', help_text='Date when the item was last shown on the display')
+    duration_download = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Download duration', help_text='Duration in seconds used for downloading')
+    duration_finishing = models.IntegerField(
+        blank=True, null=True,
+        verbose_name='Finishing duration', help_text='Duration in seconds used for finishing')
     count_hit = models.IntegerField(
         blank=True, null=True,
         verbose_name='Hits', help_text='Amount of hits for this item')

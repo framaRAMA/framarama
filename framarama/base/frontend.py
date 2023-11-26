@@ -378,15 +378,25 @@ class Display(Singleton):
     def submit_item_hit(self, frontend_item, thumbnail=False):
         _item = frontend_item.item()
         _mime = frontend_item.mime()
+        _meta = frontend_item.meta()
         _thumbnail = frontend_item.preview()
-        _meta = {
+        _thumbnail_meta = {
             'width': frontend_item.preview_width(),
             'height': frontend_item.preview_height(),
         }
+        _data = {
+          'id': _item.id,
+        }
+        if _meta:
+            _data.update({
+                'duration_download': _meta['steps'][0]['duration'] if len(_meta['steps']) else None,
+                'duration_finishing': _meta['duration'],
+            })
+        logger.info("Sumit display item status: {}".format(_data))
         if thumbnail:
-            self._client.submit_item_hit(self.get_id(), _item.id, _thumbnail, _mime, _meta)
+            self._client.submit_item_hit(self.get_id(), _data, _thumbnail, _mime, _thumbnail_meta)
         else:
-            self._client.submit_item_hit(self.get_id(), _item.id)
+            self._client.submit_item_hit(self.get_id(), _data)
 
     def get_next_item(self, refresh=False):
         if self._next is None or refresh:
@@ -454,6 +464,7 @@ class FrontendDevice(Singleton):
                   'item': item,
                   'image_meta': _result.get_image_meta(),
                   'preview_meta': _result.get_preview_meta(),
+                  'meta': _result.get_meta(),
                   'time': DateTime.utc(DateTime.now()),
                   'usage_time': (DateTime.now() - _start).seconds,
                 })
@@ -688,6 +699,9 @@ class FrontendItem:
 
     def preview_height(self):
         return self._json['preview_meta']['width']
+
+    def meta(self):
+        return self._json['meta']
 
 
 class BaseFrontendRenderer:
