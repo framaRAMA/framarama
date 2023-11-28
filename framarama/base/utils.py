@@ -214,8 +214,8 @@ class Process:
 class Json:
 
     @staticmethod
-    def from_dict(data):
-        return json.dumps(data)
+    def from_dict(data, pretty=False):
+        return json.dumps(data) if pretty == False else json.dumps(data, indent=4)
 
     @staticmethod
     def to_dict(data):
