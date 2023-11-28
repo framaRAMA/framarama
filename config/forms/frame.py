@@ -1,3 +1,6 @@
+import json
+
+from django import forms
 
 from config import models
 from config.forms.base import BasePluginForm
@@ -167,6 +170,14 @@ class UpdateFinishingForm(BasePluginForm):
         }
     def field_groups(self):
         return self._field_groups(UpdateFinishingForm.Meta.fields)
+
+
+class RawEditFinishingForm(base.BaseForm):
+    class PrettyJSONEncoder(json.JSONEncoder):
+        def __init__(self, *args, indent, sort_keys, **kwargs):
+            super().__init__(*args, indent=3, **kwargs)
+
+    config = forms.JSONField(encoder=PrettyJSONEncoder, widget=base.textareaFieldWidget())
 
 
 class CreateContextForm(BasePluginForm):

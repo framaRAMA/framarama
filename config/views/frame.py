@@ -533,6 +533,35 @@ class ImportFinishingFrameView(base.BaseFrameConfigView):
         return _context
 
 
+class RawEditFinishingFrameView(base.BaseFrameConfigView):
+    template_name = 'config/frame.finishing.rawedit.html'
+
+    def _get(self, request, frame_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _config = plugins.FinishingPluginRegistry.export_config(
+            'export.frame.{}.finishings'.format(frame_id),
+            'Finishing export of frame #{}'.format(frame_id),
+            _frame.finishings.all(),
+            plugins.PluginRegistry.EXPORT_DICT, True)
+        _form = forms.RawEditFinishingForm(initial={"config": _config})
+        _context['form'] = _form
+        return _context
+
+    def _post(self, request, frame_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _form = forms.RawEditFinishingForm(request.POST)
+        if _form.is_valid():
+            print(_form.cleaned_data)
+            plugins.FinishingPluginRegistry.import_config(
+                _form.cleaned_data['config'],
+                _frame.finishings.all())
+            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+        _context['form'] = _form
+        return _context
+
+
 class PreviewImageFrameView(base.BaseFrameConfigView):
 
     def _get(self, request, frame_id, *args, **kwargs):
