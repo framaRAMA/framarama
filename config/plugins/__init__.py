@@ -107,6 +107,10 @@ class Plugin:
 
 
 class PluginRegistry:
+    EXPORT_JSON = 'json'
+    EXPORT_JSON_PRETTY = 'json-pretty'
+    EXPORT_DICT = 'dict'
+
     instance = None
 
     @classmethod
@@ -151,7 +155,7 @@ class PluginRegistry:
         return cls._get_instance()._registry
 
     @classmethod
-    def export_config(cls, name, title, models, pretty=False, models_only=False):
+    def export_config(cls, name, title, models, export=EXPORT_JSON, models_only=False):
         _data = {
           'version': 1,
           'name': name,
@@ -159,7 +163,12 @@ class PluginRegistry:
           'date': utils.DateTime.utc(utils.DateTime.now()),
           'data': cls.Serializer(models, many=True).data
         }
-        return utils.Json.from_dict(_data['data'] if models_only else _data, pretty=pretty)
+        _result = _data['data'] if models_only else _data
+        if export == PluginRegistry.EXPORT_JSON:
+            return utils.Json.from_dict(_result)
+        if export == PluginRegistry.EXPORT_JSON_PRETTY:
+            return utils.Json.from_dict(_result, pretty=True)
+        return _result
 
     @classmethod
     def import_config(cls, config, models):
