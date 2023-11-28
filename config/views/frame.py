@@ -14,7 +14,7 @@ from config.views import base
 from config.utils import source
 from config.utils import sorting
 from config.utils import finishing
-from api.views.config import FinishingSerializer, RankedItemFrameSerializer
+from api.views.config import RankedItemFrameSerializer
 
 
 class CreateFrameView(base.BaseConfigView):
@@ -507,7 +507,6 @@ class ExportFinishingFrameView(base.BaseFrameConfigView):
         _config = plugins.FinishingPluginRegistry.export_config(
             'export.frame.{}.finishings'.format(frame_id),
             'Finishing export of frame #{}'.format(frame_id),
-            FinishingSerializer,
             _frame.finishings.all())
         self.response_download(_context, _config, 'application/json')
         return _context
@@ -528,8 +527,7 @@ class ImportFinishingFrameView(base.BaseFrameConfigView):
             except Exception as e:
                 raise ValidationError('Can not parse JSON: ' + str(e))
             plugins.FinishingPluginRegistry.import_config(
-                _config,
-                FinishingSerializer,
+                _config['data'],
                 _frame.finishings.all())
         self.response_json(_context, {})
         return _context

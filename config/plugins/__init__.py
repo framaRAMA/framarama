@@ -1,6 +1,8 @@
 import pkgutil
 import logging
 
+from rest_framework import serializers
+
 from framarama.base import utils
 from config import models
 from config.plugins import sources, sortings, finishings, contexts
@@ -149,23 +151,28 @@ class PluginRegistry:
         return cls._get_instance()._registry
 
     @classmethod
-    def export_config(cls, name, title, serializer, models):
-        return utils.Json.from_dict({
+    def export_config(cls, name, title, models, pretty=False, models_only=False):
+        _data = {
           'version': 1,
           'name': name,
           'title': title,
           'date': utils.DateTime.utc(utils.DateTime.now()),
-          'data': serializer(models, many=True).data
-        })
+          'data': cls.Serializer(models, many=True).data
+        }
+        return utils.Json.from_dict(_data['data'] if models_only else _data, pretty=pretty)
 
     @classmethod
-    def import_config(cls, config, serializer, models):
+    def import_config(cls, config, models):
+        _create = []
+        _update = []
+        _delete = []
         def _create_model(ordering, item):
             _plugin = cls.get(item['plugin'])
             _model = _plugin.create_model()
             _plugin.update_model(_model, item, True)
             _model.ordering = ordering
             _plugin.save_model(_model)
+            _create.append(_model)
         def _update_model(ordering, sitem, titem):
             _plugin = cls.get(sitem['plugin'])
             _model = titem[1]
@@ -173,13 +180,17 @@ class PluginRegistry:
             _model.id = titem[1].id
             _model.ordering = ordering
             _plugin.save_model(_model)
+            _update.append(_model)
         def _delete_model(ordering, item):
             item[0].delete_model(item[1])
+            _delete.append(item[1])
         _import = {}
-        for _item in config['data']:
-            _s = serializer(data=_item)
+        for _item in config:
+            _s = cls.Serializer(data=_item)
             if _s.is_valid():
                 _import[len(_import)] = _s.validated_data
+            else:
+                raise Exception("Can not convert item to {}: {}".format(cls.Serializer.Meta.model, _item))
         _models = {}
         for _model in cls.get_all(models):
             _models[len(_models)] = _model
@@ -191,6 +202,10 @@ class PluginRegistry:
             create_func=_create_model,
             update_func=_update_model,
             delete_func=_delete_model)
+        logger.info('Import results:')
+        logger.info('Create: {}'.format(_create))
+        logger.info('Update: {}'.format(_update))
+        logger.info('Delete: {}'.format(_delete))
 
 
 class PluginImplementation:
@@ -228,6 +243,11 @@ class SortingPluginImplementation(PluginImplementation):
 
 
 class FinishingPluginRegistry(PluginRegistry):
+
+    class Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = models.Finishing
+            fields = ('title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config')
 
     @classmethod
     def _get_base_module(cls):
