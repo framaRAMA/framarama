@@ -151,12 +151,12 @@ class ApiClient(Singleton):
     def get_contexts(self, display_id):
         return self._list(
             self._request('/displays/{}/contexts'.format(display_id)),
-            config_models.FrameContext, config_views.ContextSerializer).items()
+            config_models.FrameContext, config_views.ContextDisplaySerializer).items()
 
     def get_finishings(self, display_id):
         return self._list(
             self._request('/displays/{}/finishings'.format(display_id)),
-            config_models.Finishing, config_views.FinishingSerializer).items()
+            config_models.Finishing, config_views.FinishingDisplaySerializer).items()
 
     def submit_status(self, display_id, status):
         return self._request('/displays/{}/status'.format(display_id), ApiClient.METHOD_POST, status)

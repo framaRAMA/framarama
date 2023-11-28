@@ -344,7 +344,7 @@ class HitItemDisplaySerializer(BaseSerializer):
         return _result
 
 
-class FinishingSerializer(BaseSerializer):
+class FinishingDisplaySerializer(BaseSerializer):
 
     class Meta:
         model = models.Finishing
@@ -361,7 +361,7 @@ class FinishingSerializer(BaseSerializer):
         )
 
 
-class ContextSerializer(BaseSerializer):
+class ContextDisplaySerializer(BaseSerializer):
 
     class Meta:
         model = models.FrameContext
@@ -413,7 +413,7 @@ class DisplayViewSet(BaseViewSet):
 
     @decorators.action(detail='frame/detail', methods=['get'])
     def frame(self, request, *args, **kwargs):
-        return response.Response(FrameSerializer(self.get_object().frame, context={'request': request}).data)
+        return response.Response(FrameDisplaySerializer(self.get_object().frame, context={'request': request}).data)
 
 
 class StatusDisplayViewSet(mixins.CreateModelMixin, BaseViewSet):
@@ -504,7 +504,7 @@ class NextItemDisplayViewSet(BaseViewSet):  # BaseDetailView
 
 
 class FinishingDisplayViewSet(BaseViewSet):
-    serializer_class = FinishingSerializer
+    serializer_class = FinishingDisplaySerializer
     
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
@@ -512,7 +512,7 @@ class FinishingDisplayViewSet(BaseViewSet):
 
 
 class ContextDisplayViewSet(BaseViewSet):
-    serializer_class = ContextSerializer
+    serializer_class = ContextDisplaySerializer
 
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
