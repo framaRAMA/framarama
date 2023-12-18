@@ -446,3 +446,95 @@ class ListTestCase(TestCase):
                 self.assertEqual(ccnt, _stats['create'])
                 self.assertEqual(ucnt, _stats['update'])
                 self.assertEqual(dcnt, _stats['delete'])
+
+    def test_from_tree(self):
+        _items = [
+          {'id': 1, 'name': 'Item 1', 'children': [{'id': 11, 'name': 'Item 1.1'}, {'id': 12, 'name': 'Item 1.2'}]},
+          {'id': 2, 'name': 'Item 2', 'children': [{'id': 21, 'name': 'Item 2.1'}, {'id': 22, 'name': 'Item 2.2'}]}
+        ]
+        _result = utils.Lists.from_tree(_items, child_name='children', parent_name='parent')
+        self.assertEquals(6, len(_result))
+        self.assertEquals('Item 1', _result['0']['name'])
+        self.assertIsNone(_result['0']['parent'])
+        self.assertEquals('Item 1.1', _result['0.0']['name'])
+        self.assertEquals('0', _result['0.0']['parent'])
+        self.assertEquals('Item 1.2', _result['0.1']['name'])
+        self.assertEquals('0', _result['0.1']['parent'])
+        self.assertEquals('Item 2', _result['1']['name'])
+        self.assertIsNone(_result['1']['parent'])
+        self.assertEquals('Item 2.1', _result['1.0']['name'])
+        self.assertEquals('1', _result['1.0']['parent'])
+        self.assertEquals('Item 2.2', _result['1.1']['name'])
+        self.assertEquals('1', _result['1.1']['parent'])
+
+    def test_from_tree_idname(self):
+        _items = [
+          {'id': 1, 'name': 'Item 1', 'children': [{'id': 11, 'name': 'Item 1.1'}, {'id': 12, 'name': 'Item 1.2'}]},
+          {'id': 2, 'name': 'Item 2', 'children': [{'id': 21, 'name': 'Item 2.1'}, {'id': 22, 'name': 'Item 2.2'}]}
+        ]
+        _result = utils.Lists.from_tree(_items, 'children', 'parent', 'id')
+        self.assertEquals(6, len(_result))
+        self.assertEquals('Item 1', _result[1]['name'])
+        self.assertIsNone(_result[1]['parent'])
+        self.assertEquals('Item 1.1', _result[11]['name'])
+        self.assertEquals(1, _result[11]['parent'])
+        self.assertEquals('Item 1.2', _result[12]['name'])
+        self.assertEquals(1, _result[12]['parent'])
+        self.assertEquals('Item 2', _result[2]['name'])
+        self.assertIsNone(_result[2]['parent'])
+        self.assertEquals('Item 2.1', _result[21]['name'])
+        self.assertEquals(2, _result[21]['parent'])
+        self.assertEquals('Item 2.2', _result[22]['name'])
+        self.assertEquals(2, _result[22]['parent'])
+
+    def test_from_tree_nochild(self):
+        _items = [
+          {'id': 1, 'name': 'Item 1'},
+          {'id': 2, 'name': 'Item 2'}
+        ]
+        _result = utils.Lists.from_tree(_items, child_name='children', parent_name='parent')
+        self.assertEquals(2, len(_result))
+        self.assertEquals('Item 1', _result['0']['name'])
+        self.assertIsNone(_result['0']['parent'])
+        self.assertEquals('Item 2', _result['1']['name'])
+        self.assertIsNone(_result['1']['parent'])
+
+
+    def test_to_tree(self):
+        _items = {
+          '0': {'id': 1, 'name': 'Item 1'},
+          '0.1': {'id': 11, 'name': 'Item 11'},
+          '0.2': {'id': 12, 'name': 'Item 12'},
+          '1': {'id': 2, 'name': 'Item 2'},
+          '1.1': {'id': 21, 'name': 'Item 21'},
+          '1.2': {'id': 22, 'name': 'Item 22'},
+        }
+        _result = utils.Lists.to_tree(_items, child_name='children', parent_name='parent')
+        print(_result)
+        self.assertEquals(2, len(_result))
+        self.assertEquals(1, _result[0]['id'])
+        self.assertIsNone(_result[0]['parent'])
+        self.assertEquals(11, _result[0]['children'][0]['id'])
+        self.assertEquals(1, _result[0]['children'][0]['parent']['id'])
+        self.assertEquals(12, _result[0]['children'][1]['id'])
+        self.assertEquals(1, _result[0]['children'][1]['parent']['id'])
+        self.assertEquals(2, _result[1]['id'])
+        self.assertIsNone(_result[1]['parent'])
+        self.assertEquals(21, _result[1]['children'][0]['id'])
+        self.assertEquals(2, _result[1]['children'][0]['parent']['id'])
+        self.assertEquals(22, _result[1]['children'][1]['id'])
+        self.assertEquals(2, _result[1]['children'][1]['parent']['id'])
+
+    def test_map_tree(self):
+        _items = [
+          {'id': 1, 'name': 'Item 1', 'children': [{'id': 11, 'name': 'Item 1.1'}, {'id': 12, 'name': 'Item 1.2'}]},
+          {'id': 2, 'name': 'Item 2', 'children': [{'id': 21, 'name': 'Item 2.1'}, {'id': 22, 'name': 'Item 2.2'}]}
+        ]
+        _result = utils.Lists.map_tree(_items, lambda item:{'id': item['id']}, child_name='children')
+        self.assertEquals(2, len(_result))
+        self.assertEquals(1, _result[0]['id'])
+        self.assertEquals(11, _result[0]['children'][0]['id'])
+        self.assertEquals(12, _result[0]['children'][1]['id'])
+        self.assertEquals(2, _result[1]['id'])
+        self.assertEquals(21, _result[1]['children'][0]['id'])
+        self.assertEquals(22, _result[1]['children'][1]['id'])

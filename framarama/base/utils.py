@@ -410,6 +410,7 @@ class Classes:
 
 
 class Lists:
+    TREE_SEP = '.'
 
     @staticmethod
     def chunked(source, size):
@@ -459,6 +460,53 @@ class Lists:
                 if delete_func:
                     delete_func(_id, _tmap[_id])
         return _stats
+
+    @staticmethod
+    def from_tree(items, child_name, parent_name, id_name=None, parent_id=None):
+        _result = {}
+        for _i, _item in enumerate(items):
+            _id = _item[id_name] if id_name else "{}{}".format(parent_id+Lists.TREE_SEP if parent_id != None else "", _i)
+            if type(_item) == dict:
+                _item[parent_name] = parent_id
+            elif type(_item) == object:
+                setattr(_item, parent_name, parent_id)
+            _result[_id] = _item
+            if type(_item) == dict and child_name in _item:
+                _result.update(Lists.from_tree(_item[child_name], child_name, parent_name, id_name, _id))
+            elif type(_item) == object and hasattr(_item, child_name):
+                _result.update(Lists.from_tree(getattr(_item, child_name), child_name, parent_name, id_name, _id))
+        return _result
+
+    @staticmethod
+    def to_tree(items, parent_name='parent', child_name='children', path=''):
+        _current = [{child_name: []}]
+        _path = path
+        _parent = None
+        for _i, _item in items.items():
+            _key = _i[len(_path):]
+            if Lists.TREE_SEP in _key:  # child items
+                _path = _i[0:len(_path)+_key.find(Lists.TREE_SEP)+1]
+                _key = _i[len(_path):]
+                _current.append(_current[-1][child_name][-1])
+            if _key == '':  # back to parent
+                _path = _i[0:_path.rfind(Lists.TREE_SEP)-1]
+                _key = _i[len(_path):]
+                _current.pop()
+            _item[child_name] = []
+            _item[parent_name] = _current[-1] if len(_current) > 1 else None
+            _current[-1][child_name].append(_item)
+        return _current[0][child_name]
+
+    @staticmethod
+    def map_tree(items, func, child_name=None):
+        _result = []
+        for _item in items:
+            _result.append(func(_item))
+            if type(_item) == dict and child_name in _item:
+                _result[-1][child_name] = Lists.map_tree(_item[child_name], func, child_name)
+            elif type(_item) == object and hasattr(_item, child_name):
+                setattr(_result[-1], child_name, Lists.map_tree(getattr(_item, child_name), func, child_name))
+        return _result
 
 
 class Network:
