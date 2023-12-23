@@ -36,9 +36,11 @@ def date_format(value, format="%H:%M %d-%m-%y"):
     return localtime(value).strftime(format)
 
 
-def duration(value, parts=None, short=False):
+def duration(value, parts=None, short=False, append=None):
     if type(value) == datetime.datetime:
         value = utils.DateTime.now() - value
+    if value is None:
+        return None
     _delta = utils.DateTime.delta_dict(value)
     _result = []
     for _part in ['days', 'hours', 'minutes']:
@@ -51,7 +53,7 @@ def duration(value, parts=None, short=False):
     if len(_result) == 0:
         _part = 'seconds' if parts is None else parts[0]
         _result.append('{} {}'.format(_delta[_part], _part))
-    return ', '.join(_result)
+    return '{}{}'.format(', '.join(_result), ' ' + append if append else '')
 
 
 def b64decode(value):
