@@ -876,7 +876,7 @@
 {% endmacro %}
 
 {% macro display_info_device(display, status) %}
-  {{ display_info_header('Runtime information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-server') }}
+  {{ display_info_header('Runtime information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-server') }}
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
@@ -894,7 +894,7 @@
 {% endmacro %}
 
 {% macro display_info_software(display, status) %}
-  {{ display_info_header('Software information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-cubes') }}
+  {{ display_info_header('Software information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-cubes') }}
   <ul class="card-text">
     <li>
       running version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
@@ -903,21 +903,21 @@
       {% endif %}
     </li>
     <li>
-      checked for latest update <strong>{{ status.app_checked|duration(short=true) + ' ago' if status.app_checked else 'unknown'}}</strong>
+      checked for latest update <strong>{{ status.app_checked|duration(short=true, append='ago') if status.app_checked else 'unknown'}}</strong>
     </li>
     <li>
-      last update install <strong>{{ status.app_installed|duration(short=true) + ' ago' if status.app_installed else 'unknown'}}</strong>
+      last update install <strong>{{ status.app_installed|duration(short=true, append=' ago') if status.app_installed else 'unknown'}}</strong>
     </li>
   </ul>
 {% endmacro %}
 
 {% macro display_info_media(display, status) %}
-  {{ display_info_header('Media information (%s)'|format(status.created|duration(short=true) + ' ago' if status else 'not available'), 'fa-images') }}
+  {{ display_info_header('Media information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-images') }}
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
-    <li>items refreshed <strong>{{ status.items_updated|duration(short=True) + ' ago' if status else 'unknown'}}</strong></li>
-    <li>last items update <strong>{{ display.frame.get_last_update()|duration + ' ago' if display.frame else 'unknown' }}</strong></li>
+    <li>items refreshed <strong>{{ status.items_updated|duration(short=True, append='ago') if status else 'unknown'}}</strong></li>
+    <li>last items update <strong>{{ display.frame.get_last_update()|duration(append='ago') if display.frame else 'unknown' }}</strong></li>
     <li><strong>{{ display.time_change if display.time_change else 'default'}}</strong> minutes rotation</li>
   </ul>
 {% endmacro %}
