@@ -510,7 +510,6 @@ class ListTestCase(TestCase):
           '1.2': {'id': 22, 'name': 'Item 22'},
         }
         _result = utils.Lists.to_tree(_items, child_name='children', parent_name='parent')
-        print(_result)
         self.assertEquals(2, len(_result))
         self.assertEquals(1, _result[0]['id'])
         self.assertIsNone(_result[0]['parent'])
