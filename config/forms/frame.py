@@ -177,7 +177,7 @@ class RawEditFinishingForm(base.BaseForm):
         def __init__(self, *args, indent, sort_keys, **kwargs):
             super().__init__(*args, indent=3, **kwargs)
 
-    config = forms.JSONField(encoder=PrettyJSONEncoder, widget=base.textareaFieldWidget())
+    config = forms.JSONField(encoder=PrettyJSONEncoder, widget=base.codeareaFieldWidget())
 
 
 class CreateContextForm(BasePluginForm):

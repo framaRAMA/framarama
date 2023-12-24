@@ -18,6 +18,10 @@ def textareaFieldWidget(*args, **kwargs):
     return forms.Textarea(attrs={'class':'form-control', 'style':'height:15em;'}, *args, **kwargs)
 
 
+def codeareaFieldWidget(*args, **kwargs):
+    return forms.Textarea(attrs={'class':'form-control', 'style':'height:25em; font-family:monospace;'}, *args, **kwargs)
+
+
 def selectFieldWidget(choices, *args, **kwargs):
     return forms.Select(attrs={'class':'form-control'}, choices=choices, *args, **kwargs)
 
