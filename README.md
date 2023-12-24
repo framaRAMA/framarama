@@ -106,7 +106,8 @@ The server component depends on the following dependencies:
 * ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them and check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
 
-If only running the server component setup as follows:
+When just running the server component, setup the initial configuration using
+following command:
 ```
 python manage.py setup --set mode=cloud
 ```
