@@ -23,3 +23,12 @@ class BasePluginForm(base.BaseModelForm):
     def field_dependencies(self):
         return self.dependencies
 
+    def save(self, plugin, defaults=None, *args, **kwargs):
+        _commit = kwargs.get('commit', True)
+        _plugin_model = super().save(commit=False, *args, **kwargs)
+        _plugin_model.name = plugin.name
+        for _name, _value in defaults.items() if defaults else {}:
+            setattr(_plugin_model, _name, _value)
+        _base_model = plugin.save_model(_plugin_model, _commit)
+        return _base_model
+

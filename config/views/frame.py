@@ -190,10 +190,7 @@ class CreateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         _plugin = _context['plugin']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _step_model = _form.save(commit=False)
-            _step_model.ordering = _source.steps.count()
-            _step_model.plugin = _plugin.name
-            _step_model.source = _source
+            _step_model = _form.save(_plugin, defaults={'ordering': _source.steps.count(), 'source': _source})
             _plugin.save_model(_step_model)
             self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         _context['form'] = _form
@@ -222,8 +219,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         _source_step = _plugin.load_model(step_id)
         _form = _plugin.get_update_form(request.POST, instance=_source_step)
         if _form.is_valid():
-            _source_step = _form.save(commit=False)
-            _plugin.save_model(_source_step)
+            _source_step = _form.save(_plugin)
             self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         _context['step'] = _source_step
         _context['form'] = _form
@@ -327,11 +323,7 @@ class CreateSortingFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _model = _form.save(commit=False)
-            _model.ordering = _frame.sortings.count()
-            _model.plugin = _plugin.name
-            _model.frame = _frame
-            _plugin.save_model(_model)
+            _model = _form.save(_plugin, defaults={'ordering': _frame.sortings.count(), 'frame': _frame})
             self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
@@ -358,8 +350,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
         _sorting= _sorting_plugin.load_model(sorting_id)
         _form = _sorting_plugin.get_update_form(request.POST, instance=_sorting)
         if _form.is_valid():
-            _sorting = _form.save(commit=False)
-            _sorting_plugin.save_model(_sorting)
+            _sorting = _form.save(_sorting_plugin)
             self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
         _context['form'] = _form
         return _context
@@ -446,11 +437,7 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _model = _form.save(commit=False)
-            _model.ordering = _frame.finishings.count()
-            _model.plugin = _plugin.name
-            _model.frame = _frame
-            _plugin.save_model(_model)
+            _model = _form.save(_plugin, defaults={'enabled': False, 'ordering': _frame.finishings.count(), 'frame': _frame})
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
@@ -623,11 +610,7 @@ class CreateContextFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _model = _form.save(commit=False)
-            _model.ordering = _frame.contexts.count()
-            _model.plugin = _plugin.name
-            _model.frame = _frame
-            _plugin.save_model(_model)
+            _model = _form.save(_plugin, defaults={'ordering': _frame.contexts.count(), 'frame': _frame})
             self.redirect(_context, 'frame_context_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
@@ -654,8 +637,7 @@ class UpdateContextFrameView(base.BaseContextFrameConfigView):
         _frame_context = _context_plugin.load_model(context_id)
         _form = _context_plugin.get_update_form(request.POST, instance=_frame_context)
         if _form.is_valid():
-            _frame_context = _form.save(commit=False)
-            _context_plugin.save_model(_frame_context)
+            _frame_context = _form.save(_context_plugin)
             self.redirect(_context, 'frame_context_list', args=[_frame.id])
         _context['form'] = _form
         return _context
