@@ -5,7 +5,7 @@
 
   {% for display in displays %}
     {{ lib.card_item(display.name, display.description if display.description else '(no description)', [
-      {'title': 'View', 'icon': 'action.view', 'url': url('display_overview', args=[display.id]) }
+      {'title': 'View', 'icon': 'action.view', 'url': url('display_overview', args=[display.id]), 'align': 'center'}
     ], null, [
       {'title': ('enabled' if display.enabled else 'disabled'), 'type': ('success' if display.enabled else 'danger'), 'classes': 'float-end'}
     ], url('display_thumbnail', args=[display.id]),

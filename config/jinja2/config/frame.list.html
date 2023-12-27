@@ -5,7 +5,7 @@
 
   {% for frame in frames %}
     {{ lib.card_item(frame.name, frame.description if frame.description else '(no description)', [
-      {'title': 'View', 'icon': 'action.view', 'url': url('frame_info', args=[frame.id])}
+      {'title': 'View', 'icon': 'action.view', 'url': url('frame_info', args=[frame.id]), 'align': 'center'}
     ], null, [
       {'title': ('enabled' if frame.enabled else 'disabled'), 'type': ('success' if frame.enabled else 'danger'), 'classes': 'float-end'}
     ], url('frame_thumbnail', args=[frame.id]),
