@@ -728,7 +728,7 @@
           {{ badge_group(badges) }}
         </div>
       </div>
-      {{ card_actions(actions) }}
+      {{ card_actions(actions, 'card-footer p-2') }}
     </div>
   </div>
 {% endmacro %}
@@ -748,13 +748,13 @@
   </div>
 {% endmacro %}
 
-{% macro card_actions(actions) %}
+{% macro card_actions(actions, classes='') %}
   {% if actions %}
     {% set actions_left = actions|selectattr('align', 'equalto', 'left')|list %}
     {% set actions_right = actions|selectattr('align', 'equalto', 'right')|list %}
     {% set actions_center = actions|reject('in', actions_left + actions_right)|list %}
     {% set default_classes = 'btn-white' %}
-    <div class="card-footer border-0 bg-light p-2 d-flex">
+    <div class="{{ classes }} border-0 bg-light d-flex">
       {% for config in [
         {'actions': actions_left, 'classes': 'col-auto'},
         {'actions': actions_center, 'classes': 'd-flex justify-content-around w-100'},
@@ -989,8 +989,8 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro badge_group(items) %}
-  <div>
+{% macro badge_group(items, classes='') %}
+  <div class="{{ classes }}">
     {% for item in items %}
       <span
        class="badge rounded-pill badge-{{ item['type']|default('success') }}{% if 'classes' in item %} {{ item['classes'] }}{% endif %} ms-0 m-1"
