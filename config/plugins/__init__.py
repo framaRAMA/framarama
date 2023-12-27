@@ -49,6 +49,9 @@ class Plugin:
                 return _cls
         return None
 
+    def base_model(self, identifier=None):
+        return self._base_model() if identifier is None else self._base_model.objects.filter(pk=identifier).get()
+
     def create_model(self, instance=None):
         instance = instance if instance else self._model()
         _values = instance.get_field_values()
@@ -60,7 +63,7 @@ class Plugin:
         return _model
 
     def load_model(self, identifier):
-        return self.create_model(self._base_model.objects.filter(pk=identifier).get())
+        return self.create_model(self.base_model(identifier))
 
     def update_model(self, instance, values, base_values=False):
         _values = values.copy()
@@ -79,15 +82,12 @@ class Plugin:
 
     def save_model(self, model):
         _values = model.get_field_values()
-        if model.id:
-            _instance = self._base_model.objects.filter(pk=model.id).get()
-        else:
-            _instance = self._base_model()
+        _instance = self.base_model(model.id)
         self.update_model(_instance, _values)
         _instance.save()
 
     def delete_model(self, model):
-        _instance = self._base_model.objects.filter(pk=model.id).get()
+        _instance = self.base_model(model.id)
         _instance.delete();
 
     def get_create_form(self, *args, **kwargs):
