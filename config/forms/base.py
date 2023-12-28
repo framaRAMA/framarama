@@ -32,3 +32,11 @@ class BasePluginForm(base.BaseModelForm):
         _base_model = plugin.save_model(_plugin_model, _commit)
         return _base_model
 
+
+class TreeBasePluginForm(BasePluginForm):
+
+    def save(self, plugin, defaults, root_defaults, tree, *args, **kwargs):
+        _commit = kwargs.pop('commit', False)
+        _base_model = super().save(plugin, defaults, commit=_commit, *args, **kwargs)
+        return tree.get_root(defaults).add_child(instance=_base_model)
+

@@ -1,10 +1,86 @@
 import zoneinfo
+import collections
 
 from django.db import models
 
+from treebeard.ns_tree import NS_Node, NS_NodeManager, NS_NodeQuerySet
 
 TIMEZONE_CHOICES = [(None, '(default)')]
 TIMEZONE_CHOICES.extend([(_tz, _tz) for _tz in sorted(zoneinfo.available_timezones())])
+
+
+class BaseQuerySet(models.QuerySet):
+
+    def is_tree(self):
+        return False
+
+    def for_export(self):
+        return self
+
+    def for_import(self):
+        return {_i: _model for _i, _model in self.items()}
+
+
+class BaseManager(models.Manager):
+
+    def get_queryset(self):
+        return BaseQuerySet(self.model, using=self._db)
+
+
+class TreeQuerySet(NS_NodeQuerySet):
+
+    def is_tree(self):
+        return True
+
+    def for_export(self):
+        return self.filter(depth=2)
+
+    def for_import(self):
+        _key = ""
+        _key_next = ""
+        _key_no = [0]
+        _models = collections.OrderedDict()
+        for _i, _annotate in enumerate(self.annotated()):
+            if _annotate[1]['open']:
+                _key = _key + _key_next + "."
+                _key_no.append(_i - _key_no[-1])
+            _key_next = str(_i - _key_no[-1])
+            _models[_key[1:] + _key_next] = _annotate[0]
+            for _close in _annotate[1]['close']:
+                _key = _key[0:_key.rindex(".")-1]
+                _key_no[-1] = _i - _key_no.pop() + 1
+        return _models
+
+    def annotated(self):
+        return self.model.get_annotated_list_qs(self.filter(depth__gt=1))
+
+    def roots(self):
+        return self.filter(lft=1)
+
+    def get_root(self, create_defaults=None):
+        _root = self.roots().first()
+        if not _root and create_defaults:
+            _root_node = create_defaults.copy()
+            _root_node['title'] = 'ROOT'
+            _root = self.add_root(**_root_node)
+        return _root
+
+    def add_root(self, **kwargs):
+        return self.model.add_root(**kwargs)
+
+
+class TreeManager(NS_NodeManager):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._prefetch = []
+
+    def prefetch(self, prefetch):
+        self._prefetch = prefetch
+        return self
+
+    def get_queryset(self):
+        return TreeQuerySet(self.model, using=self._db).order_by('tree_id', 'lft').prefetch_related(*self._prefetch)
 
 
 class BaseModel(models.Model):
@@ -12,6 +88,8 @@ class BaseModel(models.Model):
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    objects = BaseManager.from_queryset(BaseQuerySet)()
 
     class Meta:
         abstract = True
@@ -56,3 +134,10 @@ class PluginModel(BaseModel):
     def get_field_values(self):
         return {_field.name:getattr(self, _field.name, None) for _field in self.get_fields(True)}
 
+
+class TreePluginModel(PluginModel, NS_Node):
+
+    objects = TreeManager.from_queryset(TreeQuerySet)()
+
+    class Meta:
+        abstract = True

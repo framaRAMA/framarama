@@ -228,6 +228,16 @@ class PluginImplementation:
         raise Exception('Implementation missing')
 
 
+class PluginImplementationSerializer(serializers.ModelSerializer):
+    pass
+
+
+class TreePluginImplementationSerializer(PluginImplementationSerializer):
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        return self.__class__(obj.get_children(), many=True).data
+
 
 class SourcePluginRegistry(PluginRegistry):
 
