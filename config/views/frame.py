@@ -412,9 +412,9 @@ class ListFinishingFrameView(base.BaseFrameConfigView):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
         _finishings = []
-        for _finishing in list(_frame.finishings.all()):
+        for (_finishing, _tree) in _frame.finishings.annotated():
             _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
-            _finishings.append(_plugin.create_model(_finishing))
+            _finishings.append({'entity': _plugin.create_model(_finishing), 'tree': _tree})
         _context['finishings'] = _finishings
         _context['finishing_plugins'] = plugins.FinishingPluginRegistry.all()
         _context['form_import'] = UploadFieldForm()
@@ -437,7 +437,8 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _model = _form.save(_plugin, defaults={'enabled': False, 'ordering': _frame.finishings.count(), 'frame': _frame})
+            _defaults = {'enabled': False, 'ordering': 0, 'frame': _frame}
+            _model = _form.save(plugin=_plugin, tree=_frame.finishings, defaults=_defaults, root_defaults=_defaults)
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
@@ -494,7 +495,7 @@ class ExportFinishingFrameView(base.BaseFrameConfigView):
         _config = plugins.FinishingPluginRegistry.export_config(
             'export.frame.{}.finishings'.format(frame_id),
             'Finishing export of frame #{}'.format(frame_id),
-            _frame.finishings.all())
+            _frame.finishings)
         self.response_download(_context, _config, 'application/json')
         return _context
 
@@ -529,7 +530,7 @@ class RawEditFinishingFrameView(base.BaseFrameConfigView):
         _config = plugins.FinishingPluginRegistry.export_config(
             'export.frame.{}.finishings'.format(frame_id),
             'Finishing export of frame #{}'.format(frame_id),
-            _frame.finishings.all(),
+            _frame.finishings,
             plugins.PluginRegistry.EXPORT_DICT, True)
         _form = forms.RawEditFinishingForm(initial={"config": _config})
         _context['form'] = _form
@@ -540,10 +541,10 @@ class RawEditFinishingFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = forms.RawEditFinishingForm(request.POST)
         if _form.is_valid():
-            print(_form.cleaned_data)
             plugins.FinishingPluginRegistry.import_config(
                 _form.cleaned_data['config'],
-                _frame.finishings.all())
+                _frame.finishings,
+                {'frame': _frame})
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['form'] = _form
         return _context

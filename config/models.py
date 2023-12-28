@@ -10,7 +10,7 @@ from django.core.files.base import File
 from django.dispatch import receiver
 
 from framarama.base import utils
-from framarama.base.models import BaseModel, PluginModel
+from framarama.base.models import BaseModel, PluginModel, TreePluginModel, TreeManager, TreeQuerySet
 
 
 logger = logging.getLogger(__name__)
@@ -379,7 +379,7 @@ class Sorting(PluginModel):
         ordering = ['-weight']
 
 
-class Finishing(PluginModel):
+class Finishing(TreePluginModel):
     STR_FIELDS = PluginModel.STR_FIELDS + ["title", "image_in", "image_out", "enabled"]
 
     CAT_SHAPE = 'shape'
@@ -388,6 +388,8 @@ class Finishing(PluginModel):
     CAT_TRANSFORM = 'transform'
     CAT_MERGE = 'merge'
     CAT_IMAGE = 'image'
+
+    objects = TreeManager.from_queryset(TreeQuerySet)().prefetch(['frame'])
 
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='finishings')
     ordering = models.IntegerField()

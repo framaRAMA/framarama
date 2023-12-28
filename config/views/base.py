@@ -65,15 +65,23 @@ class BaseFrameConfigView(BaseConfigView):
         items.filter(ordering__gt=item.ordering).update(ordering=F('ordering')-1)
 
     def _item_order_move(self, action, item, items):
-        _ordering = item.ordering
-        _ordering_target = _ordering-1 if action == 'up' else _ordering+1
-        _item_other_filter = items.filter(ordering=_ordering_target)
-        if _item_other_filter.exists():
-            _item_other_filter = _item_other_filter.get()
-            _item_other_filter.ordering = _ordering
-            _item_other_filter.save()
-            item.ordering = _ordering_target
-            item.save()
+        if items.is_tree():
+            _item = item
+            _target = None
+            while _target is None:
+                _target = _item.get_prev_sibling() if action == 'up' else _item.get_next_sibling()
+                _item = _item.get_parent()
+            if _target and not _target.is_root():
+                item.move(_target, 'left' if action == 'up' else 'right')
+        else:
+            _ordering = item.ordering
+            _ordering_target = _ordering-1 if action == 'up' else _ordering+1
+            _item_other = items.filter(ordering=_ordering_target).first()
+            if _item_other:
+                _item_other.ordering = _ordering
+                _item_other.save()
+                item.ordering = _ordering_target
+                item.save()
 
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)

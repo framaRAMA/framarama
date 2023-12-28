@@ -3,7 +3,7 @@ import json
 from django import forms
 
 from config import models
-from config.forms.base import BasePluginForm
+from config.forms.base import BasePluginForm, TreeBasePluginForm
 from framarama.base import forms as base
 
 
@@ -139,7 +139,7 @@ class UpdateSortingForm(BasePluginForm):
         return self._field_groups(UpdateSortingForm.Meta.fields)
 
 
-class CreateFinishingForm(BasePluginForm):
+class CreateFinishingForm(TreeBasePluginForm):
     class Meta:
         model = models.Finishing
         fields = ['title', 'image_in', 'image_out', 'enabled']

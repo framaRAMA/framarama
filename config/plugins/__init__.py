@@ -1,9 +1,11 @@
 import pkgutil
 import logging
+import collections
 
 from rest_framework import serializers
 
 from framarama.base import utils
+from framarama.base.models import TreeManager
 from config import models
 from config.plugins import sources, sortings, finishings, contexts
 
@@ -80,15 +82,18 @@ class Plugin:
         for _name in [_name for _name in _values.keys() if _name in self._base_model_fields]:
             setattr(instance, _name, _values[_name])
 
-    def save_model(self, model):
+    def save_model(self, model, save=True):
         _values = model.get_field_values()
         _instance = self.base_model(model.id)
         self.update_model(_instance, _values)
-        _instance.save()
+        if save:
+            _instance.save()
+        return _instance
 
     def delete_model(self, model):
         _instance = self.base_model(model.id)
         _instance.delete();
+        return _instance
 
     def get_create_form(self, *args, **kwargs):
         kwargs['instance'] = self._model()
@@ -156,12 +161,13 @@ class PluginRegistry:
 
     @classmethod
     def export_config(cls, name, title, models, export=EXPORT_JSON, models_only=False):
+        _models = models.for_export()
         _data = {
           'version': 1,
           'name': name,
           'title': title,
           'date': utils.DateTime.utc(utils.DateTime.now()),
-          'data': cls.Serializer(models, many=True).data
+          'data': cls.Serializer(_models, many=True).data
         }
         _result = _data['data'] if models_only else _data
         if export == PluginRegistry.EXPORT_JSON:
@@ -171,50 +177,70 @@ class PluginRegistry:
         return _result
 
     @classmethod
-    def import_config(cls, config, models):
-        _create = []
-        _update = []
-        _delete = []
-        def _create_model(ordering, item):
-            _plugin = cls.get(item['plugin'])
-            _model = _plugin.create_model()
-            _plugin.update_model(_model, item, True)
-            _model.ordering = ordering
-            _plugin.save_model(_model)
-            _create.append(_model)
-        def _update_model(ordering, sitem, titem):
-            _plugin = cls.get(sitem['plugin'])
-            _model = titem[1]
-            _plugin.update_model(_model, sitem, True)
-            _model.id = titem[1].id
-            _model.ordering = ordering
-            _plugin.save_model(_model)
-            _update.append(_model)
-        def _delete_model(ordering, item):
-            item[0].delete_model(item[1])
-            _delete.append(item[1])
-        _import = {}
-        for _item in config:
+    def import_config(cls, config, models, fields):
+        _import = collections.OrderedDict()
+        for _id, _item in utils.Lists.from_tree(config, 'children', 'parent').items():
             _s = cls.Serializer(data=_item)
             if _s.is_valid():
-                _import[len(_import)] = _s.validated_data
+                _import[_id] = _s.validated_data
+                print(_s.validated_data)
             else:
                 raise Exception("Can not convert item to {}: {}".format(cls.Serializer.Meta.model, _item))
-        _models = {}
-        for _model in cls.get_all(models):
-            _models[len(_models)] = _model
+        _models = models.for_import()
+        _root = models.get_root() if models.is_tree() else None
+        def _create_model(ordering, item):
+            (_parent, _sep, _ordering) = ordering.rpartition('.')
+            logger.debug("C: {} - {}".format(_parent, _ordering))
+            _plugin = cls.get(item['plugin'])
+            _model = _plugin.create_model()
+            item.update(fields)
+            _plugin.update_model(_model, item, True)
+            _model.ordering = 0 if _root else _ordering
+            _model = _plugin.save_model(_model, not _root)
+            if _root:
+                _node = _models[_parent] if _parent != '' else _root
+                _node.add_child(instance=_model)
+                _models[_parent].refresh_from_db(fields=['lft', 'rgt', 'depth'])
+            _model = _plugin.create_model(_model)
+            _models[ordering] = _model
+            _result['create'].append(_model)
+        def _update_model(ordering, sitem, titem):
+            (_parent, _sep, _ordering) = ordering.rpartition('.')
+            logger.debug("U: {} - {}".format(_parent, _ordering))
+            _plugin = cls.get(sitem['plugin'])
+            _model = titem
+            if _root:
+                _model.refresh_from_db(fields=['lft', 'rgt', 'depth'])
+            _plugin.update_model(_model, sitem, True)
+            _model.id = titem.id
+            _model.ordering = 0 if _root else _ordering
+            _plugin.save_model(_model)
+            _models[ordering] = _model
+            _result['update'].append(_model)
+        def _delete_model(ordering, item):
+            (_parent, _sep, _ordering) = ordering.rpartition('.')
+            logger.debut("D: {} - {}".format(_parent, _ordering))
+            _plugin = cls.get(item.plugin)
+            _plugin.delete_model(item)
+            _result['delete'].append(item)
+        [logger.debug("M: {} {}".format(i, _models[i])) for i in _models]
+        [logger.debug("I: {} {}".format(i, _import[i])) for i in _import]
+        _result = {'create': [], 'update': [], 'delete': []}
         utils.Lists.process(
             _import.items(),
-            lambda items: [(_ordering, _models[_ordering]) for _ordering in items if _ordering in _models],
+            lambda items: [(_idx, _models[_idx]) for _idx in items if _idx in _models],
             _models.items(),
-            lambda items: [(_ordering, _import[_ordering]) for _ordering in items if _ordering in _import],
+            lambda items: [(_idx, _import[_idx]) for _idx in items if _idx in _import],
             create_func=_create_model,
             update_func=_update_model,
             delete_func=_delete_model)
         logger.info('Import results:')
-        logger.info('Create: {}'.format(_create))
-        logger.info('Update: {}'.format(_update))
-        logger.info('Delete: {}'.format(_delete))
+        logger.info('Create:')
+        [logger.info('- {}'.format(_item)) for _item in _result['create']]
+        logger.info('Update:')
+        [logger.info('- {}'.format(_item)) for _item in _result['update']]
+        logger.info('Delete:')
+        [logger.info('- {}'.format(_item)) for _item in _result['delete']]
 
 
 class PluginImplementation:
@@ -263,10 +289,10 @@ class SortingPluginImplementation(PluginImplementation):
 
 class FinishingPluginRegistry(PluginRegistry):
 
-    class Serializer(serializers.ModelSerializer):
+    class Serializer(TreePluginImplementationSerializer):
         class Meta:
             model = models.Finishing
-            fields = ('title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config')
+            fields = ('title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'children')
 
     @classmethod
     def _get_base_module(cls):
