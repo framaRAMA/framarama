@@ -27,6 +27,8 @@
   'action.hide' : 'eye-slash',
   'action.show' : 'eye',
   'action.eximport' : 'floppy-disk',
+  'action.code': 'code',
+  'action.expand': 'angles-down',
 
   'mapped': 'arrow-right-long',
 
@@ -748,6 +750,35 @@
       </div>
     </div>
   </div>
+{% endmacro %}
+
+{% macro card_tree_list_item(id, item, title, body, actions=[], badges=[]) %}
+  {% set entity = item['entity'] %}
+  {% set tree = item['tree'] %}
+  {% if tree.open %}
+  {% else %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+    <div class="col-12 mb-4{%if classes %} {{ classes }}{% endif %}">
+      <div class="card border rounded-5">
+        <div class="card-body p-0">
+          <div class="accordion-header p-1 d-flex flex-wrap bg-light">
+            <button class="col align-items-center accordion-button bg-transparent shadow-none ps-0 py-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ id }}-{{ entity.id }}-children" aria-expanded="false" aria-controls="collapseOne">
+              <p class="col-auto fw-bold m-0 mx-2">{{ title }}</p>
+              {{ badge_group(badges) }}
+            </button>
+            {{ card_actions(actions, 'col-11 col-md-5') }}
+          </div>
+          {% if body %}{{ body }}{% endif %}
+        </div>
+        <div id="{{ id }}-{{ entity.id }}-children" class="m-3 collapse">
+  {% for close in tree.close %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 {% endmacro %}
 
 {% macro card_actions(actions, classes='') %}
