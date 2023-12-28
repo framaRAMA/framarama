@@ -22,6 +22,20 @@
   <!-- li class="nav-item">
     <a class="nav-link p-3" href="#">{{ lib.icon('frames.settings') }}<span class="d-none d-lg-inline"> Settings</span></a>
   </li -->
+  {% if lib.nav_active(request, 'frame_finishing_list', args=[frame.id]) %}
+    <ul class="col d-flex justify-content-end m-1">
+      {% if lib.nav_active(request, 'frame_finishing_rawedit', args=[frame.id]) %}
+        {{ lib.card_actions([
+          {'icon': 'action.list', 'url': url('frame_finishing_list', args=[frame.id]), 'tooltip': 'Show list', 'classes': 'btn-outline-primary fs-5 py-1'},
+        ]) }}
+      {% else %}
+        {{ lib.card_actions([
+          {'icon': 'action.code', 'url': url('frame_finishing_rawedit', args=[frame.id]), 'tooltip': 'Edit code', 'classes': 'btn-outline-primary fs-5 py-1'},
+          {'icon': 'action.eximport', 'target': 'exportImport', 'tooltip': 'Export/import list', 'classes': 'btn-outline-primary fs-5 py-1'},
+        ]) }}
+      {% endif %}
+    </ul>
+  {% endif %}
 </ul>
 
 {% block content_frame %}
