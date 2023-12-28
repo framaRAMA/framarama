@@ -32,8 +32,8 @@ class TreeQuerySet(NS_NodeQuerySet):
     def is_tree(self):
         return True
 
-    def for_export(self):
-        return self.filter(depth=2)
+    def for_export(self, all=False):
+        return self.filter(depth__gt=1) if all else self.filter(depth=2)
 
     def for_import(self):
         _key = ""
@@ -52,7 +52,7 @@ class TreeQuerySet(NS_NodeQuerySet):
         return _models
 
     def annotated(self):
-        return self.model.get_annotated_list_qs(self.filter(depth__gt=1))
+        return self.model.get_annotated_list_qs(self.for_export(True))
 
     def roots(self):
         return self.filter(lft=1)
