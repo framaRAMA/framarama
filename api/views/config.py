@@ -345,10 +345,11 @@ class HitItemDisplaySerializer(BaseSerializer):
 
 
 class FinishingDisplaySerializer(BaseSerializer):
+    children = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Finishing
-        fields = BaseSerializer.Meta.fields + ('ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config')
+        fields = BaseSerializer.Meta.fields + ('ordering', 'title', 'enabled', 'image_in', 'image_out', 'plugin', 'plugin_config', 'children')
         read_only_fields = BaseSerializer.Meta.read_only_fields
         map_fields = BaseSerializer.Meta.fields + ('plugin_config',)
 
@@ -359,6 +360,9 @@ class FinishingDisplaySerializer(BaseSerializer):
             self._link_view('display', 'display-detail', [_display_id]),
             self._link_view('finishing-list', 'display_finishing-list', [_display_id]),
         )
+
+    def get_children(self, obj):
+        return self.__class__(obj.get_children(), many=True, context=self.context).data
 
 
 class ContextDisplaySerializer(BaseSerializer):
@@ -508,7 +512,9 @@ class FinishingDisplayViewSet(BaseViewSet):
     
     def get_queryset(self):
         _display_id = self.kwargs.get('display_id')
-        return self.qs().finishings.filter(frame__display__id=_display_id)
+        _finishings = self.qs().finishings
+        _finishings = _finishings.for_export() if 'pk' not in self.kwargs else _finishings
+        return _finishings.filter(frame__display__id=_display_id)
 
 
 class ContextDisplayViewSet(BaseViewSet):
