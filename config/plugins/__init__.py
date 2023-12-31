@@ -187,40 +187,40 @@ class PluginRegistry:
                 raise Exception("Can not convert item to {}: {}".format(cls.Serializer.Meta.model, _item))
         _models = models.for_import()
         _root = models.get_root(create_defaults) if models.is_tree() else None
-        def _create_model(_parent, _ordering, ordering, item):
-            _plugin = cls.get(item['plugin'])
+        def _create_model(parent, ordering, path, item_dict):
+            _plugin = cls.get(item_dict['plugin'])
             _model = _plugin.create_model()
             item.update(create_defaults)
-            _plugin.update_model(_model, item, True)
-            _model.ordering = 0 if _root else _ordering
+            _plugin.update_model(_model, item_dict, True)
+            _model.ordering = 0 if _root else ordering
             _model = _plugin.save_model(_model, not _root)
             if _root:
-                _node = _models[_parent] if _parent != '' else _root
+                _node = _models[parent] if parent != '' else _root
                 _node.add_child(instance=_model)
-                if _parent:
-                    _models[_parent].refresh_from_db(fields=['lft', 'rgt', 'depth'])
+                if parent:
+                    _models[parent].refresh_from_db(fields=['lft', 'rgt', 'depth'])
             _model = _plugin.create_model(_model)
-            _models[ordering] = _model
+            _models[path] = _model
             return _model
-        def _update_model(_parent, _ordering, ordering, sitem, titem):
-            _plugin = cls.get(sitem['plugin'])
-            _model = titem
+        def _update_model(parent, ordering, path, item_dict, item_model):
+            _plugin = cls.get(item_dict['plugin'])
+            _model = item_model
             if _root:
                 _model.refresh_from_db(fields=['lft', 'rgt', 'depth'])
-            _plugin.update_model(_model, sitem, True)
-            _model.id = titem.id
-            _model.ordering = 0 if _root else _ordering
+            _plugin.update_model(_model, item_dict, True)
+            _model.id = item_model.id
+            _model.ordering = 0 if _root else ordering
             _plugin.save_model(_model)
-            _models[ordering] = _model
+            _models[path] = _model
             return _model
-        def _delete_model(_parent, _ordering, ordering, item):
-            _plugin = cls.get(item.plugin)
-            _plugin.delete_model(item)
+        def _delete_model(parent, ordering, path, item_model):
+            _plugin = cls.get(item_model.plugin)
+            _plugin.delete_model(item_model)
             return item
-        def wrap(mode, ordering, item, callback, *args):
-            (_parent, _sep, _ordering) = ordering.rpartition('.')
+        def wrap(mode, path, item, callback, *args):
+            (_parent, _sep, _ordering) = path.rpartition('.')
             logger.debug("{}: {} - {}".format(mode, _parent, _ordering))
-            _result[mode].append(callback(_parent, _ordering, ordering, item, *args))
+            _result[mode].append(callback(_parent, _ordering, path, item, *args))
         [logger.debug("M: {} {}".format(i, _models[i])) for i in _models]
         [logger.debug("I: {} {}".format(i, _import[i])) for i in _import]
         _result = {'Create': [], 'Update': [], 'Delete': []}
