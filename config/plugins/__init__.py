@@ -82,10 +82,12 @@ class Plugin:
         for _name in [_name for _name in _values.keys() if _name in self._base_model_fields]:
             setattr(instance, _name, _values[_name])
 
-    def save_model(self, model, save=True):
+    def save_model(self, model, ordering, defaults=None, save=True):
         _values = model.get_field_values()
+        _values.update(defaults.items() if defaults else {})
+        _values['ordering'] = ordering
         _instance = self.base_model(model.id)
-        self.update_model(_instance, _values)
+        self.update_model(_instance, _values, True if defaults else False)
         if save:
             _instance.save()
         return _instance
@@ -189,11 +191,8 @@ class PluginRegistry:
         _root = models.get_root(create_defaults) if models.is_tree() else None
         def _create_model(parent, ordering, path, item_dict):
             _plugin = cls.get(item_dict['plugin'])
-            _model = _plugin.create_model()
-            item.update(create_defaults)
-            _plugin.update_model(_model, item_dict, True)
-            _model.ordering = 0 if _root else ordering
-            _model = _plugin.save_model(_model, not _root)
+            _plugin_model = _plugin.create_model()
+            _model = _plugin.save_model(_plugin_model, ordering, item_dict + create_defaults, not _root)
             if _root:
                 _node = _models[parent] if parent != '' else _root
                 _node.add_child(instance=_model)
@@ -207,10 +206,7 @@ class PluginRegistry:
             _model = item_model
             if _root:
                 _model.refresh_from_db(fields=['lft', 'rgt', 'depth'])
-            _plugin.update_model(_model, item_dict, True)
-            _model.id = item_model.id
-            _model.ordering = 0 if _root else ordering
-            _plugin.save_model(_model)
+            _plugin.save_model(_model, ordering, item_dict)
             _models[path] = _model
             return _model
         def _delete_model(parent, ordering, path, item_model):
@@ -220,7 +216,7 @@ class PluginRegistry:
         def wrap(mode, path, item, callback, *args):
             (_parent, _sep, _ordering) = path.rpartition('.')
             logger.debug("{}: {} - {}".format(mode, _parent, _ordering))
-            _result[mode].append(callback(_parent, _ordering, path, item, *args))
+            _result[mode].append(callback(_parent, 0 if _root else _ordering, path, item, *args))
         [logger.debug("M: {} {}".format(i, _models[i])) for i in _models]
         [logger.debug("I: {} {}".format(i, _import[i])) for i in _import]
         _result = {'Create': [], 'Update': [], 'Delete': []}

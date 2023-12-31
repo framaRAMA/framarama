@@ -26,12 +26,7 @@ class BasePluginForm(base.BaseModelForm):
     def save(self, plugin, defaults=None, models=None, *args, **kwargs):
         _commit = kwargs.pop('commit', True)
         _plugin_model = super().save(commit=False, *args, **kwargs)
-        _plugin_model.name = plugin.name
-        _plugin_model.ordering = models.count() if models else 0
-        for _name, _value in defaults.items() if defaults else {}:
-            setattr(_plugin_model, _name, _value)
-        _base_model = plugin.save_model(_plugin_model, _commit)
-        return _base_model
+        return plugin.save_model(_plugin_model, models.count() if models else 0, defaults, _commit)
 
 
 class TreeBasePluginForm(BasePluginForm):
