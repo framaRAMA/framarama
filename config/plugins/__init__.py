@@ -83,12 +83,12 @@ class Plugin:
         for _name in [_name for _name in _values.keys() if _name in self._base_model_fields]:
             setattr(instance, _name, _values[_name])
 
-    def save_model(self, model, ordering, defaults=None, save=True):
+    def save_model(self, model, ordering, defaults=None, save=True, base_values=None):
         _values = model.get_field_values()
         _values.update(defaults.items() if defaults else {})
         _values['ordering'] = ordering
         _instance = self.base_model(model.id)
-        self.update_model(_instance, _values, True if defaults else False)
+        self.update_model(_instance, _values, base_values if base_values != None else True if defaults else False)
         if save:
             _instance.save()
         return _instance
@@ -189,7 +189,9 @@ class PluginRegistry:
             else:
                 raise Exception("Can not convert item to {}: {}".format(cls.Serializer.Meta.model, _item))
         _models = models.for_import()
-        _root = models.get_root(create_defaults) if models.is_tree() else None
+        _root_defaults = create_defaults.copy()
+        _root_defaults['ordering'] = 0
+        _root = models.get_root(_root_defaults) if models.is_tree() else None
         def _create_model(parent, ordering, path, item_dict):
             _plugin = cls.get(item_dict['plugin'])
             _plugin_model = _plugin.create_model()
