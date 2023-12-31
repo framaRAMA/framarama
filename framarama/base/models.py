@@ -109,7 +109,7 @@ class PluginModel(BaseModel):
     plugin = models.CharField(
         max_length=64)
     plugin_config = models.JSONField(
-        blank=True, null=True, editable=False,
+        blank=True, null=True, editable=True, default=dict,
         verbose_name='Plugin config', help_text='Plugin settings in JSON structure')
 
     class Meta:

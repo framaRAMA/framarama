@@ -83,4 +83,24 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(forward, backward),
+        migrations.AlterField(
+            model_name='finishing',
+            name='plugin_config',
+            field=models.JSONField(blank=True, default=dict, help_text='Plugin settings in JSON structure', null=True, verbose_name='Plugin config'),
+        ),
+        migrations.AlterField(
+            model_name='framecontext',
+            name='plugin_config',
+            field=models.JSONField(blank=True, default=dict, help_text='Plugin settings in JSON structure', null=True, verbose_name='Plugin config'),
+        ),
+        migrations.AlterField(
+            model_name='sorting',
+            name='plugin_config',
+            field=models.JSONField(blank=True, default=dict, help_text='Plugin settings in JSON structure', null=True, verbose_name='Plugin config'),
+        ),
+        migrations.AlterField(
+            model_name='sourcestep',
+            name='plugin_config',
+            field=models.JSONField(blank=True, default=dict, help_text='Plugin settings in JSON structure', null=True, verbose_name='Plugin config'),
+        ),
     ]
