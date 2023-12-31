@@ -57,6 +57,7 @@ class Plugin:
     def create_model(self, instance=None):
         instance = instance if instance else self._model()
         _values = instance.get_field_values()
+        _values[Plugin._plugin_field] = self.name
         _plugin_config = _values.pop(Plugin._plugin_config_field)
         if _plugin_config:
             _values.update({_n: _v for _n, _v in _plugin_config.items() if _n in self._model_fields})
