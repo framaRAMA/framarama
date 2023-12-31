@@ -451,9 +451,9 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
     def _get(self, request, frame_id, finishing_id, *args, **kwargs):
         _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
         _finishing = _context['finishing']
-        _finishing_plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
-        _finishing= _finishing_plugin.load_model(finishing_id)
-        _form = _finishing_plugin.get_update_form(instance=_finishing)
+        _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
+        _finishing= _plugin.load_model(finishing_id)
+        _form = _plugin.get_update_form(instance=_finishing)
         _context['form'] = _form
         return _context
 
@@ -461,11 +461,11 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         _context = super()._get(request, frame_id, finishing_id, *args, **kwargs)
         _frame = _context['frame']
         _finishing = _context['finishing']
-        _finishing_plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
-        _finishing = _finishing_plugin.load_model(finishing_id)
-        _form = _finishing_plugin.get_update_form(request.POST, instance=_finishing)
+        _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
+        _finishing = _plugin.load_model(finishing_id)
+        _form = _plugin.get_update_form(request.POST, instance=_finishing)
         if _form.is_valid():
-            _finishing = _form.save(plugin=_finishing_plugin)
+            _finishing = _form.save(plugin=_plugin)
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['form'] = _form
         return _context
