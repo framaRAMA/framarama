@@ -515,7 +515,8 @@ class ImportFinishingFrameView(base.BaseFrameConfigView):
                 raise ValidationError('Can not parse JSON: ' + str(e))
             plugins.FinishingPluginRegistry.import_config(
                 _config['data'],
-                _frame.finishings.all())
+                _frame.finishings,
+                {'frame': _frame})
         self.response_json(_context, {})
         return _context
 
