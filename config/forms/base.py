@@ -34,5 +34,5 @@ class TreeBasePluginForm(BasePluginForm):
     def save(self, plugin, defaults, root_defaults, models, *args, **kwargs):
         _commit = kwargs.pop('commit', False)
         _base_model = super().save(plugin, defaults, None, commit=_commit, *args, **kwargs)
-        return models.get_root(defaults).add_child(instance=_base_model)
+        return models.get_root(root_defaults).add_child(instance=_base_model)
 
