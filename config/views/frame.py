@@ -437,8 +437,8 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
         _frame = _context['frame']
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
-            _defaults = {'enabled': False, 'ordering': 0, 'frame': _frame}
-            _model = _form.save(plugin=_plugin, tree=_frame.finishings, defaults=_defaults, root_defaults=_defaults)
+            _defaults = {'enabled': False, 'frame': _frame}
+            _model = _form.save(plugin=_plugin, models=_frame.finishings, defaults=_defaults, root_defaults=_defaults)
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
