@@ -465,8 +465,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         _finishing = _finishing_plugin.load_model(finishing_id)
         _form = _finishing_plugin.get_update_form(request.POST, instance=_finishing)
         if _form.is_valid():
-            _finishing = _form.save(commit=False)
-            _finishing_plugin.save_model(_finishing)
+            _finishing = _form.save(plugin=_finishing_plugin)
             self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         _context['form'] = _form
         return _context
