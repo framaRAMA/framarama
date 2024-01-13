@@ -195,7 +195,7 @@ class PluginRegistry:
         def _create_model(parent, ordering, path, item_dict):
             _plugin = cls.get(item_dict['plugin'])
             _plugin_model = _plugin.create_model()
-            _model = _plugin.save_model(_plugin_model, ordering, item_dict + create_defaults, not _root)
+            _model = _plugin.save_model(_plugin_model, ordering, {**create_defaults, **item_dict}, not _root)
             if _root:
                 _node = _models[parent] if parent != '' else _root
                 _node.add_child(instance=_model)
