@@ -479,7 +479,7 @@ class ActionFinishingFrameView(base.BaseFinishingFrameConfigView):
         _action = request.GET['action']
         if _action == 'delete':
             self._item_order_delete(_finishing.pk, _frame.finishings)
-        elif _action == 'up' or _action == 'down':
+        elif _action in ['up', 'down', 'up-out', 'down-in']:
             self._item_order_move(_action, _finishing, _frame.finishings)
         self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         return _context

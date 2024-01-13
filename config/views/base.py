@@ -66,13 +66,15 @@ class BaseFrameConfigView(BaseConfigView):
 
     def _item_order_move(self, action, item, items):
         if items.is_tree():
-            _item = item
-            _target = None
-            while _target is None:
-                _target = _item.get_prev_sibling() if action == 'up' else _item.get_next_sibling()
-                _item = _item.get_parent()
+            if action in ['up', 'down']:
+                _target = item.get_prev_sibling() if action == 'up' else item.get_next_sibling()
+                _pos = 'left' if action == 'up' else 'right'
+            elif action in ['up-out', 'down-in']:
+                _target = item.get_parent() if action == 'up-out' else item.get_next_sibling()
+                _pos = 'left' if action == 'up-out' else 'first-child'
             if _target and not _target.is_root():
-                item.move(_target, 'left' if action == 'up' else 'right')
+                logger.info("Move {} to {} of {}".format(item, _pos, _target))
+                item.move(_target, _pos)
         else:
             _ordering = item.ordering
             _ordering_target = _ordering-1 if action == 'up' else _ordering+1

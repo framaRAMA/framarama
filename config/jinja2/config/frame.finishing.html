@@ -26,8 +26,10 @@
     loop.index ~ '. ' ~ finishing.title,
     '<div class="smaller font-monospace">%s</div>'|format('')|safe,
     [
-      {'title': '', 'icon': 'action.up', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align':'left'},
-      {'title': '', 'icon': 'action.down', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=down','classes': 'btn-outline-primary', 'align':'left'},
+      {'tooltip': 'Move to parent', 'icon': 'action.up-out', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up-out', 'classes': 'btn-outline-primary', 'align':'left'},
+      {'tooltip': 'Up', 'icon': 'action.up', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align':'left'},
+      {'tooltip': 'Down', 'icon': 'action.down', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=down','classes': 'btn-outline-primary', 'align':'left'},
+      {'tooltip': 'Move to child', 'icon': 'action.down-in', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=down-in', 'classes': 'btn-outline-primary', 'align':'left'},
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_finishing_edit', args=[frame.id, finishing.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishing%s'|format(finishing.id), 'classes': 'text-danger'}
     ],
