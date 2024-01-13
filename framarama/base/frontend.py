@@ -495,7 +495,7 @@ class FrontendDevice(Singleton):
         while _items is None:
             _items = Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN)[len(_files):]
             for _i, (_file, _num, _ext) in enumerate(_items):
-                if start != None and start < _i:
+                if start != None and start > _i:
                     continue
                 if count != None and count == len(_files):
                     _items = []
