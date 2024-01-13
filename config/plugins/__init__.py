@@ -198,10 +198,8 @@ class PluginRegistry:
             _model = _plugin.save_model(_plugin_model, ordering, {**create_defaults, **item_dict}, not _root)
             if _root:
                 _node = _models[parent] if parent != '' else _root
+                _node.refresh_from_db(fields=['lft', 'rgt', 'depth'])
                 _node.add_child(instance=_model)
-                if parent:
-                    _models[parent].refresh_from_db(fields=['lft', 'rgt', 'depth'])
-            _model = _plugin.create_model(_model)
             _models[path] = _model
             return _model
         def _update_model(parent, ordering, path, item_dict, item_model):
@@ -213,9 +211,17 @@ class PluginRegistry:
             _models[path] = _model
             return _model
         def _delete_model(parent, ordering, path, item_model):
+            if _root:
+                item_model.refresh_from_db(fields=['lft', 'rgt', 'depth'])
             _plugin = cls.get(item_model.plugin)
             _plugin.delete_model(item_model)
-            return item
+            for _k, _v in list(_models.items()):
+                if _k.startswith(path):
+                    del _models[_k]
+            if _root:
+                _node = _models[parent] if parent != '' else _root
+                _node.refresh_from_db(fields=['lft', 'rgt', 'depth'])
+            return item_model
         def wrap(mode, path, item, callback, *args):
             (_parent, _sep, _ordering) = path.rpartition('.')
             logger.debug("{}: {} - {}".format(mode, _parent, _ordering))
