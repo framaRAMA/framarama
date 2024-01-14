@@ -772,7 +772,7 @@
               <p class="col-auto fw-bold m-0 mx-2">{{ title }}</p>
               {{ badge_group(badges) }}
             </button>
-            {{ card_actions(actions, 'col-11 col-md-5') }}
+            {{ card_actions(actions, 'col-12 col-md-5') }}
           </div>
           {% if body %}{{ body }}{% endif %}
         </div>
@@ -804,7 +804,10 @@
              {% if 'url' in action %}href="{{ action['url'] }}"{% endif %}
              {% if 'target' in action %}href="#" data-bs-toggle="modal" data-bs-target="#{{ action['target'] }}"{% endif %}
              {% if 'tooltip' in action %}title="{{ action['tooltip'] }}"{% endif %}
-            >{{ action['title']|default('') }}{% if 'icon' in action %}{{ icon(action['icon'], 'ms-2' if action['title'] else '') }}{% endif %}</a>
+            >
+              <span class="d-none d-md-inline">{{ action['title']|default('') }}</span>
+              {% if 'icon' in action %}{{ icon(action['icon'], 'ms-2' if action['title'] else '') }}{% endif %}
+            </a>
           {% endfor %}
         </div>
       {% endfor %}
