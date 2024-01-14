@@ -760,6 +760,7 @@
   {% set tree = item['tree'] %}
   {% if tree.open %}
   {% else %}
+          </div>
         </div>
       </div>
     </div>
@@ -774,10 +775,12 @@
             </button>
             {{ card_actions(actions, 'col-12 col-md-5') }}
           </div>
-          {% if body %}{{ body }}{% endif %}
         </div>
-        <div id="{{ id }}-{{ entity.id }}-children" class="m-3 collapse">
+        <div id="{{ id }}-{{ entity.id }}-children" class="collapse">
+          <div class="p-2">{% if body %}{{ body }}{% endif %}</div>
+          <div class="p-2 border-top">
   {% for close in tree.close %}
+          </div>
         </div>
       </div>
     </div>

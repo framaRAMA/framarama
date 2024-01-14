@@ -24,7 +24,7 @@
     'finishings',
     item,
     loop.index ~ '. ' ~ finishing.title,
-    '<div class="smaller font-monospace">%s</div>'|format('')|safe,
+    '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'tooltip': 'Move to parent', 'icon': 'action.up-out', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up-out', 'classes': 'btn-outline-primary', 'align':'left'},
       {'tooltip': 'Up', 'icon': 'action.up', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align':'left'},
