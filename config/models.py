@@ -382,6 +382,7 @@ class Sorting(PluginModel):
 class Finishing(TreePluginModel):
     STR_FIELDS = PluginModel.STR_FIELDS + ["title", "image_in", "image_out", "enabled"]
 
+    CAT_GROUP = 'group'
     CAT_SHAPE = 'shape'
     CAT_TEXT = 'text'
     CAT_RESIZE = 'resize'
