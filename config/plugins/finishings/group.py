@@ -39,7 +39,7 @@ class GroupUpdateForm(UpdateFinishingForm):
 
 
 class Implementation(FinishingPluginImplementation):
-    CAT = Finishing.CAT_TEXT
+    CAT = Finishing.CAT_GROUP
     TITLE = 'Group'
     DESCR = 'Group elements'
     
