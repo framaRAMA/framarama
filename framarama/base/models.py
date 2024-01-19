@@ -3,13 +3,8 @@ import collections
 
 from django.db import models
 
-from framarama.base import utils
+from treebeard.ns_tree import NS_Node, NS_NodeManager, NS_NodeQuerySet
 
-# Find better solution to import dependencies from requirements (install
-# them before application startup - not in initialization phase)
-NS_Node= utils.Classes.load('treebeard.ns_tree.NS_Node', True, 'django.db.models.Model')
-NS_NodeManager = utils.Classes.load('treebeard.ns_tree.NS_NodeManager', True, 'django.db.models.Manager')
-NS_NodeQuerySet = utils.Classes.load('treebeard.ns_tree.NS_NodeQuerySet', True, 'django.db.models.QuerySet')
 
 TIMEZONE_CHOICES = [(None, '(default)')]
 TIMEZONE_CHOICES.extend([(_tz, _tz) for _tz in sorted(zoneinfo.available_timezones())])

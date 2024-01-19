@@ -8,7 +8,11 @@ openbox-session &
 # Disable energy features to avoid black screens
 [ `which xset` ] && ( xset -dpms ; xset s off )
 
+# Activate env and install requirements
 . ../venv/bin/activate
+pip install -r requirements.txt
+
+# Start main loop
 while [ "1" = "1" ] ; do
 
   # Set startup background
