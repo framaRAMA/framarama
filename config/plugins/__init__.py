@@ -145,7 +145,24 @@ class PluginRegistry:
 
     @classmethod
     def get_enabled(cls, models):
-        return cls.get_all([_model for _model in models if _model.enabled])
+        if len(models) == 0:
+            return []
+        if models[0]._meta.model.objects.is_tree():
+            _models = []
+            _depth_enabled = [True]
+            for _model in models:
+                _depth = _model.depth if _model.depth != None else 1
+                if len(_depth_enabled) < _depth:    # lower items
+                    _depth_enabled.append(_enabled)
+                else:
+                    while len(_depth_enabled) > _depth:  # upper level
+                        _depth_enabled.pop()
+                _enabled = _depth_enabled[-1] and _model.enabled
+                if _enabled:
+                    _models.append(_model)
+        else:
+            _models = [_model for _model in models if _model.enabled]
+        return cls.get_all(_models)
 
     @classmethod
     def get_all(cls, models):
