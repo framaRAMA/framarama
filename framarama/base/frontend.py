@@ -28,19 +28,15 @@ logger = logging.getLogger(__name__)
 
 class Frontend(Singleton):
     INIT_PHASE_START = 0
-    INIT_PHASE_REQ_CHECK = 1
-    INIT_PHASE_REQ_INSTALL = 2
-    INIT_PHASE_STATIC = 3
-    INIT_PHASE_DB_DEFAULT = 4
-    INIT_PHASE_CONFIGURED = 5
-    INIT_PHASE_DB_CONFIG = 6
-    INIT_PHASE_SETUP = 7
-    INIT_PHASE_API_ACCESS = 8
+    INIT_PHASE_STATIC = 1
+    INIT_PHASE_DB_DEFAULT = 2
+    INIT_PHASE_CONFIGURED = 3
+    INIT_PHASE_DB_CONFIG = 4
+    INIT_PHASE_SETUP = 5
+    INIT_PHASE_API_ACCESS = 6
     INIT_PHASE_ERROR = 100
     INIT_PHASES = {
         INIT_PHASE_START: "Started",
-        INIT_PHASE_REQ_CHECK: "Checking requirements",
-        INIT_PHASE_REQ_INSTALL: "Installing requirements",
         INIT_PHASE_STATIC: "Collect statics",
         INIT_PHASE_DB_DEFAULT: "Checking frontend database",
         INIT_PHASE_CONFIGURED: "Checking frontend configuration",
@@ -60,24 +56,6 @@ class Frontend(Singleton):
         _out, _err = io.StringIO(), io.StringIO()
         management.call_command(*args, **kwargs, stdout=_out, stderr=_err)
         return _out.getvalue().rstrip("\n").split("\n")
-
-    def _init_requirements_check(self):
-        import pkg_resources
-        try:
-            _requirements = pkg_resources.require(open('requirements.txt', 'r'))
-            logger.info("{} requirements fullfilled".format(len(_requirements)))
-            return Frontend.INIT_PHASE_REQ_INSTALL
-        except pkg_resources.VersionConflict as e:
-            logger.error("Installing requirements: {}".format(e))
-        except pkg_resources.DistributionNotFound as e:
-            logger.error("Missing requirements: {}".format(e))
-
-    def _init_requirements_install(self):
-        _pip= Process.exec_run(['pip', 'install', '-r', 'requirements.txt'])
-        if _pip:
-            logger.info("Requirements installed!")
-        else:
-            raise Exception("Installation via pip reported no output")
 
     def _init_statics(self):
         _statics = self._mgmt_cmd('collectstatic', '--no-input')
@@ -142,8 +120,6 @@ class Frontend(Singleton):
         if not self.init_get():
             logger.info("Starting system setup")
             _phases = {
-              Frontend.INIT_PHASE_REQ_CHECK: self._init_requirements_check,
-              Frontend.INIT_PHASE_REQ_INSTALL: self._init_requirements_install,
               Frontend.INIT_PHASE_STATIC: self._init_statics,
               Frontend.INIT_PHASE_DB_DEFAULT: self._init_database,
               Frontend.INIT_PHASE_CONFIGURED: self._init_configuration,
