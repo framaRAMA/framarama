@@ -93,8 +93,8 @@ class PluginTestCase(TestCase):
         self.assertEqual(None, _model.title)
         self.assertEqual(None, _model.votes)
         self.assertEqual(None, _model.enabled)
-        self.assertEqual('', _model.plugin)
-        self.assertEqual(None, _model.plugin_config)
+        self.assertEqual('test', _model.plugin)
+        self.assertEqual({}, _model.plugin_config)
 
     def test_plugin_create_model_none(self):
         _plugin = self._plugin()
@@ -105,13 +105,13 @@ class PluginTestCase(TestCase):
         self.assertEqual(None, _model.title)
         self.assertEqual(None, _model.votes)
         self.assertEqual(None, _model.enabled)
-        self.assertEqual('', _model.plugin)
-        self.assertEqual(None, _model.plugin_config)
+        self.assertEqual('test', _model.plugin)
+        self.assertEqual({}, _model.plugin_config)
 
     def test_plugin_save_model(self):
         _model = BaseTestPluginModel()
         _plugin = self._plugin()
-        _plugin.save_model(_model)
+        _plugin.save_model(_model, 0)
 
     def test_plugin_update_model(self):
         _model = BaseTestPluginModel()
