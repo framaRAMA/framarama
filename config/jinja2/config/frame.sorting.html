@@ -24,7 +24,7 @@
     {'title': 'Weight %d'|format(sorting.weight), 'type': 'warning'}
   ] %}
   {{ lib.card_list_item(
-    loop.index ~ '. ' ~ sorting.title,
+    '<span class="%s">%d. %s</span>'|format('' if sorting.enabled else 'text-muted', loop.index, sorting.title)|safe,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_sorting_edit', args=[frame.id, sorting.id])},

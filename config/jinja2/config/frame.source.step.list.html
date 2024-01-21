@@ -5,7 +5,7 @@
 <div class="row pt-3">
 {% for source_step in source.steps.all() %}
   {% set title %}
-    {{ loop.index }}. {{ source_step.title }}
+    {{ source_step.title }}
     {% if source_step.merge_in %}
       {{ lib.icon('source.mergein', '') }}
     {% endif %}
@@ -25,7 +25,7 @@
   {% endif %}
 
   {{ lib.card_list_item(
-    title,
+    '<span class="%s">%d. %s</span>'|format('' if source_step.enabled else 'text-muted', loop.index, title)|safe,
     source_step.description,
     [
       {'title': '', 'icon': 'action.up', 'url': url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) ~ '?action=up', 'classes': 'btn-outline-primary position-static', 'align': 'left'},

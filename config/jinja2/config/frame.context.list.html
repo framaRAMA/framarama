@@ -12,7 +12,7 @@
     {% endfor %}
   {% endset %}
   {{ lib.card_list_item(
-    loop.index ~ '. ' ~ context.name,
+    '<span class="%s">%d. %s</span>'|format('' if context.enabled else 'text-muted', loop.index, context.name)|safe,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'title': '', 'icon': 'action.up', 'url': url('frame_context_action', args=[frame.id, context.id]) ~ '?action=up', 'classes': 'btn-outline-primary', 'align': 'left'},
@@ -22,8 +22,7 @@
     ],
     [
       {'title': context.plugin, 'type': 'success', 'icon': 'context.plugin.'+context_plugins[context.plugin].cat},
-    ],
-    '' if context.enabled else 'text-muted'
+    ]
   ) }}
   {{ lib.modal_delete('deleteFinishingContext%s'|format(context.id), 'Delete context', 'Do you really want to delete the selected context "%s"?'|format(context.name), url('frame_context_action', args=[frame.id, context.id])+'?action=delete') }}
 {% else %}
