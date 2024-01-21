@@ -127,7 +127,7 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
         elif _action == 'run':
             _scheduler = self.get_scheduler()
             _scheduler.trigger_job(jobs.Scheduler.CFG_SOURCE_UPDATE, instance=[_frame.id, _source.id], frame=_frame, source=_source)
-        self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
+        self.redirect_finishing_list(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         return _context
 
 
@@ -409,13 +409,29 @@ class ListFinishingFrameView(base.BaseFrameConfigView):
 
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
+        _open = request.GET.get('open', '').split(',')
+        _opens = []
         _frame = _context['frame']
         _finishings = []
+        _id_path = [0]  # root item
         for (_finishing, _tree) in _frame.finishings.annotated():
+            if len(_id_path) < _finishing.depth - 1:
+                _id_path.append(_depth)
+            else:
+                while len(_id_path) > _finishing.depth - 1:
+                    _id_path.pop()
+            _depth = str(_finishing.id)
             _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
-            _finishings.append({'entity': _plugin.create_model(_finishing), 'tree': _tree})
+            _finishings.append({
+                'entity': _plugin.create_model(_finishing),
+                'tree': _tree,
+                'path': '-'.join(_id_path[1:] + [_depth])  # skip root item
+            })
+            if _open and str(_finishing.id) in _open:
+                _opens.append(_finishings[-1]['path'])
         _context['finishings'] = _finishings
         _context['finishing_plugins'] = plugins.FinishingPluginRegistry.all()
+        _context['finishing_opens'] = _opens
         _context['form_import'] = UploadFieldForm()
         return _context
 
@@ -437,8 +453,8 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
         _form = _plugin.get_create_form(request.POST)
         if _form.is_valid():
             _defaults = {'frame': _frame}
-            _form.save(plugin=_plugin, models=_frame.finishings, defaults=_defaults, base_values=False)
-            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+            _finishing = _form.save(plugin=_plugin, models=_frame.finishings, defaults=_defaults, base_values=False)
+            self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
         _context['plugin'] = _plugin
         _context['form'] = _form
         return _context
@@ -465,7 +481,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         _form = _plugin.get_update_form(request.POST, instance=_finishing)
         if _form.is_valid():
             _form.save(plugin=_plugin)
-            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+            self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
         _context['form'] = _form
         return _context
 
@@ -479,9 +495,10 @@ class ActionFinishingFrameView(base.BaseFinishingFrameConfigView):
         _action = request.GET['action']
         if _action == 'delete':
             self._item_order_delete(_finishing.pk, _frame.finishings)
+            self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
         elif _action in ['up', 'down', 'up-out', 'down-in']:
             self._item_order_move(_action, _finishing, _frame.finishings)
-        self.redirect(_context, 'frame_finishing_list', args=[_frame.id])
+            self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
         return _context
 
 

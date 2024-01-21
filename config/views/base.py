@@ -95,6 +95,9 @@ class BaseFrameConfigView(BaseConfigView):
         _context['frame'] = self.get_frames().get(id=frame_id)
         return _context
 
+    def redirect_finishing_list(self, context, finishing, *args, **kwargs):
+        self.redirect(context, 'frame_finishing_list', query='open={}'.format(finishing.id), *args, **kwargs)
+
 
 class BaseSourceFrameConfigView(BaseFrameConfigView):
 

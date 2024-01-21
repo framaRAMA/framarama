@@ -33,7 +33,8 @@
       {'title': 'Edit', 'icon': 'action.edit', 'url': url('frame_finishing_edit', args=[frame.id, finishing.id])},
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishing%s'|format(finishing.id), 'classes': 'text-danger'}
     ],
-    badges
+    badges,
+    opens=finishing_opens
   ) }}
   {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
 {% else %}
