@@ -6,7 +6,6 @@ import fcntl
 import threading
 import datetime
 import jsonpickle
-import urllib
 import base64
 import logging
 
