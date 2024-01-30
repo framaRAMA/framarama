@@ -14,13 +14,18 @@ from config.utils import context
 logger = logging.getLogger(__name__)
 
 FIELDS = [
+    'variables',
 ]
 WIDGETS = {
+    'variables': base.textareaFieldWidget(),
 }
 
 
 class GlobalsModel(FrameContext):
     frame_ptr = models.OneToOneField(FrameContext, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
+    variables = models.JSONField(
+        blank=True, null=True, default=dict,
+        verbose_name='Globals', help_text='Global parameters and variables')
 
     class Meta:
         managed = False
@@ -50,6 +55,6 @@ class Implementation(ContextPluginImplementation):
     UpdateForm = GlobalsUpdateForm
 
     def run(self, model, image, ctx):
-        _resolvers = {'globals': context.MapResolver(settings.FRAMARAMA['CONFIG_CONTEXT_GLOBALS'])}
+        _resolvers = {'globals': context.MapResolver(model.variables)}
         return _resolvers
 
