@@ -23,7 +23,7 @@
   {{ lib.card_tree_list_item(
     'finishings',
     item,
-    '<span class="%s">%d. %s</span>'|format('' if finishing.enabled else 'text-muted', loop.index, finishing.title)|safe,
+    '<span class="%s">%s</span>'|format('' if finishing.enabled else 'text-muted', finishing.title)|safe,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
     [
       {'tooltip': 'Move to parent', 'icon': 'action.up-out', 'url': url('frame_finishing_action', args=[frame.id, finishing.id]) ~ '?action=up-out', 'classes': 'btn-outline-primary', 'align':'left'},
@@ -60,7 +60,6 @@
       window.document.location.href = window.document.location.pathname + '/' + fromId + '/action?action=' + action + '&target=' + toId;
     }
   });
-  window.console.log(sortable);
 </script>
 
 
