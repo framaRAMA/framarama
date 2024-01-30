@@ -2,7 +2,7 @@
 
 {% block content_frame %}
 
-<div class="row pt-3">
+<div id="finishing_list" class="row pt-3">
 {% for item in finishings %}
   {% set finishing = item.entity %}
   {% set badges = [{'title': finishing.plugin, 'type': 'success', 'icon': 'finishing.plugin.'+finishing_plugins[finishing.plugin].cat}] %}
@@ -43,6 +43,26 @@
   </div>
 {% endfor %}
 </div>
+
+<script type="text/javascript">
+  var sortable = Sortable.create(document.getElementById('finishing_list'), {
+    draggable: '.finishings-item',
+    ghostClass: "text-primary",
+    dragoverBubble: true,
+    animation: 150,
+    onEnd: function (evt) {
+      var ids = this.toArray();
+      window.console.log(ids);
+      var fromId = ids[evt.newIndex];
+      var toId = evt.newIndex > 0 ? ids[evt.newIndex-1] : ids[1];
+      var action = evt.newIndex > 0 ? 'move-after' : 'move-before';
+      window.console.log("Move "+fromId+" "+action+" "+toId);
+      window.document.location.href = window.document.location.pathname + '/' + fromId + '/action?action=' + action + '&target=' + toId;
+    }
+  });
+  window.console.log(sortable);
+</script>
+
 
 {{ lib.nav_actions([
   {'icon': 'action.view', 'modal': 'showPreview', 'type': 'primary', 'title': 'Preview'},

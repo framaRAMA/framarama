@@ -39,6 +39,7 @@
   'error': 'exclamation-triangle',
 
   'bullet': 'caret-right',
+  'grip': 'grip-vertical',
 
   'setup.local': 'computer',
   'setup.cloud': 'globe',
@@ -135,8 +136,9 @@
     <link rel="stylesheet" href="{{ static('common/fontawesome-free-6.1.1-web/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ static('common/mdb-ui-kit-4.0.0/css/mdb.min.css') }}">
 
-    <!-- Charts.js -->
+    <!-- JS libraries -->
     <script src="{{ static('common/chartsjs-3.9.1.js') }}"></script>
+    <script src="{{ static('common/Sortable-1.15.2.min.js') }}"></script>
 
     <!-- Custom CSS & JS -->
     <link rel="stylesheet" href="{{ static('common/framarama.css') }}?1668440570">
@@ -769,7 +771,7 @@
       </div>
     </div>
   {% endif %}
-    <div class="col-12 mb-4{%if classes %} {{ classes }}{% endif %}">
+    <div class="{{ id }}-item col-12 mb-4{%if classes %} {{ classes }}{% endif %}" data-id="{{ entity.id }}">
       <div class="card border rounded-5">
         <div class="card-body p-0">
           <div class="accordion-header p-1 d-flex flex-wrap bg-light">

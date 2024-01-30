@@ -499,6 +499,9 @@ class ActionFinishingFrameView(base.BaseFinishingFrameConfigView):
         elif _action in ['up', 'down', 'up-out', 'down-in']:
             self._item_order_move(_action, _finishing, _frame.finishings)
             self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
+        elif _action in ['move-after', 'move-before']:
+            self._item_order_move(_action, _finishing, _frame.finishings, request.GET['target'])
+            self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
         return _context
 
 

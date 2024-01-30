@@ -64,7 +64,7 @@ class BaseFrameConfigView(BaseConfigView):
         item.delete();
         items.filter(ordering__gt=item.ordering).update(ordering=F('ordering')-1)
 
-    def _item_order_move(self, action, item, items):
+    def _item_order_move(self, action, item, items, target=None):
         if items.is_tree():
             if action in ['up', 'down']:
                 _target = item.get_prev_sibling() if action == 'up' else item.get_next_sibling()
@@ -72,6 +72,9 @@ class BaseFrameConfigView(BaseConfigView):
             elif action in ['up-out', 'down-in']:
                 _target = item.get_parent() if action == 'up-out' else item.get_next_sibling()
                 _pos = 'left' if action == 'up-out' else 'first-child'
+            elif action in ['move-after', 'move-before'] and target:
+                _target = items.get(pk=target)
+                _pos = 'left' if action == 'move-before' else 'right'
             if _target and not _target.is_root():
                 logger.info("Move {} to {} of {}".format(item, _pos, _target))
                 item.move(_target, _pos)
