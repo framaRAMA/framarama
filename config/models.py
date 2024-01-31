@@ -422,7 +422,7 @@ class FrameContext(PluginModel):
 
     CAT_EXIF = 'exif'
     CAT_GEO = 'geo'
-    CAT_GLOBALS = 'globals'
+    CAT_VARS = 'vars'
 
     frame = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name='contexts')
     ordering = models.IntegerField()

@@ -21,38 +21,38 @@ WIDGETS = {
 }
 
 
-class GlobalsModel(FrameContext):
+class VariablesModel(FrameContext):
     frame_ptr = models.OneToOneField(FrameContext, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
     variables = models.JSONField(
         blank=True, null=True, default=dict,
-        verbose_name='Globals', help_text='Global parameters and variables')
+        verbose_name='Variables', help_text='Key/value pairs to provied as global variables')
 
     class Meta:
         managed = False
 
 
-class GlobalsCreateForm(CreateContextForm):
+class VariablesCreateForm(CreateContextForm):
     class Meta:
-        model = GlobalsModel
+        model = VariablesModel
         fields = CreateContextForm.fields(FIELDS)
         widgets = CreateContextForm.widgets(WIDGETS)
 
 
-class GlobalsUpdateForm(UpdateContextForm):
+class VariablesUpdateForm(UpdateContextForm):
     class Meta:
-        model = GlobalsModel
+        model = VariablesModel
         fields = UpdateContextForm.fields(FIELDS)
         widgets = UpdateContextForm.widgets(WIDGETS)
 
 
 class Implementation(ContextPluginImplementation):
-    CAT = FrameContext.CAT_GLOBALS
-    TITLE = 'Globals'
-    DESCR = 'System global parameters and variables'
+    CAT = FrameContext.CAT_VARS
+    TITLE = 'Variables'
+    DESCR = 'Global variables'
 
-    Model = GlobalsModel
-    CreateForm = GlobalsCreateForm
-    UpdateForm = GlobalsUpdateForm
+    Model = VariablesModel
+    CreateForm = VariablesCreateForm
+    UpdateForm = VariablesUpdateForm
 
     def run(self, model, image, ctx):
         _resolvers = {'globals': context.MapResolver(model.variables)}
