@@ -90,8 +90,6 @@ class CreateSourceStepForm(BasePluginForm):
             'mime_out': base.selectFieldWidget(choices=models.MIME_CHOICES),
             'loop_out': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(CreateSourceStepForm.Meta.fields)
 
 
 class UpdateSourceStepForm(BasePluginForm):
@@ -109,8 +107,6 @@ class UpdateSourceStepForm(BasePluginForm):
             'mime_out': base.selectFieldWidget(choices=models.MIME_CHOICES),
             'loop_out': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(UpdateSourceStepForm.Meta.fields)
 
 
 class CreateSortingForm(BasePluginForm):
@@ -122,8 +118,6 @@ class CreateSortingForm(BasePluginForm):
             'weight': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(CreateSortingForm.Meta.fields)
 
 
 class UpdateSortingForm(BasePluginForm):
@@ -135,8 +129,6 @@ class UpdateSortingForm(BasePluginForm):
             'weight': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(UpdateSortingForm.Meta.fields)
 
 
 class CreateFinishingForm(TreeBasePluginForm):
@@ -149,8 +141,6 @@ class CreateFinishingForm(TreeBasePluginForm):
             'image_out': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(CreateFinishingForm.Meta.fields)
 
     def field_depencies(self):
         return {
@@ -168,8 +158,6 @@ class UpdateFinishingForm(BasePluginForm):
             'image_out': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(UpdateFinishingForm.Meta.fields)
 
 
 class RawEditFinishingForm(base.BaseForm):
@@ -188,8 +176,6 @@ class CreateContextForm(BasePluginForm):
             'name': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(CreateContextForm.Meta.fields)
 
 
 class UpdateContextForm(BasePluginForm):
@@ -200,7 +186,5 @@ class UpdateContextForm(BasePluginForm):
             'name': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
-    def field_groups(self):
-        return self._field_groups(UpdateContextForm.Meta.fields)
 
 

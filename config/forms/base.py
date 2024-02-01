@@ -6,19 +6,20 @@ from framarama.base import forms as base
 class BasePluginForm(base.BaseModelForm):
     dependencies = {}
     
-    def _field_groups(self, fields):
-        impl = sys.modules[self.__module__].Implementation
-        _groups = {
+    def field_groups(self):
+        _impl = sys.modules[self.__module__].Implementation
+        _model_fields = [_field.name for _field in self.Meta.model._meta.get_fields(include_parents=False)]
+        _plugin_fields = self.Meta.fields
+        return {
             'default': {
                 'title': 'General settings',
-                'fields': fields,
+                'fields': [_name for _name in _plugin_fields if _name not in _model_fields],
             },
             'plugin': {
-                'title': 'Plugin settings: ' + impl.TITLE + ' - ' + impl.DESCR,
-                'fields': [field for field in self.fields.keys() if field not in fields],
+                'title': 'Plugin settings: ' + _impl.TITLE + ' - ' + _impl.DESCR,
+                'fields': [field for field in _plugin_fields if field in _model_fields],
             }
         }
-        return _groups
 
     def field_dependencies(self):
         return self.dependencies
