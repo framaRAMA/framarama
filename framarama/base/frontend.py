@@ -116,15 +116,16 @@ class Frontend(Singleton):
     def initialize(self):
         if self._init_phase >= Frontend.INIT_PHASE_ERROR:
             return False
+        _pre_init_phases = {
+            Frontend.INIT_PHASE_STATIC: self._init_statics,
+            Frontend.INIT_PHASE_DB_DEFAULT: self._init_database,
+            Frontend.INIT_PHASE_CONFIGURED: self._init_configuration,
+            Frontend.INIT_PHASE_DB_CONFIG: self._init_data,
+        }
+        _last_pre_init_phase = list(_pre_init_phases.keys())[-1]
         if not self.init_get():
             logger.info("Starting system setup")
-            _phases = {
-              Frontend.INIT_PHASE_STATIC: self._init_statics,
-              Frontend.INIT_PHASE_DB_DEFAULT: self._init_database,
-              Frontend.INIT_PHASE_CONFIGURED: self._init_configuration,
-              Frontend.INIT_PHASE_DB_CONFIG: self._init_data,
-            }
-            for _phase, _method in _phases.items():
+            for _phase, _method in _pre_init_phases.items():
                 if self._init_phase < _phase:
                     try:
                         _result = _method()
@@ -132,9 +133,11 @@ class Frontend(Singleton):
                     except Exception as e:
                         logger.error("Error: initialization failed (phase {}): {}".format(_phase, e))
                         self._init_phase = Frontend.INIT_PHASE_ERROR + _phase
-            if self._init_phase == list(_phases.keys())[-1]:
+            if self._init_phase == _last_pre_init_phase:
                 logger.info("System environment setup completed!")
                 self.init_set(self.get_status())
+        elif self._init_phase < _last_pre_init_phase:
+            self._init_phase = _last_pre_init_phase
         if self._init_phase < Frontend.INIT_PHASE_SETUP:
             _mode = self.get_config().get_config().mode
             if _mode != None and _mode.strip() != '':
