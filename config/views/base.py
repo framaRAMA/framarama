@@ -75,6 +75,9 @@ class BaseFrameConfigView(BaseConfigView):
             elif action in ['move-after', 'move-before'] and target:
                 _target = items.get(pk=target)
                 _pos = 'left' if action == 'move-before' else 'right'
+            elif action in ['first-child'] and target:
+                _target = items.get(pk=target)
+                _pos = 'first-child'
             if _target and not _target.is_root():
                 logger.info("Move {} to {} of {}".format(item, _pos, _target))
                 item.move(_target, _pos)

@@ -24,7 +24,7 @@
     {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
   {% endset %}
   {{ lib.card_tree_list_item(
-    'finishings',
+    'finishing_list',
     item,
     '<span class="%s">%s</span>'|format('' if finishing.enabled else 'text-muted', finishing.title)|safe,
     '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
@@ -38,33 +38,16 @@
     ],
     badges,
     opens=finishing_opens,
-    body_additional=body_additional
+    body_additional=body_additional,
+    sortable='finishing_list'
   ) }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No finishings defined. Click on the add button to create a new one.', 'info') }}
   </div>
 {% endfor %}
+{{ lib.card_tree_list_item_sortable('finishing_list') }}
 </div>
-
-<script type="text/javascript">
-  var sortable = Sortable.create(document.getElementById('finishing_list'), {
-    draggable: '.finishings-item',
-    ghostClass: "text-primary",
-    dragoverBubble: true,
-    animation: 150,
-    onEnd: function (evt) {
-      var ids = this.toArray();
-      window.console.log(ids);
-      var fromId = ids[evt.newIndex];
-      var toId = evt.newIndex > 0 ? ids[evt.newIndex-1] : ids[1];
-      var action = evt.newIndex > 0 ? 'move-after' : 'move-before';
-      window.console.log("Move "+fromId+" "+action+" "+toId);
-      window.document.location.href = window.document.location.pathname + '/' + fromId + '/action?action=' + action + '&target=' + toId;
-    }
-  });
-</script>
-
 
 {{ lib.nav_actions([
   {'icon': 'action.view', 'modal': 'showPreview', 'type': 'primary', 'title': 'Preview'},

@@ -758,7 +758,7 @@
   </div>
 {% endmacro %}
 
-{% macro card_tree_list_item(id, item, title, body, actions=[], badges=[], opens=[], body_additional='') %}
+{% macro card_tree_list_item(id, item, title, body, actions=[], badges=[], opens=[], body_additional='', sortable=false) %}
   {% set entity = item['entity'] %}
   {% set tree = item['tree'] %}
   {% set path = item['path'] %}
@@ -775,7 +775,7 @@
       <div class="card border rounded-5">
         <div class="card-body p-0">
           <div class="accordion-header p-1 d-flex flex-wrap bg-light">
-            <div class="align-middle mt-1">{{ icon('grip') }}</div>
+            <div class="sortable-handle align-middle mt-1">{{ icon('grip') }}</div>
             <button class="col accordion-button flex-wrap bg-transparent shadow-none ps-0 py-0 collapsed{% if collapsed %}.show{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#{{ id }}-{{ entity.id }}-children" aria-expanded="false" aria-controls="collapseOne">
               <p class="col-auto fw-bold m-0 mx-2">{{ title }}</p>
               {{ badge_group(badges) }}
@@ -786,13 +786,45 @@
         </div>
         <div id="{{ id }}-{{ entity.id }}-children" class="collapse{% if collapsed %}.show{% endif %}">
           <div class="p-2">{% if body %}{{ body }}{% endif %}</div>
-          <div class="p-2 border-top">
+          <div {% if sortable %}id="{{ id }}-{{ entity.id }}" {% endif %}class="p-2 border-top">
+            {% if sortable %}{{ card_tree_list_item_sortable(id, item) }}{% endif %}
   {% for close in tree.close %}
           </div>
         </div>
       </div>
     </div>
   {% endfor %}
+{% endmacro %}
+
+{% macro card_tree_list_item_sortable(id, item=null) %}
+  {% set sortable = id ~ ('-' ~ item.entity.id if item else '') %}
+  <script type="text/javascript">
+    var sortables = sortables || {};
+    sortables['{{ sortable }}'] = Sortable.create(document.getElementById('{{ sortable }}'), {
+      group: '{{ id }}',
+      draggable: '.{{ id }}-item',
+      handle: '.sortable-handle',
+      ghostClass: "text-primary",
+      dragoverBubble: false,
+      animation: 150,
+      onEnd: function (evt) {
+        var ids = sortables[evt.to.id].toArray();
+        var fromId = ids[evt.newDraggableIndex];
+        if (evt.newDraggableIndex > 0) {  // move not at first position
+          var toId = ids[evt.newDraggableIndex-1];
+          var action = 'move-after';
+        } else if (ids.length > 1) {      // move to first position (non-empty list)
+          var toId = ids[1];
+          var action = 'move-before';
+        } else {                          // move to first position (empty list)
+          var toId = evt.to.closest('div.{{ id }}-item').getAttribute('data-id');
+          var action = 'first-child';
+        }
+        window.console.log("Move "+fromId+" "+action+" "+toId);
+        window.document.location.href = window.document.location.pathname + '/' + fromId + '/action?action=' + action + '&target=' + toId;
+      }
+    });
+  </script>
 {% endmacro %}
 
 {% macro card_actions(actions, classes='') %}
