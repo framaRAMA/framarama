@@ -20,6 +20,9 @@
       {% endif %}
     {% endfor %}
   {% endset %}
+  {% set body_additional %}
+    {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
+  {% endset %}
   {{ lib.card_tree_list_item(
     'finishings',
     item,
@@ -34,9 +37,9 @@
       {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteFinishing%s'|format(finishing.id), 'classes': 'text-danger'}
     ],
     badges,
-    opens=finishing_opens
+    opens=finishing_opens,
+    body_additional=body_additional
   ) }}
-  {{ lib.modal_delete('deleteFinishing%s'|format(finishing.id), 'Delete finishing', 'Do you really want to delete the selected finishing "%s"?'|format(finishing.title), url('frame_finishing_action', args=[frame.id, finishing.id])+'?action=delete') }}
 {% else %}
   <div class="col-12 pt-2">
     {{ lib.note('No finishings defined. Click on the add button to create a new one.', 'info') }}

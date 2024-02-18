@@ -758,7 +758,7 @@
   </div>
 {% endmacro %}
 
-{% macro card_tree_list_item(id, item, title, body, actions=[], badges=[], opens=[]) %}
+{% macro card_tree_list_item(id, item, title, body, actions=[], badges=[], opens=[], body_additional='') %}
   {% set entity = item['entity'] %}
   {% set tree = item['tree'] %}
   {% set path = item['path'] %}
@@ -782,6 +782,7 @@
             </button>
             {{ card_actions(actions, 'col-12 col-md-5') }}
           </div>
+          {{ body_additional }}
         </div>
         <div id="{{ id }}-{{ entity.id }}-children" class="collapse{% if collapsed %}.show{% endif %}">
           <div class="p-2">{% if body %}{{ body }}{% endif %}</div>
