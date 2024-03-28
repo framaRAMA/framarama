@@ -1,9 +1,10 @@
 import zoneinfo
-import collections
 
 from django.db import models
 
 from treebeard.ns_tree import NS_Node, NS_NodeManager, NS_NodeQuerySet
+
+from framarama.base import utils
 
 
 TIMEZONE_CHOICES = [(None, '(default)')]
@@ -37,20 +38,7 @@ class TreeQuerySet(NS_NodeQuerySet):
         return self.filter(depth__gt=1) if all else self.filter(depth=2)
 
     def for_import(self):
-        _key = ""
-        _key_next = ""
-        _key_no = [0]
-        _models = collections.OrderedDict()
-        for _i, _annotate in enumerate(self.annotated()):
-            if _annotate[1]['open']:
-                _key = _key + _key_next + "."
-                _key_no.append(_i - _key_no[-1])
-            _key_next = str(_i - _key_no[-1])
-            _models[_key[1:] + _key_next] = _annotate[0]
-            for _close in _annotate[1]['close']:
-                _key = _key[0:_key.rindex(".")-1]
-                _key_no[-1] = _i - _key_no.pop() + 1
-        return _models
+        return utils.Lists.from_annotated(self.annotated())
 
     def annotated(self):
         return self.model.get_annotated_list_qs(self.for_export(True))

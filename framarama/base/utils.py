@@ -4,6 +4,7 @@ import sys
 import time
 import datetime
 import zoneinfo
+import collections
 import shutil
 import subprocess
 import threading
@@ -496,6 +497,26 @@ class Lists:
             _item[parent_name] = _current[-1] if len(_current) > 1 else None
             _current[-1][child_name].append(_item)
         return _current[0][child_name]
+
+    @staticmethod
+    def from_annotated(items):
+        _key = ""
+        _key_next = ""
+        _key_no = [0]
+        _result = collections.OrderedDict()
+        for _i, _annotate in enumerate(items):
+            if _annotate[1]['open']:
+                _key = _key + _key_next + "."
+                _key_no.append(_i)
+            _key_next = str(_i - _key_no[-1])
+            _result[_key[1:] + _key_next] = _annotate[0]
+            if _annotate[1]['close']:
+                _key_count = 0
+                for _close in _annotate[1]['close']:
+                    _key = _key[0:_key.rindex(".")-1]
+                    _key_count = _key_count + _i - _key_no.pop()
+                _key_no[-1] = _key_no[-1] + _key_count + 1
+        return _result
 
     @staticmethod
     def map_tree(items, func, child_name=None):

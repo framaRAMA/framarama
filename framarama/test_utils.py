@@ -524,6 +524,24 @@ class ListTestCase(TestCase):
         self.assertEquals(22, _result[1]['children'][1]['id'])
         self.assertEquals(2, _result[1]['children'][1]['parent']['id'])
 
+    def test_from_annotated(self):
+        _items = [
+          ({'id': 1, 'name': 'Item 1'}, {'open': True, 'close':[]}),
+          ({'id': 11, 'name': 'Item 11'}, {'open': True, 'close':[]}),
+          ({'id': 12, 'name': 'Item 12'}, {'open': False, 'close':[0]}),
+          ({'id': 2, 'name': 'Item 2'}, {'open': False, 'close':[]}),
+          ({'id': 21, 'name': 'Item 21'}, {'open': True, 'close':[]}),
+          ({'id': 22, 'name': 'Item 22'}, {'open': False, 'close':[0]}),
+        ]
+        _result = utils.Lists.from_annotated(_items)
+        self.assertEquals(6, len(_result))
+        self.assertEquals(1, _result['0']['id'])
+        self.assertEquals(11, _result['0.0']['id'])
+        self.assertEquals(12, _result['0.1']['id'])
+        self.assertEquals(2, _result['1']['id'])
+        self.assertEquals(21, _result['1.0']['id'])
+        self.assertEquals(22, _result['1.1']['id'])
+
     def test_map_tree(self):
         _items = [
           {'id': 1, 'name': 'Item 1', 'children': [{'id': 11, 'name': 'Item 1.1'}, {'id': 12, 'name': 'Item 1.2'}]},
