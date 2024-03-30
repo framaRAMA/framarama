@@ -196,7 +196,7 @@ class Processor:
             'plugin': 'merge', 'image_in': 'default lineb', 'plugin_config': {
                 'alignment': 'coords',
                 'left': "0",
-                'top': "{{-" + _shift + "+image['height']-images['lineb']['height']}}",
+                'top': "{{" + _shift + "*-1+image['height']-images['lineb']['height']}}",
             }
         }]
         return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
@@ -243,7 +243,7 @@ class Processor:
         }, {
             'plugin': 'merge', 'image_in': 'default liner', 'plugin_config': {
                 'alignment': 'coords',
-                'left': "{{-" + _shift + "+image['width']-images['liner']['width']}}",
+                'left': "{{" + _shift + "*-1+image['width']-images['liner']['width']}}",
                 'top': "0",
             }
         }]
