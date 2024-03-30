@@ -3,9 +3,6 @@ from django.db.models.fields.related import RelatedField
 
 from jinja2.sandbox import SandboxedEnvironment
 
-class Result:
-    pass
-
 
 class ResultValue:
 
@@ -156,7 +153,7 @@ class Context:
         return _env.from_string(expr).render()
 
     def evaluate_model(self, model):
-        _result = Result()
+        _result = ResultValue(None)
         for field in model.get_fields():
             try:
                 _value = getattr(model, field.name)
