@@ -113,8 +113,8 @@ class Processor:
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(math.sqrt(int(shift)**2*2))
         _scale = _factor + "*" + str(math.sqrt(int(scale)**2/2)) + "*1.1"  # 10% saftey factor
-        _size_x = "{_factor}*{scale}+{_factor}*{shift}"
-        _size_y = "{_factor}*{scale}"
+        _size_x = f"{_factor}*{scale}+{_factor}*{shift}"
+        _size_y = f"{_factor}*{scale}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
@@ -162,7 +162,7 @@ class Processor:
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(shift)
         _size_x = "images['default']['width']"
-        _size_y = "{{_factor}}*{{scale}}"
+        _size_y = f"{_factor}*{scale}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
@@ -205,7 +205,7 @@ class Processor:
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(shift)
         _size_x = "images['default']['height']"
-        _size_y = "{{_factor}}*{{scale}}"
+        _size_y = f"{_factor}*{scale}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
