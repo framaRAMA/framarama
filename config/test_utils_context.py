@@ -77,6 +77,41 @@ class ResultValueTestCase(TestCase):
         self.assertTrue(context.ResultValue(None) == None)
         #self.assertIsNone(context.ResultValue(None))
 
+    def test_add(self):
+        self.assertEqual(10, context.ResultValue(5)+context.ResultValue(5))
+        self.assertEqual(10, context.ResultValue(5)+5)
+        self.assertEqual(10, 5+context.ResultValue(5))
+
+    def test_sub(self):
+        self.assertEqual(5, context.ResultValue(10)-context.ResultValue(5))
+        self.assertEqual(5, context.ResultValue(10)-5)
+        self.assertEqual(5, 10-context.ResultValue(5))
+
+    def test_mul(self):
+        self.assertEqual(50, context.ResultValue(10)*context.ResultValue(5))
+        self.assertEqual(50, context.ResultValue(10)*5)
+        self.assertEqual(50, 10*context.ResultValue(5))
+
+    def test_truediv(self):
+        self.assertEqual(2, context.ResultValue(10)/context.ResultValue(5))
+        self.assertEqual(2, context.ResultValue(10)/5)
+        self.assertEqual(2, 10/context.ResultValue(5))
+
+    def test_floordiv(self):
+        self.assertEqual(3, context.ResultValue(10)//context.ResultValue(3))
+        self.assertEqual(3, context.ResultValue(10)//3)
+        self.assertEqual(3, 10//context.ResultValue(3))
+
+    def test_mod(self):
+        self.assertEqual(0, context.ResultValue(10)%context.ResultValue(5))
+        self.assertEqual(0, context.ResultValue(10)%5)
+        self.assertEqual(0, 10%context.ResultValue(5))
+
+    def test_pow(self):
+        self.assertEqual(100000, context.ResultValue(10)**context.ResultValue(5))
+        self.assertEqual(100000, context.ResultValue(10)**5)
+        self.assertEqual(100000, 10**context.ResultValue(5))
+
 
 class ContextTestCase(TestCase):
 
@@ -90,13 +125,12 @@ class ContextTestCase(TestCase):
 
     def test_context_evaluate_no_resolver_key_missing(self):
         _context = context.Context()
-        with self.assertRaises(NameError):
-            self.assertEqual('', _context.evaluate("{missing}"))
+        self.assertEqual('', _context.evaluate("{{missing}}"))
 
     def test_context_evaluate_keys(self):
         _context = context.Context()
         _context.set_resolver('test', context.MapResolver({'key': 'value', 'second':'other'}))
-        self.assertEqual('value-other', _context.evaluate("{test['key']}-{test['second']}"))
+        self.assertEqual('value-other', _context.evaluate("{{test['key']}}-{{test['second']}}"))
 
     def test_context_evaluate_quotes(self):
         _context = context.Context()
@@ -134,9 +168,9 @@ hello \"\"\" world \"\"\"
 <html>
 <head>
   <script>
-  function dummy() {{
+  function dummy() {
     return 'hello world';
-  }}
+  }
   </script>
 </head>
 <body/>
@@ -180,3 +214,14 @@ class ContextResolverTestCase(TestCase):
         self.assertEqual(None, _context.missing)
         self.assertEqual(None, _context['missing']['missing'])
         self.assertEqual(None, _context.missing.missing)
+
+    def test_resolve_key_punctation(self):
+        _context = context.MapResolver({'key': 'value', 'second':{'key1':'val1', 'key2':'key2'}})
+        self.assertIsNotNone(_context['key'])
+        self.assertIsNotNone(_context['second']['key1'])
+        self.assertIsNotNone(_context.second.key1)
+        self.assertIsNotNone(_context['second']['key2'])
+        self.assertIsNotNone(_context.second.key2)
+        self.assertEqual(None, _context['second']['key3'])
+        self.assertEqual(None, _context.second.key3)
+

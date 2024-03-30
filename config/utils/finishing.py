@@ -113,8 +113,8 @@ class Processor:
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(math.sqrt(int(shift)**2*2))
         _scale = _factor + "*" + str(math.sqrt(int(scale)**2/2)) + "*1.1"  # 10% saftey factor
-        _size_x = f"{_factor}*{scale}+{_factor}*{shift}"
-        _size_y = f"{_factor}*{scale}"
+        _size_x = "{_factor}*{scale}+{_factor}*{shift}"
+        _size_y = "{_factor}*{scale}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
@@ -122,16 +122,16 @@ class Processor:
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
-                'resize_x': "{" + _size_x + "}",
-                'resize_y': "{" + _size_y + "}",
+                'resize_x': "{{" + _size_x + "}}",
+                'resize_y': "{{" + _size_y + "}}",
             }
         }, {
             'plugin': 'text', 'image_in': 'line', 'image_out': 'linetl', 'plugin_config': {
                 'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
-                'font': 'Helvetica', 'weight': '700', 'size': '{' + _scale + '*0.3}',
+                'font': 'Helvetica', 'weight': '700', 'size': '{{' + _scale + '*0.3}}',
                 'color_stroke': '#ffffff', 'color_alpha': '50',
-                'start_x': "{images['line']['width']/2}",
-                'start_y': "{" + _scale + "*0.17}",
+                'start_x': "{{images['line']['width']/2}}",
+                'start_y': "{{" + _scale + "*0.17}}",
             }
         }, {
             'plugin': 'transform', 'image_in': 'linetl', 'image_out': 'linetl', 'plugin_config': {
@@ -146,14 +146,14 @@ class Processor:
         }, {
             'plugin': 'merge', 'image_in': 'default linetl', 'plugin_config': {
                 'alignment': 'coords',
-                'left': "{-" + _scale + "}",
-                'top': "{-" + _scale + "}",
+                'left': "{{" + _scale + "*-1}}",
+                'top': "{{" + _scale + "*-1}}",
             }
         }, {
             'plugin': 'merge', 'image_in': 'default linebr', 'plugin_config': {
                 'alignment': 'coords',
-                'left': "{" + _scale + "+image['width']-images['linebr']['width']}",
-                'top': " {" + _scale + "+image['height']-images['linebr']['height']}",
+                'left': "{{" + _scale + "+image['width']-images['linebr']['width']}}",
+                'top': " {{" + _scale + "+image['height']-images['linebr']['height']}}",
             }
         }]
         return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
@@ -161,8 +161,8 @@ class Processor:
     def _watermark_hbars(self, frame, shift, scale):
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(shift)
-        _size_x = f"images['default']['width']"
-        _size_y = f"{_factor}*{scale}"
+        _size_x = "images['default']['width']"
+        _size_y = "{{_factor}}*{{scale}}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
@@ -170,8 +170,8 @@ class Processor:
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'linet', 'plugin_config': {
-                'resize_x': "{" + _size_x + "}",
-                'resize_y': "{" + _size_y + "}",
+                'resize_x': "{{" + _size_x + "}}",
+                'resize_y': "{{" + _size_y + "}}",
             }
         }, {
             'plugin': 'transform', 'image_in': 'linet', 'image_out': 'lineb', 'plugin_config': {
@@ -181,22 +181,22 @@ class Processor:
         }, {
             'plugin': 'text', 'image_in': 'linet', 'image_out': 'linet', 'plugin_config': {
                 'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
-                'font': 'Helvetica', 'weight': '700', 'size': '{' + _size_y + '*0.22}',
+                'font': 'Helvetica', 'weight': '700', 'size': '{{' + _size_y + '*0.22}}',
                 'color_stroke': '#ffffff', 'color_alpha': '50',
-                'start_x': "{images['linet']['width']/2}",
-                'start_y': "{" + _size_y + "*0.12}",
+                'start_x': "{{images['linet']['width']/2}}",
+                'start_y': "{{" + _size_y + "*0.12}}",
             }
         }, {
             'plugin': 'merge', 'image_in': 'default linet', 'plugin_config': {
                 'alignment': 'coords',
                 'left': "0",
-                'top': "{" + _shift + "}",
+                'top': "{{" + _shift + "}}",
             }
         }, {
             'plugin': 'merge', 'image_in': 'default lineb', 'plugin_config': {
                 'alignment': 'coords',
                 'left': "0",
-                'top': "{-" + _shift + "+image['height']-images['lineb']['height']}",
+                'top': "{{-" + _shift + "+image['height']-images['lineb']['height']}}",
             }
         }]
         return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
@@ -204,8 +204,8 @@ class Processor:
     def _watermark_vbars(self, frame, shift, scale):
         _factor = "images['default']['width']*0.01"
         _shift = _factor + "*" + str(shift)
-        _size_x = f"images['default']['height']"
-        _size_y = f"{_factor}*{scale}"
+        _size_x = "images['default']['height']"
+        _size_y = "{{_factor}}*{{scale}}"
         _finishings = [{
             'plugin': 'image', 'image_out': 'line', 'plugin_config': {
                 'url': './static/common/stripes.png',
@@ -213,16 +213,16 @@ class Processor:
             }
         }, {
             'plugin': 'resize', 'image_in': 'line', 'image_out': 'line', 'plugin_config': {
-                'resize_x': "{" + _size_x + "}",
-                'resize_y': "{" + _size_y + "}",
+                'resize_x': "{{" + _size_x + "}}",
+                'resize_y': "{{" + _size_y + "}}",
             }
         }, {
             'plugin': 'text', 'image_in': 'line', 'image_out': 'linel', 'plugin_config': {
                 'text': settings.FRAMARAMA['TITLE'], 'alignment': 'center', 'alignment_vertical': 'center',
-                'font': 'Helvetica', 'weight': '700', 'size': '{' + _size_y + '*0.22}',
+                'font': 'Helvetica', 'weight': '700', 'size': '{{' + _size_y + '*0.22}}',
                 'color_stroke': '#ffffff', 'color_alpha': '50',
-                'start_x': "{images['line']['width']/2}",
-                'start_y': "{" + _size_y + "*0.12}",
+                'start_x': "{{images['line']['width']/2}}",
+                'start_y': "{{" + _size_y + "*0.12}}",
             }
         }, {
             'plugin': 'transform', 'image_in': 'linel', 'image_out': 'linel', 'plugin_config': {
@@ -237,13 +237,13 @@ class Processor:
         }, {
             'plugin': 'merge', 'image_in': 'default linel', 'plugin_config': {
                 'alignment': 'coords',
-                'left': "{" + _shift + "}",
+                'left': "{{" + _shift + "}}",
                 'top': "0",
             }
         }, {
             'plugin': 'merge', 'image_in': 'default liner', 'plugin_config': {
                 'alignment': 'coords',
-                'left': "{-" + _shift + "+image['width']-images['liner']['width']}",
+                'left': "{{-" + _shift + "+image['width']-images['liner']['width']}}",
                 'top': "0",
             }
         }]
