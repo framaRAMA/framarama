@@ -140,10 +140,10 @@ class ResultValue:
 class Context:
 
     def __init__(self):
-        self._resolver = ChainedResolver()
+        self._resolvers = {}
 
     def set_resolver(self, name, resolver):
-        self._resolver.set_resolver(name, resolver)
+        self._resolvers[name] = resolver
 
     def evaluate(self, expr):
         if expr is None:
@@ -178,27 +178,11 @@ class ContextResolver:
     def __getattr__(self, key):
         return self._resolve(key)
 
+    def __len__(self):
+        return 0
+
     def _resolve(self, name):
         raise NotImplemented("Missing implementation for {}".format(type(self)))
-
-
-class ChainedResolver(ContextResolver):
-
-    def __init__(self):
-        self._resolvers = {}
-
-    def set_resolver(self, name, resolver):
-        self._resolvers[name] = resolver
-
-    def get_resolvers(self):
-        return self._resolvers
-
-    def _resolve(self, name):
-        for _name, _resolver in self._resolvers.items():
-            _value = _resolver.resolve(name)
-            if _value is not None:
-                return _value
-        return ''
 
 
 class MapResolver(ContextResolver):
