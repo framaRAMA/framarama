@@ -133,7 +133,7 @@ class ResultValue:
 
     def as_bool(self):
         if self._value is None:
-            return None
+            return False
         return str(self._value).lower() in ['true', '1', 't', 'y', 'yes']
 
 
