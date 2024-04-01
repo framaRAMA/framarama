@@ -115,68 +115,25 @@ class ResultValueTestCase(TestCase):
 
 class ContextTestCase(TestCase):
 
-    def test_context_evaluate_none(self):
-        _context = context.Context()
-        self.assertIsNone(_context.evaluate(None))
-
-    def test_context_evaluate_no_resolver(self):
-        _context = context.Context()
-        self.assertEqual('hello world', _context.evaluate("hello world"))
-
-    def test_context_evaluate_no_resolver_key_missing(self):
-        _context = context.Context()
-        self.assertEqual('', _context.evaluate("{{missing}}"))
-
     def test_context_evaluate_keys(self):
         _context = context.Context()
         _context.set_resolver('test', context.MapResolver({'key': 'value', 'second':'other'}))
         self.assertEqual('value-other', _context.evaluate("{{test['key']}}-{{test['second']}}"))
 
-    def test_context_evaluate_quotes(self):
+    def test_context_evaluate_slice(self):
         _context = context.Context()
-        self.assertEqual('"some quotes"', _context.evaluate('"some quotes"'))
-        self.assertEqual("'some quotes'", _context.evaluate("'some quotes'"))
+        _context.set_resolver('test', context.MapResolver({'list': [1,2,3,4, 5, 6, 7, 8, 9, 10]}))
+        self.assertEqual('2468', _context.evaluate('{{(test.list)[1:8:2]|join}}'))
 
-    def test_context_evaluate_long(self):
+    def test_context_evaluate_split(self):
         _context = context.Context()
-        _text = """
-hello world
-"""
-        self.assertEqual("\nhello world\n", _context.evaluate(_text))
+        _context.set_resolver('test', context.MapResolver({'key': 'this is a test'}))
+        self.assertEqual('this', _context.evaluate('{{test.key|split|first}}'))
 
-    def test_context_evaluate_long_quotes(self):
+    def test_context_evaluate_keys(self):
         _context = context.Context()
-        _text = """
-hello \"\"\" world \"\"\"
-"""
-        self.assertEqual('\nhello """ world """\n', _context.evaluate(_text))
-
-    def test_context_evaluate_long_html(self):
-        _context = context.Context()
-        _text = """
-<html>
-<body>
-  <a href="http://github.com/framarama/">framaRAMA</a>
-</body>
-</html>
-"""
-        self.assertEqual('\n<html>\n<body>\n  <a href="http://github.com/framarama/">framaRAMA</a>\n</body>\n</html>\n', _context.evaluate(_text))
-
-    def test_context_evaluate_long_script(self):
-        _context = context.Context()
-        _text = """
-<html>
-<head>
-  <script>
-  function dummy() {
-    return 'hello world';
-  }
-  </script>
-</head>
-<body/>
-</html>
-"""
-        self.assertEqual('\n<html>\n<head>\n  <script>\n  function dummy() {\n    return \'hello world\';\n  }\n  </script>\n</head>\n<body/>\n</html>\n', _context.evaluate(_text))
+        _context.set_resolver('test', context.MapResolver({'key': {'a':'b', 'c':'d', 'e':'f', 'h':'i'}}))
+        self.assertEqual('aceh', _context.evaluate('{{test.key|keys|join}}'))
 
 
 class ContextResolverTestCase(TestCase):

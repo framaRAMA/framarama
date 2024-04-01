@@ -555,3 +555,78 @@ class ListTestCase(TestCase):
         self.assertEquals(2, _result[1]['id'])
         self.assertEquals(21, _result[1]['children'][0]['id'])
         self.assertEquals(22, _result[1]['children'][1]['id'])
+
+
+class TemplateTestCase(TestCase):
+
+    def test_evaluate_none(self):
+        self.assertIsNone(utils.Template.render(None))
+
+    def test_evaluate_no_resolver(self):
+        self.assertEqual('hello world', utils.Template.render("hello world"))
+
+    def test_evaluate_no_resolver_key_missing(self):
+        self.assertEqual('', utils.Template.render("{{missing}}"))
+
+    def test_evaluate_keys(self):
+        self.assertEqual('value', utils.Template.render("{{test['test']}}", {
+            'test': 'value'
+        }))
+
+    def test_evaluate_quotes(self):
+        self.assertEqual('"some quotes"', utils.Template.render('"some quotes"'))
+        self.assertEqual("'some quotes'", utils.Template.render("'some quotes'"))
+
+    def test_evaluate_slice(self):
+        self.assertEqual('2468', utils.Template.render('{{(test)[1:8:2]|join}}', {
+            'test': [1,2,3,4, 5, 6, 7, 8, 9, 10]
+        }))
+
+    def test_evaluate_split(self):
+        self.assertEqual('this', utils.Template.render('{{test|split|first}}', {
+            'test': 'this is a test'
+        }))
+
+    def test_valuate_keys(self):
+        self.assertEqual('aceh', utils.Template.render('{{test|keys|join}}', {
+            'test', {'a':'b', 'c':'d', 'e':'f', 'h':'i'}
+        }))
+
+    def test_evaluate_long(self):
+        _text = """
+hello world
+"""
+        self.assertEqual("\nhello world\n", utils.Template.render(_text))
+
+    def test_evaluate_long_quotes(self):
+        _text = """
+hello \"\"\" world \"\"\"
+"""
+        self.assertEqual('\nhello """ world """\n', utils.Template.render(_text))
+
+    def test_evaluate_long_html(self):
+        _context = context.Context()
+        _text = """
+<html>
+<body>
+  <a href="http://github.com/framarama/">framaRAMA</a>
+</body>
+</html>
+"""
+        self.assertEqual('\n<html>\n<body>\n  <a href="http://github.com/framarama/">framaRAMA</a>\n</body>\n</html>\n', utils.Template.render(_text))
+
+    def test_evaluate_long_script(self):
+        _context = context.Context()
+        _text = """
+<html>
+<head>
+  <script>
+  function dummy() {
+    return 'hello world';
+  }
+  </script>
+</head>
+<body/>
+</html>
+"""
+        self.assertEqual('\n<html>\n<head>\n  <script>\n  function dummy() {\n    return \'hello world\';\n  }\n  </script>\n</head>\n<body/>\n</html>\n', utils.Template.render(_text))

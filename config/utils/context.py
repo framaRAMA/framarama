@@ -1,8 +1,7 @@
 
 from django.db.models.fields.related import RelatedField
 
-from jinja2.sandbox import SandboxedEnvironment
-
+from framarama.base import utils
 
 class ResultValue:
 
@@ -143,14 +142,7 @@ class Context:
         self._resolvers[name] = resolver
 
     def evaluate(self, expr):
-        if expr is None:
-            return None
-        _env = SandboxedEnvironment()
-        _env.globals.update(self._resolvers)
-        _env.keep_trailing_newline = True
-        _env.filters['split'] = lambda v, sep=None, maxsplit=-1: v.split(sep, maxsplit)
-        _env.filters['keys'] = lambda v: v.keys() if type(v) == dict else []
-        return _env.from_string(expr).render()
+        return utils.Template.render(expr, self._resolvers)
 
     def evaluate_model(self, model):
         _result = ResultValue(None)

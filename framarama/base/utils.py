@@ -17,6 +17,8 @@ import requests
 
 from django.utils import dateparse, timezone
 
+from jinja2.sandbox import SandboxedEnvironment
+
 
 logger = logging.getLogger(__name__)
 
@@ -554,3 +556,17 @@ class Network:
         else:
             raise Exception("Can not handle HTTP method {}".format(method))
         return _response
+
+
+class Template:
+
+    @staticmethod
+    def render(template, globals_vars={}):
+        if template is None:
+            return None
+        _env = SandboxedEnvironment()
+        _env.globals.update(globals_vars)
+        _env.keep_trailing_newline = True
+        _env.filters['split'] = lambda v, sep=None, maxsplit=-1: str(v).split(sep, maxsplit)
+        _env.filters['keys'] = lambda v: dict(v).keys()
+        return _env.from_string(template).render()
