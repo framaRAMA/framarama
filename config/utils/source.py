@@ -76,7 +76,10 @@ class Processor:
                 _source.save()
             except Exception as e:
                 _source.update_date_end = utils.DateTime.now()
-                _source.update_error = getattr(e, 'message', repr(e))
+                _source.update_error = "{}: {}".format(
+                    _last_step.title if _last_step else 'General error',
+                    getattr(e, 'message', repr(e))
+                )
                 _source.update_status = None
                 _source.save()
                 raise e
