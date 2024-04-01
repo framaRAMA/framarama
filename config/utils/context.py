@@ -14,25 +14,34 @@ class ResultValue:
         else:
             self._resolver = None
 
-    def __call__(self, *args, **kwargs):
-        return ResultValue(None)
+    def keys(self):
+        if type(self._value) == dict:
+            return self._value.keys()
+        return []
 
     def __len__(self):
         return len(self._value) if self._value != None else 0
 
     def __iter__(self):
-        def value_iterator(value, l):
+        def value_iterator_list(value, l):
             i = 0
             while i < l:
-                yield self[i]
+                yield ResultValue(value[i])
                 i = i + 1
-        return value_iterator(self, len(self))
+        def value_iterator_dict(value, l):
+            for k, v in value.items():
+                yield k, ResultValue(v)
+        if type(self._value) == list:
+            return value_iterator_list(self._value, len(self._value))
+        if type(self._value) == dict:
+            return value_iterator_dict(self._value)
+        return None
 
     def __getitem__(self, key):
         if self._value == None:
             return ResultValue(None)
         if self._resolver:
-            return self._resolver[key]
+            return ResultValue(self._resolver[key])
         try:
             return ResultValue(self._value[key])
         except:
@@ -159,13 +168,13 @@ class Context:
 class ContextResolver:
 
     def __call__(self, *args, **kwargs):
-        return None
+        return ResultValue(None)
 
     def __getitem__(self, key):
-        return self._resolve(key)
+        return ResultValue(self._resolve(key))
 
     def __getattr__(self, key):
-        return self._resolve(key)
+        return ResultValue(self._resolve(key))
 
     def __len__(self):
         return 0
