@@ -55,6 +55,6 @@ class Implementation(ContextPluginImplementation):
     UpdateForm = VariablesUpdateForm
 
     def run(self, model, image, ctx):
-        _resolvers = {'globals': context.MapResolver(model.variables)}
+        _resolvers = {'globals': context.EvaluatedResolver(ctx, context.MapResolver(model.variables))}
         return _resolvers
 

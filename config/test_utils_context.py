@@ -172,6 +172,12 @@ class ContextResolverTestCase(TestCase):
         self.assertEqual(None, _context['missing']['missing'])
         self.assertEqual(None, _context.missing.missing)
 
+    def text_evalresolver(self):
+        _ctx = context.Context()
+        _ctx.set_resolver('other', context.MapResolver({'value': 'test'}))
+        _context = context.EvaluatedResolver(_ctx, context.MapResolver({'key': '{{other.value}}'}))
+        self.assertEqual('test', _context.key)
+
     def test_resolve_key_punctation(self):
         _context = context.MapResolver({'key': 'value', 'second':{'key1':'val1', 'key2':'key2'}})
         self.assertIsNotNone(_context['key'])
@@ -181,4 +187,3 @@ class ContextResolverTestCase(TestCase):
         self.assertIsNotNone(_context.second.key2)
         self.assertEqual(None, _context['second']['key3'])
         self.assertEqual(None, _context.second.key3)
-

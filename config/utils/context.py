@@ -212,3 +212,13 @@ class ObjectResolver(ContextResolver):
             return getattr(self._instance, name)
         return None
 
+
+class EvaluatedResolver(ContextResolver):
+
+    def __init__(self, ctx, resolver):
+        self._ctx = ctx
+        self._resolver = resolver
+
+    def _resolve(self, name):
+        _value = self._resolver._resolve(name)
+        return self._ctx.evaluate(_value)
