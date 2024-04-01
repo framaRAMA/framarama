@@ -25,7 +25,7 @@
   {% endif %}
 
   {{ lib.card_list_item(
-    '<span class="%s">%d. %s</span>'|format('' if source_step.enabled else 'text-muted', loop.index, title)|safe,
+    '<span>%d. %s</span>'|format(loop.index, title)|safe,
     source_step.description,
     [
       {'title': '', 'icon': 'action.up', 'url': url('frame_source_step_action', args=[frame.id, source.id, source_step.id]) ~ '?action=up', 'classes': 'btn-outline-primary position-static', 'align': 'left'},
