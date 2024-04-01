@@ -127,7 +127,7 @@ class ActionSourceFrameView(base.BaseSourceFrameConfigView):
         elif _action == 'run':
             _scheduler = self.get_scheduler()
             _scheduler.trigger_job(jobs.Scheduler.CFG_SOURCE_UPDATE, instance=[_frame.id, _source.id], frame=_frame, source=_source)
-        self.redirect_finishing_list(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
+        self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         return _context
 
 
