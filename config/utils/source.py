@@ -78,7 +78,7 @@ class Processor:
                 _source.update_date_end = utils.DateTime.now()
                 _source.update_error = "{}: {}".format(
                     _last_step.title if _last_step else 'General error',
-                    getattr(e, 'message', repr(e))
+                    getattr(e, 'message', e)
                 )
                 _source.update_status = None
                 _source.save()
