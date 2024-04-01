@@ -52,7 +52,7 @@ class DataConverter:
         try:
             return self._convert(direction, data_type, data)
         except Exception as e:
-            raise Exception("Error converting {} to {} with {}".format(type(data), data_type, type(self).__name__)) from e
+            raise Exception("Error converting {} to {} with {}: {}".format(type(data), data_type, type(self).__name__, e)) from e
     
     def filter(self, data, filter_expr):
         return self._filter(data, filter_expr)
