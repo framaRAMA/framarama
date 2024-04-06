@@ -12,10 +12,12 @@
         {% for source in sources %}
           {% set active = lib.nav_active(request, 'frame_source', args=[frame.id, source.id]) %}
           <li>
-            <a class="dropdown-item" href="{{ url('frame_source', args=[frame.id, source.id]) }}">{{ source.name }}</a>
-            {% if source.update_error %}
-              <span class="text-danger" title="Error: {{ source.update_error }}">{{ lib.icon('error', '') }}</span>
-            {% endif %}
+            <a class="dropdown-item" href="{{ url('frame_source', args=[frame.id, source.id]) }}">
+            {{ source.name }}
+              {% if source.update_error %}
+                <span class="smaller badge rounded-pill bg-danger float-end" title="Error: {{ source.update_error }}">{{ lib.icon('error', '') }}</span>
+              {% endif %}
+            </a>
             {% if active %}
               {{ lib.modal_delete('deleteSource', 'Delete source', 'Do you really want to delete the selected source "%s" including configuration?'|format(source.name), url('frame_source_action', args=[frame.id, source.id])+'?action=delete') }}
             {% endif %}
