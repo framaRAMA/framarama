@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 
 from framarama.base import utils
-from config import models
+from config.models import base as models
 
 class Command(BaseCommand):
     help = 'Check files of Data models and report status'

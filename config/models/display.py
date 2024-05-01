@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 from framarama.base.models import BaseModel, PluginModel, TreePluginModel, TreeManager, TreeQuerySet
 from config.models import frame
-from config.models.base import DisplayItemThumbnailData
+from config.models.base import Data, DisplayItemThumbnailData
 
 
 DEVICE_CHOICES = [

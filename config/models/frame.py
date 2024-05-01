@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel, TreePluginModel, TreeManager, TreeQuerySet
-from config.models.base import ItemThumbnailData
+from config.models.base import Data, ItemThumbnailData
 
 
 MIME_CHOICES = [
