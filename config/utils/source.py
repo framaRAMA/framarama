@@ -210,7 +210,6 @@ class Processor:
         for _item in _existing.values():
             _item.delete()
             _stats['delete'] = _stats['delete'] + 1
-            break
 
         return _stats
 
