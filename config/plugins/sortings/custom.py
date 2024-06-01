@@ -28,8 +28,8 @@ class Implementation(SortingPluginImplementation):
     
     Form = CustomForm
     
-    def run(self, model, context):
-        _code = model.plugin_config.get('code', '')
+    def run(self, model, config, context):
+        _code = config.code.as_str()
 
         return _code
 

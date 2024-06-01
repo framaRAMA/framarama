@@ -6,6 +6,7 @@ from django.db.models import functions as Function
 
 from framarama.base import utils
 from config.plugins import SortingPluginRegistry
+from config.utils import context
 
 
 class Context:
@@ -50,7 +51,7 @@ Item = models.Item.objects
         if not _sortings:
             _sortings = self._context.get_frame().sortings.all()
         for _plugin, _sorting in SortingPluginRegistry.get_enabled(_sortings):
-            _code = _plugin.run(_sorting, self._context)
+            _code = _plugin.run(_sorting, context.ResultValue(_sorting.get_config()), self._context)
             _code = re.sub(r"[\r\n]+\s*", "", _code)  # fix indent by removing newline/whitespaces
             try:
                 _code = _code + ".annotate(rank=Model.F('rank')*Model.Value({}))".format(_sorting.weight)
