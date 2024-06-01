@@ -174,7 +174,7 @@ class ListStepSourceFrameView(base.BaseSourceFrameConfigView):
         return _context
 
 
-class CreateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
+class CreateStepSourceFrameView(base.BaseSourceFrameConfigView):
     template_name = 'config/frame.source.step.create.html'
     
     def _get(self, request, frame_id, source_id, plugin, *args, **kwargs):
@@ -200,22 +200,19 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
     template_name = 'config/frame.source.step.update.html'
     
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _plugin = _context['plugin']
-        _source_step = _plugin.load_model(step_id)
+        _source_step = _context['source_step']
         _form = _plugin.get_form(instance=_source_step)
-        _context['step'] = _source_step
         _context['form'] = _form
         return _context
 
     def _post(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
         _plugin = _context['plugin']
-        _source_step = _plugin.load_model(step_id)
+        _source_step = _context['source_step']
         _form = _plugin.get_form(request.POST, instance=_source_step)
         if _form.is_valid():
             _form.save(_plugin)
@@ -227,10 +224,10 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 class ActionStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _source_step = self.qs().sourcesteps.filter(pk=step_id).get()
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
+        _source_step = _context['source_step']
         _action = request.GET['action']
         if _action == 'delete':
             self._item_order_delete(_source_step.pk, _source.steps)

@@ -120,14 +120,16 @@ class BaseSourceFrameConfigView(BaseFrameConfigView):
 
 class BaseStepSourceFrameConfigView(BaseSourceFrameConfigView):
 
-    def _get(self, request, frame_id, source_id, plugin, *args, **kwargs):
+    def _get(self, request, frame_id, source_id, step_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _context['plugin'] = plugins.SourcePluginRegistry.get(plugin)
+        _context['source_step'] = _context['source'].steps.get(pk=step_id)
         return _context
 
-    def _post(self, request, frame_id, source_id, plugin, *args, **kwargs):
+    def _post(self, request, frame_id, source_id, step_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
         _context['plugin'] = plugins.SourcePluginRegistry.get(plugin)
+        _context['source_step'] = _context['source'].steps.get(pk=step_id)
         return _context
 
 
