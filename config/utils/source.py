@@ -9,6 +9,7 @@ from framarama.base import utils
 from config.plugins import SourcePluginRegistry
 from config.utils.data import DataType, DataContainer, NoopDataConverter
 from config import models
+from config.utils import context
 
 
 logger = logging.getLogger(__name__)
@@ -117,7 +118,7 @@ class Processor:
         if step.mime_in:
             _data_in = DataContainer(data=_data_in, data_type=DataType(DataType.MIME, step.mime_in))
 
-        _data_out = plugin.run_instance(step.instance, step, _data_in, self._context)
+        _data_out = plugin.run_instance(step.instance, step, context.ResultValue(step.get_config()), _data_in, self._context)
 
         if not step.data_out:
             return []

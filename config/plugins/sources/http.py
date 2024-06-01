@@ -67,16 +67,16 @@ class Implementation(SourcePluginImplementation):
     def __init__(self):
         self._cookies = {}
 
-    def _args(self, model, data_in):
-        _url = model.plugin_config.get('url')
-        _url_formatted = model.plugin_config.get('url_formatted')
-        _method = model.plugin_config.get('method')
-        _body = model.plugin_config.get('body')
-        _body_formatted = model.plugin_config.get('body_formatted')
-        _body_type = model.plugin_config.get('body_type')
-        _auth_user = model.plugin_config.get('auth_user')
-        _auth_pass = model.plugin_config.get('auth_pass')
-        _headers = model.plugin_config.get('headers')
+    def _args(self, model, config, data_in):
+        _url = config.url.as_str()
+        _url_formatted = config.url_formatted.as_str()
+        _method = config.method.as_str()
+        _body = config.body.as_str()
+        _body_formatted = config.body_formatted.as_str()
+        _body_type = config.body_type.as_str()
+        _auth_user = config.auth_user.as_str()
+        _auth_pass = config.auth_pass.as_str()
+        _headers = config.headers.as_str()
 
         _api_methods = {
             'GET': api.ApiClient.METHOD_GET,
@@ -105,8 +105,8 @@ class Implementation(SourcePluginImplementation):
 
         return _args
 
-    def run(self, model, data_in, ctx):
-        _args = self._args(model, data_in)
+    def run(self, model, config, data_in, ctx):
+        _args = self._args(model, config, data_in)
         logger.info("Loading {}".format(_args["url"]))
         _response = api.ApiClient.get().get_url(**_args)
         if _response:

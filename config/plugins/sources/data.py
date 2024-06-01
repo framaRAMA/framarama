@@ -33,10 +33,10 @@ class Implementation(SourcePluginImplementation):
     
     Form = DataForm
 
-    def run(self, model, data_in, ctx):
-        _filter_in = model.plugin_config.get('filter_in')
-        _template_out = model.plugin_config.get('template_out')
-        _mime_out = model.mime_out
+    def run(self, model, config, data_in, ctx):
+        _filter_in = config.filter_in.as_str()
+        _template_out = config.template_out.as_str()
+        _mime_out = config.mime_out.as_str()
 
         _data_out = data_in.copy()
 
