@@ -373,7 +373,9 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
             try:
                 _plugin = plugins.SortingPluginRegistry.get('custom')
                 _custom = _plugin.create_model()
-                _custom.code = _code
+                _custom.enabled = True
+                _custom.plugin = 'custom'
+                _custom.plugin_config['code'] = _code
 
                 if int(_page_size) > 100:
                     _page_size = 100
