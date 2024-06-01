@@ -34,7 +34,7 @@ class ResultValue:
         if type(self._value) == list:
             return value_iterator_list(self._value, len(self._value))
         if type(self._value) == dict:
-            return value_iterator_dict(self._value)
+            return value_iterator_dict(self._value, len(self._value))
         return None
 
     def __getitem__(self, key):
