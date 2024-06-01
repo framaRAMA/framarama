@@ -54,23 +54,7 @@ class Plugin:
         return self._base_model() if identifier is None else self._base_model.objects.filter(pk=identifier).get()
 
     def create_model(self, instance=None):
-        instance = instance if instance else self._model()
-        if self.entangled():
-            return instance
-        _values = instance.get_field_values()
-        _values[Plugin._plugin_field] = self.name
-        _plugin_config = _values.pop(Plugin._plugin_config_field)
-        if _plugin_config:
-            _values.update({_n: _v for _n, _v in _plugin_config.items() if _n in self._model_fields})
-        _model = self._model(**_values)
-        _model._base = instance
-        return _model
-
-    def load_model(self, identifier):
-        _base_model = self.base_model(identifier)
-        if self.entangled():
-            return _base_model
-        return self.create_model(_base_model)
+        return instance if instance else self._model()
 
     def update_model(self, instance, values, base_values=False):
         _values = values.copy()
@@ -88,36 +72,24 @@ class Plugin:
             setattr(instance, _name, _values[_name])
 
     def save_model(self, model, ordering, defaults=None, save=True, base_values=None):
-        _values = {} if self.entangled() else model.get_field_values()
+        _values = {}
         _values.update(defaults.items() if defaults else {})
         _values[Plugin._plugin_field] = self.name
         _values['ordering'] = ordering
-        if self.entangled():
-            _instance = model
-            for _k, _v in _values.items():
-                setattr(_instance, _k, _v)
-        else:
-            _instance = self.base_model(model.id)
-            self.update_model(_instance, _values, base_values if base_values != None else True if defaults else False)
+        for _k, _v in _values.items():
+            setattr(model, _k, _v)
         if save:
-            _instance.save()
-        return _instance
+            model.save()
+        return model
 
     def delete_model(self, model):
-        if self.entangled():
-            _instance = model
-        else:
-            _instance = self.base_model(model.id)
-        _instance.delete();
-        return _instance
+        model.delete();
+        return model
 
     def get_form(self, *args, **kwargs):
         if 'instance' not in kwargs:
             kwargs['instance'] = self._model()
         return self.impl.Form(*args, **kwargs)
-
-    def entangled(self):
-        return hasattr(self.impl, 'Form')
 
     def run(self, *args, **kwargs):
         return self.run_instance('__default__', *args, **kwargs)

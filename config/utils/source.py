@@ -64,7 +64,7 @@ class Processor:
                     if not _plugin:
                         logger.warn("Unknown plugin {} - skipping.".format(_step.plugin))
                         continue
-                    self._process_step(i+1, _plugin, _plugin.load_model(_step.id))
+                    self._process_step(i+1, _plugin, _step)
                     _last_step = _step
                 if _last_step and _last_step.data_out:
                     _stats = self._process_items_updates(_source, _last_step)
