@@ -65,6 +65,11 @@ class ResultValue:
             return True
         return False
 
+    def __contains__(self, other):
+        _this_value = self._value
+        _other_value = other._value if isinstance(other, ResultValue) else other
+        return _other_value in _this_value
+
     def __add__(self, other):
         return other if self._value is None else self._value + other
 
