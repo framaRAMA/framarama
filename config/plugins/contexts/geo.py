@@ -146,8 +146,8 @@ class Implementation(ContextPluginImplementation):
             self._cache[_key] = _json
         return self._cache[_key]
 
-    def run(self, model, image, ctx):
-        _image = model.plugin_config.get('image')
+    def run(self, model, config, image, ctx):
+        _image = config.image.as_str()
 
         _adapter = ctx.get_adapter()
 

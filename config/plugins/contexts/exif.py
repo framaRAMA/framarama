@@ -31,8 +31,8 @@ class Implementation(ContextPluginImplementation):
     
     Form = ExifForm
 
-    def run(self, model, image, ctx):
-        _image = model.plugin_config.get('image')
+    def run(self, model, config, image, ctx):
+        _image = config.image.as_str()
 
         _adapter = ctx.get_adapter()
 

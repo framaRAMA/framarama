@@ -30,8 +30,8 @@ class Implementation(ContextPluginImplementation):
 
     Form = VariablesForm
 
-    def run(self, model, image, ctx):
-        _variables = model.plugin_config.get('variables')
+    def run(self, model, config, image, ctx):
+        _variables = config.variables
         _resolvers = {'globals': context.EvaluatedResolver(ctx, context.MapResolver(_variables))}
         return _resolvers
 

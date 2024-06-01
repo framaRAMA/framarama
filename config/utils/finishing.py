@@ -252,7 +252,7 @@ class Processor:
     def _register_context_resolvers(self, plugins, image):
         _resolvers = {}
         for _plugin, _model in plugins:
-            _resolvers.update(_plugin.run(_model, image, self._context))
+            _resolvers.update(_plugin.run(_model, context.ResultValue(_model.get_config()), image, self._context))
         for _name, _resolver in _resolvers.items():
             self._context.set_resolver(_name, _resolver)
 
