@@ -49,7 +49,7 @@ class BaseSerializer(serializers.ModelSerializer):
         return self.context.get('request')
 
     def get_kwargs(self):
-        return self.get_request().parser_context['kwargs']
+        return self.get_request().parser_context['kwargs'] if self.get_request() else {}
 
     def reverse(self, view_name, args):
         return reverse(view_name, args=args, request=self.get_request())
@@ -154,7 +154,7 @@ class DisplayStatusSerializer(BaseSerializer):
         _display_id = self.get_kwargs().get('display_id')
         return super().get_links(obj) + (
             self._link_view('self', 'display_status-detail', [_display_id, obj.id]),
-        )
+        ) if _display_id else ()
 
     def to_representation(self, instance):
         _result = super().to_representation(instance)
@@ -185,7 +185,7 @@ class ItemFrameSerializer(BaseSerializer):
         return super().get_links(obj) + (
             self._link_view('self', 'frame_item-detail', [_frame_id, obj.id]),
             self._link_view('frame', 'frame-detail', [_frame_id]),
-        )
+        ) if _frame_id else ()
 
 
 class ItemDisplaySerializer(BaseSerializer):
@@ -203,7 +203,7 @@ class ItemDisplaySerializer(BaseSerializer):
             self._link_view('display', 'display-detail', [_display_id]),
             self._link_view('hit', 'display_item_hit-detail', [_display_id, obj.id]),
             self._link_view('download', 'display_item_all-display_item_all_download', [_display_id, obj.id]),
-        )
+        ) if _display_id else ()
 
 
 class RankedItemFrameSerializer(ItemFrameSerializer):
@@ -282,7 +282,7 @@ class HitItemDisplaySerializer(BaseSerializer):
         return super().get_links(obj) + (
             self._link_view('self', 'display_item_hit-detail', [_display_id, obj.id]),
             self._link_view('item', 'display_item_all-detail', [_display_id, obj.id]),
-        )
+        ) if _display_id else ()
 
     def _save(self, item_id, validated_data):
         _view = self.context['view']
@@ -358,7 +358,7 @@ class FinishingDisplaySerializer(BaseSerializer):
             self._link_view('self', 'display_finishing-detail', [_display_id, obj.id]),
             self._link_view('display', 'display-detail', [_display_id]),
             self._link_view('finishing-list', 'display_finishing-list', [_display_id]),
-        )
+        ) if _display_id else ()
 
 
 class ContextDisplaySerializer(BaseSerializer):
@@ -375,7 +375,7 @@ class ContextDisplaySerializer(BaseSerializer):
             self._link_view('self', 'display_context-detail', [_display_id, obj.id]),
             self._link_view('display', 'display-detail', [_display_id]),
             self._link_view('context-list', 'display_context-list', [_display_id]),
-        )
+        ) if _display_id else ()
 
 
 class BaseListView(generics.GenericAPIView):
