@@ -285,11 +285,7 @@ class ListSortingFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _sortings = []
-        for _sorting in list(_frame.sortings.all()):
-            _plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
-            _sortings.append(_plugin.create_model(_sorting))
-        _context['sortings'] = _sortings
+        _context['sortings'] = _frame.sortings.all()
         _context['sorting_plugins'] = plugins.SortingPluginRegistry.all()
         
         _page = request.GET.get('page')
@@ -419,7 +415,7 @@ class ListFinishingFrameView(base.BaseFrameConfigView):
             _depth = str(_finishing.id)
             _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
             _finishings.append({
-                'entity': _plugin.create_model(_finishing),
+                'entity': _finishing,
                 'tree': _tree,
                 'path': '-'.join(_id_path[1:] + [_depth])  # skip root item
             })
@@ -599,11 +595,7 @@ class ListContextFrameView(base.BaseFrameConfigView):
     def _get(self, request, frame_id, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _frame = _context['frame']
-        _contexts = []
-        for _finishing_context in list(_frame.contexts.all()):
-            _plugin = plugins.ContextPluginRegistry.get(_finishing_context.plugin)
-            _contexts.append(_plugin.create_model(_finishing_context))
-        _context['contexts'] = _contexts
+        _context['contexts'] = _frame.contexts.all()
         _context['context_plugins'] = plugins.ContextPluginRegistry.all()
         return _context
 
