@@ -151,15 +151,22 @@ class Context:
         self._resolvers[name] = resolver
 
     def evaluate(self, expr):
-        return utils.Template.render(expr, self._resolvers)
+        if type(expr) is dict:
+            return ResultValue({_k: self.evaluate(_v) for _k, _v in expr.items()})
+        elif type(expr) is list:
+            return ResultValue([self.evaluate(_v) for _v in expr])
+        elif expr is not None:
+            return ResultValue(utils.Template.render(str(expr), self._resolvers))
+        else:
+            return None
 
     def evaluate_model(self, model):
         _result = ResultValue(None)
         for field in model.get_fields():
             try:
                 _value = getattr(model, field.name)
-                _evaluated = self.evaluate(str(_value)) if _value is not None else None
-                setattr(_result, field.name, ResultValue(_evaluated))
+                _evaluated = self.evaluate(_value) if _value is not None else None
+                setattr(_result, field.name, _evaluated)
             except Exception as e:
                 raise Exception('Evaluation of \"{}\" in {}.{} failed: {}'.format(_value, type(model).__name__, field.name, e)) from e
         return _result

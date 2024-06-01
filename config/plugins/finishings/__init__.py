@@ -1,41 +1,46 @@
 
-from django.db import models
+from django import forms
+
+from framarama.base import forms as base
 
 
-class ColorStroke(models.Model):
-    color_stroke = models.CharField(
-        max_length=16,
-        verbose_name='Foreground color', help_text='The foreground color (lines, text) to use in HEX (RGB)')
-    stroke_width = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Line width', help_text='The width to use when drawing lines')
-
-    class Meta:
-        abstract = True
-
-
-class ColorFill(models.Model):
-    color_fill = models.CharField(
-        max_length=16, blank=True, null=True,
-        verbose_name='Background color', help_text='The background color (fill) to use in HEX (RGB)')
+class ColorStroke(forms.Form):
+    color_stroke = forms.CharField(
+        max_length=16, widget=base.charFieldWidget(),
+        label='Foreground color', help_text='The foreground color (lines, text) to use in HEX (RGB)')
+    stroke_width = forms.IntegerField(
+        required=False, widget=base.charFieldWidget(),
+        label='Line width', help_text='The width to use when drawing lines')
 
     class Meta:
-        abstract = True
+        entangled_fields = {'plugin_config': ['color_stroke', 'stroke_width']}
 
 
-
-class ColorAlpha(models.Model):
-    color_alpha = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Transparency', help_text='The alpha value between 0 (transparent) and 100 (no transparency)')
+class ColorFill(forms.Form):
+    color_fill = forms.CharField(
+        max_length=16, required=False, widget=base.charFieldWidget(),
+        label='Background color', help_text='The background color (fill) to use in HEX (RGB)')
 
     class Meta:
-        abstract = True
+        entangled_fields = {'plugin_config': ['color_fill']}
+
+
+class ColorAlpha(forms.Form):
+    color_alpha = forms.IntegerField(
+        required=False, widget=base.charFieldWidget(),
+        label='Transparency', help_text='The alpha value between 0 (transparent) and 100 (no transparency)')
+
+    class Meta:
+        entangled_fields = {'plugin_config': ['color_alpha']}
 
 
 class ColorStrokeFillAlpha(ColorStroke, ColorFill, ColorAlpha):
 
     class Meta:
-        abstract = True
+        entangled_fields = {'plugin_config':
+            ColorStroke.Meta.entangled_fields['plugin_config'] +
+            ColorFill.Meta.entangled_fields['plugin_config'] +
+            ColorAlpha.Meta.entangled_fields['plugin_config']
+        }
 
 

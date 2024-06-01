@@ -1,43 +1,24 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Sorting
 from config.plugins import SortingPluginImplementation
-from config.forms.frame import CreateSortingForm, UpdateSortingForm
+from config.forms.frame import SortingForm
 
 
 logger = logging.getLogger(__name__)
 
-FIELDS = [
-    'code',
-]
-WIDGETS = {
-    'code': base.customSortingQueryFieldWidget(),
-}
 
-class CustomModel(Sorting):
-    sorting_ptr = models.OneToOneField(Sorting, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    code = models.TextField(
-        verbose_name='Query', help_text='Custom query to execute to generate a rank value')
+class CustomForm(SortingForm):
+    code = forms.CharField(
+        label='Query', help_text='Custom query to execute to generate a rank value', widget=base.customSortingQueryFieldWidget())
 
-    class Meta:
-        managed = False
+    class Meta(SortingForm.Meta):
+        entangled_fields = {'plugin_config': ['code']}
 
-
-class CustomCreateForm(CreateSortingForm):
-    class Meta:
-        model = CustomModel
-        fields = CreateSortingForm.fields(FIELDS)
-        widgets = CreateSortingForm.widgets(WIDGETS)
-
-
-class CustomUpdateForm(UpdateSortingForm):
-    class Meta:
-        model = CustomModel
-        fields = UpdateSortingForm.fields(FIELDS)
-        widgets = UpdateSortingForm.widgets(WIDGETS)
+    field_order = SortingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(SortingPluginImplementation):
@@ -45,11 +26,11 @@ class Implementation(SortingPluginImplementation):
     TITLE = 'Custom'
     DESCR = 'Specify a custom query'
     
-    Model = CustomModel
-    CreateForm = CustomCreateForm
-    UpdateForm = CustomUpdateForm
+    Form = CustomForm
     
     def run(self, model, context):
-        return model.code
+        _code = model.plugin_config.get('code', '')
+
+        return _code
 
 

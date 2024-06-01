@@ -3,89 +3,58 @@ import json
 import requests
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base, api
 from config.models import SourceStep
 from config.plugins import SourcePluginImplementation
-from config.forms.frame import CreateSourceStepForm, UpdateSourceStepForm
+from config.forms.frame import SourceStepForm
 from config.utils import data
 
 
 logger = logging.getLogger(__name__)
 
-METHOD_CHOICES = [('GET', 'GET Request'), ('POST', 'POST Request'), ('PUT', 'PUT Request'), ('HEAD', 'HEAD Request')]
-
-FIELDS = [
-    'url_formatted',
-    'url',
-    'method',
-    'body_formatted',
-    'body',
-    'body_type',
-    'auth_user',
-    'auth_pass',
-    'headers',
+METHOD_CHOICES = [
+  ('GET', 'GET Request'),
+  ('POST', 'POST Request'),
+  ('PUT', 'PUT Request'),
+  ('HEAD', 'HEAD Request')
 ]
-WIDGETS = {
-    'url_formatted': base.booleanFieldWidget(),
-    'url': base.charFieldWidget(),
-    'method': base.selectFieldWidget(choices=METHOD_CHOICES),
-    'body_formatted': base.booleanFieldWidget(),
-    'body': base.textareaFieldWidget(),
-    'body_type': base.charFieldWidget(),
-    'auth_user': base.charFieldWidget(),
-    'auth_pass': base.charFieldWidget(),
-    'headers': base.textareaFieldWidget(),
-}
 
 
-class HttpModel(SourceStep):
-    source_ptr = models.OneToOneField(SourceStep, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    url = models.URLField(
-        max_length=1024,
-        verbose_name='Address (URL)', help_text='Enter the complete address (URL) to load')
-    url_formatted = models.BooleanField(
-        default=False,
-        verbose_name='URL includes format tokens')
-    method = models.CharField(
-        max_length=16, choices=METHOD_CHOICES, default='GET',
-        verbose_name='Type', help_text='Specify the type of the request (defaults to GET)')
-    body = models.TextField(
-        blank=True,
-        verbose_name='Content')
-    body_type = models.CharField(
-        max_length=64, blank=True,
-        verbose_name='Content type', help_text='Content (body) and Content-Type to send with request')
-    body_formatted = models.BooleanField(
-        default=False,
-        verbose_name='Body includes format tokens')
-    auth_user = models.CharField(
-        max_length=64, blank=True,
-        verbose_name='Username', help_text='Username to use for authentication (basic auth)')
-    auth_pass = models.CharField(
-        max_length=64, blank=True,
-        verbose_name='Password', help_text='Password to use for authentication (basic auth)')
-    headers = models.TextField(
-        default="{\n}\n",
-        verbose_name='Headers', help_text='Specify additional headers in JSON structure (key=header name, value=header value)')
+class HttpForm(SourceStepForm):
+    url = forms.URLField(
+        max_length=1024, widget=base.charFieldWidget(),
+        label='Address (URL)', help_text='Enter the complete address (URL) to load')
+    url_formatted = forms.BooleanField(
+        initial=False, required=False, widget=base.booleanFieldWidget(),
+        label='URL includes format tokens')
+    method = forms.CharField(
+        max_length=16, initial='GET', widget=base.selectFieldWidget(choices=METHOD_CHOICES),
+        label='Type', help_text='Specify the type of the request (defaults to GET)')
+    body = forms.CharField(
+        required=False, widget=base.textareaFieldWidget(),
+        label='Content')
+    body_type = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='Content type', help_text='Content (body) and Content-Type to send with request')
+    body_formatted = forms.BooleanField(
+        initial=False, required=False, widget=base.booleanFieldWidget(),
+        label='Body includes format tokens')
+    auth_user = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='Username', help_text='Username to use for authentication (basic auth)')
+    auth_pass = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='Password', help_text='Password to use for authentication (basic auth)')
+    headers = forms.CharField(
+        initial="{\n}\n", widget=base.textareaFieldWidget(),
+        label='Headers', help_text='Specify additional headers in JSON structure (key=header name, value=header value)')
 
-    class Meta:
-        managed = False
+    class Meta(SourceStepForm.Meta):
+        entangled_fields = {'plugin_config': ['url', 'url_formatted', 'method', 'body', 'body_type', 'body_formatted', 'auth_user', 'auth_pass', 'headers']}
 
-
-class HttpCreateForm(CreateSourceStepForm):
-    class Meta:
-        model = HttpModel
-        fields = CreateSourceStepForm.fields(FIELDS)
-        widgets = CreateSourceStepForm.widgets(WIDGETS)
-
-
-class HttpUpdateForm(UpdateSourceStepForm):
-    class Meta:
-        model = HttpModel
-        fields = UpdateSourceStepForm.fields(FIELDS)
-        widgets = UpdateSourceStepForm.widgets(WIDGETS)
+    field_order = SourceStepForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(SourcePluginImplementation):
@@ -93,14 +62,22 @@ class Implementation(SourcePluginImplementation):
     TITLE = 'HTTP'
     DESCR = 'Fetch data using HTTP protocol'
     
-    Model = HttpModel
-    CreateForm = HttpCreateForm
-    UpdateForm = HttpUpdateForm
+    Form = HttpForm
     
     def __init__(self):
         self._cookies = {}
 
     def _args(self, model, data_in):
+        _url = model.plugin_config.get('url')
+        _url_formatted = model.plugin_config.get('url_formatted')
+        _method = model.plugin_config.get('method')
+        _body = model.plugin_config.get('body')
+        _body_formatted = model.plugin_config.get('body_formatted')
+        _body_type = model.plugin_config.get('body_type')
+        _auth_user = model.plugin_config.get('auth_user')
+        _auth_pass = model.plugin_config.get('auth_pass')
+        _headers = model.plugin_config.get('headers')
+
         _api_methods = {
             'GET': api.ApiClient.METHOD_GET,
             'POST': api.ApiClient.METHOD_POST,
@@ -109,22 +86,22 @@ class Implementation(SourcePluginImplementation):
         }
         _data = data_in.get_as_dict()
         _args = {}
-        _args["url"] = self.format_field(model.url, model.url_formatted, _data.get() if _data else {})
-        _args["method"] = _api_methods[model.method] if model.method in _api_methods else api.ApiClient.METHOD_GET
+        _args["url"] = self.format_field(_url, _url_formatted, _data.get() if _data else {})
+        _args["method"] = _api_methods[_method] if _method in _api_methods else api.ApiClient.METHOD_GET
         _args["cookies"] = self._cookies
         _args["headers"] = {}
 
-        if model.body:
-          _args["data"] = self.format_field(model.body, model.body_formatted, _data)
+        if _body:
+          _args["data"] = self.format_field(_body, _body_formatted, _data)
         
-        if model.body_type:
-          _args["headers"]["Content-Type"] = model.body_type
+        if _body_type:
+          _args["headers"]["Content-Type"] = _body_type
 
-        if model.auth_user:
-            _args["auth"] = (model.auth_user, model.auth_pass)
+        if _auth_user:
+            _args["auth"] = (_auth_user, _auth_pass)
 
-        #if model.headers:
-        #    _args["headers"] = model.headers
+        #if _headers:
+        #    _args["headers"] = _headers
 
         return _args
 

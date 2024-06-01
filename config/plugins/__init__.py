@@ -21,8 +21,7 @@ class Plugin:
       'TITLE': 'Implementation is missing title (TITLE)',
       'DESCR': 'Implementation is missing description (DESCR)',
       'Model': 'Model class missing',
-      'CreateForm': 'CreateForm class missing',
-      'UpdateForm': 'UpdateForm class missing',
+      'Form': 'Form class missing',
     }
 
     def __init__(self, name, module):
@@ -56,6 +55,8 @@ class Plugin:
 
     def create_model(self, instance=None):
         instance = instance if instance else self._model()
+        if self.entangled():
+            return instance
         _values = instance.get_field_values()
         _values[Plugin._plugin_field] = self.name
         _plugin_config = _values.pop(Plugin._plugin_config_field)
@@ -66,7 +67,10 @@ class Plugin:
         return _model
 
     def load_model(self, identifier):
-        return self.create_model(self.base_model(identifier))
+        _base_model = self.base_model(identifier)
+        if self.entangled():
+            return _base_model
+        return self.create_model(_base_model)
 
     def update_model(self, instance, values, base_values=False):
         _values = values.copy()
@@ -84,26 +88,36 @@ class Plugin:
             setattr(instance, _name, _values[_name])
 
     def save_model(self, model, ordering, defaults=None, save=True, base_values=None):
-        _values = model.get_field_values()
+        _values = {} if self.entangled() else model.get_field_values()
         _values.update(defaults.items() if defaults else {})
+        _values[Plugin._plugin_field] = self.name
         _values['ordering'] = ordering
-        _instance = self.base_model(model.id)
-        self.update_model(_instance, _values, base_values if base_values != None else True if defaults else False)
+        if self.entangled():
+            _instance = model
+            for _k, _v in _values.items():
+                setattr(_instance, _k, _v)
+        else:
+            _instance = self.base_model(model.id)
+            self.update_model(_instance, _values, base_values if base_values != None else True if defaults else False)
         if save:
             _instance.save()
         return _instance
 
     def delete_model(self, model):
-        _instance = self.base_model(model.id)
+        if self.entangled():
+            _instance = model
+        else:
+            _instance = self.base_model(model.id)
         _instance.delete();
         return _instance
 
-    def get_create_form(self, *args, **kwargs):
-        kwargs['instance'] = self._model()
-        return self.impl.CreateForm(*args, **kwargs)
+    def get_form(self, *args, **kwargs):
+        if 'instance' not in kwargs:
+            kwargs['instance'] = self._model()
+        return self.impl.Form(*args, **kwargs)
 
-    def get_update_form(self, *args, **kwargs):
-        return self.impl.UpdateForm(*args, **kwargs)
+    def entangled(self):
+        return hasattr(self.impl, 'Form')
 
     def run(self, *args, **kwargs):
         return self.run_instance('__default__', *args, **kwargs)
@@ -290,7 +304,7 @@ class SourcePluginRegistry(PluginRegistry):
 
 
 class SourcePluginImplementation(PluginImplementation):
-    pass
+    Model = models.SourceStep
 
 
 class SortingPluginRegistry(PluginRegistry):
@@ -301,7 +315,7 @@ class SortingPluginRegistry(PluginRegistry):
 
 
 class SortingPluginImplementation(PluginImplementation):
-    pass
+    Model = models.Sorting
 
 
 class FinishingPluginRegistry(PluginRegistry):
@@ -317,7 +331,7 @@ class FinishingPluginRegistry(PluginRegistry):
 
 
 class FinishingPluginImplementation(PluginImplementation):
-    pass
+    Model = models.Finishing
 
 
 class ContextPluginRegistry(PluginRegistry):
@@ -328,6 +342,7 @@ class ContextPluginRegistry(PluginRegistry):
 
 
 class ContextPluginImplementation(PluginImplementation):
+    Model = models.FrameContext
 
     def get_images(self, ctx, names, default=True):
         _names = ['default'] if default else []

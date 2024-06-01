@@ -123,6 +123,13 @@ class PluginModel(BaseModel):
     def get_field_values(self):
         return {_field.name:getattr(self, _field.name, None) for _field in self.get_fields(True)}
 
+    def get_config(self):
+        _config = self.get_field_values()
+        _plugin_config = _config.pop('plugin_config')
+        if _plugin_config:
+            _config.update(_plugin_config)
+        return _config
+
 
 class TreePluginModel(PluginModel, NS_Node):
 

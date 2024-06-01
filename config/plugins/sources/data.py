@@ -1,64 +1,29 @@
 import logging
 
-from django.db import models
-from django.template import Context
-from jinja2 import Template
+from django import forms
 
 from framarama.base import forms as base, utils
 from config.models import SourceStep
 from config.plugins import SourcePluginImplementation
-from config.forms.frame import CreateSourceStepForm, UpdateSourceStepForm
+from config.forms.frame import SourceStepForm
 from config.utils import data
 
 
 logger = logging.getLogger(__name__)
 
-MIME_CHOICES = [
-    ('auto', 'Auto (automatically detect mime type)'),
-    ('text/csv', 'CSV (comma separated data)'),
-    ('application/json', 'JSON'),
-    ('text/plain','Plain text')
-]
 
-FIELDS = [
-    'mime_in',
-    'filter_in',
-    'mime_out',
-    'template_out',
-]
-WIDGETS = {
-    'mime_in': base.selectFieldWidget(choices=MIME_CHOICES),
-    'filter_in': base.charFieldWidget(),
-    'mime_out': base.selectFieldWidget(choices=MIME_CHOICES),
-    'template_out': base.textareaFieldWidget(),
-}
+class DataForm(SourceStepForm):
+    filter_in = forms.CharField(
+        max_length=256, required=False, widget=base.charFieldWidget(),
+        label='Input filter', help_text='Filter data using given expression (e.g. <a href="https://pypi.org/project/jsonpath-python/" target="_blank">JSONPath</a>, <a href="https://docs.python.org/3/library/xml.etree.elementtree.html#elementtree-xpath" target="_blank">XPath</a>)')
+    template_out = forms.CharField(
+        required=False, widget=base.textareaFieldWidget(),
+        label='Output template', help_text='Write a simple Jinja2 template (the "data" variable contains filter result)')
 
+    class Meta(SourceStepForm.Meta):
+        entangled_fields = {'plugin_config': ['filter_in', 'template_out']}
 
-class DataModel(SourceStep):
-    source_ptr = models.OneToOneField(SourceStep, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    filter_in = models.CharField(
-        max_length=256, blank=True,
-        verbose_name='Input filter', help_text='Filter data using given expression (e.g. <a href="https://pypi.org/project/jsonpath-python/" target="_blank">JSONPath</a>, <a href="https://docs.python.org/3/library/xml.etree.elementtree.html#elementtree-xpath" target="_blank">XPath</a>)')
-    template_out = models.TextField(
-        blank=True,
-        verbose_name='Output template', help_text='Write a simple Jinja2 template (the "data" variable contains filter result)')
-
-    class Meta:
-        managed = False
-
-
-class DataCreateForm(CreateSourceStepForm):
-    class Meta:
-        model = DataModel
-        fields = CreateSourceStepForm.fields(FIELDS)
-        widgets = CreateSourceStepForm.widgets(WIDGETS)
-
-
-class DataUpdateForm(UpdateSourceStepForm):
-    class Meta:
-        model = DataModel
-        fields = UpdateSourceStepForm.fields(FIELDS)
-        widgets = UpdateSourceStepForm.widgets(WIDGETS)
+    field_order = SourceStepForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(SourcePluginImplementation):
@@ -66,21 +31,23 @@ class Implementation(SourcePluginImplementation):
     TITLE = 'Data'
     DESCR = 'Process data (filter, convert)'
     
-    Model = DataModel
-    CreateForm = DataCreateForm
-    UpdateForm = DataUpdateForm
+    Form = DataForm
 
     def run(self, model, data_in, ctx):
+        _filter_in = model.plugin_config.get('filter_in')
+        _template_out = model.plugin_config.get('template_out')
+        _mime_out = model.mime_out
+
         _data_out = data_in.copy()
 
-        if model.filter_in:
-            _data_out = _data_out.filter(model.filter_in)
+        if _filter_in:
+            _data_out = _data_out.filter(_filter_in)
         
-        if model.template_out:
+        if _template_out:
             _data_out_dict = _data_out.get_as_dict()
-            _output = utils.Template.render(model.template_out, globals_vars={'data': _data_out_dict.get() if _data_out_dict else {}})
+            _output = utils.Template.render(_template_out, globals_vars={'data': _data_out_dict.get() if _data_out_dict else {}})
             
-            _data_out = data.DataContainer(data=_output, data_type=data.DataType(data.DataType.MIME, model.mime_out))
+            _data_out = data.DataContainer(data=_output, data_type=data.DataType(data.DataType.MIME, _mime_out))
         
         return [_data_out]
 

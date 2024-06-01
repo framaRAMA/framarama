@@ -180,7 +180,7 @@ class CreateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
     def _get(self, request, frame_id, source_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, plugin, *args, **kwargs)
         _plugin = _context['plugin']
-        _context['form'] = _plugin.get_create_form()
+        _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, source_id, plugin, *args, **kwargs):
@@ -188,10 +188,9 @@ class CreateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         _frame = _context['frame']
         _source = _context['source']
         _plugin = _context['plugin']
-        _form = _plugin.get_create_form(request.POST)
+        _form = _plugin.get_form(request.POST)
         if _form.is_valid():
             _form.save(_plugin, defaults={'source': _source}, models=_source.steps)
-            _plugin.save_model(_step_model)
             self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
         _context['form'] = _form
         return _context
@@ -205,7 +204,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
         _plugin = _context['plugin']
         _source_step = _plugin.load_model(step_id)
-        _form = _plugin.get_update_form(instance=_source_step)
+        _form = _plugin.get_form(instance=_source_step)
         _context['step'] = _source_step
         _context['form'] = _form
         return _context
@@ -217,7 +216,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         _source = _context['source']
         _plugin = _context['plugin']
         _source_step = _plugin.load_model(step_id)
-        _form = _plugin.get_update_form(request.POST, instance=_source_step)
+        _form = _plugin.get_form(request.POST, instance=_source_step)
         if _form.is_valid():
             _form.save(_plugin)
             self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
@@ -313,14 +312,14 @@ class CreateSortingFrameView(base.BaseFrameConfigView):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.SortingPluginRegistry.get(plugin)
         _context['plugin'] = _plugin
-        _context['form'] = _plugin.get_create_form()
+        _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.SortingPluginRegistry.get(plugin)
         _frame = _context['frame']
-        _form = _plugin.get_create_form(request.POST)
+        _form = _plugin.get_form(request.POST)
         if _form.is_valid():
             _form.save(_plugin, defaults={'frame': _frame}, models=_frame.sortings)
             self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
@@ -337,7 +336,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
         _sorting = self.qs().sortings.filter(pk=sorting_id).get()
         _sorting_plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
         _sorting= _sorting_plugin.load_model(sorting_id)
-        _form = _sorting_plugin.get_update_form(instance=_sorting)
+        _form = _sorting_plugin.get_form(instance=_sorting)
         _context['form'] = _form
         return _context
 
@@ -347,7 +346,7 @@ class UpdateSortingFrameView(base.BaseSortingFrameConfigView):
         _sorting = self.qs().sortings.filter(pk=sorting_id).get()
         _sorting_plugin = plugins.SortingPluginRegistry.get(_sorting.plugin)
         _sorting= _sorting_plugin.load_model(sorting_id)
-        _form = _sorting_plugin.get_update_form(request.POST, instance=_sorting)
+        _form = _sorting_plugin.get_form(request.POST, instance=_sorting)
         if _form.is_valid():
             _form.save(_sorting_plugin)
             self.redirect(_context, 'frame_sorting_list', args=[_frame.id])
@@ -443,14 +442,14 @@ class CreateFinishingFrameView(base.BaseFrameConfigView):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.FinishingPluginRegistry.get(plugin)
         _context['plugin'] = _plugin
-        _context['form'] = _plugin.get_create_form()
+        _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.FinishingPluginRegistry.get(plugin)
         _frame = _context['frame']
-        _form = _plugin.get_create_form(request.POST)
+        _form = _plugin.get_form(request.POST)
         if _form.is_valid():
             _defaults = {'frame': _frame}
             _finishing = _form.save(plugin=_plugin, models=_frame.finishings, defaults=_defaults, base_values=False)
@@ -468,7 +467,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         _finishing = _context['finishing']
         _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
         _finishing= _plugin.load_model(finishing_id)
-        _form = _plugin.get_update_form(instance=_finishing)
+        _form = _plugin.get_form(instance=_finishing)
         _context['form'] = _form
         return _context
 
@@ -478,7 +477,7 @@ class UpdateFinishingFrameView(base.BaseFinishingFrameConfigView):
         _finishing = _context['finishing']
         _plugin = plugins.FinishingPluginRegistry.get(_finishing.plugin)
         _finishing = _plugin.load_model(finishing_id)
-        _form = _plugin.get_update_form(request.POST, instance=_finishing)
+        _form = _plugin.get_form(request.POST, instance=_finishing)
         if _form.is_valid():
             _form.save(plugin=_plugin)
             self.redirect_finishing_list(_context, _finishing, args=[_frame.id])
@@ -621,14 +620,14 @@ class CreateContextFrameView(base.BaseFrameConfigView):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.ContextPluginRegistry.get(plugin)
         _context['plugin'] = _plugin
-        _context['form'] = _plugin.get_create_form()
+        _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, *args, **kwargs)
         _plugin = plugins.ContextPluginRegistry.get(plugin)
         _frame = _context['frame']
-        _form = _plugin.get_create_form(request.POST)
+        _form = _plugin.get_form(request.POST)
         if _form.is_valid():
             _form.save(_plugin, defaults={'frame': _frame}, models=_frame.contexts)
             self.redirect(_context, 'frame_context_list', args=[_frame.id])
@@ -645,7 +644,7 @@ class UpdateContextFrameView(base.BaseContextFrameConfigView):
         _frame_context = _context['context']
         _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
         _frame_context = _context_plugin.load_model(context_id)
-        _form = _context_plugin.get_update_form(instance=_frame_context)
+        _form = _context_plugin.get_form(instance=_frame_context)
         _context['form'] = _form
         return _context
 
@@ -655,7 +654,7 @@ class UpdateContextFrameView(base.BaseContextFrameConfigView):
         _frame_context = _context['context']
         _context_plugin = plugins.ContextPluginRegistry.get(_frame_context.plugin)
         _frame_context = _context_plugin.load_model(context_id)
-        _form = _context_plugin.get_update_form(request.POST, instance=_frame_context)
+        _form = _context_plugin.get_form(request.POST, instance=_frame_context)
         if _form.is_valid():
             _form.save(_context_plugin)
             self.redirect(_context, 'frame_context_list', args=[_frame.id])

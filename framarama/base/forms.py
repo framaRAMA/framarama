@@ -64,18 +64,7 @@ class BaseForm(forms.Form):
 
 
 class BaseModelForm(forms.ModelForm, BaseForm):
-
-    @classmethod
-    def fields(cls, subclass_fields):
-        fields = cls.Meta.fields.copy()
-        fields.extend(subclass_fields)
-        return fields
-
-    @classmethod
-    def widgets(cls, subclass_widgets):
-        widgets = cls.Meta.widgets.copy()
-        widgets.update(subclass_widgets)
-        return widgets
+    pass
 
 
 class UploadFieldForm(forms.Form):

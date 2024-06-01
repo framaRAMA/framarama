@@ -1,56 +1,34 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
+from config.forms.frame import FinishingForm
 from config.utils import finishing
 
 
 logger = logging.getLogger(__name__)
 
-FIELDS = [
-    'resize_x',
-    'resize_y',
-    'keep_aspect',
-]
-WIDGETS = {
-    'resize_x': base.charFieldWidget(),
-    'resize_y': base.charFieldWidget(),
-    'keep_aspect': base.booleanFieldWidget(),
-}
 
-class ResizeModel(Finishing):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    resize_x = models.CharField(
-        max_length=64,
-        verbose_name='X resizing', help_text='Resize to given image width')
-    resize_y = models.CharField(
-        max_length=64,
-        verbose_name='Y resizing', help_text='Resize to given image height')
-    keep_aspect = models.BooleanField(
-        verbose_name='Keep aspect ratio', help_text='Resize only to given size as maximum while keeping aspect ratio')
+class ResizeForm(FinishingForm):
+    resize_x = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='X resizing', help_text='Resize to given image width')
+    resize_y = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Y resizing', help_text='Resize to given image height')
+    keep_aspect = forms.BooleanField(
+        widget=base.booleanFieldWidget(),
+        label='Keep aspect ratio', help_text='Resize only to given size as maximum while keeping aspect ratio')
 
-    class Meta:
-        managed = False
-
-
-class ResizeCreateForm(CreateFinishingForm):
     dependencies = {}
-    class Meta:
-        model = ResizeModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
 
+    class Meta(FinishingForm.Meta):
+        entangled_fields = {'plugin_config': ['resize_x', 'resize_y', 'keep_aspect']}
 
-class ResizeUpdateForm(UpdateFinishingForm):
-    dependencies = {}
-    class Meta:
-        model = ResizeModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
@@ -58,15 +36,13 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Resize'
     DESCR = 'Apply horizontal and/or vertical resize'
     
-    Model = ResizeModel
-    CreateForm = ResizeCreateForm
-    UpdateForm = ResizeUpdateForm
+    Form = ResizeForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         _adapter = ctx.get_adapter()
-        _resize_x = model.resize_x.as_int()
-        _resize_y = model.resize_y.as_int()
-        _keep_aspect = model.keep_aspect.as_bool()
+        _resize_x = config.resize_x.as_int()
+        _resize_y = config.resize_y.as_int()
+        _keep_aspect = config.keep_aspect.as_bool()
         _adapter.image_resize(image, _resize_x, _resize_y, _keep_aspect)
         return image
 

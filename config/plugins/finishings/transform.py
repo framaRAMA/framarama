@@ -1,11 +1,11 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
+from config.forms.frame import FinishingForm
 from config.utils import finishing
 
 
@@ -17,42 +17,21 @@ TRANSFORM_CHOICES = [
     ('rotate', 'Rotate image'),
 ]
 
-FIELDS = [
-    'mode',
-    'factor',
-]
-WIDGETS = {
-    'mode': base.selectFieldWidget(choices=TRANSFORM_CHOICES),
-    'factor': base.charFieldWidget(),
-}
 
-class TransformModel(Finishing):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    mode = models.CharField(
-        max_length=32,
-        verbose_name='Type', help_text='The transformation to apply')
-    factor = models.CharField(
-        max_length=64,
-        verbose_name='Factor', help_text='Factor to apply (>1/<1 for blur/sharpen, percent for scale, degrees for rotate)')
+class TransformForm(FinishingForm):
+    mode = forms.CharField(
+        max_length=32, widget=base.selectFieldWidget(choices=TRANSFORM_CHOICES),
+        label='Type', help_text='The transformation to apply')
+    factor = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Factor', help_text='Factor to apply (>1/<1 for blur/sharpen, percent for scale, degrees for rotate)')
 
-    class Meta:
-        managed = False
-
-
-class TransformCreateForm(CreateFinishingForm):
     dependencies = {}
-    class Meta:
-        model = TransformModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
 
+    class Meta(FinishingForm.Meta):
+        entangled_fields = {'plugin_config': ['mode', 'factor']}
 
-class TransformUpdateForm(UpdateFinishingForm):
-    dependencies = {}
-    class Meta:
-        model = TransformModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
@@ -60,14 +39,12 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Transform'
     DESCR = 'Apply transformation on image (blur/scale/rotate)'
     
-    Model = TransformModel
-    CreateForm = TransformCreateForm
-    UpdateForm = TransformUpdateForm
+    Form = TransformForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         _adapter = ctx.get_adapter()
-        _mode = model.mode.as_str()
-        _factor = model.factor.as_float()
+        _mode = config.mode.as_str()
+        _factor = config.factor.as_float()
         if _mode == 'blur':
             _adapter.image_blur(image, _factor)
         elif _mode == 'scale':

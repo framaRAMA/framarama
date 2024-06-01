@@ -1,12 +1,12 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
 from config.plugins.finishings import ColorStrokeFillAlpha
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
+from config.forms.frame import FinishingForm
 from config.utils import finishing
 
 
@@ -17,102 +17,60 @@ TEXT_ALIGNMENTS = [
     ('right', 'Right'),
     ('center', 'Center'),
 ]
-TEXT_VERTICAL_ALIGNMENTS = [
-    ('default', 'Default'),
-    ('center', 'Center'),
-]
+#TEXT_VERTICAL_ALIGNMENTS = [
+#    ('default', 'Default'),
+#    ('center', 'Center'),
+#]
 
 
-FIELDS = [
-    'font',
-    'weight',
-    'text',
-    'size',
-    'color_stroke',
-    'stroke_width',
-    'color_fill',
-    'color_alpha',
-    'alignment',
-    'start_x',
-    'start_y',
-    'border',
-    'border_radius',
-    'border_alpha',
-    'border_padding',
-]
-WIDGETS = {
-    'text': base.textareaFieldWidget(),
-    'font': base.charFieldWidget(),
-    'weight': base.charFieldWidget(),
-    'size': base.charFieldWidget(),
-    'color_stroke': base.charFieldWidget(),
-    'stroke_width': base.charFieldWidget(),
-    'color_fill': base.charFieldWidget(),
-    'color_alpha': base.charFieldWidget(),
-    'alignment': base.selectFieldWidget(choices=TEXT_ALIGNMENTS),
-    'start_x': base.charFieldWidget(),
-    'start_y': base.charFieldWidget(),
-    'border' : base.charFieldWidget(),
-    'border_radius': base.charFieldWidget(),
-    'border_alpha': base.charFieldWidget(),
-    'border_padding': base.charFieldWidget(),
-}
+class TextForm(FinishingForm, ColorStrokeFillAlpha):
+    font = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Font', help_text='Font name to use (e.g. Arial, Helvetica, Courier)')
+    weight = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='Font weight', help_text='Front weight (e.g. 400 for normal, 700 for bold, 900 for bolder)')
+    text = forms.CharField(
+        max_length=1024, widget=base.textareaFieldWidget(),
+        label='Text', help_text='Text to show')
+    size = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Size', help_text='Font size')
+    start_x = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='X position', help_text='Starting point horizontally')
+    start_y = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Y position', help_text='Starting point vertically')
+    alignment = forms.CharField(
+        max_length=16, widget=base.selectFieldWidget(choices=TEXT_ALIGNMENTS),
+        label='Alignment', help_text='How to align the text')
+    #alignment_vertical = forms.CharField(
+    #    max_length=16, widget=base.selectFieldWidget(choices=TEXT_VERTICAL_ALIGNMENTS),
+    #    label='Vertical alignment', help_text='How to align the text vertically')
+    border = forms.CharField(
+        max_length=16, required=False, widget=base.charFieldWidget(),
+        label='Border', help_text='Draw border around the text with given width')
+    border_radius = forms.CharField(
+        max_length=16, required=False, widget=base.charFieldWidget(),
+        label='Border radius', help_text='Use rounded corners when drawing border')
+    border_alpha = forms.IntegerField(
+        required=False, widget=base.charFieldWidget(),
+        label='Border transparency', help_text='The border alpha value between 0 (transparent) and 100 (no transparency)')
+    border_padding = forms.IntegerField(
+        required=False, widget=base.charFieldWidget(),
+        label='Border padding', help_text='Spacing between text and border')
 
-class TextModel(Finishing, ColorStrokeFillAlpha):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    text = models.CharField(
-        max_length=1024,
-        verbose_name='Text', help_text='Text to show')
-    font = models.CharField(
-        max_length=64,
-        verbose_name='Font', help_text='Font name to use (e.g. Arial, Helvetica, Courier)')
-    weight = models.CharField(
-        max_length=64, blank=True, null=True,
-        verbose_name='Font weight', help_text='Front weight (e.g. 400 for normal, 700 for bold, 900 for bolder)')
-    size = models.CharField(
-        max_length=64,
-        verbose_name='Size', help_text='Font size')
-    start_x = models.CharField(
-        max_length=64,
-        verbose_name='X position', help_text='Starting point horizontally')
-    start_y = models.CharField(
-        max_length=64,
-        verbose_name='Y position', help_text='Starting point vertically')
-    alignment = models.CharField(
-        max_length=16, choices = TEXT_ALIGNMENTS,
-        verbose_name='Alignment', help_text='How to align the text')
-    alignment_vertical = models.CharField(
-        max_length=16, choices = TEXT_VERTICAL_ALIGNMENTS,
-        verbose_name='Vertical alignment', help_text='How to align the text vertically')
-    border = models.CharField(
-        max_length=16, blank=True, null=True,
-        verbose_name='Border', help_text='Draw border around the text with given width')
-    border_radius = models.CharField(
-        max_length=16, blank=True, null=True,
-        verbose_name='Border radius', help_text='Use rounded corners when drawing border')
-    border_alpha = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Border transparency', help_text='The border alpha value between 0 (transparent) and 100 (no transparency)')
-    border_padding = models.IntegerField(
-        blank=True, null=True,
-        verbose_name='Border padding', help_text='Spacing between text and border')
+    dependencies = {}
 
-    class Meta:
-        managed = False
+    class Meta(FinishingForm.Meta):
+        entangled_fields = {'plugin_config':
+            ['font', 'weight', 'text', 'size'] +
+            ColorStrokeFillAlpha.Meta.entangled_fields['plugin_config'] +
+            ['alignment', 'start_x', 'start_y', 'border', 'border_radius', 'border_alpha', 'border_padding']
+        }
 
-
-class TextCreateForm(CreateFinishingForm):
-    class Meta:
-        model = TextModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
-
-
-class TextUpdateForm(UpdateFinishingForm):
-    class Meta:
-        model = TextModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
@@ -120,28 +78,26 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Text'
     DESCR = 'Write some text to given position'
     
-    Model = TextModel
-    CreateForm = TextCreateForm
-    UpdateForm = TextUpdateForm
+    Form = TextForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         _adapter = ctx.get_adapter()
-        _start_x = model.start_x.as_int()
-        _start_y = model.start_y.as_int()
-        _color_stroke = model.color_stroke.as_str()
-        _color_fill = model.color_fill.as_str()
-        _color_alpha = model.color_alpha.as_int()
-        _stroke_width = model.stroke_width.as_int()
-        _font = model.font.as_str()
-        _text = model.text.as_str()
-        _size = model.size.as_int()
-        _weight = model.weight.as_int()
-        _alignment = model.alignment.as_str()
-        _alignment_vertical = model.alignment_vertical.as_str()
-        _border = model.border.as_int()
-        _border_radius = model.border_radius.as_int()
-        _border_alpha = model.border_alpha.as_int()
-        _border_padding = model.border_padding.as_int()
+        _start_x = config.start_x.as_int()
+        _start_y = config.start_y.as_int()
+        _color_stroke = config.color_stroke.as_str()
+        _color_fill = config.color_fill.as_str()
+        _color_alpha = config.color_alpha.as_int()
+        _stroke_width = config.stroke_width.as_int()
+        _font = config.font.as_str()
+        _text = config.text.as_str()
+        _size = config.size.as_int()
+        _weight = config.weight.as_int()
+        _alignment = config.alignment.as_str()
+        _alignment_vertical = config.alignment_vertical.as_str()
+        _border = config.border.as_int()
+        _border_radius = config.border_radius.as_int()
+        _border_alpha = config.border_alpha.as_int()
+        _border_padding = config.border_padding.as_int()
         
         _pos = finishing.Position(_start_x, _start_y)
         _brush = finishing.Brush(

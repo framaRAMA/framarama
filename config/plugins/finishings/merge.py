@@ -1,11 +1,11 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
+from config.forms.frame import FinishingForm
 from config.utils import finishing
 
 
@@ -24,47 +24,24 @@ ALIGNMENT_CHOICES = [
     ('bottom-right', 'Align all images at bottom right corner'),
 ]
 
-FIELDS = [
-    'alignment',
-    'left',
-    'top',
-]
-WIDGETS = {
-    'alignment': base.selectFieldWidget(choices=ALIGNMENT_CHOICES),
-    'left': base.charFieldWidget(),
-    'top': base.charFieldWidget(),
-}
 
-class MergeModel(Finishing):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    alignment = models.CharField(
-        max_length=32,
-        verbose_name='Alignment', help_text='Align images when merging (use predefined alignments or coordinates below)')
-    left = models.CharField(
-        max_length=64, blank=True, null=True,
-        verbose_name='X position', help_text='The horizontal position for the alignment')
-    top = models.CharField(
-        max_length=64, blank=True, null=True,
-        verbose_name='Y position', help_text='The vertical position for the alignment')
+class MergeForm(FinishingForm):
+    alignment = forms.CharField(
+        max_length=32, widget=base.selectFieldWidget(choices=ALIGNMENT_CHOICES),
+        label='Alignment', help_text='Align images when merging (use predefined alignments or coordinates below)')
+    left = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='X position', help_text='The horizontal position for the alignment')
+    top = forms.CharField(
+        max_length=64, required=False, widget=base.charFieldWidget(),
+        label='Y position', help_text='The vertical position for the alignment')
 
-    class Meta:
-        managed = False
-
-
-class MergeCreateForm(CreateFinishingForm):
     dependencies = {}
-    class Meta:
-        model = MergeModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
 
+    class Meta(FinishingForm.Meta):
+        entangled_fields = {'plugin_config': ['alignment', 'left', 'top']}
 
-class MergeUpdateForm(UpdateFinishingForm):
-    dependencies = {}
-    class Meta:
-        model = MergeModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
@@ -72,14 +49,12 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Merge'
     DESCR = 'Merge multiple images into one'
     
-    Model = MergeModel
-    CreateForm = MergeCreateForm
-    UpdateForm = MergeUpdateForm
+    Form = MergeForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         _adapter = ctx.get_adapter()
-        _alignment = model.alignment.as_str()
-        _coordinates = [model.left.as_int(), model.top.as_int()] if _alignment == 'coords' else None
+        _alignment = config.alignment.as_str()
+        _coordinates = [config.left.as_int(), config.top.as_int()] if _alignment == 'coords' else None
         _image = _adapter.image_merge(image, _alignment, _coordinates)
         return _image
 

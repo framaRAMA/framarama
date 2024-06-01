@@ -1,12 +1,12 @@
 import logging
 
-from django.db import models
+from django import forms
 
 from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
 from config.plugins.finishings import ColorStrokeFillAlpha
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
+from config.forms.frame import FinishingForm
 from config.utils import finishing
 
 
@@ -18,72 +18,40 @@ SHAPE_CHOICES = [
     ('rectangle', 'Rectangle'),
 ]
 
-
-FIELDS = [
-    'shape',
-    'color_stroke',
-    'stroke_width',
-    'color_fill',
-    'color_alpha',
-    'start_x',
-    'start_y',
-    'size_x',
-    'size_y',
-]
 FIELD_DEPENDENCIES = {
   'shape' : {
     'circle': ['start_x', 'start_y'],
     'line': ['start_x']
   }
 }
-WIDGETS = {
-    'shape': base.selectFieldWidget(choices=SHAPE_CHOICES),
-    'color_stroke': base.charFieldWidget(),
-    'stroke_width': base.charFieldWidget(),
-    'color_fill': base.charFieldWidget(),
-    'color_alpha': base.charFieldWidget(),
-    'start_x': base.charFieldWidget(),
-    'start_y': base.charFieldWidget(),
-    'size_x': base.charFieldWidget(),
-    'size_y': base.charFieldWidget(),
-}
-
-class ShapeModel(Finishing, ColorStrokeFillAlpha):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
-    shape = models.CharField(
-        max_length=32,
-        verbose_name='Shape', help_text='The shapw to draw')
-    start_x = models.CharField(
-        max_length=64,
-        verbose_name='X position', help_text='Starting point horizontally')
-    start_y = models.CharField(
-        max_length=64,
-        verbose_name='Y position', help_text='Starting point vertically')
-    size_x = models.CharField(
-        max_length=64,
-        verbose_name='X dimension', help_text='Ending point horizontally (or width)')
-    size_y = models.CharField(
-        max_length=64,
-        verbose_name='Y dimension', help_text='Ending point vertically (or height)')
-
-    class Meta:
-        managed = False
 
 
-class ShapeCreateForm(CreateFinishingForm):
+class ShapeForm(FinishingForm, ColorStrokeFillAlpha):
+    shape = forms.CharField(
+        max_length=32, widget=base.selectFieldWidget(choices=SHAPE_CHOICES),
+        label='Shape', help_text='The shapw to draw')
+    start_x = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='X position', help_text='Starting point horizontally')
+    start_y = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Y position', help_text='Starting point vertically')
+    size_x = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='X dimension', help_text='Ending point horizontally (or width)')
+    size_y = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Y dimension', help_text='Ending point vertically (or height)')
+
     dependencies = FIELD_DEPENDENCIES
-    class Meta:
-        model = ShapeModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
 
+    class Meta(FinishingForm.Meta):
+        entangled_fields = {'plugin_config':
+            ['shape', 'start_x', 'start_y', 'size_x', 'size_y'] +
+            ColorStrokeFillAlpha.Meta.entangled_fields['plugin_config']
+        }
 
-class ShapeUpdateForm(UpdateFinishingForm):
-    dependencies = FIELD_DEPENDENCIES
-    class Meta:
-        model = ShapeModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
@@ -91,19 +59,17 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Shape'
     DESCR = 'Draw a given shape'
     
-    Model = ShapeModel
-    CreateForm = ShapeCreateForm
-    UpdateForm = ShapeUpdateForm
+    Form = ShapeForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         _adapter = ctx.get_adapter()
-        _shape = model.shape.as_str()
-        _color_alpha = model.color_alpha.as_int()
-        _color_stroke = finishing.Color(model.color_stroke.as_str(), _color_alpha)
-        _color_fill = finishing.Color(model.color_fill.as_str(), _color_alpha)
-        _stroke_width = model.stroke_width.as_int()
-        _start = finishing.Position(model.start_x.as_int(), model.start_y.as_int())
-        _size = finishing.Size(model.size_x.as_int(), model.size_y.as_int())
+        _shape = config.shape.as_str()
+        _color_alpha = config.color_alpha.as_int()
+        _color_stroke = finishing.Color(config.color_stroke.as_str(), _color_alpha)
+        _color_fill = finishing.Color(config.color_fill.as_str(), _color_alpha)
+        _stroke_width = config.stroke_width.as_int()
+        _start = finishing.Position(config.start_x.as_int(), config.start_y.as_int())
+        _size = finishing.Size(config.size_x.as_int(), config.size_y.as_int())
         _brush = finishing.Brush(stroke_color=_color_stroke, stroke_width=_stroke_width, fill_color=_color_fill)
         if _shape == 'line':
             _adapter.draw_line(image, _start, _start + _size, _brush)

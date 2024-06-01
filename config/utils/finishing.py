@@ -310,7 +310,7 @@ class Processor:
             self._context.set_resolver('images', context.MapResolver(_image_metas))
 
             logger.info("Input: {} = {}".format(_images_in, _image))
-            _image_out = _plugin.run(self._context.evaluate_model(_finishing), _image, self._context)
+            _image_out = _plugin.run(_finishing, self._context.evaluate(_finishing.get_config()), _image, self._context)
             logger.info("Output: {} = {}".format(_images_out, _image_out))
     
             for _name_out in _images_out:

@@ -1,6 +1,7 @@
 import json
 
 from django import forms
+from entangled.forms import EntangledModelFormMixin
 
 from config import models
 from config.forms.base import BasePluginForm, TreeBasePluginForm
@@ -75,10 +76,11 @@ class UpdateSourceForm(base.BaseModelForm):
         }
 
 
-class CreateSourceStepForm(BasePluginForm):
+class SourceStepForm(EntangledModelFormMixin, BasePluginForm):
     class Meta:
         model = models.SourceStep
-        fields = ['title', 'description', 'instance', 'data_in', 'mime_in', 'merge_in', 'data_out', 'mime_out', 'loop_out']
+        fields = []
+        untangled_fields = ['title', 'description', 'instance', 'data_in', 'mime_in', 'merge_in', 'data_out', 'mime_out', 'loop_out']
         widgets = {
             'title': base.charFieldWidget(),
             'description': base.textareaFieldWidget(),
@@ -92,27 +94,11 @@ class CreateSourceStepForm(BasePluginForm):
         }
 
 
-class UpdateSourceStepForm(BasePluginForm):
-    class Meta:
-        model = models.SourceStep
-        fields = ['title', 'description', 'instance', 'data_in', 'mime_in', 'merge_in', 'data_out', 'mime_out', 'loop_out']
-        widgets = {
-            'title': base.charFieldWidget(),
-            'description': base.textareaFieldWidget(),
-            'instance': base.charFieldWidget(),
-            'data_in': base.charFieldWidget(),
-            'mime_in': base.selectFieldWidget(choices=models.MIME_CHOICES),
-            'merge_in': base.booleanFieldWidget(),
-            'data_out': base.charFieldWidget(),
-            'mime_out': base.selectFieldWidget(choices=models.MIME_CHOICES),
-            'loop_out': base.booleanFieldWidget(),
-        }
-
-
-class CreateSortingForm(BasePluginForm):
+class SortingForm(EntangledModelFormMixin, BasePluginForm):
     class Meta:
         model = models.Sorting
-        fields = ['title', 'weight', 'enabled']
+        fields = []
+        untangled_fields = ['title', 'weight', 'enabled']
         widgets = {
             'title': base.charFieldWidget(),
             'weight': base.charFieldWidget(),
@@ -120,38 +106,11 @@ class CreateSortingForm(BasePluginForm):
         }
 
 
-class UpdateSortingForm(BasePluginForm):
-    class Meta:
-        model = models.Sorting
-        fields = ['title', 'weight', 'enabled']
-        widgets = {
-            'title': base.charFieldWidget(),
-            'weight': base.charFieldWidget(),
-            'enabled': base.booleanFieldWidget(),
-        }
-
-
-class CreateFinishingForm(TreeBasePluginForm):
+class FinishingForm(EntangledModelFormMixin, TreeBasePluginForm):
     class Meta:
         model = models.Finishing
-        fields = ['title', 'image_in', 'image_out', 'enabled']
-        widgets = {
-            'title': base.charFieldWidget(),
-            'image_in': base.charFieldWidget(),
-            'image_out': base.charFieldWidget(),
-            'enabled': base.booleanFieldWidget(),
-        }
-
-    def field_depencies(self):
-        return {
-            
-        }
-
-
-class UpdateFinishingForm(BasePluginForm):
-    class Meta:
-        model = models.Finishing
-        fields = ['title', 'image_in', 'image_out', 'enabled']
+        fields = []
+        untangled_fields = ['title', 'image_in', 'image_out', 'enabled']
         widgets = {
             'title': base.charFieldWidget(),
             'image_in': base.charFieldWidget(),
@@ -168,20 +127,11 @@ class RawEditFinishingForm(base.BaseForm):
     config = forms.JSONField(encoder=PrettyJSONEncoder, widget=base.codeareaFieldWidget())
 
 
-class CreateContextForm(BasePluginForm):
+class ContextForm(EntangledModelFormMixin, BasePluginForm):
     class Meta:
         model = models.FrameContext
-        fields = ['name', 'enabled']
-        widgets = {
-            'name': base.charFieldWidget(),
-            'enabled': base.booleanFieldWidget(),
-        }
-
-
-class UpdateContextForm(BasePluginForm):
-    class Meta:
-        model = models.FrameContext
-        fields = ['name', 'enabled']
+        fields = []
+        untangled_fields = ['name', 'enabled']
         widgets = {
             'name': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),

@@ -1,41 +1,19 @@
 import logging
 
-from django.db import models
-
-from framarama.base import forms as base
 from config.models import Finishing
 from config.plugins import FinishingPluginImplementation
-from config.forms.frame import CreateFinishingForm, UpdateFinishingForm
-from config.utils import finishing
+from config.forms.frame import FinishingForm
 
 
 logger = logging.getLogger(__name__)
 
-FIELDS = [
-]
-WIDGETS = {
-}
 
+class GroupForm(FinishingForm):
 
-class GroupModel(Finishing):
-    finishing_ptr = models.OneToOneField(Finishing, on_delete=models.DO_NOTHING, parent_link=True, primary_key=True)
+    dependencies = {}
 
-    class Meta:
-        managed = False
-
-
-class GroupCreateForm(CreateFinishingForm):
-    class Meta:
-        model = GroupModel
-        fields = CreateFinishingForm.fields(FIELDS)
-        widgets = CreateFinishingForm.widgets(WIDGETS)
-
-
-class GroupUpdateForm(UpdateFinishingForm):
-    class Meta:
-        model = GroupModel
-        fields = UpdateFinishingForm.fields(FIELDS)
-        widgets = UpdateFinishingForm.widgets(WIDGETS)
+    class Meta(FinishingForm.Meta):
+        pass
 
 
 class Implementation(FinishingPluginImplementation):
@@ -43,10 +21,8 @@ class Implementation(FinishingPluginImplementation):
     TITLE = 'Group'
     DESCR = 'Group elements'
     
-    Model = GroupModel
-    CreateForm = GroupCreateForm
-    UpdateForm = GroupUpdateForm
+    Form = GroupForm
     
-    def run(self, model, image, ctx):
+    def run(self, model, config, image, ctx):
         return image
 
