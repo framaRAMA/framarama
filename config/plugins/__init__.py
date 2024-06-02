@@ -52,10 +52,6 @@ class Plugin:
             model.save()
         return model
 
-    def delete_model(self, model):
-        model.delete();
-        return model
-
     def get_form(self, *args, **kwargs):
         if 'instance' not in kwargs:
             kwargs['instance'] = self._model()
@@ -186,8 +182,7 @@ class PluginRegistry:
         def _delete_model(parent, ordering, path, item_model):
             if _root:
                 item_model.refresh_from_db(fields=['lft', 'rgt', 'depth'])
-            _plugin = cls.get(item_model.plugin)
-            _plugin.delete_model(item_model)
+            item_model.delete()
             for _k, _v in list(_models.items()):
                 if _k.startswith(path):
                     del _models[_k]
