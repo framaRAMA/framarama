@@ -36,22 +36,7 @@ class Plugin:
         self.title = self.impl.TITLE
         self.descr = self.impl.DESCR
         self._model = self.impl.Model
-        self._model_fields = [_field.name for _field in self._model().get_fields()]
-        self._base_model = self._find_base_model(self._model)
-        self._base_model_fields = [_field.name for _field in self._base_model().get_fields()]
         self._instances = {}
-
-    def _find_base_model(self, cls):
-        if Plugin._plugin_config_field in vars(cls).keys():
-            return cls
-        for _base_cls in cls.__bases__:
-            _cls = self._find_base_model(_base_cls)
-            if _cls:
-                return _cls
-        return None
-
-    def base_model(self, identifier=None):
-        return self._base_model() if identifier is None else self._base_model.objects.filter(pk=identifier).get()
 
     def create_model(self, instance=None):
         return instance if instance else self._model()
