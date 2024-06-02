@@ -7,6 +7,7 @@ from unittest import TestCase
 from django.utils import timezone
 
 from framarama.base import utils
+from config.utils import context
 
 
 class FilesystemTestCase(TestCase):
