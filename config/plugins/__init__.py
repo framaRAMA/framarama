@@ -124,7 +124,7 @@ class PluginRegistry:
             if not _plugin:
                 logger.warn("Unknown {} plugin {} - skipping.".format(cls.__name__, _model.plugin))
                 continue
-            _plugins.append((_plugin, _plugin.create_model(_model)))
+            _plugins.append((_plugin, _model))
         return _plugins
 
     @classmethod
