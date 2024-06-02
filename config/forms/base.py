@@ -1,9 +1,11 @@
 import sys
 
+from entangled.forms import EntangledModelFormMixin
+
 from framarama.base import forms as base
 
 
-class BasePluginForm(base.BaseModelForm):
+class BasePluginForm(EntangledModelFormMixin, base.BaseModelForm):
     dependencies = {}
     
     def field_groups(self):

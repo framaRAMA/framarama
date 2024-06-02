@@ -1,7 +1,6 @@
 import json
 
 from django import forms
-from entangled.forms import EntangledModelFormMixin
 
 from config import models
 from config.forms.base import BasePluginForm, TreeBasePluginForm
@@ -76,7 +75,7 @@ class UpdateSourceForm(base.BaseModelForm):
         }
 
 
-class SourceStepForm(EntangledModelFormMixin, BasePluginForm):
+class SourceStepForm(BasePluginForm):
     class Meta:
         model = models.SourceStep
         fields = []
@@ -94,7 +93,7 @@ class SourceStepForm(EntangledModelFormMixin, BasePluginForm):
         }
 
 
-class SortingForm(EntangledModelFormMixin, BasePluginForm):
+class SortingForm(BasePluginForm):
     class Meta:
         model = models.Sorting
         fields = []
@@ -106,7 +105,7 @@ class SortingForm(EntangledModelFormMixin, BasePluginForm):
         }
 
 
-class FinishingForm(EntangledModelFormMixin, TreeBasePluginForm):
+class FinishingForm(TreeBasePluginForm):
     class Meta:
         model = models.Finishing
         fields = []
@@ -127,7 +126,7 @@ class RawEditFinishingForm(base.BaseForm):
     config = forms.JSONField(encoder=PrettyJSONEncoder, widget=base.codeareaFieldWidget())
 
 
-class ContextForm(EntangledModelFormMixin, BasePluginForm):
+class ContextForm(BasePluginForm):
     class Meta:
         model = models.FrameContext
         fields = []
