@@ -38,8 +38,8 @@ class Plugin:
         self._model = self.impl.Model
         self._instances = {}
 
-    def create_model(self, instance=None):
-        return instance if instance else self._model()
+    def create_model(self):
+        return self._model()
 
     def save_model(self, model, ordering, defaults=None, save=True, base_values=None):
         _values = {}

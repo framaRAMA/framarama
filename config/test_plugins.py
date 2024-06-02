@@ -84,18 +84,6 @@ class PluginTestCase(TestCase):
         from config import test_plugins
         return plugins.Plugin('test', test_plugins)
 
-    def test_plugin_create_model(self):
-        _plugin = self._plugin()
-        _model = _plugin.create_model(BaseTestPluginModel())
-        self.assertIsNotNone(_model)
-        self.assertEqual(None, _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual(None, _model.title)
-        self.assertEqual(None, _model.votes)
-        self.assertEqual(None, _model.enabled)
-        self.assertEqual('test', _model.plugin)
-        self.assertEqual({}, _model.plugin_config)
-
     def test_plugin_create_model_none(self):
         _plugin = self._plugin()
         _model = _plugin.create_model()
