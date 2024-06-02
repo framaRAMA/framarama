@@ -56,21 +56,6 @@ class Plugin:
     def create_model(self, instance=None):
         return instance if instance else self._model()
 
-    def update_model(self, instance, values, base_values=False):
-        _values = values.copy()
-        _values[Plugin._plugin_field] = self.name
-        if base_values:
-            for _name in [_name for _name in values if _name not in self._base_model_fields]:
-                del _values[_name]
-            for _name in [_name for _name in values.get(Plugin._plugin_config_field, {}) if _name not in self._model_fields]:
-                del _values[Plugin._plugin_config_field][_name]
-        else:
-            _values[Plugin._plugin_config_field] = {}
-            for _name in [_name for _name in values.keys() if _name in self._model_fields]:
-                _values[Plugin._plugin_config_field][_name] = values[_name]
-        for _name in [_name for _name in _values.keys() if _name in self._base_model_fields]:
-            setattr(instance, _name, _values[_name])
-
     def save_model(self, model, ordering, defaults=None, save=True, base_values=None):
         _values = {}
         _values.update(defaults.items() if defaults else {})

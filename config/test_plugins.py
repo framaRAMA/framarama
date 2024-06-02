@@ -113,46 +113,6 @@ class PluginTestCase(TestCase):
         _plugin = self._plugin()
         _plugin.save_model(_model, 0)
 
-    def test_plugin_update_model(self):
-        _model = BaseTestPluginModel()
-        _plugin = self._plugin()
-        _plugin.update_model(_model, {'name': 'Name', 'title': 'Test', 'votes': 100, 'enabled': True})
-        self.assertIsNotNone(_model)
-        self.assertEqual('test', _model.plugin)
-        self.assertEqual('Name', _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual({'title': 'Test', 'votes': 100, 'enabled': True}, _model.plugin_config)
-
-    def test_plugin_update_model_ignore_unknown(self):
-        _model = BaseTestPluginModel()
-        _plugin = self._plugin()
-        _plugin.update_model(_model, {'wrong': 'value'})
-        self.assertIsNotNone(_model)
-        self.assertEqual(None, _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual({}, _model.plugin_config)
-        self.assertFalse(hasattr(_model, 'wrong'))
-
-    def test_plugin_update_model_base(self):
-        _model = BaseTestPluginModel()
-        _plugin = self._plugin()
-        _plugin.update_model(_model, {'name': 'Name', 'plugin_config':{'title': 'Test', 'votes': 100, 'enabled': True}}, True)
-        self.assertIsNotNone(_model)
-        self.assertEqual('test', _model.plugin)
-        self.assertEqual('Name', _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual({'title': 'Test', 'votes': 100, 'enabled': True}, _model.plugin_config)
-
-    def test_plugin_update_model_base_ignore_unknown(self):
-        _model = BaseTestPluginModel()
-        _plugin = self._plugin()
-        _plugin.update_model(_model, {'wrong': 'value', 'plugin_config':{'wrong': 'value'}}, True)
-        self.assertIsNotNone(_model)
-        self.assertEqual(None, _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual({}, _model.plugin_config)
-        self.assertFalse(hasattr(_model, 'wrong'))
-
 
 class PluginRegistryTestCase(TestCase):
 
