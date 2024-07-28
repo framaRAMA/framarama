@@ -33,14 +33,16 @@ Follow the steps below to setup both components on the same system. If you
 want to separate them, see sections below.
 
 📢 Before starting check the requirements of the components below and install
-them if required.
+them if required (enable them in requirements.txt):
+* mysqlclient==2.1.0 - if you want to use MySQL as backend (configuration
+  see below)
 
 
 ```
 git clone https://github.com/framaRAMA/framarama.git framarama
 cd  framarama
 mkdir data
-python -m ven venv
+python -m venv venv
 . ./venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -53,9 +55,28 @@ Running both components on one system, set `MODES` in `framarama/settings.py`:
     ],
 ```
 
-Start application:
+To use an external database change `DATABASE` in `framarama/settings.py`:
 ```
-python manage.py runserver 0.0.0.0:8000 --noreload
+  'default': {
+    'NAME': 'dbname',
+    'ENGINE': 'django.db.backends.mysql',
+    'USER': 'dbuser',
+    'PASSWORD': 'dbpassword',
+    'HOST': 'dbhost',
+  }
+```
+
+Initial setup:
+```
+python manage.py migrate
+python manage.py collectstatic
+python manage.py createsuperuser
+python manage.py setup --set mode=local
+```
+
+Start application (flag `--insecure` is required to serve static files):
+```
+python manage.py runserver 0.0.0.0:8000 --noreload --insecure
 ```
 
 ... and navigate browser to
@@ -75,16 +96,22 @@ and assign them to different frames or displays.
 Checkout the project as mentioned before and adjust the configuration:
 ```
     'MODES': [
-        #'server',
-        'frontend'
+        'server',
+        #'frontend'
     ],
 ```
 
 The server component depends on the following dependencies:
 
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
-* ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them an check via `convert -list font`)
+* ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them and check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
+
+When just running the server component, setup the initial configuration using
+following command:
+```
+python manage.py setup --set mode=cloud
+```
 
 After application startup you can open the server setup in the browser.
 

@@ -6,6 +6,7 @@ Keep your memories alive with framaRAMA. The smart way to show your memories fro
 a photo collection on a digital photo frame.
 
 Features:
+
 * 📷 configure multiple different sets of photos
 * 📺 show them on different devices
 * 🤝 integrate you own photo collections
@@ -19,6 +20,7 @@ Features:
 ## 🚀 How to start
 
 The software consists of mainly two parts:
+
 * the **server** component, for administration and management
 * the **frontend** component, for displaying the photos
 
@@ -38,14 +40,16 @@ Follow the steps below to setup both components on the same system. If you
 want to separate them, see sections below.
 
 📢 Before starting check the requirements of the components below and install
-them if required.
+them if required (enable them in requirements.txt):
+* mysqlclient==2.1.0 - if you want to use MySQL as backend (configuration
+  see below)
 
 
 ```
 git clone https://github.com/framaRAMA/framarama.git framarama
 cd  framarama
 mkdir data
-python -m ven venv
+python -m venv venv
 . ./venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -71,16 +75,19 @@ To use an external database change `DATABASE` in `framarama/settings.py`:
 
 Initial setup:
 ```
+python manage.py migrate
+python manage.py collectstatic
 python manage.py createsuperuser
 python manage.py setup --set mode=local
 ```
 
-Start application:
+Start application (flag `--insecure` is required to serve static files):
 ```
-python manage.py runserver 0.0.0.0:8000 --noreload
+python manage.py runserver 0.0.0.0:8000 --noreload --insecure
 ```
 
 ... and navigate browser to
+
 * http://server:8000/config/ for server setup or
 * http://server:8000/frontend/ for frontend setup
 
@@ -102,6 +109,7 @@ Checkout the project as mentioned before and adjust the configuration:
 ```
 
 The server component depends on the following dependencies:
+
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
 * ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them and check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
@@ -129,6 +137,7 @@ Checkout the project as mentioned before and adjust the configuration:
 ```
 
 The frontend component depends on the following dependencies:
+
 * ☝ `python3`, `python3-venv`, `python3-dev` - standard Python environment
 * 💡 `network-manager`, `dnsmasq-base` - configuring and setting up networking
 * 💡 `plymouth`, `plymouth-themes`, `plymouth-x11` - create startup booting screen
