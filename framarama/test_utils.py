@@ -569,7 +569,7 @@ class TemplateTestCase(TestCase):
         self.assertEqual('', utils.Template.render("{{missing}}"))
 
     def test_evaluate_keys(self):
-        self.assertEqual('value', utils.Template.render("{{test['test']}}", {
+        self.assertEqual('value', utils.Template.render("{{test}}", {
             'test': 'value'
         }))
 
@@ -587,9 +587,9 @@ class TemplateTestCase(TestCase):
             'test': 'this is a test'
         }))
 
-    def test_valuate_keys(self):
+    def test_evaluate_keys(self):
         self.assertEqual('aceh', utils.Template.render('{{test|keys|join}}', {
-            'test', {'a':'b', 'c':'d', 'e':'f', 'h':'i'}
+            'test': {'a':'b', 'c':'d', 'e':'f', 'h':'i'}
         }))
 
     def test_evaluate_long(self):
@@ -605,7 +605,6 @@ hello \"\"\" world \"\"\"
         self.assertEqual('\nhello """ world """\n', utils.Template.render(_text))
 
     def test_evaluate_long_html(self):
-        _context = context.Context()
         _text = """
 <html>
 <body>
@@ -616,7 +615,6 @@ hello \"\"\" world \"\"\"
         self.assertEqual('\n<html>\n<body>\n  <a href="http://github.com/framarama/">framaRAMA</a>\n</body>\n</html>\n', utils.Template.render(_text))
 
     def test_evaluate_long_script(self):
-        _context = context.Context()
         _text = """
 <html>
 <head>
