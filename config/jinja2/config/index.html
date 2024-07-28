@@ -108,16 +108,14 @@
                 </button>
               </div>
             </p>
-          {% elif display.frame.items.count() %}
+          {% elif not display %}
             <div class="card-body text-center">
-              Currently no pictures served by the display. If you want you can check the the
-              display or frame settings.<br/>
+              Currently there is no display defined. Create your first display!<br/>
             </div>
             <div class="text-center">
-              <a href="{{ url('frame_info', args=[display.frame.id]) }}" class="btn btn-primary btn-xs">Open display</a>
-              <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open frame</a>
+              <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs">Create display</a>
             </div>
-          {% elif display.frame.items.count() %}
+          {% elif display.frame is null %}
             <div class="card-body text-center">
               Currently no pictures shown on this display. There's no frame assigned to this
               display or the frame does not have items currently.<br/>
@@ -125,6 +123,15 @@
             <div class="text-center">
               <a href="{{ url('frame_create') }}" class="btn btn-primary btn-xs">Create frame</a>
               <a href="{{ url('display_edit', args=[display.id]) }}" class="btn btn-primary btn-xs">Assign frame</a>
+            </div>
+          {% elif display.frame.items.count() == 0 %}
+            <div class="card-body text-center">
+              Currently no pictures served by the display. If you want you can check the the
+              display or frame settings.<br/>
+            </div>
+            <div class="text-center">
+              <a href="{{ url('frame_info', args=[display.frame.id]) }}" class="btn btn-primary btn-xs">Open display</a>
+              <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open frame</a>
             </div>
           {% endif %}
         </div>
