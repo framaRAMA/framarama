@@ -79,6 +79,7 @@ python manage.py migrate
 python manage.py collectstatic
 python manage.py createsuperuser
 python manage.py setup --set mode=local
+python manage.py setup --set local_db_type=local
 ```
 
 Start application (flag `--insecure` is required to serve static files):
