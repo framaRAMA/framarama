@@ -233,7 +233,7 @@ class Capabilities:
 
     def uptime_loadavg():
         _info = Process.exec_run(['uptime'])
-        return float(_info.split()[-3].rstrip(b',')) if _info else None
+        return float(_info.split()[-3].rstrip(b' ').strip(b',').replace(b',', b'.')) if _info else None
 
     def read_thermal():
         _info = Filesystem.file_read('/sys/class/thermal/thermal_zone0/temp')
