@@ -778,7 +778,7 @@ class WebsiteFrontendRenderer(BaseFrontendRenderer):
             'data': base64.b64encode(data).decode() if data else ''
         }))
         _content = _context.evaluate(self.TEMPLATE)
-        Filesystem.file_write(self.FILE_OUTPUT, _content.encode())
+        Filesystem.file_write(self.FILE_OUTPUT, str(_content).encode())
 
     def activate(self, item):
         self._update(item.item().url, item.mime(), item.data())
