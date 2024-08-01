@@ -47,7 +47,7 @@ class Implementation(ContextPluginImplementation):
         _coord = 0
         for _val in [_sec, _min, _deg]:
             _num, _fract = _val.split('/')
-            _coord = _coord / 60 + _factor * int(_num) / int(_fract)
+            _coord = _coord / 60 + _factor * int(_num) / int(_fract) if _fract else None
         return _coord
 
     def _resolve(self, data, attrs, level=0):
@@ -70,7 +70,10 @@ class Implementation(ContextPluginImplementation):
             _vals = [exif[_key] for _key in [_key_ref, _key_str] if _key in exif]
             if len(_vals) < 2:
                 return {}
-            _coords[_name] = self._coord(_vals[0], _vals[1])
+            _coord = self._coord(_vals[0], _vals[1])
+            if _coord is None:
+                return {}
+            _coords[_name] = _coord
 
         # Use OpenStreetMap API
         # https://nominatim.org/release-docs/develop/api/Overview/ - entry point
