@@ -750,22 +750,22 @@ class WebsiteFrontendRenderer(BaseFrontendRenderer):
     FILE_OUTPUT = BaseFrontendRenderer.DATA_PATH + '/framarama.html'
     TEMPLATE = """<html>
   <head>
-    <title>framaRAMA - {item['title']}</title>
+    <title>framaRAMA - {{item['title']}}</title>
     <script type="text/javascript">
       const delay = 60000;
-      function reload() {{
-        fetch(window.location.href, {{method: 'HEAD'}}).then(r => {{
-          if (String(r.status).startsWith(2) || String(r.status).startsWith(3)) {{
+      function reload() {
+        fetch(window.location.href, {method: 'HEAD'}).then(r => {
+          if (String(r.status).startsWith(2) || String(r.status).startsWith(3)) {
             window.location.reload();
-          }}
-        }});
+          }
+        });
         window.setTimeout(() => reload(), delay);
-      }}
+      }
       window.setTimeout(() => reload(), delay);
     </script>
   </head>
   <body>
-    <img src="data:{item['mime']};base64,{item['data']}" style="width: 100%; height: 100%; object-fit: contain;"/>
+    <img src="data:{{item['mime']}};base64,{{item['data']}}" style="width: 100%; height: 100%; object-fit: contain;"/>
   </body>
 </html>
 """
