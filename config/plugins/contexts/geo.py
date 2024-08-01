@@ -47,7 +47,10 @@ class Implementation(ContextPluginImplementation):
         _coord = 0
         for _val in [_sec, _min, _deg]:
             _num, _fract = _val.split('/')
-            _coord = _coord / 60 + _factor * int(_num) / int(_fract) if _fract else None
+            _num = int(_num) if len(_num) else 0
+            _fract = int(_fract) if len(_fract) else 0
+            if _num and _fract:
+                _coord = _coord / 60 + _factor * _num / _fract
         return _coord
 
     def _resolve(self, data, attrs, level=0):
