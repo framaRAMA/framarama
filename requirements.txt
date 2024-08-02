@@ -1,5 +1,5 @@
 # basic
-Django==4.2
+Django==4.2.14
 Jinja2==3.1.4
 #mysqlclient==2.1.0
 djangorestframework==3.15.2
