@@ -1023,11 +1023,13 @@
             </a>
           </span>
         </div>
+      {% else %}
+        (no items available)
       {% endfor %}
     </div>
   {% elif style == 'carousel' %}
     <div class="d-flex justify-content-center">
-      {% if items|selectattr('data_mime') %}
+      {% if items|selectattr('data_mime')|list %}
         <div id="{{ id }}" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
           <div class="carousel-indicators">
             {% for item in items %}
@@ -1054,7 +1056,7 @@
           {{ modal_image('%s%s'|format(id, loop.index), item.item.url, url('display_item_thumbnail', args=[item.display.id, item.item.id])) }}
         {% endfor %}
       {% else %}
-        (no thumbnails available)
+        (no items available)
       {% endif %}
     </div>
   {% else %}
