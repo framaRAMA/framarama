@@ -3,7 +3,7 @@
 {% block content %}
 {{ lib.page_header(display.name, display.description, 'display_list', url('display_thumbnail', args=[display.id])) }}
 
-<ul class="nav nav-tabs pt-2">
+<ul class="nav nav-tabs py-2">
   <li class="nav-item">
     <a class="nav-link p-3{{ lib.nav_active(request, 'display_overview', args=[display.id]) }}" href="{{ url('display_overview', args=[display.id]) }}">{{ lib.icon('display.overview') }}<span class="d-none d-lg-inline"> Overview</span></a>
   </li>

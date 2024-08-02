@@ -1,6 +1,10 @@
 {% extends "config/base.display.html" %}
 
 {% block content_display %}
+{% if not display.frame %}
+  {{ lib.note('Currently there is no frame assigned to this display. Create a new frame <a href="%s">here</a>.'|format(url('frame_list'))|safe, 'info') }}
+{% endif %}
+
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
   {% set stats = display.get_latest_status(60) %}
   {% set latest_items = display.get_latest_items(10) %}
