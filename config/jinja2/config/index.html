@@ -64,13 +64,13 @@
           <div class="card-body">
             {{ lib.display_info_device(display, status) }}
             <div class="text-center">
-              <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open</a>
+              <a href="{{ url('display_overview', args=[display.id]) }}" class="btn btn-primary btn-xs">Open display</a>
             </div>
           </div>
         {% else %}
           <div class="card-body text-center">
             To be able to show some details about the display create a new one.<br/>
-            <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs m-5">Add</a>
+            <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs m-5">Add display</a>
           </div>
         {% endif %}
       </div>
@@ -115,7 +115,7 @@
             <div class="text-center">
               <a href="{{ url('display_create') }}" class="btn btn-primary btn-xs">Create display</a>
             </div>
-          {% elif display.frame is null %}
+          {% elif not display.frame %}
             <div class="card-body text-center">
               Currently no pictures shown on this display. There's no frame assigned to this
               display or the frame does not have items currently.<br/>
@@ -130,8 +130,8 @@
               display or frame settings.<br/>
             </div>
             <div class="text-center">
-              <a href="{{ url('frame_info', args=[display.frame.id]) }}" class="btn btn-primary btn-xs">Open display</a>
-              <a href="{{ url('display_info', args=[display.id]) }}" class="btn btn-primary btn-xs">Open frame</a>
+              <a href="{{ url('display_overview', args=[display.id]) }}" class="btn btn-primary btn-xs">Open display</a>
+              <a href="{{ url('frame_info', args=[display.frame.id]) }}" class="btn btn-primary btn-xs">Open frame</a>
             </div>
           {% endif %}
         </div>
