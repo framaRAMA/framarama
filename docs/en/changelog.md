@@ -1,8 +1,26 @@
 # Changelog
 
-## v0.5.0
+## v0.5.0 - not yet released
 
-* update to Django 4.0.10
+* update to Django 4.2.14, Jinja2 3.1.3, requests 2.31.0
+* create some documentation pages and add workflows
+* frontend: use serializer for client API to be more robust
+* frontend: configure options for auto update check and auto install
+* config: wrap all plugin config values into ResultValue to be more failsafe
+* config: refactor plugin storage to use django-entangled for JSON config
+* config: separate models into modules
+* config: replace format strings with Jinja templating for model expressions
+* config: !! update all model expression to Jinja templating !!
+* config: support tree structures in finishings (for grouping)
+* config: switch to use Jinja2 templats in "data" plugin
+* config: ignore duplicates when updating source items
+* config: extend length for text in text plugin
+* config: add "globals" plugin to inject global server parameters
+* config: improve data_check command (generators, chunks)
+* config: some dashboard improvements (media/version info, short dates, resources)
+* config: start JSON exports and imports for frame configuration
+* config: add query evaluation popup for sorting queries
+
 
 ## v0.4.0 - 2023-04-09
 
