@@ -82,8 +82,8 @@ python manage.py runserver 0.0.0.0:8000 --noreload --insecure
 
 ... and navigate browser to
 
-* http://server:8000/config/ for server setup or
-* http://server:8000/frontend/ for frontend setup
+* [http://server:8000/config/](http://server:8000/config/) for server setup or
+* [http://server:8000/frontend/](http://server:8000/frontend/) for frontend setup
 
 Enjoy!
 

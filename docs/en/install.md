@@ -121,6 +121,6 @@ python manage.py runserver --noreload
 
 This will start the application and serve it using the following URLs:
 
-* http://system:8000/frontend/ - the frontend running on the device showing pictures
-* http://system:8000/config/ - the server running to configure the photo collections
+* [http://server:8000/frontend/](http://server:8000/frontend/) - the frontend running on the device showing pictures
+* [http://server:8000/config/](http://server:8000/config/) - the server running to configure the photo collections
 
