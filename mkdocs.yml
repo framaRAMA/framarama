@@ -13,7 +13,6 @@ nav:
   - 'architecture.md'
   - 'install.md'
   - 'config.md'
-  - 'changelog.md'
   - 'Server':
     - 'server/index.md'
     - 'server/dashboard.md'
@@ -27,4 +26,6 @@ nav:
       - 'server/plugins/context.md'
   - 'Frontend':
     - 'frontend/index.md'
+  - 'development.md'
+  - 'changelog.md'
 
