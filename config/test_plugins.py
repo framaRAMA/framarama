@@ -2,104 +2,18 @@ import os
 import datetime
 
 from unittest import TestCase
+from django import forms
 from django.db import connection, models as fields
 
+from framarama.base import forms as base
+from framarama.base.models import PluginModel
 from config import plugins, models
-from config.forms import frame as forms
+from config.forms.base import BasePluginForm
+from config.forms.frame import ContextForm
 from config.plugins.contexts import exif
 from config.plugins.finishings import shape
 from config.plugins.sortings import custom
 from config.plugins.sources import http
-
-
-class BaseTestPluginModel(models.PluginModel):
-    name = fields.CharField(null=True, max_length=32)
-    desc = fields.CharField(null=True, max_length=255)
-
-    class Meta:
-        managed = False
-
-    def save(self, *args, **kwargs):
-        pass
-
-
-class SpecificTestPluginModel(BaseTestPluginModel):
-    title = fields.CharField(null=True, max_length=32)
-    votes = fields.IntegerField()
-    enabled = fields.BooleanField()
-
-    class Meta:
-        managed = False
-
-
-class Implementation(plugins.PluginImplementation):
-    CAT = 'test'
-    TITLE = 'Test'
-    DESCR = 'Test plugin'
-
-    Model = SpecificTestPluginModel
-    CreateForm = forms.BasePluginForm
-    UpdateForm = forms.BasePluginForm
-
-
-class PluginModelTestCase(TestCase):
-
-    def test_get_fields(self):
-        _model = SpecificTestPluginModel()
-        _field_names = [_field.name for _field in _model.get_fields()]
-        self.assertFalse('name' in _field_names)
-        self.assertFalse('desc' in _field_names)
-        self.assertTrue('title' in _field_names)
-        self.assertTrue('votes' in _field_names)
-        self.assertTrue('enabled' in _field_names)
-        self.assertFalse('plugin' in _field_names)
-        self.assertFalse('plugin_config' in _field_names)
-
-    def test_get_fields_base(self):
-        _model = SpecificTestPluginModel()
-        _field_names = [_field.name for _field in _model.get_fields(True)]
-        self.assertTrue('name' in _field_names)
-        self.assertTrue('desc' in _field_names)
-        self.assertTrue('title' in _field_names)
-        self.assertTrue('votes' in _field_names)
-        self.assertTrue('enabled' in _field_names)
-        self.assertTrue('plugin' in _field_names)
-        self.assertTrue('plugin_config' in _field_names)
-
-    def test_get_fields_model(self):
-        _model = SpecificTestPluginModel()
-        _field_names = [_field.name for _field in _model.get_fields(False, True)]
-        self.assertFalse('name' in _field_names)
-        self.assertFalse('desc' in _field_names)
-        self.assertTrue('title' in _field_names)
-        self.assertTrue('votes' in _field_names)
-        self.assertTrue('enabled' in _field_names)
-        self.assertFalse('plugin' in _field_names)
-        self.assertFalse('plugin_config' in _field_names)
-
-
-class PluginTestCase(TestCase):
-
-    def _plugin(self):
-        from config import test_plugins
-        return plugins.Plugin('test', test_plugins)
-
-    def test_plugin_create_model_none(self):
-        _plugin = self._plugin()
-        _model = _plugin.create_model()
-        self.assertIsNotNone(_model)
-        self.assertEqual(None, _model.name)
-        self.assertEqual(None, _model.desc)
-        self.assertEqual(None, _model.title)
-        self.assertEqual(None, _model.votes)
-        self.assertEqual(None, _model.enabled)
-        self.assertEqual('test', _model.plugin)
-        self.assertEqual({}, _model.plugin_config)
-
-    def test_plugin_save_model(self):
-        _model = BaseTestPluginModel()
-        _plugin = self._plugin()
-        _plugin.save_model(_model, 0)
 
 
 class PluginRegistryTestCase(TestCase):
@@ -145,7 +59,7 @@ class ContextPluginRegistryTestCase(BasePluginRegistryTestCase, TestCase):
         return 'exif'
 
     def _plugin_instance(self, **kwargs):
-        return exif.ExifModel(plugin='exif', **kwargs)
+        return exif.ExifForm.Meta.model(plugin=self._plugin(), **kwargs)
 
     def test_source_get_enabled(self):
       _models = self._registry().get_enabled([
@@ -164,7 +78,7 @@ class FinishingPluginRegistryTestCase(BasePluginRegistryTestCase, TestCase):
         return 'shape'
 
     def _plugin_instance(self, **kwargs):
-        return shape.ShapeModel(plugin='shape', **kwargs)
+        return shape.ShapeForm.Meta.model(plugin=self._plugin(), **kwargs)
 
     def test_source_get_enabled(self):
       _models = self._registry().get_enabled([
@@ -183,7 +97,7 @@ class SortingPluginRegistryTestCase(BasePluginRegistryTestCase, TestCase):
         return 'custom'
 
     def _plugin_instance(self, **kwargs):
-        return custom.CustomModel(plugin='custom', **kwargs)
+        return custom.CustomForm.Meta.model(plugin=self._plugin(), **kwargs)
 
     def test_source_get_enabled(self):
       _models = self._registry().get_enabled([
@@ -202,7 +116,7 @@ class SourcePluginRegistryTestCase(BasePluginRegistryTestCase, TestCase):
         return 'http'
 
     def _plugin_instance(self, **kwargs):
-        return http.HttpModel(plugin='http', **kwargs)
+        return http.HttpForm.Meta.model(plugin=self._plugin(), **kwargs)
 
 
 
