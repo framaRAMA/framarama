@@ -1029,7 +1029,7 @@
     </div>
   {% elif style == 'carousel' %}
     <div class="d-flex justify-content-center">
-      {% if items|selectattr('data_mime')|list %}
+      {% if items|selectattr('thumbnail')|list %}
         <div id="{{ id }}" class="carousel slide mt-2 w-75 h-75" data-bs-ride="carousel">
           <div class="carousel-indicators">
             {% for item in items %}
