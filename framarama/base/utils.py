@@ -211,7 +211,7 @@ class Process:
         _global_vars = global_vars.copy()
         _global_vars['__builtins__'] = None
         _global_vars['__import__'] = None
-        return eval(code, global_vars, local_vars)
+        return eval(code, _global_vars, local_vars)
 
 
 class Json:

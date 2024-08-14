@@ -144,6 +144,10 @@ class ProcessTestCase(TestCase):
         _result = utils.Process.eval('42')
         self.assertEqual(42, _result)
 
+    def test_eval_builtins(self):
+        self.assertIsNone(utils.Process.eval('__builtins__'))
+        self.assertIsNone(utils.Process.eval('__import__'))
+
 
 class JsonTestCase(TestCase):
 
