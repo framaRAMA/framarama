@@ -2,7 +2,7 @@
 
 ## v0.5.0 - not yet released
 
-* update to Django 4.2.14, Jinja2 3.1.3, requests 2.31.0
+* update to Django 4.2.14, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2
 * create some documentation pages and add workflows
 * frontend: use serializer for client API to be more robust
 * frontend: configure options for auto update check and auto install
