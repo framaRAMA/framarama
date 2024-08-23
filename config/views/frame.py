@@ -178,20 +178,22 @@ class CreateStepSourceFrameView(base.BaseSourceFrameConfigView):
     template_name = 'config/frame.source.step.create.html'
     
     def _get(self, request, frame_id, source_id, plugin, *args, **kwargs):
-        _context = super()._get(request, frame_id, source_id, plugin, *args, **kwargs)
-        _plugin = _context['plugin']
+        _context = super()._get(request, frame_id, source_id, *args, **kwargs)
+        _plugin = plugins.SortingPluginRegistry.get(plugin)
+        _context['plugin'] = _plugin
         _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, source_id, plugin, *args, **kwargs):
-        _context = super()._get(request, frame_id, source_id, plugin, *args, **kwargs)
+        _context = super()._get(request, frame_id, source_id, *args, **kwargs)
+        _plugin = plugins.SortingPluginRegistry.get(plugin)
         _frame = _context['frame']
         _source = _context['source']
-        _plugin = _context['plugin']
         _form = _plugin.get_form(request.POST)
         if _form.is_valid():
             _form.save(_plugin, defaults={'source': _source}, models=_source.steps)
             self.redirect(_context, 'frame_source_step_list', args=[_frame.id, _source.id])
+        _context['plugin'] = _plugin
         _context['form'] = _form
         return _context
 
@@ -200,7 +202,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
     template_name = 'config/frame.source.step.update.html'
     
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
+        _context = super()._get(request, frame_id, source_id, step_id, *args, **kwargs)
         _plugin = _context['plugin']
         _source_step = _context['source_step']
         _form = _plugin.get_form(instance=_source_step)
@@ -208,7 +210,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         return _context
 
     def _post(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
+        _context = super()._get(request, frame_id, source_id, step_id, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
         _plugin = _context['plugin']
@@ -224,7 +226,7 @@ class UpdateStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 class ActionStepSourceFrameView(base.BaseStepSourceFrameConfigView):
 
     def _get(self, request, frame_id, source_id, step_id, *args, **kwargs):
-        _context = super()._get(request, frame_id, source_id, _source_step.plugin, *args, **kwargs)
+        _context = super()._get(request, frame_id, source_id, step_id, *args, **kwargs)
         _frame = _context['frame']
         _source = _context['source']
         _source_step = _context['source_step']
