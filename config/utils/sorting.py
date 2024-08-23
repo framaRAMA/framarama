@@ -54,14 +54,14 @@ Item = models.Item.objects
             _code = _plugin.run(_sorting, context.ResultValue(_sorting.get_config()), self._context)
             _code = re.sub(r"[\r\n]+\s*", "", _code)  # fix indent by removing newline/whitespaces
             try:
-                _code = _code + ".annotate(rank=Model.F('rank')*Model.Value({}))".format(_sorting.weight)
-                _code = _code + ".values('id', 'rank')"
+                _code = _code + ".annotate(pk=Model.F('pk'), rank=Model.F('rank')*Model.Value({}))".format(_sorting.weight)
+                _code = _code + ".values('pk', 'rank')"
                 _queries.append(utils.Process.eval(_code, _data))
             except Exception as e:
                 _result['errors']['sorting{}'.format(_sorting.id)] = e
 
         if len(_queries) == 0:
-            _query = _data['Item'].order_by('id').annotate(rank=Model.F('id'))
+            _query = _data['Item'].order_by('id').annotate(pk=Model.F('id'), rank=Model.F('id'))
         else:
             _query = _queries.pop(0)
             if len(_queries):
@@ -77,8 +77,8 @@ Item = models.Item.objects
         try:
             _query = (
                 "SELECT i.*, rank FROM config_item i, ("
-                "  SELECT id, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.id"
-                ") AS result WHERE result.id=i.id" )
+                "  SELECT pk, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.pk"
+                ") AS result WHERE result.pk=i.id" )
             if self._context.get_random_item():
                 _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1", _query_params)[0].rank
                 _query = _query + " AND result.rank >= " + str(random.randint(0, _rank_max))
