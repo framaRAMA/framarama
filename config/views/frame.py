@@ -179,14 +179,14 @@ class CreateStepSourceFrameView(base.BaseSourceFrameConfigView):
     
     def _get(self, request, frame_id, source_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
-        _plugin = plugins.SortingPluginRegistry.get(plugin)
+        _plugin = plugins.SourcePluginRegistry.get(plugin)
         _context['plugin'] = _plugin
         _context['form'] = _plugin.get_form()
         return _context
 
     def _post(self, request, frame_id, source_id, plugin, *args, **kwargs):
         _context = super()._get(request, frame_id, source_id, *args, **kwargs)
-        _plugin = plugins.SortingPluginRegistry.get(plugin)
+        _plugin = plugins.SourcePluginRegistry.get(plugin)
         _frame = _context['frame']
         _source = _context['source']
         _form = _plugin.get_form(request.POST)
