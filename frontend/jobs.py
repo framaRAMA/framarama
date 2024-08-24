@@ -38,15 +38,16 @@ class Scheduler(jobs.Scheduler):
         self._startup = None
         self._last_update = None
         self._time_zone = None
-        self._monitor = None
-        self._monitor = frontend.Frontend.get().get_device().monitor()
-        self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
-        self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
-        self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
-        self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
-        self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
-        self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
-        self._monitor.start()
+        if settings.FRAMARAMA['FRONTEND_KEYSTROKES']:
+            logger.info("Registering frontend keystrokes")
+            self._monitor = frontend.Frontend.get().get_device().monitor()
+            self._monitor.register_key_event(['Control_R', 'r'], self.key_restart)
+            self._monitor.register_key_event(['Control_L', 'r'], self.key_restart)
+            self._monitor.register_key_event(['Control_R', 's'], self.key_shutdown)
+            self._monitor.register_key_event(['Control_L', 's'], self.key_shutdown)
+            self._monitor.register_key_event(['Control_R', 'a'], self.key_network_toggle)
+            self._monitor.register_key_event(['Control_L', 'a'], self.key_network_toggle)
+            self._monitor.start()
         self.register_job(Scheduler.FE_REFRESH_DISPLAY, self.refresh_display, minutes=10, name='Frontend refresh display')
         self.register_job(Scheduler.FE_NEXT_ITEM, self.next_item, minutes=1, name='Frontend next item')
         self.register_job(Scheduler.FE_REFRESH_ITEM, self.refresh_items, minutes=15, name='Frontend refresh items')

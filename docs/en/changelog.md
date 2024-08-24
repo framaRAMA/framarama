@@ -6,6 +6,7 @@
 * create some documentation pages and add workflows
 * frontend: use serializer for client API to be more robust
 * frontend: configure options for auto update check and auto install
+* frontend: configure option for keystroke registration
 * config: wrap all plugin config values into ResultValue to be more failsafe
 * config: refactor plugin storage to use django-entangled for JSON config
 * config: separate models into modules

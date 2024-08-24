@@ -94,6 +94,13 @@ value to `None` to disable automatic updates completely.
 
 ### Frontend
 
+#### `FRAMARAMA.FRONTEND_KEYSTROKES`
+
+Default: `True`
+
+Register key strokes to control the frontend device when connecting a keyboard
+to it (e.g. activate wireless access point, reboot device, etc.).
+
 #### `FRAMARAMA.FRONTEND_ITEM_UPDATE_INTERVAL`
 
 Default: `00:05:00`
