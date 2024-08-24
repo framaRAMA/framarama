@@ -301,7 +301,7 @@ class Capabilities:
     def nmcli_profile_save(name, password):
         if name is None or name == '' or password is None or password == '':
             return
-        _profiles = Capabilities.nmcli_profile_list(device, *args, **kwargs)
+        _profiles = Capabilities.nmcli_profile_list()
         _args = ['sudo', 'nmcli', 'connection']
         if name in _profiles:
             _args.extend(['modify', name])
@@ -368,7 +368,7 @@ class Capabilities:
         return _networks
 
     def nmcli_toggle_ap():
-        _profiles = Capabilities.nmcli_profile_list(device, *args, **kwargs)
+        _profiles = Capabilities.nmcli_profile_list()
         if not Capabilities.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
             if 'framarama' not in _profiles:
