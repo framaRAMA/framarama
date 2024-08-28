@@ -1,21 +1,13 @@
 # basic
 Django==4.2.14
 Jinja2==3.1.4
-#mysqlclient==2.1.0
 djangorestframework==3.15.2
 drf-extensions==0.7.1
 django-apscheduler==0.6.2
-django-entangled==0.5.4
-django-treebeard==4.6.1
 jsonpickle==3.2.2
-pyyaml==6.0.1
 uritemplate==4.1.1
-Wand==0.6.7
 
 # plugins
 requests==2.32.0
 jsonpath-python==1.0.6
 
-# docs
-mkdocs==1.4.2
-mkdocs-material==9.1.6
