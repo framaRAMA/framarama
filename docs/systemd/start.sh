@@ -13,7 +13,7 @@ feh --bg-scale ./common/static/common/background.png
 
 # Activate env and install requirements
 . ../venv/bin/activate
-[ -f ./data/framarama-init.json ] || pip install -r requirements.txt
+[ -f ./data/framarama-init.json ] || pip install -r requirements/default.txt
 
 # Start main loop
 while [ "1" = "1" ] ; do
