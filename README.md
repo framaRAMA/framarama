@@ -40,7 +40,7 @@ Follow the steps below to setup both components on the same system. If you
 want to separate them, see sections below.
 
 📢 Before starting check the requirements of the components below and install
-them if required (enable them in requirements.txt):
+them if required (enable them in requirements/config.txt):
 * mysqlclient==2.1.0 - if you want to use MySQL as backend (configuration
   see below)
 
@@ -51,7 +51,7 @@ cd  framarama
 mkdir data
 python -m venv venv
 . ./venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements/default.txt
 ```
 
 Running both components on one system, set `MODES` in `framarama/settings.py`:

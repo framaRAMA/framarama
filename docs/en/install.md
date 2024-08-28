@@ -44,7 +44,7 @@ python -m venv venv
 Installing Python dependencies:
 
 ```
-pip install -r requirements.txt
+pip install -r requirements/default.txt
 ```
 
 ### Server installation
