@@ -20,7 +20,7 @@ class ResizeForm(FinishingForm):
         max_length=64, widget=base.charFieldWidget(),
         label='Y resizing', help_text='Resize to given image height')
     keep_aspect = forms.BooleanField(
-        widget=base.booleanFieldWidget(),
+        widget=base.booleanFieldWidget(), required=False,
         label='Keep aspect ratio', help_text='Resize only to given size as maximum while keeping aspect ratio')
 
     dependencies = {}
