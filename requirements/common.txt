@@ -4,6 +4,8 @@ Jinja2==3.1.4
 djangorestframework==3.15.2
 drf-extensions==0.7.1
 django-apscheduler==0.6.2
+django-entangled==0.5.4
+django-treebeard==4.6.1
 jsonpickle==3.2.2
 uritemplate==4.1.1
 

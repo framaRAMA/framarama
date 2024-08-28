@@ -1,6 +1,4 @@
 -r common.txt
 #mysqlclient==2.1.0
-django-entangled==0.5.4
-django-treebeard==4.6.1
 Wand==0.6.7
 
