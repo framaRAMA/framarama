@@ -141,6 +141,18 @@ class DisplayStatus(BaseModel):
     app_installed = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Application installation', help_text='Date of last update installation')
+    python_version = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Python version', help_text='Version of python in use')
+    django_version = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Django version', help_text='Django version running application')
+    container_name = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Container', help_text='Container running Django WSGI application')
+    container_version = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Container', help_text='Version of WSGI container')
 
     class Meta:
         db_table = 'config_display_status'

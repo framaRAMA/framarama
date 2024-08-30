@@ -1,6 +1,7 @@
 import os
 import io
 import re
+import sys
 import time
 import fcntl
 import threading
@@ -8,6 +9,7 @@ import datetime
 import jsonpickle
 import base64
 import logging
+import django
 
 from django.conf import settings
 from django.core import management
@@ -228,7 +230,26 @@ class Frontend(Singleton):
         } for _file in _items]
         _data = {}
         if restrictions is None or 'sys' in restrictions:
+            _container = os.environ.get('SERVER_SOFTWARE', '')
+            if 'gunicorn' in _container:
+                import gunicorn
+                _container = 'gunicorn'
+                _contianer_version = 'gunicorn:' + gunicorn.__version__
+            elif 'uwsgi' in _container:
+                import uwsgi
+                _container = 'uwsgi'
+                _container_version = uwsgi.version()
+            elif 'mod_wsgi' in _container:
+                import mod_wsgi
+                _container = 'apache'
+                _container_version = mod_wsgi.__version__
+            else:
+                _container = 'unknown'
+                _container_version = 'unknown'
             _data['uptime'] = _capability.sys_uptime()
+            _data['python'] = { 'version': sys.version.split()[0] }
+            _data['django'] = { 'version': django.get_version() }
+            _data['container'] = { 'name': _container, 'version' : _container_version }
         if restrictions is None  or 'memory' in restrictions:
             _data['memory'] = {
                 'used': _mem_total - _mem_free if _mem_total and _mem_free else None,
