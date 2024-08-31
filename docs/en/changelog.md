@@ -2,7 +2,7 @@
 
 ## v0.5.0 - not yet released
 
-* update to Django 4.2.14, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2
+* update to Django 4.2.15, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2
 * create some documentation pages and add workflows
 * frontend: show application logs on 3rd console
 * frontend: include versions in status submission
