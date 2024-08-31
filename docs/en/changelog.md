@@ -4,6 +4,8 @@
 
 * update to Django 4.2.14, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2
 * create some documentation pages and add workflows
+* frontend: show application logs on 3rd console
+* frontend: include versions in status submission
 * frontend: use serializer for client API to be more robust
 * frontend: configure options for auto update check and auto install
 * frontend: configure option for keystroke registration
