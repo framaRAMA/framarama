@@ -141,6 +141,12 @@ class DisplayStatus(BaseModel):
     app_installed = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Application installation', help_text='Date of last update installation')
+    os_name = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Operating system', help_text='Name of installed operating system')
+    os_version = models.CharField(
+        max_length=32, blank=True, null=True,
+        verbose_name='Operating system version', help_text='Version of operating system')
     python_version = models.CharField(
         max_length=32, blank=True, null=True,
         verbose_name='Python version', help_text='Version of python in use')

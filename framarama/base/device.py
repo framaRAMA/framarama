@@ -43,6 +43,9 @@ class Capability:
     def display_size(self):
         return self._none()
 
+    def os_info(self):
+        return self._none()
+
     def mem_total(self):
         return self._none()
 
@@ -116,6 +119,8 @@ class Capabilities:
             _capability.display_status = Capabilities.xrandr_display_status
         if Process.exec_search('xrandr'):
             _capability.display_size = Capabilities.xrandr_display_size
+        if Process.exec_search('lsb_release'):
+            _capability.os_info = Capabilities.lsb_release_info
         if Filesystem.file_exists('/proc/meminfo'):
             _capability.mem_total = Capabilities.read_meminfo_total
             _capability.mem_free = Capabilities.read_meminfo_free
@@ -197,6 +202,21 @@ class Capabilities:
                     _values = _resolution.strip().split(b' ')
                     return (int(_values[1]), int(_values[3]))
         return None
+
+    def _lsb_release_info():
+        _info = Process.exec_run(['lsb_release', '-a'])
+        _result = {}
+        for _name, _value in [_line.split(b':') for _line in _info.split(b'\n') if _line]:
+            _value = _value.strip()
+            if b'Distributor' in _name:
+                _result['distibution'] = _value
+            elif b'Description' == _name:
+                _result['name'] = _value
+            elif b'Release' in _name:
+                _result['release'] = _value
+            elif b'Codename' in _name:
+                _result['codename'] = _value
+        return _result
 
     def _read_meminfo(fields=None):
         _lines = Filesystem.file_read('/proc/meminfo')

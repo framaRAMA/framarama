@@ -30,4 +30,14 @@ class Migration(migrations.Migration):
             name='python_version',
             field=models.CharField(blank=True, help_text='Version of python in use', max_length=32, null=True, verbose_name='Python version'),
         ),
+        migrations.AddField(
+            model_name='displaystatus',
+            name='os_name',
+            field=models.CharField(blank=True, help_text='Name of installed operating system', max_length=32, null=True, verbose_name='Operating system'),
+        ),
+        migrations.AddField(
+            model_name='displaystatus',
+            name='os_version',
+            field=models.CharField(blank=True, help_text='Version of operating system', max_length=32, null=True, verbose_name='Operating system version'),
+        ),
     ]
