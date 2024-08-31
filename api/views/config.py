@@ -145,7 +145,7 @@ class DisplayStatusSerializer(BaseSerializer):
             'screen_on', 'screen_width', 'screen_height',
             'items_total', 'items_shown', 'items_error', 'items_updated',
             'app_uptime', 'app_date', 'app_branch', 'app_hash', 'app_checked', 'app_installed',
-            'os_name', 'os_version', 'container_name', 'container_version',  'python_version', 'django_version',
+            'os_dist', 'os_name', 'os_version', 'container_name', 'container_version',  'python_version', 'django_version',
             'links',
         )
         read_only_fields = BaseSerializer.Meta.read_only_fields

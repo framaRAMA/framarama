@@ -32,6 +32,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='displaystatus',
+            name='os_dist',
+            field=models.CharField(blank=True, help_text='Distribution of installed operating system', max_length=32, null=True, verbose_name='Operating system distribution'),
+        ),
+        migrations.AddField(
+            model_name='displaystatus',
             name='os_name',
             field=models.CharField(blank=True, help_text='Name of installed operating system', max_length=32, null=True, verbose_name='Operating system'),
         ),

@@ -240,6 +240,7 @@ class Frontend(Singleton):
             _data['container'] = { 'name': _container, 'version' : _container_version }
             _os_info = _capability.os_info()
             _data['os'] = {
+                'dist': _os_info.get('distibution') if _os_info else None,
                 'name': _os_info.get('name') if _os_info else None,
                 'version': _os_info.get('release') if _os_info else None
             }
