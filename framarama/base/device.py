@@ -207,7 +207,7 @@ class Capabilities:
         _info = Process.exec_run(['lsb_release', '-a'])
         _result = {}
         for _name, _value in [_line.split(b':') for _line in _info.split(b'\n') if _line]:
-            _value = _value.strip()
+            _value = _value.strip().decode()
             if b'Distributor' in _name:
                 _result['distibution'] = _value
             elif b'Description' == _name:
