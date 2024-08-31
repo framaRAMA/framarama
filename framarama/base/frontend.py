@@ -251,9 +251,10 @@ class Frontend(Singleton):
             _data['django'] = { 'version': django.get_version() }
             _data['container'] = { 'name': _container, 'version' : _container_version }
             _os_info = _capability.os_info()
-            if _os_info:
-                _data['os_name'] = _os_info.get('name')
-                _data['os_version'] = _os_info.get('release')
+            _data['os'] = {
+                'name': _os_info.get('name') if _os_info else None,
+                'version': _os_info.get('release') if _os_info else None
+            }
         if restrictions is None  or 'memory' in restrictions:
             _data['memory'] = {
                 'used': _mem_total - _mem_free if _mem_total and _mem_free else None,
