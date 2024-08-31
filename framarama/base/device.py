@@ -203,7 +203,7 @@ class Capabilities:
                     return (int(_values[1]), int(_values[3]))
         return None
 
-    def _lsb_release_info():
+    def lsb_release_info():
         _info = Process.exec_run(['lsb_release', '-a'])
         _result = {}
         for _name, _value in [_line.split(b':') for _line in _info.split(b'\n') if _line]:
