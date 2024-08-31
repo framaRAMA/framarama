@@ -216,18 +216,6 @@ class Frontend(Singleton):
         _config = self.get_config().get_config()
         _device = self.get_device()
         _capability = _device.get_capability()
-        _mem_total = _capability.mem_total()
-        _mem_free = _capability.mem_free()
-        _disk_data = _capability.disk_data_free()
-        _disk_tmp = _capability.disk_tmp_free()
-        _network_config = _capability.net_config()
-        _network_status = _device.network_status()
-        _app_revision = _capability.app_revision()
-        _items = _device.get_items()
-        _latest_items = [{
-            'id': _file.item().id,
-            'time': DateTime.utc(_file.time())
-        } for _file in _items]
         _data = {}
         if restrictions is None or 'sys' in restrictions:
             _container = os.environ.get('SERVER_SOFTWARE', '')
@@ -256,6 +244,8 @@ class Frontend(Singleton):
                 'version': _os_info.get('release') if _os_info else None
             }
         if restrictions is None  or 'memory' in restrictions:
+            _mem_total = _capability.mem_total()
+            _mem_free = _capability.mem_free()
             _data['memory'] = {
                 'used': _mem_total - _mem_free if _mem_total and _mem_free else None,
                 'free': _mem_free if _mem_free else None,
@@ -266,6 +256,8 @@ class Frontend(Singleton):
                 'temp': _capability.cpu_temp(),
             }
         if restrictions is None  or 'disk' in restrictions:
+            _disk_data = _capability.disk_data_free()
+            _disk_tmp = _capability.disk_tmp_free()
             _data['disk'] = {
                 'data': {
                     'used': _disk_data[0],
@@ -277,6 +269,8 @@ class Frontend(Singleton):
                 },
             }
         if restrictions is None  or 'network' in restrictions:
+            _network_status = _device.network_status()
+            _network_config = _capability.net_config()
             _data['network'] = {
                 'profile': _network_status['profile'],
                 'connected': DateTime.utc(_network_status['connected']) if _network_status['connected'] else None,
@@ -288,6 +282,10 @@ class Frontend(Singleton):
         if restrictions is None  or 'screen' in restrictions:
             _data['screen'] = self.get_screen()
         if restrictions is None  or 'item' in restrictions:
+            _latest_items = [{
+                'id': _file.item().id,
+                'time': DateTime.utc(_file.time())
+            } for _file in _device.get_items()]
             _data['items'] = {
                 'total': _config.count_items,
                 'shown': _config.count_views,
@@ -296,6 +294,7 @@ class Frontend(Singleton):
                 'latest': _latest_items,
             }
         if restrictions is None  or 'app' in restrictions:
+            _app_revision = _capability.app_revision()
             _data['app'] = {
                 'uptime': (DateTime.now() - _config.date_app_startup).seconds if _config.date_app_startup else None,
                 'date': DateTime.utc(_app_revision['date']) if _app_revision else None,
