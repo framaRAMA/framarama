@@ -234,7 +234,7 @@ class Frontend(Singleton):
             if 'gunicorn' in _container:
                 import gunicorn
                 _container = 'gunicorn'
-                _contianer_version = 'gunicorn:' + gunicorn.__version__
+                _container_version = 'gunicorn:' + gunicorn.__version__
             elif 'uwsgi' in _container:
                 import uwsgi
                 _container = 'uwsgi'
