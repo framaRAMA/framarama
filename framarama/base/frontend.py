@@ -250,7 +250,7 @@ class Frontend(Singleton):
             _data['python'] = { 'version': sys.version.split()[0] }
             _data['django'] = { 'version': django.get_version() }
             _data['container'] = { 'name': _container, 'version' : _container_version }
-            _os_info = _capability.os_version()
+            _os_info = _capability.os_info()
             if _os_info:
                 _data['os_name'] = _os_info.get('name')
                 _data['os_version'] = _os_info.get('release')
