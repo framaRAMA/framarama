@@ -26,7 +26,7 @@ For this case the following parts can be configured:
 * frames - a frame is a representation for a photo collection
 * displays - a display is a physical device showing content from a frame
 
-![Dashboard](/assets/screenshots/config-dashboard.png)
+![Dashboard](../assets/screenshots/config-dashboard.png)
 
 ## Frontend component
 
@@ -36,7 +36,7 @@ connected to a display/monitor.
 There're also some settings which are frontend specific and which can
 be managed by a web interface (e.g. device geometry, network setup, etc.).
 
-![Frontend](/assets/screenshots/frontend-display.png)
+![Frontend](../assets/screenshots/frontend-display.png)
 
 ## API
 
