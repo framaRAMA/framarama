@@ -26,6 +26,9 @@ nav:
       - 'server/plugins/context.md'
   - 'Frontend':
     - 'frontend/index.md'
-  - 'development.md'
+  - 'Development':
+    - 'development/index.md'
+    - 'development/software.md'
+    - 'development/documentation.md'
   - 'changelog.md'
 

@@ -1,14 +1,4 @@
-# Development
-
-A development setup can be create by using the setup steps mentioned in the documentation
-for general setup.
-
-## Software
-
-When developing code for this project just keep in mind to have it clean and create merge
-requests for it.
-
-## Documentation
+# Documentation
 
 The documentation is generated using `mkdocs` utility which can generate documentation from
 different sources. All content should be written using markdown syntax.
@@ -16,7 +6,7 @@ different sources. All content should be written using markdown syntax.
 All the documentation will reside in the `docs/en/` folder and is currently only in
 english available.
 
-### Writing
+## Writing
 
 Reviewing the documentation locally can be done by using the following command, which
 makes it available via [http://127.0.0.1:8000/](http://127.0.0.1:8000/):
@@ -26,7 +16,7 @@ makes it available via [http://127.0.0.1:8000/](http://127.0.0.1:8000/):
 mkdocs serve
 ```
 
-### Publishing
+## Publishing
 
 To publish committed documentation in the documentation folder, run the following
 command:
