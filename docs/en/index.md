@@ -1,6 +1,6 @@
 # framaRAMA
 
-<img src="assets/stripes.png" style="width: 100%; height: 48px;" />
+![Stripes](assets/stripes.png){ style="width: 100%; height: 48px;" }
 
 Keep your memories alive with framaRAMA. The smart way to show your memories
 from a photo collection on a digital photo frame.

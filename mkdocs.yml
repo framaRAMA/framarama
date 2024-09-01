@@ -1,6 +1,8 @@
 site_name: framaRAMA
 docs_dir: docs/en
 repo_url: https://github.com/framaRAMA/framarama
+markdown_extensions:
+  - attr_list
 theme:
   logo: assets/logo.png
   favicon: assets/favicon.ico
