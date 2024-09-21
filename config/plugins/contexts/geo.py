@@ -4,7 +4,7 @@ import requests
 from django import forms
 from django.template import Context
 
-from framarama.base import utils, forms as base
+from framarama.base import api, utils, forms as base
 from config.models import FrameContext
 from config.plugins import ContextPluginImplementation
 from config.forms.frame import ContextForm
@@ -78,6 +78,9 @@ class Implementation(ContextPluginImplementation):
                 return {}
             _coords[_name] = _coord
 
+        if _coords['lat'] == 0 and _coords['long'] == 0:
+            return {}
+
         # Use OpenStreetMap API
         # https://nominatim.org/release-docs/develop/api/Overview/ - entry point
         # https://nominatim.org/release-docs/develop/api/Output/ - output formats
@@ -86,8 +89,14 @@ class Implementation(ContextPluginImplementation):
             _url = "https://nominatim.openstreetmap.org/reverse.php?lat={}&lon={}&zoom=18&format=jsonv2".format(
                 _coords['lat'],
                 _coords['long'])
-            _response = requests.get(_url, timeout=(5, 10))
-            _response.raise_for_status()
+
+            try:
+                _response = api.ApiClient.get().get_url(_url)
+                _response.raise_for_status()
+            except Exception as e:
+                logger.warn("Resolving coordinates via {} failed: {}".format(_url, e))
+                return {}
+
             _json = _response.json()
 
             # Extract information from JSON response:
