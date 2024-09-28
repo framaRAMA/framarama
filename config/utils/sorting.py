@@ -60,31 +60,39 @@ Item = models.Item.objects
             except Exception as e:
                 _result['errors']['sorting{}'.format(_sorting.id)] = e
 
+        # No query given, use the default ranking
         if len(_queries) == 0:
-            _query = _data['Item'].order_by('id').annotate(pk=Model.F('id'), rank=Model.F('id'))
-        else:
-            _query = _queries.pop(0)
-            if len(_queries):
-                _query = _query.union(*_queries)
+            _queries.append(_data['Item']
+              .annotate(pk=Model.F('id'), rank=Model.Window(expression=Function.Rank(), order_by=Model.F('id').asc()))
+              .values('pk', 'rank')
+           )
 
         # Get raw SQL query using compiler as used in the Query code, but
         # this defaults to "default" connection and not "config" connection:
         # https://github.com/django/django/blob/6654289f5b350dfca3dc4f6abab777459b906756/django/db/models/sql/query.py#L293
         _conn_name = 'config' if 'config' in connections else 'default'
-        (_query_sql, _query_params) = _query.query.get_compiler(_conn_name).as_sql()
+
+        # Surround queries with subquery to calculate rank differences
+        _query_params = []
+        for _i, _q in enumerate(_queries):
+            (_sql, _sql_params) = _q.query.get_compiler(_conn_name).as_sql()
+            _query_params.extend(_sql_params)
+            _queries[_i] = "SELECT pk, (rank - COALESCE(LAG(rank) OVER(ORDER BY rank), 0)) AS rank_diff FROM ( " + str(_sql) + ") AS result_" + str(_i)
+        _query = " UNION ".join(_queries)
 
         _items = _data['Item']
         try:
             _query = (
-                "SELECT i.*, rank FROM config_item i, ("
-                "  SELECT pk, SUM(rank) AS rank FROM ( " + str(_query_sql) + " ) AS rank GROUP BY rank.pk"
-                ") AS result WHERE result.pk=i.id" )
+                "SELECT i.*, rank, weight FROM config_item i, ( SELECT pk, (SUM(rank) OVER(ORDER BY pk)) AS rank, rank AS weight FROM ("
+                "  SELECT pk AS pk, SUM(rank_diff) AS rank FROM (" + str(_query) + ") AS result_diff GROUP BY pk"
+                ") AS result_sum) result WHERE result.pk=i.id"
+            )
             if self._context.get_random_item():
                 _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1", _query_params)[0].rank
                 _query = _query + " AND result.rank >= " + str(random.randint(0, _rank_max))
                 _query = _query + " ORDER BY result.rank ASC LIMIT 1"
             else:
-                _query = _query + " ORDER BY result.rank DESC"
+                _query = _query + " ORDER BY result.weight DESC, result.pk DESC"
             _items = _items.prefetch_related('source').raw(_query, _query_params)
             len(_items)
         except Exception as e:
