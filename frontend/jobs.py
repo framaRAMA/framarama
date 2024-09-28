@@ -58,10 +58,12 @@ class Scheduler(jobs.Scheduler):
 
     def _setup_start(self):
         if self._startup is None:
+            _config = frontend.Frontend.get().get_config().get_config()
+            if _config is None:
+                return
             self._startup = utils.DateTime.now()
-            _config = frontend.Frontend.get().get_config()
-            _config.get_config().date_app_startup = self._startup
-            _config.get_config().save()
+            _config.date_app_startup = self._startup
+            _config.save()
         self.disable_jobs()
     
     def _setup_completed(self):

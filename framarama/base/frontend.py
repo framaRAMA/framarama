@@ -140,6 +140,8 @@ class Frontend(Singleton):
                 self.init_set(self.get_status())
         elif self._init_phase < _last_pre_init_phase:
             self._init_phase = _last_pre_init_phase
+        if self.get_config().get_config() is None:
+            return
         if self._init_phase < Frontend.INIT_PHASE_SETUP:
             _mode = self.get_config().get_config().mode
             if _mode != None and _mode.strip() != '':
