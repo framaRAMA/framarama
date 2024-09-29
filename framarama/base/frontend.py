@@ -47,11 +47,15 @@ class Frontend(Singleton):
         INIT_PHASE_ERROR: "Some error occurred, recovery mode"
     }
     INIT_FILE = settings.FRAMARAMA['DATA_PATH'] + '/framarama-init.json'
+    BG_HINT_FILE = settings.FRAMARAMA['DATA_PATH'] + '/background.txt'
 
     def __init__(self):
         super().__init__()
         self._client = None
         self._init_phase = Frontend.INIT_PHASE_START
+
+    def _bg_hint(self, msg):
+        Filesystem.file_write(Frontend.BG_HINT_FILE, msg.encode())
 
     def _mgmt_cmd(self, *args, **kwargs):
         _out, _err = io.StringIO(), io.StringIO()
@@ -129,6 +133,7 @@ class Frontend(Singleton):
             logger.info("Starting system setup")
             for _phase, _method in _pre_init_phases.items():
                 if self._init_phase < _phase:
+                    self._bg_hint(Frontend.INIT_PHASES[_phase])
                     try:
                         _result = _method()
                         self._init_phase = _phase if _result is None else _result
@@ -138,6 +143,10 @@ class Frontend(Singleton):
             if self._init_phase == _last_pre_init_phase:
                 logger.info("System environment setup completed!")
                 self.init_set(self.get_status())
+                self._bg_hint("")
+            else:
+                _init_status = self.get_init_status()['phase']
+                self._bg_hint("{}{}".format('Error: ' if _init_status['status'] == 'Error' else '', _init_status['phase']))
         elif self._init_phase < _last_pre_init_phase:
             self._init_phase = _last_pre_init_phase
         if self.get_config().get_config() is None:
