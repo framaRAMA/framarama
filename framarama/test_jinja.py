@@ -71,6 +71,10 @@ class JinjaDurationTestCase(TestCase):
         _result = jinja.duration(datetime.timedelta(days=2, hours=2), ['days'], short=True)
         self.assertEqual('2 days', _result)
 
+    def test_duration_append(self):
+        _result = jinja.duration(datetime.timedelta(days=7), ['days'], append='ago')
+        self.assertEqual('7 days ago', _result)
+
     def test_duration_datetime(self):
         _result = jinja.duration(datetime.datetime.now(tz=zoneinfo.ZoneInfo('UTC')))
         self.assertEqual('0 seconds', _result)
