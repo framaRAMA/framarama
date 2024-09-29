@@ -60,6 +60,8 @@ class JinjaDurationTestCase(TestCase):
         self.assertEqual('1 days, 2 hours', _result)
 
     def test_duration_short(self):
+        _result = jinja.duration(datetime.timedelta(seconds=2), short=True)
+        self.assertEqual('2 seconds', _result)
         _result = jinja.duration(datetime.timedelta(hours=2), short=True)
         self.assertEqual('2 hours', _result)
         _result = jinja.duration(datetime.timedelta(days=2, hours=2), short=True)
