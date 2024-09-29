@@ -10,6 +10,27 @@ openbox-session &
 
 # Set startup background
 feh --bg-scale ./common/static/common/background.png
+rm -f ./data/background.txt
+
+# Background listener
+(
+  while [ "1" = "1" ] ; do
+    if [ -f ./data/background.txt ] ; then
+      if [ -s ./data/background.txt ] ; then
+        convert -font helvetica -fill white -gravity South -pointsize 25 -annotate +0+100 "$(cat ./data/background.txt)" ./common/static/common/background.png ./data/background.png
+      else
+        rm -f ./data/background.png
+      fi
+      if [ -s ./data/background.png ] ; then
+        feh --bg-scale ./data/background.png
+      else
+        feh --bg-scale ./common/static/common/background.png
+      fi
+      rm -f ./data/background.txt
+    fi
+    sleep 1
+  done
+) &
 
 # Activate env and install requirements
 . ../venv/bin/activate
