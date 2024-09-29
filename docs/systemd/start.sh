@@ -34,13 +34,14 @@ rm -f ./data/background.txt
 
 # Activate env and install requirements
 . ../venv/bin/activate
-[ -f ./data/framarama-init.json ] || pip install -r requirements/default.txt
+if [ ! -f ./data/framarama-init.json ] ; then
+  echo "Updating ..." > ./data/background.txt
+  pip install -r requirements/default.txt
+fi
 
 # Start main loop
 while [ "1" = "1" ] ; do
-
-  # Set startup background
-  feh --bg-scale ./common/static/common/background.png
+  echo "Starting ..." > ./data/background.txt
 
   # Start application
   gunicorn --capture-output -b 0.0.0.0:8000 framarama.wsgi
