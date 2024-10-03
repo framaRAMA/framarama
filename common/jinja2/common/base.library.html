@@ -704,7 +704,7 @@
           {% for col in columns %}
             <td class="p-2 text-break" {% if col == columns.keys()|first %}scope="row"{% endif %}>
               {% if col in templates %}
-                {{ templates[col]|template({'loop':ploop, 'value':item|getattr(col)})|safe }}
+                {{ templates[col]|template({'loop':ploop, 'value':item|getattr(col), 'item':item})|safe }}
               {% else %}
                 {{ item|getattr(col) }}
               {% endif %}
