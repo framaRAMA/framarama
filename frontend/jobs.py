@@ -190,7 +190,7 @@ class Scheduler(jobs.Scheduler):
         if force is False:
             if _interval is None:
                 return
-            if _config.app_update_check_date + _interval > utils.DateTime.now():
+            if not utils.DateTime.reached(_config.app_update_check_date, _interval):
                 return
         _capability = frontend.Frontend.get().get_device().get_capability()
         _config.app_update_check_date = utils.DateTime.now()
