@@ -83,7 +83,7 @@ Item = models.Item.objects
         _items = _data['Item']
         try:
             _query = (
-                "SELECT i.*, rank, weight FROM config_item i, ( SELECT pk, (SUM(rank) OVER(ORDER BY rank, pk)) AS rank, rank AS weight FROM ("
+                "SELECT i.*, (SUM(weight) OVER(ORDER BY weight, pk)) AS rank, weight FROM config_item i, ( SELECT pk, rank AS weight FROM ("
                 "  SELECT pk AS pk, SUM(rank_diff) AS rank FROM (" + str(_query) + ") AS result_diff GROUP BY pk"
                 ") AS result_sum) result WHERE result.pk=i.id"
             )
