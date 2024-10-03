@@ -1,6 +1,8 @@
 import json
+import jinja2
 
 from django import forms
+from django.core.exceptions import ValidationError
 
 from config import models
 from config.forms.base import BasePluginForm, TreeBasePluginForm
@@ -116,6 +118,17 @@ class FinishingForm(TreeBasePluginForm):
             'image_out': base.charFieldWidget(),
             'enabled': base.booleanFieldWidget(),
         }
+
+    def clean(self):
+        _data = super().clean()
+        for _name, _value in _data.items():
+            if _value is None or type(_value) != str:
+                continue
+            try:
+                jinja2.Environment().from_string(_value)
+            except jinja2.exceptions.TemplateSyntaxError as e:
+                raise ValidationError('Invalid template in {}: {}'.format(_name, e))
+        return _data
 
 
 class RawEditFinishingForm(base.BaseForm):

@@ -1,6 +1,9 @@
+import re
+import ast
 import logging
 
 from django import forms
+from django.core.exceptions import ValidationError
 
 from framarama.base import forms as base
 from config.models import Sorting
@@ -19,6 +22,14 @@ class CustomForm(SortingForm):
         entangled_fields = {'plugin_config': ['code']}
 
     field_order = SortingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
+
+    def clean_code(self):
+        _code = self.cleaned_data['code']
+        try:
+            ast.parse(re.sub(r"[\r\n]+\s*", "", _code))  # fix indent by removing newline/whitespaces)
+        except SyntaxError as e:
+            raise ValidationError('Invalid code: {}'.format(e))
+        return _code
 
 
 class Implementation(SortingPluginImplementation):
