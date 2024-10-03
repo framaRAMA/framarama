@@ -83,9 +83,9 @@ Item = models.Item.objects
         _items = _data['Item']
         try:
             _query = (
-                "SELECT i.*, (SUM(weight) OVER(ORDER BY weight, pk)) AS rank, weight FROM config_item i, ( SELECT pk, rank AS weight FROM ("
+                "SELECT i.*, rank, weight FROM config_item i, ( SELECT pk, (SUM(weight) OVER(ORDER BY weight, pk)) AS rank, weight FROM ( SELECT pk, rank AS weight FROM ("
                 "  SELECT pk AS pk, SUM(rank_diff) AS rank FROM (" + str(_query) + ") AS result_diff GROUP BY pk"
-                ") AS result_sum) result WHERE result.pk=i.id"
+                ") ) ) result WHERE result.pk=i.id"
             )
             if self._context.get_random_item():
                 _rank_max = _items.raw(_query + " ORDER BY result.rank DESC LIMIT 1", _query_params)[0].rank
