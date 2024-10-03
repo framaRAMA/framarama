@@ -78,7 +78,7 @@ Item = models.Item.objects
             (_sql, _sql_params) = _q.query.get_compiler(_conn_name).as_sql()
             _query_params.extend(_sql_params)
             _queries[_i] = "SELECT pk, (rank - COALESCE(LAG(rank) OVER(ORDER BY rank), 0)) AS rank_diff FROM ( " + str(_sql) + ") AS result_" + str(_i)
-        _query = " UNION ".join(_queries)
+        _query = " UNION ALL ".join(_queries)
 
         _items = _data['Item']
         try:
