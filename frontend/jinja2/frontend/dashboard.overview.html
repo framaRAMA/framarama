@@ -6,7 +6,7 @@
   {% if config.mode == 'local' %}
     {{ lib.field_text('Mode', 'Local setup') }}
     <div id="status-database"><!-- class="position-absolute pe-5"> -->
-      {{ lib.status_icons('position-absolute end-0 me-2') }}
+      {{ lib.status_icons('position-absolute end-0 me-4', 'me-0') }}
       {% if config.local_db_type == 'local' %}
         {{ lib.field_text('Database', '(use integrated database)') }}
       {% else %}
@@ -18,7 +18,7 @@
     {{ lib.field_text('Server', config.cloud_server) }}
   {% endif %}
   <div id="status-display"><!-- class="position-absolute pe-5"> -->
-    {{ lib.status_icons('position-absolute end-0 me-2') }}
+    {{ lib.status_icons('position-absolute end-0 me-4', 'me-0') }}
     {% if config.cloud_display_access_key != '' %}
       {{ lib.field_text('Display', lib.status_loading('display')) }}
       {{ lib.field_text('Type', lib.status_loading('device-type')) }}
