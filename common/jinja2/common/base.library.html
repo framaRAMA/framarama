@@ -977,7 +977,7 @@
     </li>
     <li>
       last heart beat on <strong>{% if status and status['created'] %}
-        {{ status['created']|duration(append='ago') if 'minutes' in status['created']|duration(short=true) else status['created']|date_format('%d.%m.%Y %H:%M') }}
+        {{ status['created']|date_format('%d.%m.%Y %H:%M') if 'days' in status['created']|duration(short=true) else status['created']|duration(append='ago') }}
       {% else %}unknown{% endif %}</strong>
     </li>
   </ul>
