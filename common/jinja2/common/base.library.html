@@ -959,7 +959,7 @@
 {% endmacro %}
 
 {% macro display_info_device(display, status) %}
-  {{ display_info_header('Runtime information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-server') }}
+  {{ display_info_header('Runtime information', 'fa-server') }}
   <ul class="card-text">
     <li><strong>{{ display.name }}</strong> frame providing data</li>
     <li>
@@ -984,7 +984,7 @@
 {% endmacro %}
 
 {% macro display_info_software(display, status) %}
-  {{ display_info_header('Software information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-cubes') }}
+  {{ display_info_header('Software information', 'fa-cubes') }}
   <ul class="card-text">
     <li>
       running version <strong>{{ status['app_branch'] if status else 'unknown' }}</strong>
@@ -1002,7 +1002,7 @@
 {% endmacro %}
 
 {% macro display_info_media(display, status) %}
-  {{ display_info_header('Media information (%s)'|format(status.created|duration(short=true, append='ago') if status else 'not available'), 'fa-images') }}
+  {{ display_info_header('Media information', 'fa-images') }}
   <ul class="card-text">
     <li><strong>{{ display.frame.items.count() if display.frame else 0 }} </strong> items in collection</li>
     <li><strong>{{ status.items_shown|default('unknown', True) if status else '0' }}</strong> items served</li>
