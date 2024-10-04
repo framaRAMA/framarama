@@ -20,8 +20,8 @@
   {{ lib.modal_start('itemThumbnail%s'|format(loop.index), item.url.split('/')[-1], 'modal-fullscreen-sm-down') }}
     {% set thumbnail = item.thumbnail.id != null %}
     <div class="text-center">
-      <img src="{{ item.url }}" class="w-75 m-1 border rounded-5 border-0 opacity-50" loading="lazy"/>
-      <span class="w-25 shadow position-absolute mt-5 start-50 translate-middle-x border border-red rounded border-5 bg-light">
+      <img src="{{ item.url }}" class="w-75 w-md-50 m-1 border rounded-5 border-0 opacity-25" loading="lazy"/>
+      <span class="w-50 w-md-25 shadow position-absolute mt-5 start-50 translate-middle-x border border-red rounded border-5 bg-light">
         {% if thumbnail %}
           <img src="{{ url('frame_source_image_thumbnail', args=[frame.id, source.id, item.id]) }}" class="w-100" loading="lazy"/>
         {% else %}
