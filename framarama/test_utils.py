@@ -25,6 +25,15 @@ class FilesystemTestCase(TestCase):
         os.remove('test')
         self.assertEquals(b'Hello World!', _result)
 
+    def test_file_append(self):
+        with open('test', 'wb') as f:
+            f.write(b'Hello World!')
+            f.close()
+        utils.Filesystem.file_append('test', b'How are you?')
+        _result = utils.Filesystem.file_read('test')
+        os.remove('test')
+        self.assertEquals(b'Hello World!How are you?', _result)
+
     def test_file_copy(self):
         with open('test1', 'wb') as f:
             f.write(b'Hello World!')

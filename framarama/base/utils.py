@@ -91,6 +91,11 @@ class Filesystem:
             f.write(data)
 
     @staticmethod
+    def file_append(filename, data):
+        with open(filename, 'ab') as f:
+            f.write(data)
+
+    @staticmethod
     def file_copy(source, target):
         shutil.copyfile(source, target)
 
