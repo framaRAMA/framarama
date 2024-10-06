@@ -334,6 +334,15 @@ class DateTimeTestCase(TestCase):
         self.assertEqual(45, _time.minute)
         self.assertEqual(10, _time.second)
 
+    def test_parse_iso(self):
+        _time = utils.DateTime.parse('Sun, 06 Oct 2024 17:02:54 GMT')
+        self.assertEqual(2024, _time.year)
+        self.assertEqual(10, _time.month)
+        self.assertEqual(6, _time.day)
+        self.assertEqual(17, _time.hour)
+        self.assertEqual(2, _time.minute)
+        self.assertEqual(54, _time.second)
+
     def test_zoned(self):
         with utils.DateTime.zoned('UTC'):
             _time_utc = utils.DateTime.now()

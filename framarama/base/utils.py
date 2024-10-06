@@ -14,6 +14,7 @@ import json
 import importlib
 import traceback
 import requests
+import dateutil.parser
 
 from django.utils import dateparse, timezone
 
@@ -361,7 +362,13 @@ class DateTime:
 
     @staticmethod
     def parse(date):
-        return dateparse.parse_datetime(date)
+        _result = dateparse.parse_datetime(date)
+        if _result:
+            return _result
+        try:
+            return dateutil.parser.parse(date)
+        except:
+            return None
 
     @staticmethod
     def zoned(tz):
