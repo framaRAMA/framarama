@@ -55,8 +55,13 @@ class BaseView(TemplateView):
         _page = page if page else self.view_name(self.request)
         context['_response'] = HttpResponseRedirect(reverse(_page, args=args) + _query)
 
-    def response(self, context, data, mime=None):
+    def response(self, context, data=None, mime=None, status=None, headers=None):
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
+        if status:
+            context['_response'].status_code = status
+        if headers:
+            for _name, _value in headers.items():
+                context['_response'][_name] = _value
 
     def response_json(self, context, data):
         self.response(context, utils.Json.from_dict(data), 'application/json')
