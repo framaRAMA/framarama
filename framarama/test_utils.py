@@ -281,6 +281,24 @@ class DateTimeTestCase(TestCase):
         self.assertTrue(utils.DateTime.reached(_time, utils.DateTime.delta(minutes=-10)))
         self.assertFalse(utils.DateTime.reached(_time, utils.DateTime.delta(minutes=10)))
 
+    def test_before(self):
+        _time1 = utils.DateTime.now()
+        _time2 = utils.DateTime.now(add=utils.DateTime.delta(minutes=1))
+        self.assertTrue(utils.DateTime.before(_time1, _time2))
+        self.assertFalse(utils.DateTime.before(_time2, _time1))
+        self.assertFalse(utils.DateTime.before(None, None))
+        self.assertFalse(utils.DateTime.before(_time1, None))
+        self.assertFalse(utils.DateTime.before(None, _time2))
+
+    def test_after(self):
+        _time1 = utils.DateTime.now(add=utils.DateTime.delta(minutes=1))
+        _time2 = utils.DateTime.now()
+        self.assertTrue(utils.DateTime.after(_time1, _time2))
+        self.assertFalse(utils.DateTime.after(_time2, _time1))
+        self.assertFalse(utils.DateTime.after(None, None))
+        self.assertFalse(utils.DateTime.after(_time1, None))
+        self.assertFalse(utils.DateTime.after(None, _time2))
+
     def test_in_range_list(self):
         _range = [utils.DateTime.delta(minutes=-10), utils.DateTime.delta(minutes=10)]
         _result = utils.DateTime.in_range(utils.DateTime.now(), _range)

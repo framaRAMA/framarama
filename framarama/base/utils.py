@@ -331,6 +331,22 @@ class DateTime:
         return time is None or time + delta < DateTime.now()
 
     @staticmethod
+    def after(time1, time2):
+        if time1 is None:
+            return None
+        if time2 is None:
+            return None
+        return time1 > time2
+
+    @staticmethod
+    def before(time1, time2):
+        if time1 is None:
+            return None
+        if time2 is None:
+            return None
+        return time1 < time2
+
+    @staticmethod
     def in_range(time, deltas):
         if type(deltas) == dict:
             _deltas = deltas
