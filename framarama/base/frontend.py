@@ -439,7 +439,7 @@ class Display(Singleton):
 class FrontendDevice(Singleton):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
-    FILE_FORMAT = 'framarama-{:05d}.{:s}'
+    FILE_FORMAT = 'framarama-{:05}.{:s}'
 
     def __init__(self):
         super().__init__()
@@ -516,8 +516,8 @@ class FrontendDevice(Singleton):
                     _items = []
                     break
                 _file_json = self.DATA_PATH + '/' + _file
-                _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'image')
-                _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(int(_num), 'preview')
+                _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(_num, 'image')
+                _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(_num, 'preview')
                 try:
                     _files.append(FrontendItem(_file_json, _file_image, _file_preview))
                 except Exception as e:
