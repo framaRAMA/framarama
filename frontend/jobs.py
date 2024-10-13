@@ -38,6 +38,7 @@ class Scheduler(jobs.Scheduler):
         self._startup = None
         self._last_update = None
         self._time_zone = None
+        self._stream = False
         if settings.FRAMARAMA['FRONTEND_KEYSTROKES']:
             logger.info("Registering frontend keystrokes")
             self._monitor = frontend.Frontend.get().get_device().monitor()
@@ -146,6 +147,8 @@ class Scheduler(jobs.Scheduler):
             logger.info("Skipping next item, display is off.")
         elif not self._display.get_enabled():
             logger.info("Skipping next item, display is not enabled.")
+        elif self._stream:
+            logger.info("Skipping next item, streaming is enabled.")
         elif self._display.time_change_reached(self._last_update) or force:
             _last_update = self._last_update
             _config = frontend.Frontend.get().get_config().get_config()
@@ -167,6 +170,12 @@ class Scheduler(jobs.Scheduler):
             finally:
                 _config.save()
             self._display.submit_item_hit(_frontend_item, 'thumbs' in _restrictions if _restrictions else False)
+
+    def stream_toggle(self):
+        self._stream = not self._stream
+
+    def is_streaming(self):
+        return self._stream
 
     def submit_status(self):
         if self._display is None:

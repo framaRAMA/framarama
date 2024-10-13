@@ -44,17 +44,152 @@
   (no items processes so far)
 {% endif %}
 
+{% else %}
+
+  {{ lib.field_text('Stream items:', ' ') }}
+{% if streamed %}
+  <div id="carouselPictures" class="carousel slide mt-2" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      {% for _item_data in streamed %}
+        <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
+      {% endfor %}
+    </div>
+    <div class="carousel-inner bg-light rounded rounded-5">
+      {% for _item_data in streamed %}
+        <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#displayItemStream{{ loop.index }}">
+            <img src="{{ url('fe_dashboard_display_stream_item', args=[loop.index0]) }}?type=preview&ts=0" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+    {% for _item_data in streamed %}
+      {{ lib.modal_image('displayItemStream%s'|format(loop.index), 'Item %s'|format(loop.index), url('fe_dashboard_display_stream_item', args=[loop.index0])) }}
+    {% endfor %}
+  </div>
+{% else %}
+  (no items processes so far)
+{% endif %}
+
+
+  <form method="post">
+    {{ csrf_input }}
+    <input id="itemUpload" class="form-control mt-2" type="file" id="formFileMultiple" multiple="multiple" onchange="uploadPreview(this)" accept=".jpg,.jpeg,.png,.gif"/>
+  </form>
+  <div id="itemsContainer" class="row px-1">
+    {% for _item_data in items|reverse %}
+      {% set item_id = 'item-' ~ (items|length - loop.index) %}
+      <div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">
+        <a href="#" onclick="uploadActivate('preview', '{{loop.index0}}'); return false;">
+          <img id="{{item_id}}" src="{{ url('fe_dashboard_display_item', args=[loop.index0]) }}?type=preview" loading="lazy" class="border rounded w-100 item-preview">
+        </a>
+      </div>
+    {% else %}
+      <span class="w-100 text-center">(no items available)</span>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="pt-4 text-center">
-  <a href="#" onclick="setItem()" class="btn btn-{% if not display.refresh and not display.set %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set %} disabled{% endif %}" title="Switch to shown item">{{ lib.icon('frontend.display.set') }}</a>
-  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh and not display.set %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
+  <a href="#" onclick="setItem()" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Switch to shown item">{{ lib.icon('frontend.display.set') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
   <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if not display.status %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.stream" class="btn btn-{% if not display.stream %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle streaming">{{ lib.icon('frontend.display.stream') }}</a>
 </div>
 
 <script type="text/javascript">
+  function responseError(res) {
+    throw new Error('Activation failed, response code received: ' + res.status);
+  }
+  function activateItemUrl(item) {
+    return '{{ url('fe_dashboard_display') }}?action=display.set&item=' + item;
+  }
   function setItem() {
     const caruselItem = document.querySelector('.carousel-item.active img');
-    const url = '{{ url('fe_dashboard_display') }}?action=display.set&item=' + caruselItem.getAttribute('item');
-    window.location.href = url;
+    window.location.href = activateItemUrl(caruselItem.getAttribute('item'));
+  }
+  const uploadedFiles = [];
+  function uploadPreview(fileInput) {
+    const imageContainer = document.getElementById('itemsContainer');
+    const imageCount = document.querySelectorAll('img.item-preview, img.item-uploaded').length;
+    Array.from(fileInput.files).forEach(function (file, i) {
+      imageContainer.innerHTML = '' +
+        '<div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">' +
+        '  <span class="d-inline-block position-relative">' +
+        '    <span class="position-absolute bottom-0 start-50 translate-middle w-100">' +
+        '      <span class="smaller badge rounded-pill bg-success">' + file.name + '</span>' +
+        '      <span class="smaller badge rounded-pill bg-info">' + Math.round(file.size/1024/1024) + ' MB</span>' +
+        '    </span>' +
+        '    <a href="#" onclick="uploadActivate(\'upload\', ' + (imageCount + i) + '); return false;">' +
+        '      <img id="item-' + (imageCount + i) + '" src="' + URL.createObjectURL(file) + '" loading="lazy" class="border rounded w-100 item-uploaded"/>' +
+        '    </a>' +
+        '  </span>' +
+        '</div>' +
+        imageContainer.innerHTML;
+      uploadedFiles.push(file);
+    });
+    fileInput.value = null;
+    fileInput.blur();
+  }
+  function uploadActivate(type, item) {
+    if (type == 'preview') {
+      urlFetch('GET', activateItemUrl(item), true)
+        .then(res => res.status == 200 ? res : responseError(res))
+        .then(res => fetch('{{ url('fe_dashboard_display_item', args=[0]) }}?type=preview'.replace('0', item), { headers: headers }))
+        .then(res => res.status == 200 ? res : responseError(res))
+        .then(res => setPreviewImage(res))
+        .catch(error => window.console.log(error.message));
+    } else if (type == 'upload') {
+      const file = uploadedFiles[item - document.querySelectorAll('img.item-preview').length];
+      file.arrayBuffer().then(function (data) {
+        uploadStream(file.name, file.type, data, 0, 512000, 0);
+      });
+    }
+  }
+  function uploadStream(name, mime, data, chunk, chunkSize, ts) {
+    if (data.byteLength == 0) {
+      uploadStreamUpdate(ts);
+      return;
+    }
+    window.console.log("Upload " + name + " (" + mime + "), remaining " + data.byteLength + " bytes");
+    const dataChunk = new Uint8Array(data.slice(0, chunkSize));
+    const postData = new FormData();
+    postData.append("name", name);
+    postData.append("mime", mime);
+    postData.append("chunk", chunk);
+    postData.append("final", data.byteLength <= chunkSize ? 1 : 0);
+    postData.append("ts", ts);
+    postData.append("data", new Blob([dataChunk]));
+    urlFetch("POST", "{{ url('fe_dashboard_display_stream') }}", true, {}, postData)
+      .then(res => (res.status == 200) ? res : responseError(res))
+      .then(res => res.json())
+      .then(res => uploadStream(name, mime, data.slice(chunkSize), chunk + chunkSize, chunkSize, res.ts))
+      .catch(error => window.console.log(error.message));
+  }
+  function uploadStreamUpdate(ts) {
+    urlFetch("GET", "{{ url('fe_dashboard_display_stream_item', args=[0]) }}", true, {
+      'If-Modified-Since': new Date(ts).toUTCString(),
+    })
+    .then(res => {
+      if (res.status == 200) {
+        setPreviewImage(res);
+      } else if (res.status == 304) {
+        setTimeout(function () { uploadStreamUpdate(ts); }, 1000);
+      }
+    });
+  }
+  function setPreviewImage(res) {
+     res
+       .blob()
+       .then(b => document.querySelector("img[item='0']").src = URL.createObjectURL(b));
   }
 </script>
 

@@ -19,6 +19,7 @@ class DisplayDashboardView(base.BaseFrontendView):
         _capability = _frontend_device.get_capability()
         _scheduler = self.get_scheduler()
         _context['items'] = _frontend_device.get_items()
+        _context['streamed'] = _frontend_device.get_streamed()
         _action = self.request.GET.get('action')
         if _action == 'display.toggle':
           if _capability.display_status():
@@ -29,6 +30,8 @@ class DisplayDashboardView(base.BaseFrontendView):
             _scheduler.trigger_job(jobs.Scheduler.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
             _scheduler.run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _frontend_device.activate(int(self.request.GET['item'])))
+        elif _action == 'display.stream':
+            _scheduler.stream_toggle()
         if _action:
             self.redirect(_context)
         _context['display'] = {
@@ -36,6 +39,7 @@ class DisplayDashboardView(base.BaseFrontendView):
             'size': _capability.display_size(),
             'refresh': _scheduler.running_jobs(jobs.Scheduler.FE_NEXT_ITEM, starts_with=True),
             'set': _scheduler.running_jobs(jobs.Scheduler.FE_ACTIVATE_ITEM),
+            'stream': _scheduler.is_streaming()
         }
         return _context
 
@@ -47,6 +51,76 @@ class ImageDisplayDashboardView(base.BaseFrontendView):
         _frontend_device = _context['frontend'].get_device()
         _items = _frontend_device.get_items()
         _item = _items[nr] if nr >= 0 and nr < len(_items) else _items[0]
+        if self.request.GET.get('type') == 'preview':
+            self.response(_context, _item.preview(), _item.preview_mime())
+        else:
+            self.response(_context, _item.data(), _item.mime())
+        return _context
+
+
+class StreamDisplayDashboardView(base.BaseFrontendView):
+    FILE_STREAM = '/tmp/framarama-stream.img'
+    FILE_STREAM_JSON = '/tmp/framarama-stream.json'
+
+    def _post(self, request, *args, **kwargs):
+        _context = super()._post(request, *args, **kwargs)
+        _name = request.POST.get('name', None)
+        _mime = request.POST.get('mime', None)
+        _chunk = request.POST.get('chunk', "0")
+        _final = request.POST.get('final', 0)
+        _ts = request.POST.get('ts', 0)
+        _data = request.FILES.get('data', None)
+        if _data is None:
+            return _context
+        _chunks = list(_data.chunks())
+        if _chunk == "0":
+            _ts = int(utils.DateTime.now().timestamp()*1000)
+            utils.Filesystem.file_write(StreamDisplayDashboardView.FILE_STREAM_JSON, utils.Json.from_dict({'ts': _ts}).encode())
+            utils.Filesystem.file_write(StreamDisplayDashboardView.FILE_STREAM, _chunks.pop(0))
+        elif _ts is None:
+            self.response_json(_context, {'status': 'ERROR', 'message': 'No ts given'})
+            return _context
+        else:
+            _status = utils.Json.to_dict(utils.Filesystem.file_read(StreamDisplayDashboardView.FILE_STREAM_JSON).decode())
+            if _status['ts'] is _ts:
+                self.response_json(_context, {'status': 'ERROR', 'message': 'Wrong ts given: ' + _ts})
+                return _context
+            _ts = _status['ts']
+        for _chunk_data in _chunks:
+            utils.Filesystem.file_append(StreamDisplayDashboardView.FILE_STREAM, _chunk_data)
+        if utils.Filesystem.file_size(StreamDisplayDashboardView.FILE_STREAM) > 20 * 1024 * 1024:
+            self.response_json(_context, {'status': 'ERROR', 'message': 'File too large'})
+        elif str(_final) == "1":
+            _frontend = _context['frontend']
+            _display = _frontend.get_display()
+            _device = _frontend.get_device()
+            self.get_scheduler().run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _device.finish_file(
+                _display,
+                _display.get_contexts(True),
+                StreamDisplayDashboardView.FILE_STREAM,
+                _display.get_finishings(True)))
+            self.response_json(_context, {'status': 'OK', 'message': 'Start finalizing', 'ts': _ts})
+        else:
+            self.response_json(_context, {'status': 'OK', 'message': 'Chunk added', 'ts': _ts})
+        return _context
+
+
+class ItemStreamDisplayDashboardView(base.BaseFrontendView):
+
+    def _item(self, context, nr):
+        _frontend_device = context['frontend'].get_device()
+        _items = _frontend_device.get_streamed()
+        return _items[nr] if nr >= 0 and nr < len(_items) else _items[0]
+
+    def _get(self, request, nr, *args, **kwargs):
+        _context = super()._get(request, *args, **kwargs)
+        _item = self._item(_context, nr)
+        _modified_since = request.headers.get('if-modified-since', None)
+        if _modified_since and utils.DateTime.before(_item.time(), utils.DateTime.parse(_modified_since)):
+            self.response(_context, status=304, headers={
+              'Last-Modified': _item.time().strftime("%a, %d %b %Y %H:%M:%S GMT")
+            })
+            return _context
         if self.request.GET.get('type') == 'preview':
             self.response(_context, _item.preview(), _item.preview_mime())
         else:
