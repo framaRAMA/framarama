@@ -11,6 +11,8 @@
   {{ lib.field_text('Items update', config.date_items_update|date_format('%d.%m.%Y %H:%M:%S')) }}
 </div>
 
+{% if not display.stream %}
+
 {{ lib.field_text('Latest items:', ' ') }}
 {% if items %}
   <div id="carouselPictures" class="carousel slide mt-2" data-bs-ride="carousel">
@@ -118,9 +120,15 @@
   }
   const uploadedFiles = [];
   function uploadPreview(fileInput) {
+    let skipFiles = 0;
     const imageContainer = document.getElementById('itemsContainer');
     const imageCount = document.querySelectorAll('img.item-preview, img.item-uploaded').length;
     Array.from(fileInput.files).forEach(function (file, i) {
+      if (uploadedFiles.filter(f => f.name == file.name).length) {
+        skipFiles++;
+        return;
+      }
+      const fileNo = imageCount + i - skipFiles;
       imageContainer.innerHTML = '' +
         '<div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">' +
         '  <span class="d-inline-block position-relative">' +
@@ -128,8 +136,8 @@
         '      <span class="smaller badge rounded-pill bg-success">' + file.name + '</span>' +
         '      <span class="smaller badge rounded-pill bg-info">' + Math.round(file.size/1024/1024) + ' MB</span>' +
         '    </span>' +
-        '    <a href="#" onclick="uploadActivate(\'upload\', ' + (imageCount + i) + '); return false;">' +
-        '      <img id="item-' + (imageCount + i) + '" src="' + URL.createObjectURL(file) + '" loading="lazy" class="border rounded w-100 item-uploaded"/>' +
+        '    <a href="#" onclick="uploadActivate(\'upload\', ' + fileNo + '); return false;">' +
+        '      <img id="item-' + fileNo + '" src="' + URL.createObjectURL(file) + '" loading="lazy" class="border rounded w-100 item-uploaded"/>' +
         '    </a>' +
         '  </span>' +
         '</div>' +
