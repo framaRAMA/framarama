@@ -440,6 +440,8 @@ class FrontendDevice(Singleton):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
     FILE_FORMAT = 'framarama-{:05}.{:s}'
+    FILE_STREAM_PATTERN = r'^framarama-(stream)\.(json)$'
+    FILE_STREAM_FORMAT = 'framarama-{}.{}'
 
     def __init__(self):
         super().__init__()
@@ -512,9 +514,9 @@ class FrontendDevice(Singleton):
     def finish_file(self, display, contexts, filename, finishings):
         _item = config_models.Item(**{'id_ext': -1, 'url': filename, 'date_creation': DateTime.now()})
         return self._finish(display, contexts, _item, finishings, lambda: {
-            'json': self.DATA_PATH + '/framarama-stream.json',
-            'image': self.DATA_PATH + '/framarama-stream.image',
-            'preview': self.DATA_PATH + '/framarama-stream.preview'
+            'json': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'json'),
+            'image': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'image'),
+            'preview': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'preview')
         })
 
     def activate(self, idx):
@@ -553,7 +555,7 @@ class FrontendDevice(Singleton):
 
     def get_streamed(self):
         _config = Frontend.get().get_config().get_config()
-        return self._get_items(r'^framarama-(stream)\.(json)$', 'framarama-{}.{}', 1)
+        return self._get_items(self.FILE_STREAM_PATTERN, self.FILE_STREAM_FORMAT, 1)
 
     def network_connect(self, name):
         self.get_capability().net_profile_connect(name=name)
