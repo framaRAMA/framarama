@@ -129,7 +129,7 @@
     if (type == 'preview') {
       urlFetch('GET', activateItemUrl(item), true)
         .then(res => res.status == 200 ? res : responseError(res))
-        .then(res => fetch('{{ url('fe_dashboard_display_item', args=[0]) }}?type=preview'.replace('0', item), { headers: headers }))
+        .then(res => urlFetch('GET', '{{ url('fe_dashboard_display_item', args=[0]) }}?type=preview'.replace('0', item)))
         .then(res => res.status == 200 ? res : responseError(res))
         .then(res => setPreviewImage(res))
         .catch(error => window.console.log(error.message));
