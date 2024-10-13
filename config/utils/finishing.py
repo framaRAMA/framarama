@@ -683,7 +683,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
         if type(source) == str and (source.startswith('http://') or source.startswith('https://')):
             _image = self._wand_image.Image(blob=api.ApiClient.get().get_url(source, stream=True).raw)
         elif type(source) == str and Filesystem.file_exists(source):
-            _image = self._wand_image.Image(blob=Filesystem.file_read(source))
+            _image = self._wand_image.Image(filename=source)
         elif type(source) == bytes:
             _image = self._wand_image.Image(blob=source)
         else:
