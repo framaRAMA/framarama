@@ -464,7 +464,8 @@ class FrontendDevice(Singleton):
     def monitor(self):
         return self._monitor
 
-    def finish(self, display, contexts, item, finishings):
+    def _finish(self, display, contexts, item, finishings, output):
+        logger.info('Finishing item {}'.format(item))
         _adapter = finishing.ImageProcessingAdapter.get_default()
         _context = finishing.Context(
             display.display(),
@@ -481,7 +482,6 @@ class FrontendDevice(Singleton):
             _processor.set_watermark(_config.watermark_type, _config.watermark_shift, _config.watermark_scale)
             _result = _processor.process()
             if _result:
-                _files = self._items_rotate(_config.count_items_keep)
                 _json = jsonpickle.encode({
                   'item': item,
                   'image_meta': _result.get_image_meta(),
@@ -491,11 +491,23 @@ class FrontendDevice(Singleton):
                   'usage_time': (DateTime.now() - _start).seconds,
                 })
 
+                _files = output()
                 Filesystem.file_write(_files['json'], _json.encode())
                 Filesystem.file_write(_files['image'], _result.get_image_data())
                 Filesystem.file_write(_files['preview'], _result.get_preview_data())
 
+                logger.info("Item finished in {} seconds ({} bytes, {}x{} pixels, mime {})!".format(
+                    (DateTime.now() - _start).seconds,
+                    len(_result.get_image_data()),
+                    _result.get_image_width(),
+                    _result.get_image_height(),
+                    _result.get_image_mime()))
+
                 return self.get_items()[0]
+
+    def finish_item(self, display, contexts, item, finishings):
+        _config = Frontend.get().get_config().get_config()
+        return self._finish(display, contexts, item, finishings, lambda: self._items_rotate(_config.count_items_keep))
 
     def activate(self, idx):
         _items = self.get_items(idx, count=1)

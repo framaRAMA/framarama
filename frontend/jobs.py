@@ -157,14 +157,8 @@ class Scheduler(jobs.Scheduler):
                 logger.info("Next item is {}".format(_next_item))
                 _contexts = self._display.get_contexts(True)
                 _finishings = self._display.get_finishings(True)
-                _frontend_item = _device.finish(self._display, _contexts, _next_item, _finishings)
+                _frontend_item = _device.finish_item(self._display, _contexts, _next_item, _finishings)
                 _device.activate(0)
-                logger.info("Image updated in {} seconds ({} bytes, {}x{} pixels, mime {})!".format(
-                    (utils.DateTime.now() - self._last_update).seconds,
-                    len(_frontend_item.data()),
-                    _frontend_item.width(),
-                    _frontend_item.height(),
-                    _frontend_item.mime()))
                 _config.count_views = _config.count_views + 1
             except Exception as e:
                 self._last_update = _last_update
