@@ -1,20 +1,6 @@
 {% extends "frontend/dashboard.base.html" %}
 
-{% block content_dashboard %}
-
-<div class="pt-2">
-  {{ lib.field_text('System startup', config.date_app_startup|date_format('%d.%m.%Y %H:%M:%S')) }}
-  {% if display.size %}
-    {{ lib.field_text('Display size', '%dx%d'|format(display.size[0], display.size[1])) }}
-  {% endif %}
-  {{ lib.field_text('Items', '%d shown, total %d items'|format(config.count_views, config.count_items)) }}
-  {{ lib.field_text('Items update', config.date_items_update|date_format('%d.%m.%Y %H:%M:%S')) }}
-</div>
-
-{% if not display.stream %}
-
-{{ lib.field_text('Latest items:', ' ') }}
-{% if items %}
+{% macro carousel_items(id, items, imagePage) %}
   <div id="carouselPictures" class="carousel slide mt-2" data-bs-ride="carousel">
     <div class="carousel-indicators">
       {% for _item_data in items %}
@@ -24,8 +10,8 @@
     <div class="carousel-inner bg-light rounded rounded-5">
       {% for _item_data in items %}
         <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-          <a href="#" data-bs-toggle="modal" data-bs-target="#displayItem{{ loop.index }}">
-            <img src="{{ url('fe_dashboard_display_item', args=[loop.index0]) }}?type=preview" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}">
+            <img src="{{ url(imagePage, args=[loop.index0]) }}?type=preview" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
           </a>
         </div>
       {% endfor %}
@@ -39,47 +25,39 @@
       <span class="visually-hidden">Next</span>
     </button>
     {% for _item_data in items %}
-      {{ lib.modal_image('displayItem%s'|format(loop.index), 'Item %s'|format(loop.index), url('fe_dashboard_display_item', args=[loop.index0])) }}
+      {{ lib.modal_image('%s%s'|format(id, loop.index), 'Item %s'|format(loop.index), url(imagePage, args=[loop.index0])) }}
     {% endfor %}
   </div>
-{% else %}
-  (no items processes so far)
-{% endif %}
+{% endmacro %}
+
+{% block content_dashboard %}
+
+<div class="pt-2">
+  {{ lib.field_text('System startup', config.date_app_startup|date_format('%d.%m.%Y %H:%M:%S')) }}
+  {% if display.size %}
+    {{ lib.field_text('Display size', '%dx%d'|format(display.size[0], display.size[1])) }}
+  {% endif %}
+  {{ lib.field_text('Items', '%d shown, total %d items'|format(config.count_views, config.count_items)) }}
+  {{ lib.field_text('Items update', config.date_items_update|date_format('%d.%m.%Y %H:%M:%S')) }}
+</div>
+
+{% if not display.stream %}
+
+  {{ lib.field_text('Latest items:', ' ') }}
+  {% if items %}
+    {{ carousel_items('displayItems', items, 'fe_dashboard_display_item') }}
+  {% else %}
+    (no items processes so far)
+  {% endif %}
 
 {% else %}
 
   {{ lib.field_text('Stream items:', ' ') }}
-{% if streamed %}
-  <div id="carouselPictures" class="carousel slide mt-2" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-      {% for _item_data in streamed %}
-        <button type="button" data-bs-target="#carouselPictures" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index + 1 }}"></button>
-      {% endfor %}
-    </div>
-    <div class="carousel-inner bg-light rounded rounded-5">
-      {% for _item_data in streamed %}
-        <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-          <a href="#" data-bs-toggle="modal" data-bs-target="#displayItemStream{{ loop.index }}">
-            <img src="{{ url('fe_dashboard_display_stream_item', args=[loop.index0]) }}?type=preview&ts=0" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
-          </a>
-        </div>
-      {% endfor %}
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPictures" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselPictures" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-    {% for _item_data in streamed %}
-      {{ lib.modal_image('displayItemStream%s'|format(loop.index), 'Item %s'|format(loop.index), url('fe_dashboard_display_stream_item', args=[loop.index0])) }}
-    {% endfor %}
-  </div>
-{% else %}
-  (no items processes so far)
-{% endif %}
+  {% if streamed %}
+    {{ carousel_items('displayItemStream', streamed, 'fe_dashboard_display_stream_item') }}
+  {% else %}
+    (no items processes so far)
+  {% endif %}
 
 
   <form method="post">
