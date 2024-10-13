@@ -515,12 +515,11 @@ class FrontendDevice(Singleton):
             for _renderer in self._renderers:
                 _renderer.activate(_items[0])
 
-    def get_items(self, start=None, count=None):
-        _config = Frontend.get().get_config().get_config()
+    def _get_items(self, file_pattern, file_format, count_items_keep, start=None, count=None):
         _files = []
         _items = None
         while _items is None:
-            _items = Filesystem.file_match(self.DATA_PATH, self.FILE_PATTERN)[len(_files):]
+            _items = Filesystem.file_match(self.DATA_PATH, file_pattern)[len(_files):]
             for _i, (_file, _num, _ext) in enumerate(_items):
                 if start != None and start > _i:
                     continue
@@ -528,17 +527,21 @@ class FrontendDevice(Singleton):
                     _items = []
                     break
                 _file_json = self.DATA_PATH + '/' + _file
-                _file_image = self.DATA_PATH + '/' + self.FILE_FORMAT.format(_num, 'image')
-                _file_preview = self.DATA_PATH + '/' + self.FILE_FORMAT.format(_num, 'preview')
+                _file_image = self.DATA_PATH + '/' + file_format.format(_num, 'image')
+                _file_preview = self.DATA_PATH + '/' + file_format.format(_num, 'preview')
                 try:
                     _files.append(FrontendItem(_file_json, _file_image, _file_preview))
                 except Exception as e:
                     logger.warn('Removing non-readable item {}: {}'.format(_file_json, e))
-                    self._items_rotate(_config.count_items_keep, start=_i, reverse=True)
+                    self._items_rotate(count_items_keep, start=_i, reverse=True)
                     _items = None
                     start = _i
                     break;
         return _files
+
+    def get_items(self, start=None, count=None):
+        _config = Frontend.get().get_config().get_config()
+        return self._get_items(self.FILE_PATTERN, self.FILE_FORMAT, _config.count_items_keep, start, count)
 
     def network_connect(self, name):
         self.get_capability().net_profile_connect(name=name)
