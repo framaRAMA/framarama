@@ -442,6 +442,8 @@ class FrontendDevice(Singleton):
     FILE_FORMAT = 'framarama-{:05}.{:s}'
     FILE_STREAM_PATTERN = r'^framarama-(stream)\.(json)$'
     FILE_STREAM_FORMAT = 'framarama-{}.{}'
+    FILE_UPLOAD = DATA_PATH + '/framarama-upload.image'
+    FILE_UPLOAD_JSON = DATA_PATH + '/framarama-upload.json'
 
     def __init__(self):
         super().__init__()
@@ -556,6 +558,27 @@ class FrontendDevice(Singleton):
     def get_streamed(self):
         _config = Frontend.get().get_config().get_config()
         return self._get_items(self.FILE_STREAM_PATTERN, self.FILE_STREAM_FORMAT, 1)
+
+    def upload_streamed(self, data, ts, final):
+        if data is None:
+            raise Error('No data')
+        _chunks = list(data.chunks())
+        if ts is None or str(ts) is "0":
+            _status = {'ts': int(DateTime.now().timestamp()*1000)}
+            Filesystem.file_write(self.FILE_UPLOAD_JSON, Json.from_dict(_status).encode())
+            Filesystem.file_write(self.FILE_UPLOAD, _chunks.pop(0))
+        else:
+            _status = Json.to_dict(Filesystem.file_read(self.FILE_UPLOAD_JSON).decode())
+            if _status['ts'] is ts:
+                raise Error('Wrong ts given: ' + ts)
+        for _chunk_data in _chunks:
+            Filesystem.file_append(self.FILE_UPLOAD, _chunk_data)
+        if Filesystem.file_size(self.FILE_UPLOAD) > 20 * 1024 * 1024:
+            raise Error('File too large')
+        return _status
+
+    def upload_file(self):
+        return self.FILE_UPLOAD
 
     def network_connect(self, name):
         self.get_capability().net_profile_connect(name=name)

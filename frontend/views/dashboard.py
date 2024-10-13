@@ -59,49 +59,30 @@ class ImageDisplayDashboardView(base.BaseFrontendView):
 
 
 class StreamDisplayDashboardView(base.BaseFrontendView):
-    FILE_STREAM = '/tmp/framarama-stream.img'
-    FILE_STREAM_JSON = '/tmp/framarama-stream.json'
 
     def _post(self, request, *args, **kwargs):
         _context = super()._post(request, *args, **kwargs)
         _name = request.POST.get('name', None)
-        _mime = request.POST.get('mime', None)
-        _chunk = request.POST.get('chunk', "0")
         _final = request.POST.get('final', 0)
         _ts = request.POST.get('ts', 0)
         _data = request.FILES.get('data', None)
-        if _data is None:
-            return _context
-        _chunks = list(_data.chunks())
-        if _chunk == "0":
-            _ts = int(utils.DateTime.now().timestamp()*1000)
-            utils.Filesystem.file_write(StreamDisplayDashboardView.FILE_STREAM_JSON, utils.Json.from_dict({'ts': _ts}).encode())
-            utils.Filesystem.file_write(StreamDisplayDashboardView.FILE_STREAM, _chunks.pop(0))
-        elif _ts is None:
-            self.response_json(_context, {'status': 'ERROR', 'message': 'No ts given'})
-            return _context
-        else:
-            _status = utils.Json.to_dict(utils.Filesystem.file_read(StreamDisplayDashboardView.FILE_STREAM_JSON).decode())
-            if _status['ts'] is _ts:
-                self.response_json(_context, {'status': 'ERROR', 'message': 'Wrong ts given: ' + _ts})
-                return _context
-            _ts = _status['ts']
-        for _chunk_data in _chunks:
-            utils.Filesystem.file_append(StreamDisplayDashboardView.FILE_STREAM, _chunk_data)
-        if utils.Filesystem.file_size(StreamDisplayDashboardView.FILE_STREAM) > 20 * 1024 * 1024:
-            self.response_json(_context, {'status': 'ERROR', 'message': 'File too large'})
-        elif str(_final) == "1":
-            _frontend = _context['frontend']
-            _display = _frontend.get_display()
-            _device = _frontend.get_device()
-            self.get_scheduler().run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _device.finish_file(
-                _display,
-                _display.get_contexts(True),
-                StreamDisplayDashboardView.FILE_STREAM,
-                _display.get_finishings(True)))
-            self.response_json(_context, {'status': 'OK', 'message': 'Start finalizing', 'ts': _ts})
-        else:
-            self.response_json(_context, {'status': 'OK', 'message': 'Chunk added', 'ts': _ts})
+
+        _frontend = _context['frontend']
+        _device = _frontend.get_device()
+        try:
+            _status = _device.upload_streamed(_data, _ts, _final)
+            if str(_final) == "1":
+                _display = _frontend.get_display()
+                self.get_scheduler().run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _device.finish_file(
+                    _display,
+                    _display.get_contexts(True),
+                    _device.upload_file(),
+                    _display.get_finishings(True)))
+                self.response_json(_context, {'status': 'OK', 'message': 'Start finalizing', 'ts': _status['ts']})
+            else:
+                self.response_json(_context, {'status': 'OK', 'message': 'Chunk added', 'ts': _status['ts']})
+        except Exception as e:
+            self.response_json(_context, {'status': 'ERROR', 'message': str(e)})
         return _context
 
 
