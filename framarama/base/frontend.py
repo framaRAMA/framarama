@@ -439,7 +439,7 @@ class Display(Singleton):
 class FrontendDevice(Singleton):
     DATA_PATH = settings.FRAMARAMA['DATA_PATH']
     FILE_PATTERN = r'^framarama-(\d+)\.(json)$'
-    FILE_FORMAT = 'framarama-{:05}.{:s}'
+    FILE_FORMAT = 'framarama-{:0>5}.{:s}'
     FILE_STREAM_PATTERN = r'^framarama-(stream)\.(json)$'
     FILE_STREAM_FORMAT = 'framarama-{}.{}'
     FILE_UPLOAD = DATA_PATH + '/framarama-upload.image'
