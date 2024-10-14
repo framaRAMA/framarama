@@ -8,6 +8,7 @@ django-entangled==0.5.4
 django-treebeard==4.6.1
 jsonpickle==3.2.2
 uritemplate==4.1.1
+python-dateutil==2.9.0
 
 # plugins
 requests==2.32.0
