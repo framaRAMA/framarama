@@ -91,18 +91,22 @@ class ItemStreamDisplayDashboardView(base.BaseFrontendView):
     def _item(self, context, nr):
         _frontend_device = context['frontend'].get_device()
         _items = _frontend_device.get_streamed()
-        return _items[nr] if nr >= 0 and nr < len(_items) else _items[0]
+        if nr >= 0 and nr < len(_items):
+            return _items[nr]
+        elif len(_items) > 0:
+            return _items[0]
 
     def _get(self, request, nr, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
         _item = self._item(_context, nr)
         _modified_since = request.headers.get('if-modified-since', None)
-        if _modified_since and utils.DateTime.before(_item.time(), utils.DateTime.parse(_modified_since)):
+        if not _item:
+            self.response_image_default(_context)
+        elif _modified_since and utils.DateTime.before(_item.time(), utils.DateTime.parse(_modified_since)):
             self.response(_context, status=304, headers={
               'Last-Modified': _item.time().strftime("%a, %d %b %Y %H:%M:%S GMT")
             })
-            return _context
-        if self.request.GET.get('type') == 'preview':
+        elif self.request.GET.get('type') == 'preview':
             self.response(_context, _item.preview(), _item.preview_mime())
         else:
             self.response(_context, _item.data(), _item.mime())
