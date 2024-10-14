@@ -13,6 +13,8 @@ from config import models
 
 
 class BaseView(TemplateView):
+    DEFAULT_IMAGE = utils.Filesystem.file_read('common/static/common/1x1-transparent.png')
+    DEFAULT_IMAGE_MIME = 'image/png'
 
     def _tz(self, context):
         return settings.TIME_ZONE
@@ -75,6 +77,9 @@ class BaseView(TemplateView):
           _filename = 'download-{}'.format(str(_ts).split('.')[0])
         context['_response'] = HttpResponse(data, mime if mime else 'application/octet-stream')
         context['_response']['Content-Disposition'] = 'attachment; filename={}{}'.format(_filename, _ext)
+
+    def response_image_default(self, context):
+        self.response(context, BaseView.DEFAULT_IMAGE, BaseView.DEFAULT_IMAGE_MIME)
 
 
 class BaseQuerySetMixin:
