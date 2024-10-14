@@ -10,9 +10,15 @@
     <div class="carousel-inner bg-light rounded rounded-5">
       {% for _item_data in items %}
         <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %} bg-light">
-          <a href="#" data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}">
-            <img src="{{ url(imagePage, args=[loop.index0]) }}?type=preview" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
-          </a>
+          <div class="position-relative w-100 h-100">
+            <div id="previewImageSpinner" class="position-absolute top-50 start-50 translate-middle text-center d-none" role="status">
+              <img src="{{ static('common/logo.svg') }}" class="w-25 h-25 fa-spin"/>
+            </div>
+            <div id="previewImageMessage" class="position-absolute top-50 start-50 translate-middle text-center text-white d-none " role="status"></div>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#{{ id }}{{ loop.index }}">
+              <img src="{{ url(imagePage, args=[loop.index0]) }}?type=preview" item="{{ loop.index0 }}" class="d-block w-100 h-100 rounded rounded-5 bg-black"{% if display.size %} width="{{ display.size[0] }}" height="{{ display.size[1] }}" style="aspect-ratio: {{ display.size[0] }}/{{ display.size[1] }}"{% endif %} loading="lazy"/>
+            </a>
+          </div>
         </div>
       {% endfor %}
     </div>
@@ -56,9 +62,8 @@
   {% if streamed %}
     {{ carousel_items('displayItemStream', streamed, 'fe_dashboard_display_stream_item') }}
   {% else %}
-    (no items processes so far)
+    {{ carousel_items('displayItemStream', [{}], 'fe_dashboard_display_stream_item') }}
   {% endif %}
-
 
   <form method="post">
     {{ csrf_input }}
@@ -86,6 +91,17 @@
 </div>
 
 <script type="text/javascript">
+  const preivewItem = document.querySelector("img[item='0']");
+  const previewSpinner = document.getElementById('previewImageSpinner');
+  const previewMessage = document.getElementById('previewImageMessage');
+
+  function showPreviewError(error) {
+    const emptyItem = '{{ static('common/1x1-transparent.png') }}';
+    preivewItem.img = emptyItem;
+    previewMessage.innerHTML = error.message;
+    cssAdd(previewSpinner, 'd-none');
+    cssRemove(previewMessage, 'd-none');
+  }
   function responseError(res) {
     throw new Error('Activation failed, response code received: ' + res.status);
   }
@@ -132,7 +148,7 @@
         .then(res => urlFetch('GET', '{{ url('fe_dashboard_display_item', args=[0]) }}?type=preview'.replace('0', item)))
         .then(res => res.status == 200 ? res : responseError(res))
         .then(res => setPreviewImage(res))
-        .catch(error => window.console.log(error.message));
+        .catch(error => showPreviewError(error));
     } else if (type == 'upload') {
       const file = uploadedFiles[item - document.querySelectorAll('img.item-preview').length];
       file.arrayBuffer().then(function (data) {
@@ -161,22 +177,30 @@
       .catch(error => window.console.log(error.message));
   }
   function uploadStreamUpdate(ts) {
+    cssRemove(previewSpinner, 'd-none');
     urlFetch("GET", "{{ url('fe_dashboard_display_stream_item', args=[0]) }}", true, {
       'If-Modified-Since': new Date(ts).toUTCString(),
     })
-    .then(res => {
-      if (res.status == 200) {
-        setPreviewImage(res);
-      } else if (res.status == 304) {
-        setTimeout(function () { uploadStreamUpdate(ts); }, 1000);
-      }
-    });
+      .then(res => {
+        if (res.status == 200) {
+          setPreviewImage(res);
+        } else if (res.status == 304) {
+          setTimeout(function () { uploadStreamUpdate(ts); }, 1000);
+        }
+      })
+      .catch(error => showPreviewError(error));
   }
   function setPreviewImage(res) {
      res
        .blob()
-       .then(b => document.querySelector("img[item='0']").src = URL.createObjectURL(b));
+       .then(b => document.querySelector("img[item='0']").src = URL.createObjectURL(b))
+       .then(b => cssAdd(previewSpinner, 'd-none'))
+       .then(b => cssAdd(previewMessage, 'd-none'))
+       .catch(error => showPreviewError(error));
   }
+{% if display.stream and not streamed|length %}
+  showPreviewError(new Error('No items uploaded'));
+{% endif %}
 </script>
 
 {% endblock %}
