@@ -126,6 +126,11 @@
       imageContainer.innerHTML = '' +
         '<div class="col-sm-12 col-md-6 col-xxl-4 text-center p-2">' +
         '  <span class="d-inline-block position-relative">' +
+        '    <span class="position-absolute top-50 start-50 translate-middle w-75">' +
+        '      <div id="progressbar' + fileNo + '" class="progress rounded-5 d-none" style="height: 1em;">' +
+        '        <div id="progress' + fileNo + '" class="progress-bar bg-success" role="progress-bar"></div>' +
+        '      </div>' +
+        '    </span>' +
         '    <span class="position-absolute bottom-0 start-50 translate-middle w-100">' +
         '      <span class="smaller badge rounded-pill bg-success">' + file.name + '</span>' +
         '      <span class="smaller badge rounded-pill bg-info">' + Math.round(file.size/1024/1024) + ' MB</span>' +
@@ -152,16 +157,25 @@
     } else if (type == 'upload') {
       const file = uploadedFiles[item - document.querySelectorAll('img.item-preview').length];
       file.arrayBuffer().then(function (data) {
-        uploadStream(file.name, file.type, data, 0, 512000, 0);
+        uploadStream(item, file.name, file.type, data, 0, 512000, 0);
       });
     }
   }
-  function uploadStream(name, mime, data, chunk, chunkSize, ts) {
+  function uploadStream(item, name, mime, data, chunk, chunkSize, ts) {
+    const progressBar = document.getElementById('progressbar' + item);
+    const progressStatus = document.getElementById('progress' + item);
+    const progress = Math.round(100 * chunk / (chunk + data.byteLength));
     if (data.byteLength == 0) {
+      cssAdd(progressBar, 'd-none')
       uploadStreamUpdate(ts);
       return;
+    } if (chunk == 0) {
+      progressStatus.style.width = "0%";
+      cssRemove(progressBar, 'd-none');
+    } else {
+      progressStatus.style.width = progress + '%';
     }
-    window.console.log("Upload " + name + " (" + mime + "), remaining " + data.byteLength + " bytes");
+    window.console.log("Upload " + name + " (" + mime + "), remaining " + data.byteLength + " bytes (" + (100 - progress) + '%)');
     const dataChunk = new Uint8Array(data.slice(0, chunkSize));
     const postData = new FormData();
     postData.append("name", name);
@@ -173,7 +187,7 @@
     urlFetch("POST", "{{ url('fe_dashboard_display_stream') }}", true, {}, postData)
       .then(res => (res.status == 200) ? res : responseError(res))
       .then(res => res.json())
-      .then(res => uploadStream(name, mime, data.slice(chunkSize), chunk + chunkSize, chunkSize, res.ts))
+      .then(res => uploadStream(item, name, mime, data.slice(chunkSize), chunk + chunkSize, chunkSize, res.ts))
       .catch(error => window.console.log(error.message));
   }
   function uploadStreamUpdate(ts) {
