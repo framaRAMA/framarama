@@ -73,11 +73,7 @@ class StreamDisplayDashboardView(base.BaseFrontendView):
             _status = _device.upload_streamed(_data, _ts, _final)
             if str(_final) == "1":
                 _display = _frontend.get_display()
-                self.get_scheduler().run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: _device.finish_file(
-                    _display,
-                    _display.get_contexts(True),
-                    _device.upload_file(),
-                    _display.get_finishings(True)))
+                self.get_scheduler().run_job(jobs.Scheduler.FE_ACTIVATE_ITEM, lambda: self._finish_streamed(_device, _display))
                 self.response_json(_context, {'status': 'OK', 'message': 'Start finalizing', 'ts': _status['ts']})
             else:
                 self.response_json(_context, {'status': 'OK', 'message': 'Chunk added', 'ts': _status['ts']})
@@ -85,6 +81,13 @@ class StreamDisplayDashboardView(base.BaseFrontendView):
             self.response_json(_context, {'status': 'ERROR', 'message': str(e)})
         return _context
 
+    def _finish_streamed(self, device, display):
+        device.finish_file(
+            display,
+            display.get_contexts(True),
+            device.upload_file(),
+            display.get_finishings(True))
+        device.activate_item(device.get_streamed()[0])
 
 class ItemStreamDisplayDashboardView(base.BaseFrontendView):
 

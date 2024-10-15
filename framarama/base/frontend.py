@@ -527,8 +527,11 @@ class FrontendDevice(Singleton):
     def activate(self, idx):
         _items = self.get_items(idx, count=1)
         if len(_items):
-            for _renderer in self._renderers:
-                _renderer.activate(_items[0])
+            self.activate_item(_items[0])
+
+    def activate_item(self, item):
+        for _renderer in self._renderers:
+            _renderer.activate(item)
 
     def _get_items(self, file_pattern, file_format, count_items_keep, start=None, count=None):
         _files = []
