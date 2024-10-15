@@ -506,20 +506,23 @@ class FrontendDevice(Singleton):
                     _result.get_image_width(),
                     _result.get_image_height(),
                     _result.get_image_mime()))
-
-                return self.get_items()[0]
+                return _result
 
     def finish_item(self, display, contexts, item, finishings):
         _config = Frontend.get().get_config().get_config()
-        return self._finish(display, contexts, item, finishings, lambda: self._items_rotate(_config.count_items_keep))
+        _result = self._finish(display, contexts, item, finishings, lambda: self._items_rotate(_config.count_items_keep))
+        if _result:
+            return self.get_items(0, count=1)[0]
 
     def finish_file(self, display, contexts, filename, finishings):
         _item = config_models.Item(**{'id_ext': -1, 'url': filename, 'date_creation': DateTime.now()})
-        return self._finish(display, contexts, _item, finishings, lambda: {
+        _result = self._finish(display, contexts, _item, finishings, lambda: {
             'json': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'json'),
             'image': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'image'),
             'preview': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'preview')
         })
+        if _result:
+            return self.get_streamed()[0]
 
     def activate(self, idx):
         _items = self.get_items(idx, count=1)
