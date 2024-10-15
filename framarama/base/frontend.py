@@ -564,14 +564,17 @@ class FrontendDevice(Singleton):
             raise Error('No data')
         _chunks = list(data.chunks())
         if ts is None or str(ts) is "0":
+            _chunk_data = _chunks.pop(0)
             _status = {'ts': int(DateTime.now().timestamp()*1000)}
+            logger.info("Started streamed upload ({} bytes)".format(len(_chunk_data)))
             Filesystem.file_write(self.FILE_UPLOAD_JSON, Json.from_dict(_status).encode())
-            Filesystem.file_write(self.FILE_UPLOAD, _chunks.pop(0))
+            Filesystem.file_write(self.FILE_UPLOAD, _chunk_data)
         else:
             _status = Json.to_dict(Filesystem.file_read(self.FILE_UPLOAD_JSON).decode())
             if _status['ts'] is ts:
                 raise Error('Wrong ts given: ' + ts)
         for _chunk_data in _chunks:
+            logger.info("Continued streamed upload ({} bytes)".format(len(_chunk_data)))
             Filesystem.file_append(self.FILE_UPLOAD, _chunk_data)
         if Filesystem.file_size(self.FILE_UPLOAD) > 20 * 1024 * 1024:
             raise Error('File too large')
