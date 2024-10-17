@@ -153,7 +153,7 @@ class DeviceDashboardView(base.BaseFrontendView):
             self.redirect_startup(_context, message='device.shutdown', negate=True)
         elif _action == 'wifi.list':
             _profiles = _capability.net_profile_list()
-            _ap_active = device.Capabilities.nmcli_ap_active(_profiles)
+            _ap_active = _capability.net_ap_active(_profiles)
             if _ap_active:
                 _networks = _frontend_device.network_status()['networks']
             else:

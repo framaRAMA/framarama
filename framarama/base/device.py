@@ -76,6 +76,9 @@ class Capability:
     def net_wifi_list(self):
         return self._dict()
 
+    def net_ap_active(self, profiles):
+        return self._false()
+
     def net_profile_list(self):
         return self._list()
 
@@ -138,6 +141,7 @@ class Capabilities:
         if Process.exec_search('nmcli'):
             _capability.net_toggle_ap = Capabilities.nmcli_toggle_ap
             _capability.net_wifi_list = Capabilities.nmcli_wifi_list
+            _capability.net_ap_active = Capabilities.nmcli_ap_active
             _capability.net_profile_list = Capabilities.nmcli_profile_list
             _capability.net_profile_save = Capabilities.nmcli_profile_save
             _capability.net_profile_delete = Capabilities.nmcli_profile_delete

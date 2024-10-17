@@ -607,7 +607,7 @@ class FrontendDevice(Singleton):
         if self._network['connected']:
             return True
         _profile_list = self.get_capability().net_profile_list()
-        _ap_active = device.Capabilities.nmcli_ap_active(_profile_list)
+        _ap_active = self.get_capability().net_ap_active(_profile_list)
         if self._network['started'] is None:
             self._network['started'] = DateTime.now()
             logger.info("Checking network connectivity ...")
