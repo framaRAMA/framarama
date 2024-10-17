@@ -649,6 +649,15 @@ class FrontendDevice(Singleton):
             return True
         return False
 
+    def display_toggle(self, state=None):
+        _status = self.get_capability().display_status()
+        _state = not _status if state is None else state
+        if _status and not _state:
+            self.get_capability().display_off()
+        elif not _status and _state:
+            self.get_capability().display_on()
+        return _state
+
     def get_capability(self):
         if self._capability is None:
             self._capability = device.Capabilities.discover()
