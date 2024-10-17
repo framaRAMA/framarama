@@ -65,6 +65,16 @@
     {{ carousel_items('displayItemStream', [{}], 'fe_dashboard_display_stream_item') }}
   {% endif %}
 
+{% endif %}
+
+<div class="pt-4 text-center">
+  <a href="#" onclick="setItem()" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Switch to shown item">{{ lib.icon('frontend.display.set') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if not display.status %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
+  <a href="{{ url('fe_dashboard_display') }}?action=display.stream" class="btn btn-{% if not display.stream %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle streaming">{{ lib.icon('frontend.display.stream') }}</a>
+</div>
+
+{% if display.stream %}
   <form method="post">
     {{ csrf_input }}
     <input id="itemUpload" class="form-control mt-2" type="file" id="formFileMultiple" multiple="multiple" onchange="uploadPreview(this)" accept=".jpg,.jpeg,.png,.gif"/>
@@ -82,13 +92,6 @@
     {% endfor %}
   </div>
 {% endif %}
-
-<div class="pt-4 text-center">
-  <a href="#" onclick="setItem()" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Switch to shown item">{{ lib.icon('frontend.display.set') }}</a>
-  <a href="{{ url('fe_dashboard_display') }}?action=display.refresh" class="btn btn-{% if not display.refresh and not display.set and not display.stream %}outline-{% endif %}primary btn-floating btn-lg{% if display.refresh or display.set or display.stream %} disabled{% endif %}" title="Trigger refresh">{{ lib.icon('frontend.display.refresh') }}</a>
-  <a href="{{ url('fe_dashboard_display') }}?action=display.toggle" class="btn btn-{% if not display.status %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle display">{{ lib.icon('display') }}</a>
-  <a href="{{ url('fe_dashboard_display') }}?action=display.stream" class="btn btn-{% if not display.stream %}outline-{% endif %}primary btn-floating btn-lg" title="Toggle streaming">{{ lib.icon('frontend.display.stream') }}</a>
-</div>
 
 <script type="text/javascript">
   const preivewItem = document.querySelector("img[item='0']");
