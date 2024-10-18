@@ -569,7 +569,7 @@ class FrontendDevice(Singleton):
         if data is None:
             raise Error('No data')
         _chunks = list(data.chunks())
-        if ts is None or str(ts) is "0":
+        if ts is None or str(ts) == "0":
             _chunk_data = _chunks.pop(0)
             _status = {'ts': int(DateTime.now().timestamp()*1000)}
             logger.info("Started streamed upload ({} bytes)".format(len(_chunk_data)))
