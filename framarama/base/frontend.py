@@ -455,6 +455,7 @@ class FrontendDevice(Singleton):
             WebsiteFrontendRenderer(),
         }
         self._capability = None
+        self._display_status_force = None
 
     def _items_rotate(self, count_items_keep=None, start=0, reverse=False):
         return Filesystem.file_rotate(
@@ -649,14 +650,29 @@ class FrontendDevice(Singleton):
             return True
         return False
 
-    def display_toggle(self, state=None):
+    def display_toggle(self, state=None, force=False):
         _status = self.get_capability().display_status()
         _state = not _status if state is None else state
-        if _status and not _state:
-            self.get_capability().display_off()
-        elif not _status and _state:
-            self.get_capability().display_on()
-        return _state
+        _state_text = 'on' if _state else 'off'
+        if _status != _state:
+            if force:
+                logger.info("Force display status {}".format(_state_text))
+                self._display_status_force = _state
+            elif self._display_status_force == _state:
+                logger.info("Remove force display status {}".format(_state_text))
+                self._display_status_force = None
+            elif self._display_status_force is not None:
+                _state = self._display_status_force
+            if _status != _state:
+                if _state:
+                    self.get_capability().display_on()
+                else:
+                    self.get_capability().display_off()
+                return _state
+        elif self._display_status_force == _state:
+            logger.info("Remove force display status {}".format(_state_text))
+            self._display_status_force = None
+        return None
 
     def get_capability(self):
         if self._capability is None:
