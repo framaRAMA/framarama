@@ -156,10 +156,10 @@ class SwitchScreenDisplayView(viewsets.ViewSet):
         _frontend = frontend.Frontend.get()
         _frontend_device = _frontend.get_device()
         if state == 'toggle':
-            _frontend_device.display_toggle()
+            _frontend_device.display_toggle(force=True)
         elif state == 'on':
-            _frontend_device.display_toggle(True)
+            _frontend_device.display_toggle(True, force=True)
         elif state == 'off':
-            _frontend_device.display_toggle(False)
+            _frontend_device.display_toggle(False, force=True)
         return Response(_frontend.get_screen())
 

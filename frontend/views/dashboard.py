@@ -22,10 +22,7 @@ class DisplayDashboardView(base.BaseFrontendView):
         _context['streamed'] = _frontend_device.get_streamed()
         _action = self.request.GET.get('action')
         if _action == 'display.toggle':
-          if _capability.display_status():
-              _capability.display_off()
-          else:
-              _capability.display_on()
+          _frontend_device.display_toggle(force=True)
         elif _action == 'display.refresh':
             _scheduler.trigger_job(jobs.Scheduler.FE_NEXT_ITEM, force=True)
         elif _action == 'display.set':
