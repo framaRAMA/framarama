@@ -115,14 +115,16 @@ class Scheduler(jobs.Scheduler):
             self.display_on()
 
     def display_on(self):
-        logger.info("Switch display on at {}".format(self._display.get_time_on()))
         _device = frontend.Frontend.get().get_device()
-        _device.get_capability().display_on()
+        _status = _device.display_toggle(True)
+        if _status is not None and _status:
+            logger.info("Switch display on at {}".format(self._display.get_time_on()))
 
     def display_off(self):
-        logger.info("Switch display off at {}".format(self._display.get_time_off()))
         _device = frontend.Frontend.get().get_device()
-        _device.get_capability().display_off()
+        _status = _device.display_toggle(False)
+        if _status is not None and not _status:
+            logger.info("Switch display off at {}".format(self._display.get_time_off()))
 
     def refresh_items(self):
         if self._display:
