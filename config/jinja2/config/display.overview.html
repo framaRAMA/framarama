@@ -2,7 +2,8 @@
 
 {% block content_display %}
 {% if not display.frame %}
-  {{ lib.note('Currently there is no frame assigned to this display. Create a new frame <a href="%s">here</a>.'|format(url('frame_list'))|safe, 'info') }}
+  {{ lib.note('Currently there is no frame assigned to this display. Create a new frame <a href="%s">here</a> or assign an existing frame <a href="%s">here</a>.'|format(
+    url('frame_list'), url('display_edit', args=[display.id]))|safe, 'info') }}
 {% endif %}
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
