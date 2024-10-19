@@ -35,5 +35,7 @@
   {'icon': 'action.edit', 'url': url('frame_source_edit', args=[frame.id, source.id]), 'type': 'primary', 'title': 'Edit source'},
 ]) }}
 
+{{ lib.modal_delete('deleteSource', 'Delete source', 'Do you really want to delete the selected source "%s" including configuration?'|format(source.name), url('frame_source_action', args=[frame.id, source.id])+'?action=delete') }}
+
 {% endblock %}
 
