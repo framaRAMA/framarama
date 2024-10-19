@@ -10,6 +10,8 @@ A dashboard for a display is available in the overview page. It shows
 different information about the runtime (if data is submitted by the
 device), the photo collections shown and more.
 
+![Dashboard](../assets/screenshots/config-display.png)
+
 ## Info
 
 Common information about a display can be specified here:

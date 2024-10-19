@@ -7,6 +7,13 @@ to priorize them and much more.
 The system can manage multiple frames to separate and configure different
 photo collections.
 
+## Overview
+
+When view a given frame all common information of this frame will be shown,
+e.g. name, description or associated displays.
+
+![Dashboard](../assets/screenshots/config-frame.png)
+
 ## Info
 
 Common information about a frame can be specified here:

@@ -5,3 +5,5 @@ some details about the system and the configuration.
 
 From this point you can reach all the further configuration pages.
 
+![Dashboard](../assets/screenshots/config-dashboard.png)
+
