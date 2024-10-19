@@ -53,6 +53,18 @@ class ViewInfoFrameView(base.BaseFrameConfigView):
     template_name= 'config/frame.info.html'
 
 
+class ActionFrameView(base.BaseFrameConfigView):
+
+    def _get(self, request, frame_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, *args, **kwargs)
+        _frame = _context['frame']
+        _action = request.GET['action']
+        if _action == 'delete':
+            _frame.delete()
+        self.redirect(_context, 'frame_list')
+        return _context
+
+
 class UpdateGeneralFrameView(base.BaseFrameConfigView):
     template_name = 'config/frame.general.html'
 

@@ -14,6 +14,7 @@ urlpatterns = [
     path('frames', frame.ListFrameView.as_view(), name='frame_list'),
     path('frames/create', frame.CreateFrameView.as_view(), name='frame_create'),
     path('frames/<int:frame_id>/info', frame.ViewInfoFrameView.as_view(), name='frame_info'),
+    path('frames/<int:frame_id>/action', frame.ActionFrameView.as_view(), name='frame_action'),
     path('frames/<int:frame_id>/edit', frame.UpdateGeneralFrameView.as_view(), name='frame_edit'),
     path('frames/<int:frame_id>/thumbnail', frame.ThumbnailFrameView.as_view(), name='frame_thumbnail'),
 
