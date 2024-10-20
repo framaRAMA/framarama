@@ -4,16 +4,39 @@ The application is split up into a **server component** and a **frontend
 component**. Each component can be run on own devices where the frontend
 component is interacting with the server component by using an API.
 
+## Setup
+
+It can be decided to
+
+* run frontend in the local network but server component in the internet
+* run frontend in the local network and server component too
+* run frontend and server on same device in the local network
+
+In all cases the frontend component is interacting remotely with the server
+component using the API provided by the server component.
+
+### Frontend local network and server in the internet
+
+![Cloud Setup](../assets/architecture-cs-1.png)
+
 This way the server component can be run on a central device, which
-provides all the information about the frontends used, the photos in
+provides all the information about the frontends, the photos in
 collections, the photo processing and more.
 
-And the frontend component is interacting remotely with the server component
-using the API provided by the server component.
+### Frontend local network and server local
+
+Same setup mentioned in the section before can also be setup in the
+local network without having a component in the internet.
+
+![Cloud Setup](../assets/architecture-cs-2.png)
+
+### Frontend and server on same device in local network
+
+![Local Setup](../assets/architecture-ls.png)
 
 On the other hand it is also possible to run both components on the
 same system. In this case the server API is also used, but just from
-the local device - no change in the architecture.
+the local device.
 
 ## Server component
 
@@ -40,6 +63,11 @@ be managed by a web interface (e.g. device geometry, network setup, etc.).
 
 ## API
 
-All components mentioned before provides an API. The frontend API is used
-by the frontend itself, the server API is used by the frontend.
+All components mentioned before provides an API to interact with other
+components or to controll the system by external systems.
+
+For example, the frontend API is used by the frontend itself to show up
+the status information. The server API is used by the frontend to retrieve
+configuration or other data to be able to show up items on the frontend
+display.
 
