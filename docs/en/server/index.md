@@ -1,5 +1,9 @@
-# Interface
+# Dashboard
 
-The server is used to configure and setup all the things needed to know
-to present you some photos through a frontend.
+When opening the server web interface a dashboard will be presented showing
+some details about the system and the configuration.
+
+From this point you can reach all the further configuration pages.
+
+![Dashboard](../assets/screenshots/config-dashboard.png)
 

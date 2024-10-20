@@ -11,13 +11,13 @@ theme:
     - navigation.tabs
 
 nav:
-  - 'Introduction': 'index.md'
-  - 'architecture.md'
-  - 'install.md'
+  - 'Introduction':
+    - 'index.md'
+    - 'architecture.md'
+    - 'install.md'
   - 'config.md'
   - 'Server':
     - 'server/index.md'
-    - 'server/dashboard.md'
     - 'server/frames.md'
     - 'server/displays.md'
     - 'Plugins':
