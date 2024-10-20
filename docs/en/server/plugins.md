@@ -1,4 +1,4 @@
-# Overview
+# Plugins
 
 Different parts of the system is using a plugin system to be extendable. These
 are:

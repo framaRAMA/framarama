@@ -18,14 +18,15 @@ nav:
   - 'config.md'
   - 'Server':
     - 'server/index.md'
-    - 'server/frames.md'
+    - 'Frames':
+      - 'Overview': 'server/frames.md'
+      - 'Plugins':
+        - 'Overview': 'server/plugins.md'
+        - 'server/plugins/source.md'
+        - 'server/plugins/sorting.md'
+        - 'server/plugins/finishing.md'
+        - 'server/plugins/context.md'
     - 'server/displays.md'
-    - 'Plugins':
-      - 'server/plugins.md'
-      - 'server/plugins/source.md'
-      - 'server/plugins/sorting.md'
-      - 'server/plugins/finishing.md'
-      - 'server/plugins/context.md'
   - 'Frontend':
     - 'frontend/index.md'
   - 'Development':
