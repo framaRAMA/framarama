@@ -3,7 +3,9 @@
 The frontend web interface can be used to setup and configure the device
 showing the photos.
 
-Use the "⚙" (gear) button to change to the server frontend to update the
+![Frontend](../assets/screenshots/frontend-display.png)
+
+Use the "⚙" (gear) button to change to the server component to update the
 server configuration.
 
 ## Overview
