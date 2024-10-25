@@ -17,7 +17,7 @@ component using the API provided by the server component.
 
 ### Frontend local network and server in the internet
 
-![Cloud Setup](../assets/architecture-cs-1.png)
+![Cloud Setup](assets/architecture-cs-1.png)
 
 This way the server component can be run on a central device, which
 provides all the information about the frontends, the photos in
@@ -28,11 +28,11 @@ collections, the photo processing and more.
 Same setup mentioned in the section before can also be setup in the
 local network without having a component in the internet.
 
-![Cloud Setup](../assets/architecture-cs-2.png)
+![Cloud Setup](assets/architecture-cs-2.png)
 
 ### Frontend and server on same device in local network
 
-![Local Setup](../assets/architecture-ls.png)
+![Local Setup](assets/architecture-ls.png)
 
 On the other hand it is also possible to run both components on the
 same system. In this case the server API is also used, but just from
@@ -49,7 +49,7 @@ For this case the following parts can be configured:
 * frames - a frame is a representation for a photo collection
 * displays - a display is a physical device showing content from a frame
 
-![Dashboard](../assets/screenshots/config-dashboard.png)
+![Dashboard](assets/screenshots/config-dashboard.png)
 
 ## Frontend component
 
@@ -59,7 +59,7 @@ connected to a display/monitor.
 There're also some settings which are frontend specific and which can
 be managed by a web interface (e.g. device geometry, network setup, etc.).
 
-![Frontend](../assets/screenshots/frontend-display.png)
+![Frontend](assets/screenshots/frontend-display.png)
 
 ## API
 
