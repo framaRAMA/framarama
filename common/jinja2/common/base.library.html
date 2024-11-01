@@ -504,18 +504,21 @@
                 }))
                 .then(response => response.json())
                 .then(data => {
-                  var html = '<h5 class="pt-2">Results</h5>';
+                  var html = '';
+                  html += '<table class="table">';
+                  html += '<thead><tr><th>ID</th><th>Item</th><th>Date</th></tr></thead>';
                   data.items.forEach(item => {
-                    html += '<div class="row">';
-                    html += '<div class="col-2">' + item.id + '</div>';
-                    html += '<div class="col-6">' + item.url+ '</div>';
-                    html += '<div class="col-4">' + item.date_creation + '</div>';
-                    html += '</div>';
+                    html += '<tr>';
+                    html += '<td class="col-1" scope="row">' + item.id + '</td>';
+                    html += '<td class="col-auto"><a href="' + item.url + '" target="_blank">' + item.url+ '</a></td>';
+                    html += '<td class="col-2">' + item.date_creation + '</td>';
+                    html += '</tr>';
                     window.console.log(item);
                   });
                   if (data.error != undefined) {
                     html += '<span class="text-danger">Error: ' + data.error + '</span>';
                   }
+                  html += '</table>';
                   const result = window.document.getElementById('{{ field.id_for_label }}sortqueryevalresult');
                   result.innerHTML = html;
                 });
