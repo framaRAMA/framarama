@@ -402,6 +402,7 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
                 self.response_json(_context, {
                     'start': _result['items'].start_index(),
                     'end': _result['items'].end_index(),
+                    'error': ', '.join([str(_e) for _i, _e in _result['errors'].items()]) if _result['errors'] else None,
                     'page': _page,
                     'items': _items
                 })

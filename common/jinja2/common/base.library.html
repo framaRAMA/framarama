@@ -484,43 +484,39 @@
               <input id="{{ field.id_for_label }}sortqueryevalsize" class="form-control" id="id_code"/>
               <label for="{{ field.id_for_label }}sortqueryevalsize" class="form-label">Page size</label>
             </div>
-            <button id="{{ field.id_for_label }}sortqueryevalbtn" type="button" class="btn btn-primary w-100">Run</button>
+            <button id="{{ field.id_for_label }}sortqueryevalbtn" type="button" class="btn btn-primary w-100 mb-2">Run</button>
             <div id="{{ field.id_for_label }}sortqueryevalresult" class="overflow-auto h-50">
             </div>
             <script type="text/javascript">
               window.document.getElementById('{{ field.id_for_label }}sortqueryevalbtn').onclick = function () {
                 const queryField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalcode');
+                const queryResult = window.document.getElementById('{{ field.id_for_label }}sortqueryevalresult')
                 const pageField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalpage');
                 const pageSizeField = window.document.getElementById('{{ field.id_for_label }}sortqueryevalsize');
                 const formdata = new FormData();
                 formdata.append('code', queryField.value);
                 formdata.append('page', pageField.value);
                 formdata.append('page_size', pageSizeField.value);
-                fetch(new Request('eval', {
-                  method: 'POST',
-                  headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value},
-                  mode: 'same-origin',
-                  body: formdata
-                }))
+                urlFetch('POST', 'eval', true, {}, formdata)
                 .then(response => response.json())
                 .then(data => {
                   var html = '';
-                  html += '<table class="table">';
-                  html += '<thead><tr><th>ID</th><th>Item</th><th>Date</th></tr></thead>';
-                  data.items.forEach(item => {
-                    html += '<tr>';
-                    html += '<td class="col-1" scope="row">' + item.id + '</td>';
-                    html += '<td class="col-auto"><a href="' + item.url + '" target="_blank">' + item.url+ '</a></td>';
-                    html += '<td class="col-2">' + item.date_creation + '</td>';
-                    html += '</tr>';
-                    window.console.log(item);
-                  });
                   if (data.error != undefined) {
-                    html += '<span class="text-danger">Error: ' + data.error + '</span>';
+                    html += '{{- note_start("Error evaluating expression:", "danger")|replace("\n", "") -}}' + data.error + '{{- note_end()|replace("\n", "") -}}';
+                  } else if (data.items.length > 0) {
+                    html += '<table class="table">';
+                    html += '<thead><tr><th>Rank</th><th>Item</th><th>Date</th></tr></thead>';
+                    data.items.forEach(item => {
+                      html += '<tr>';
+                      html += '<td class="col-1" scope="row">' + item.rank + '</td>';
+                      html += '<td class="col-auto"><a href="' + item.url + '" target="_blank">' + item.url+ '</a></td>';
+                      html += '<td class="col-2">' + item.date_creation + '</td>';
+                      html += '</tr>';
+                      window.console.log(item);
+                    });
+                    html += '</table>';
                   }
-                  html += '</table>';
-                  const result = window.document.getElementById('{{ field.id_for_label }}sortqueryevalresult');
-                  result.innerHTML = html;
+                  queryResult.innerHTML = html;
                 });
               }
             </script>
