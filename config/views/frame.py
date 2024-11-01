@@ -384,6 +384,7 @@ class EvalSortingFrameView(base.BaseSortingFrameConfigView):
             try:
                 _plugin = plugins.SortingPluginRegistry.get('custom')
                 _custom = _plugin.create_model()
+                _custom.weight = 1
                 _custom.enabled = True
                 _custom.plugin = 'custom'
                 _custom.plugin_config['code'] = _code
