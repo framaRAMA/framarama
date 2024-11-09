@@ -112,7 +112,7 @@
     return '{{ url('fe_dashboard_display') }}?action=display.set&item=' + item;
   }
   function setItem() {
-    const caruselItem = document.querySelector('.carousel-item.active img');
+    const caruselItem = document.querySelector('.carousel-item.active img[item]');
     window.location.href = activateItemUrl(caruselItem.getAttribute('item'));
   }
   const uploadedFiles = [];
