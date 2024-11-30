@@ -12,7 +12,7 @@ from config.utils import context
 
 class FilesystemTestCase(TestCase):
 
-    def test_file_wrte(self):
+    def test_file_write(self):
         utils.Filesystem.file_write('test', b'Hello World!');
         self.assertTrue(os.path.exists('test'))
         os.remove('test')
