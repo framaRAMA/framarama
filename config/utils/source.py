@@ -216,7 +216,7 @@ class Processor:
 
     def _item_mapping(self, source):
         _fields = {
-            'id': 'int:' + source.map_item_id_ext,
+            'id': 'str:' + source.map_item_id_ext,
             'url': 'str:' + source.map_item_url,
             'date_creation': 'date:' + source.map_item_date_creation
         }

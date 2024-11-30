@@ -96,6 +96,7 @@ class SourceStep(PluginModel):
 
     CAT_NETWORK = 'network'
     CAT_DATA = 'data'
+    CAT_DIR = 'dir'
 
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='steps')
     ordering = models.IntegerField()

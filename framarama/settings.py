@@ -222,6 +222,7 @@ FRAMARAMA = {
         'frontend'
     ],
     'DATA_PATH': './data/',
+    'MEDIA_PATH': './data/media/',
     'COMMON_PATH': './common/static/common/',
     'ADMIN_USERNAME': 'admin',
     'ADMIN_PASSWORD': 'testabc123',
