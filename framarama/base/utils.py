@@ -399,6 +399,11 @@ class DateTime:
             return None
 
     @staticmethod
+    def format(date, fmt=None):
+        _fmt = fmt if fmt else '%Y-%m-%d %H:%M:%S'
+        return date.strftime(_fmt)
+
+    @staticmethod
     def zoned(tz):
         class Zoned:
             def __init__(self, tz):

@@ -393,6 +393,11 @@ class DateTimeTestCase(TestCase):
         self.assertEqual(2, _time.minute)
         self.assertEqual(54, _time.second)
 
+    def test_format(self):
+        _time = utils.DateTime.parse('2023-01-01T15:45:10')
+        self.assertEquals('2023-01-01 15:45:10', utils.DateTime.format(_time))
+        self.assertEquals('01.01.2023', utils.DateTime.format(_time, '%d.%m.%Y'))
+
     def test_zoned(self):
         with utils.DateTime.zoned('UTC'):
             _time_utc = utils.DateTime.now()
