@@ -216,9 +216,9 @@ class Processor:
 
     def _item_mapping(self, source):
         _fields = {
-            'id': 'str:' + source.map_item_id_ext,
+            'id': 'str:' + (source.map_item_id_ext if source.map_item_id_ext else 'id'),
             'url': 'str:' + source.map_item_url,
-            'date_creation': 'date:' + source.map_item_date_creation
+            'date_creation': 'date:' + (source.map_item_date_creation if source.map_item_date_creation else 'date')
         }
         _map_item_meta = source.map_item_meta
         if _map_item_meta:
