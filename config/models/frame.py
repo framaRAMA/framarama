@@ -158,6 +158,11 @@ class Item(BaseModel):
     class Meta:
         ordering = ['-created']
 
+    def is_remote(self):
+        if self.url and self.url.startswith('http://') or self.url.startswith('https://'):
+            return True
+        return False
+
 
 @receiver(models.signals.post_delete, sender=Item)
 def post_delete_item(sender, instance, *args, **kwargs):
