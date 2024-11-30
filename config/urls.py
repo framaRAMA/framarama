@@ -27,6 +27,7 @@ urlpatterns = [
     path('frames/<int:frame_id>/sources/<int:source_id>/edit', frame.UpdateSourceFrameView.as_view(), name='frame_source_edit'),
     path('frames/<int:frame_id>/sources/<int:source_id>/items', frame.ItemsSourceFrameView.as_view(), name='frame_source_images'),
     path('frames/<int:frame_id>/sources/<int:source_id>/items/<int:item_id>/thumbnail', frame.ThumbnailItemFrameView.as_view(), name='frame_source_image_thumbnail'),
+    path('frames/<int:frame_id>/sources/<int:source_id>/items/<int:item_id>/download', frame.DownloadItemFrameView.as_view(), name='frame_source_image_download'),
 
     path('frames/<int:frame_id>/sources/<int:source_id>/steps', frame.ListStepSourceFrameView.as_view(), name='frame_source_step_list'),
     path('frames/<int:frame_id>/sources/<int:source_id>/steps/create?plugin=<str:plugin>', frame.CreateStepSourceFrameView.as_view(), name='frame_source_step_create'),

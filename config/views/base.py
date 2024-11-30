@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.db.models import F
 
-from framarama.base import utils
+from framarama.base import utils, api
 from framarama.base.views import BaseAuthenticatedView
 from config import forms, models, plugins
 
@@ -55,6 +55,19 @@ class BaseConfigView(BaseAuthenticatedView):
         except Exception as e:
             logger.error("Can not load thumbnail data #{}: {}".format(data.thumbnail.id, e))
         self.response(context, _thumbnail_data, _thumbnail_mime)
+
+    def response_item_download(self, context, item):
+        _download_data = BaseConfigView.DEFAULT_THUMBNAIL
+        _download_mime = BaseConfigView.DEFAULT_THUMBNAIL_MIME
+        try:
+            if item and item.url:
+                _response = api.ApiClient.get().get_url(item.url)
+                _response.raise_for_status()
+                _download_data = _response.content
+                _download_mime = _response.headers['content-type']
+        except Exception as e:
+            logger.error("Can not load item data #{}: {}".format(item.id, e))
+        self.response(context, _download_data, _download_mime)
 
 
 class BaseFrameConfigView(BaseConfigView):

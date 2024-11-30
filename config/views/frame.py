@@ -294,6 +294,15 @@ class ThumbnailItemFrameView(base.BaseSourceFrameConfigView):
         return _context
 
 
+class DownloadItemFrameView(base.BaseSourceFrameConfigView):
+
+    def _get(self, request, frame_id, source_id, item_id, *args, **kwargs):
+        _context = super()._get(request, frame_id, source_id, *args, **kwargs)
+        _items = list(self.qs().items.filter(pk=item_id))
+        self.response_item_download(_context, _items[0] if len(_items) else None)
+        return _context
+
+
 class ListSortingFrameView(base.BaseFrameConfigView):
     template_name = 'config/frame.sorting.html'
 
