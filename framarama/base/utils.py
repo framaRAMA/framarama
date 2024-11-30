@@ -7,6 +7,7 @@ import datetime
 import zoneinfo
 import collections
 import shutil
+import mimetypes
 import subprocess
 import threading
 import signal
@@ -138,6 +139,11 @@ class Filesystem:
     @staticmethod
     def file_size(filename):
         return os.path.getsize(filename)
+
+    @staticmethod
+    def file_mime(filename):
+        _mime = mimetypes.guess_type(filename)
+        return _mime[0] if _mime else None
 
     @staticmethod
     def file_rotate(path, pattern, fmt, count, extensions=[], start=0, reverse=False):

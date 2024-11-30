@@ -86,6 +86,10 @@ class FilesystemTestCase(TestCase):
         os.remove('test')
         self.assertEquals(12, _size)
 
+    def test_file_mime(self):
+        self.assertEquals('text/plain', utils.Filesystem.file_mime('/to/some/file.txt'))
+        self.assertEquals('image/jpeg', utils.Filesystem.file_mime('/to/some/file.jpg'))
+
     def test_file_rotate(self):
         open('test-1.txt', 'w').close()
         open('test-2.txt', 'w').close()
