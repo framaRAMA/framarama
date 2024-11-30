@@ -113,6 +113,38 @@ class FilesystemTestCase(TestCase):
         os.remove('test-1.txt')
         os.remove('test-2.txt')
 
+    def test_path_normalize_relative(self):
+        _pathes = {
+            '.': '.',
+            './framarama': 'framarama',
+            './framarama/': 'framarama',
+            './framarama/test': 'framarama/test',
+        }
+        for _path, _expected in _pathes.items():
+            self.assertEqual(_expected, utils.Filesystem.path_normalize(_path))
+
+    def test_path_normalize_absolute(self):
+        _cwd = os.getcwd()
+        _pathes = {
+            _cwd + '/.': _cwd,
+            _cwd + '/framarama': _cwd + '/framarama',
+            _cwd + '/framarama/': _cwd + '/framarama',
+            _cwd + '/framarama/test': _cwd + '/framarama/test',
+        }
+        for _path, _expected in _pathes.items():
+            self.assertEqual(_expected, utils.Filesystem.path_normalize(_path, absolute=True))
+
+    def test_path_normalize_root(self):
+        _cwd = os.getcwd()
+        _pathes = {
+            '.': _cwd,
+            '..': None,
+            _cwd + '/.': _cwd,
+            _cwd + '/..': None,
+        }
+        for _path, _expected in _pathes.items():
+            self.assertEqual(_expected, utils.Filesystem.path_normalize(_path, root=_cwd, absolute=True))
+
 
 class ProcessTestCase(TestCase):
 

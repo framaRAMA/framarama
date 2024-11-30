@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import pathlib
 import datetime
 import zoneinfo
 import collections
@@ -165,6 +166,17 @@ class Filesystem:
                 os.unlink(_current_name)
 
         return {_ext: path + fmt.format(start+1, _ext) for _ext in extensions}
+
+    def path_normalize(path, root=None, absolute=False):
+        _root = pathlib.Path(root) if root else pathlib.Path.cwd()
+        _path = pathlib.Path(path)
+        _normalized = pathlib.Path(os.path.normpath(_root / _path))
+        if root and not _normalized.is_relative_to(_root):
+            return None
+        _result = _normalized.absolute()
+        if not absolute:
+            _result = _result.relative_to(_root)
+        return str(_result)
 
 
 class Process:
