@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.apps import apps
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -60,13 +61,17 @@ class BaseConfigView(BaseAuthenticatedView):
         _download_data = BaseConfigView.DEFAULT_THUMBNAIL
         _download_mime = BaseConfigView.DEFAULT_THUMBNAIL_MIME
         try:
-            if item and item.url:
+            if item.is_remote():
                 _response = api.ApiClient.get().get_url(item.url)
                 _response.raise_for_status()
                 _download_data = _response.content
                 _download_mime = _response.headers['content-type']
+            else:
+                _filename = settings.FRAMARAMA['MEDIA_PATH'] + '/' + item.url
+                _download_data = utils.Filesystem.file_read(_filename)
+                _download_mime = utils.Filesystem.file_mime(_filename)
         except Exception as e:
-            logger.error("Can not load item data #{}: {}".format(item.id, e))
+            logger.error("Can not load item data #{} from {}: {}".format(item.id, item.url, e))
         self.response(context, _download_data, _download_mime)
 
 
