@@ -52,6 +52,12 @@ Should point to a directory where the application can store some data. Please
 do not point this to a temporary directory. It will contain persistent data
 which should not be deleted.
 
+#### `FRAMARAMA.MEDIA_PATH`
+
+Default: `./data/media/`
+
+Points to a directory where some media files can be placed to read. The directory
+source plugin will read the files located in this directory.
 
 
 ### Server

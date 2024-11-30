@@ -22,6 +22,14 @@ Common fields for all source steps:
 * mime_out - if required provide mime type of output data
 * loop_out - flag if following steps should loop over generated output data
 
+## dir
+
+Read list of files from a given directory.
+
+Fields:
+* path - the path to read (relative to media directory)
+* filter_files - the pattern to filter files (defaults to JPEG pattern)
+
 ## data
 
 Manipulates a given input data (e.g. a CSV list) and convert/filter/strip data
