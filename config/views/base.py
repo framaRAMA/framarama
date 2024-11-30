@@ -45,15 +45,15 @@ class BaseConfigView(BaseAuthenticatedView):
         _context['displays'] = self.get_displays()
         return _context
 
-    def response_thumbnail(self, context, data):
+    def response_item_thumbnail(self, context, item):
         _thumbnail_data = BaseConfigView.DEFAULT_THUMBNAIL
         _thumbnail_mime = BaseConfigView.DEFAULT_THUMBNAIL_MIME
         try:
-            if data:
-                _thumbnail_data = data.data()
-                _thumbnail_mime = data.data_mime
+            if item and item.thumbnail:
+                _thumbnail_data = item.thumbnail.data()
+                _thumbnail_mime = item.thumbnail.data_mime
         except Exception as e:
-            logger.error("Can not load thumbnail data #{}: {}".format(data.id, e))
+            logger.error("Can not load thumbnail data #{}: {}".format(data.thumbnail.id, e))
         self.response(context, _thumbnail_data, _thumbnail_mime)
 
 
