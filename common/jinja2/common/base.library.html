@@ -114,9 +114,9 @@
 }
 %}
 
-{% macro icon(type, style='me-1', raw=False) %}
+{%- macro icon(type, style='me-1', raw=False) -%}
   <i class="fas fa-{% if raw %}{{ type }}{% else %}{{ icons[type] }}{% endif %} {{ style }}"></i>
-{% endmacro %}
+{%- endmacro -%}
 
 {% macro html_start() %}
 <!doctype html>
