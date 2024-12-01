@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class DirectoryForm(SourceStepForm):
     path = forms.CharField(
-        max_length=255, required=False, widget=base.charFieldWidget(),
+        max_length=255, required=False, widget=base.pathSelectorCharFieldWidget(),
         label='Directory', help_text='Path to read the media files from (defaults to media directory)')
     filter_files = forms.CharField(
         max_length=64, required=False, widget=base.charFieldWidget(),
