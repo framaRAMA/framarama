@@ -83,7 +83,7 @@
 }
 
 /** Password generator icon */
-.password-generator-button, .sort-query-eval-button {
+.password-generator-button, .sort-query-eval-button, .path-select-button {
   opacity: 50%;
   position: absolute;
   outline: none;

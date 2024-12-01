@@ -33,6 +33,7 @@ urlpatterns = [
     path('frames/<int:frame_id>/sources/<int:source_id>/steps/create?plugin=<str:plugin>', frame.CreateStepSourceFrameView.as_view(), name='frame_source_step_create'),
     path('frames/<int:frame_id>/sources/<int:source_id>/steps/<int:step_id>', frame.UpdateStepSourceFrameView.as_view(), name='frame_source_step_edit'),
     path('frames/<int:frame_id>/sources/<int:source_id>/steps/<int:step_id>/action', frame.ActionStepSourceFrameView.as_view(), name='frame_source_step_action'),
+    path('frames/<int:frame_id>/sources/<int:source_id>/steps/<int:step_id>/paths', frame.PathsStepSourceFrameView.as_view(), name='frame_source_step_paths'),
 
     path('frames/<int:frame_id>/sortings', frame.ListSortingFrameView.as_view(), name='frame_sorting_list'),
     path('frames/<int:frame_id>/sortings/create?plugin=<str:plugin>', frame.CreateSortingFrameView.as_view(), name='frame_sorting_create'),

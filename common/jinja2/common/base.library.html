@@ -66,6 +66,7 @@
   'software': 'cubes',
   'help': 'question',
   'account': 'user',
+  'folder': 'folder',
 
   'frame' : 'image',
   'frames' : 'images',
@@ -460,6 +461,58 @@
               for (let i=0; i<field.getAttribute('generate-length'); i++) gen += chars[Math.floor(Math.random()*chars.length)];
               field.value = gen;
             }
+          </script>
+        {% elif field_class == 'PathSelectorTextInput' %}
+          <button id="{{ field.id_for_label }}pathselect" tabindex="0" type="button" class="path-select-button" data-bs-toggle="modal" data-bs-target="#{{ field.id_for_label }}pathselectmodal">
+            {{ icon('folder') }}
+          </button>
+          {{ modal_start(field.id_for_label + 'pathselectmodal', 'Select path', 'modal-fullscreen h-100') }}
+            <div id="{{ field.id_for_label }}pathselectmodalresult">
+              <div class="mb-3 form-floating">
+                <input id="{{ field.id_for_label }}pathselectpath" class="form-control" id="id_path" readonly="readonly"/>
+                <label for="{{ field.id_for_label }}pathselectpath" class="form-label">Path</label>
+              </div>
+            </div>
+            <div id="{{ field.id_for_label }}pathselectresult" class="overflow-auto">
+            </div>
+          {{ modal_end(submit_click='pathResultSelect()', submit_title='Select') }}
+          <script type="text/javascript">
+            function pathResultQuery(pathValue) {
+              const pathResult = window.document.getElementById('{{ field.id_for_label }}pathselectresult')
+              const pathField = window.document.querySelector('[id="{{ field.id_for_label }}pathselectpath"]');
+              const formdata = new FormData();
+              formdata.append('path', pathField.value + (pathField.value != '' ? '/' : '') + pathValue);
+              urlFetch('POST', window.document.location + '/paths', true, {}, formdata)
+              .then(response => response.json())
+              .then(data => {
+                var html = '';
+                html += '<table class="table">';
+                html += '<thead><tr><th>Name</th></tr></thead>';
+                if (data.path != '') {
+                  data.items.unshift({'name':'..'});
+                }
+                data.items.forEach(item => {
+                  html += '<tr>';
+                  html += '<td class="col-12" scope="row"><a href="#" onclick="pathResultQuery(this.textContent); return false;">{{ icon("folder", "me-2") }}' + item.name + '</a></td>';
+                  html += '</tr>';
+                });
+                html += '</table>';
+                pathResult.innerHTML = html;
+                pathField.value = data.path;
+              })
+            }
+            function pathResultSelect() {
+              const sourceField = window.document.querySelector('[id="{{ field.id_for_label }}"]');
+              const pathField = window.document.querySelector('[id="{{ field.id_for_label }}pathselectpath"]');
+              sourceField.value = pathField.value;
+              return false;
+            }
+            window.document.getElementById('{{ field.id_for_label }}pathselect').onclick = function() {
+              const sourceField = window.document.querySelector('[id="{{ field.id_for_label }}"]');
+              const pathField = window.document.querySelector('[id="{{ field.id_for_label }}pathselectpath"]');
+              pathField.value = '';
+              pathResultQuery(sourceField.value);
+            };
           </script>
         {% elif field_class == 'CustomSortingQueryTextInput' %}
           <button id="{{ field.id_for_label }}sortqueryeval" tabindex="0" type="button" class="sort-query-eval-button" data-bs-toggle="modal" data-bs-target="#{{ field.id_for_label }}sortqueryevalmodal">

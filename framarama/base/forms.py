@@ -57,6 +57,12 @@ def customSortingQueryFieldWidget(*args, **kwargs):
         return textareaFieldWidget(*args, **kwargs)
 
 
+def pathSelectorCharFieldWidget(*args, **kwargs):
+    class PathSelectorTextInput(forms.TextInput):
+        pass
+    return PathSelectorTextInput(attrs={'class':'form-control'}, *args, **kwargs)
+
+
 class BaseForm(forms.Form):
 
     def field_groups(self):

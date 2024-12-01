@@ -252,6 +252,24 @@ class ActionStepSourceFrameView(base.BaseStepSourceFrameConfigView):
         return _context
 
 
+class PathsStepSourceFrameView(base.BaseStepSourceFrameConfigView):
+
+    def _post(self, request, frame_id, source_id, step_id, *args, **kwargs):
+        _context = super()._post(request, frame_id, source_id, step_id, *args, **kwargs)
+        _frame = _context['frame']
+        _root = utils.Filesystem.path_normalize(settings.FRAMARAMA['MEDIA_PATH'], absolute=True)
+        if _root:
+            _path = request.POST.get('path', '')
+            _path = utils.Filesystem.path_normalize(_path, root=_root, absolute=True) if _path != '' else _root
+            _items = []
+            for _item in utils.Filesystem.file_match(_path, '.*', files=False, dirs=True):
+                _items.append({'name': _item})
+            self.response_json(_context, {'path': _path.replace(_root, '').strip('/'), 'items': _items})
+        else:
+            self.response_json(_context, {'path': '', 'items': _items})
+        return _context
+
+
 class ItemsSourceFrameView(base.BaseSourceFrameConfigView):
     template_name = 'config/frame.source.items.html'
 
