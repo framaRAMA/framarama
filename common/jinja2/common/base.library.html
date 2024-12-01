@@ -870,12 +870,14 @@
         <div class="modal-body">
 {% endmacro %}
 
-{% macro modal_end(submit=None, submit_title='Yes', submit_class='btn-primary', cancel_title='Close', cancel_args=[]) %}
+{% macro modal_end(submit=None, submit_click=None, submit_title='Yes', submit_class='btn-primary', cancel_title='Close', cancel_args=[]) %}
         </div>
         {% if submit or cancel_title %}
           <div class="modal-footer">
             {% if submit %}
               <a href="{{ submit }}" class="btn {{ submit_class }}">{{ submit_title }}</a>
+            {% elif submit_click %}
+              <a href="#" class="btn {{ submit_class }}" onclick="return {{ submit_click }};" data-bs-dismiss="modal">{{ submit_title }}</a>
             {% endif %}
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ cancel_title }}</button>
           </div>
