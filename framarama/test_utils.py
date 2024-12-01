@@ -119,6 +119,7 @@ class FilesystemTestCase(TestCase):
 
     def test_path_normalize_relative(self):
         _pathes = {
+            None: None,
             '.': '.',
             './framarama': 'framarama',
             './framarama/': 'framarama',
@@ -130,6 +131,7 @@ class FilesystemTestCase(TestCase):
     def test_path_normalize_absolute(self):
         _cwd = os.getcwd()
         _pathes = {
+            None: None,
             _cwd + '/.': _cwd,
             _cwd + '/framarama': _cwd + '/framarama',
             _cwd + '/framarama/': _cwd + '/framarama',
@@ -141,6 +143,7 @@ class FilesystemTestCase(TestCase):
     def test_path_normalize_root(self):
         _cwd = os.getcwd()
         _pathes = {
+            None: None,
             '.': _cwd,
             '..': None,
             _cwd + '/.': _cwd,

@@ -174,7 +174,9 @@ class Filesystem:
         return {_ext: path + fmt.format(start+1, _ext) for _ext in extensions}
 
     def path_normalize(path, root=None, absolute=False):
-        _root = pathlib.Path(root) if root else pathlib.Path.cwd()
+        if path is None:
+            return None
+        _root = pathlib.Path(root).resolve() if root else pathlib.Path.cwd()
         _path = pathlib.Path(path)
         _normalized = pathlib.Path(os.path.normpath(_root / _path))
         if root and not _normalized.is_relative_to(_root):
