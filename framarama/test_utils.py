@@ -70,6 +70,26 @@ class FilesystemTestCase(TestCase):
         self.assertEqual([('test-1', '1'), ('test-2', '2'), ('test-3', '3'), ('test-4', '4')], _result_files_all)
         self.assertEqual([('test-1', '1'), ('test-2', '2')], _result_files_restricted)
 
+    def test_file_match_types(self):
+        open('test-1', 'w').close()
+        os.mkdir('test-2')
+        os.symlink('dummy', 'test-3')
+        _result_files = utils.Filesystem.file_match('.', 'test-.*', files=True, dirs=False, links=False)
+        _result_dirs = utils.Filesystem.file_match('.', 'test-.*', files=False, dirs=True, links=False)
+        _result_links = utils.Filesystem.file_match('.', 'test-.*', files=False, dirs=False, links=True)
+        os.remove('test-1')
+        os.rmdir('test-2')
+        os.remove('test-3')
+        self.assertTrue(('test-1',) in _result_files)
+        self.assertFalse(('test-2',) in _result_files)
+        self.assertFalse(('test-3',) in _result_files)
+        self.assertFalse(('test-1',) in _result_dirs)
+        self.assertTrue(('test-2',) in _result_dirs)
+        self.assertFalse(('test-3',) in _result_dirs)
+        self.assertFalse(('test-1',) in _result_links)
+        self.assertFalse(('test-2',) in _result_links)
+        self.assertTrue(('test-3',) in _result_links)
+
     def test_file_match_nonexistent(self):
         _result = utils.Filesystem.file_match('unknown-directory', '.*')
         self.assertEqual([], _result)

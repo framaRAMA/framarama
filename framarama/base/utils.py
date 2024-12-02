@@ -107,7 +107,7 @@ class Filesystem:
         os.remove(filename)
 
     @staticmethod
-    def file_match(path, pattern, files=True, dirs=False, recurse=None, prefix=None):
+    def file_match(path, pattern, files=True, dirs=False, links=False, recurse=None, prefix=None):
         if not Filesystem.file_exists(path):
             return []
         _dirs = []
@@ -117,7 +117,7 @@ class Filesystem:
             for entry in it:
                 if entry.is_dir() and (dirs or recurse):
                     _dirs.append(entry.name)
-                if entry.is_file() and files == True and re.match(pattern, entry.name):
+                if ((entry.is_file() and files == True) or (entry.is_symlink() and links == True)) and re.match(pattern, entry.name):
                     _files.append(entry.name)
         _files.sort(reverse=False)
         _files = [(_prefix + _file,) + re.match(pattern, _file).groups() for _file in _files]
