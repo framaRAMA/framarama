@@ -493,7 +493,7 @@
                 }
                 data.items.forEach(item => {
                   html += '<tr>';
-                  html += '<td class="col-12" scope="row"><a href="#" onclick="pathResultQuery(this.textContent); return false;">{{ icon("folder", "me-2") }}' + item.name + '</a></td>';
+                  html += '<td class="col-12" scope="row"><a href="#" onclick="pathResultQuery(this.textContent); return false;" class="d-block">{{ icon("folder", "me-2") }}' + item.name + '</a></td>';
                   html += '</tr>';
                 });
                 html += '</table>';
