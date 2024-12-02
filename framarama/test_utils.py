@@ -94,6 +94,30 @@ class FilesystemTestCase(TestCase):
         _result = utils.Filesystem.file_match('unknown-directory', '.*')
         self.assertEqual([], _result)
 
+    def test_file_match_recurse(self):
+        os.makedirs('test/test-1/test-1', exist_ok=True)
+        os.makedirs('test/test-1/test-2', exist_ok=True)
+        os.makedirs('test/test-2', exist_ok=True)
+        _result_all = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=True)
+        _result_level_0 = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=0)
+        _result_level_1 = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=1)
+        _result_min_level_0 = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=1, recurse_min=0)
+        _result_min_level_1 = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=1, recurse_min=1)
+        _result_min_level_0_true = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=True, recurse_min=0)
+        _result_min_level_1_true = utils.Filesystem.file_match('test', 'test-.*', dirs=True, recurse=True, recurse_min=1)
+        os.rmdir('test/test-1/test-1')
+        os.rmdir('test/test-1/test-2')
+        os.rmdir('test/test-1')
+        os.rmdir('test/test-2')
+        os.rmdir('test')
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_all)
+        self.assertEqual([('test-1',), ('test-2',)], _result_level_0)
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_level_1)
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_min_level_0)
+        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], _result_min_level_1)
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_min_level_0_true)
+        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], _result_min_level_1_true)
+
     def test_file_exists(self):
         with open('test', 'wb') as f:
             f.write(b'Hello World!')
