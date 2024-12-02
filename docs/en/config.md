@@ -59,6 +59,25 @@ Default: `./data/media/`
 Points to a directory where some media files can be placed to read. The directory
 source plugin will read the files located in this directory.
 
+#### `FRAMARAMA.MOUNT_PATH`
+
+Default: `/media`
+
+To automatically provide mounted storaged in media path to use for picture collecton,
+this settings points to the standard system mount path for external storages (e.g.
+when using `automount`).
+
+#### `FRAMARAMA.MOUNT_LEVEL`
+
+Default: `1`
+
+When `MOUNT_PATH` is configured to watch for new mounted storaged, this setting
+will define how many directory levels to check (useful when external storages
+will be mounted in sub-directory of `MOUNT_PATH` (e.g. `/media/username/ext-storage`).
+Using level of `0` will make directories one level below `MOUNT_PATH` available,
+`1` will make directories two levels below `MOUNT_PATH` as media directories (e.g.
+`ext-storage`).
+
 
 ### Server
 

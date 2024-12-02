@@ -223,6 +223,8 @@ FRAMARAMA = {
     ],
     'DATA_PATH': './data/',
     'MEDIA_PATH': './data/media/',
+    'MOUNT_PATH': '/media/',
+    'MOUNT_LEVEL': 1,
     'COMMON_PATH': './common/static/common/',
     'ADMIN_USERNAME': 'admin',
     'ADMIN_PASSWORD': 'testabc123',
