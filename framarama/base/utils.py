@@ -108,6 +108,8 @@ class Filesystem:
 
     @staticmethod
     def file_match(path, pattern, files=True, dirs=False, recurse=None, prefix=None):
+        if not Filesystem.file_exists(path):
+            return []
         _dirs = []
         _files = []
         _prefix = '' if prefix is None else prefix + '/'

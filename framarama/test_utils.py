@@ -70,7 +70,7 @@ class FilesystemTestCase(TestCase):
         self.assertEqual([('test-1', '1'), ('test-2', '2'), ('test-3', '3'), ('test-4', '4')], _result_files_all)
         self.assertEqual([('test-1', '1'), ('test-2', '2')], _result_files_restricted)
 
-    def text_file_match_nonexistent(self):
+    def test_file_match_nonexistent(self):
         _result = utils.Filesystem.file_match('unknown-directory', '.*')
         self.assertEqual([], _result)
 
