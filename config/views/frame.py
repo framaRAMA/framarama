@@ -263,7 +263,7 @@ class PathsStepSourceFrameView(base.BaseStepSourceFrameConfigView):
             _path = utils.Filesystem.path_normalize(_path, root=_root, absolute=True) if _path != '' else _root
             _items = []
             for _item in utils.Filesystem.file_match(_path, '.*', files=False, dirs=True):
-                _items.append({'name': _item})
+                _items.append({'name': _item[0]})
             self.response_json(_context, {'path': _path.replace(_root, '').strip('/'), 'items': _items})
         else:
             self.response_json(_context, {'path': '', 'items': _items})
