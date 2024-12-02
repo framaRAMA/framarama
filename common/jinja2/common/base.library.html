@@ -145,7 +145,7 @@
 
     <!-- Custom CSS & JS -->
     <link rel="stylesheet" href="{{ static('common/framarama.css') }}?1668440570">
-    <script src="{{ static('common/framarama.js') }}?1729011119"></script>
+    <script src="{{ static('common/framarama.js') }}?1733138214"></script>
     <link rel="apple-touch-icon" sizes="180x180" href="{{ static('common/icon/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ static('common/icon/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ static('common/icon/favicon-16x16.png') }}">
@@ -493,7 +493,7 @@
                 }
                 data.items.forEach(item => {
                   html += '<tr>';
-                  html += '<td class="col-12" scope="row"><a href="#" onclick="pathResultQuery(this.textContent); return false;" class="d-block">{{ icon("folder", "me-2") }}' + item.name + '</a></td>';
+                  html += '<td class="col-12" scope="row"><a href="#" onclick="pathResultQuery(this.textContent); return false;" class="d-block">{{ icon("folder", "me-2") }}' + htmlEscape(item.name) + '</a></td>';
                   html += '</tr>';
                 });
                 html += '</table>';
