@@ -103,6 +103,10 @@ class Filesystem:
         shutil.copyfile(source, target)
 
     @staticmethod
+    def file_link(source, target):
+        os.symlink(source, target)
+
+    @staticmethod
     def file_delete(filename):
         os.remove(filename)
 

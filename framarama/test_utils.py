@@ -46,6 +46,12 @@ class FilesystemTestCase(TestCase):
         self.assertTrue(_exists1)
         self.assertTrue(_exists2)
 
+    def text_file_link(self):
+        utils.Filesystem.file_link('dummy', 'test')
+        _exists = os.path.exists('test')
+        os.remove('test')
+        self.assertTrue(_exists)
+
     def test_file_delete(self):
         with open('test', 'wb') as f:
             f.write(b'Hello World!')
