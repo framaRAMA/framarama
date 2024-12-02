@@ -80,24 +80,21 @@ class Scheduler(jobs.Scheduler):
         _media_path = settings.FRAMARAMA['MEDIA_PATH']
         _mount_path = settings.FRAMARAMA['MOUNT_PATH']
         _mount_level = settings.FRAMARAMA['MOUNT_LEVEL']
-        _links = []
-        _mounts = []
-        if _media_path:
-            _links = [_dir[0] for _dir in utils.Filesystem.file_match(_media_path, '.*', files=False, links=True)]
-            if _mount_path and utils.Filesystem.file_exists(_mount_path):
-                _mounts = [_dir[0] for _dir in utils.Filesystem.file_match(_mount_path, '.*', files=False, dirs=True, recurse=_mount_level, recurse_min=_mount_level)]
-            _mounts = [(os.path.basename(_mount), _mount) for _mount in _mounts]
-            _links = [(os.path.basename(_link), _link) for _link in _links]
+        _links = [(os.path.basename(_mount[0]), _mount[0]) for _mount in utils.Filesystem.file_match(
+            _media_path, '.*', files=False, links=True)] if _media_path else []
+        _mounts = [(os.path.basename(_link[0]), _link[0]) for _link in utils.Filesystem.file_match(
+            _mount_path, '.*', files=False, dirs=True,
+            recurse=_mount_level, recurse_min=_mount_level)] if _mount_path else []
         utils.Lists.process(
-            _mounts, lambda ids: [(_i, _v) for _i, _v in _links if _i in ids],
-            _links, lambda ids: [(_i, _v) for _i, _v in _mounts if _i in ids],
-            create_func=lambda i, val: logger.info("Adding mount path {} -> {}".format(
-                _mount_path + '/' + val,
-                _media_path + '/' + i,
-                utils.Filesystem.file_link(_mount_path + '/' + val, _media_path + '/' + i))),
-            delete_func=lambda i, val: logger.info("Removing mount path {}".format(
-                _media_path + '/' + i,
-                utils.Filesystem.file_delete(_media_path + '/' + i))))
+            _mounts, lambda ids: [(_name, _path) for _name, _path in _links if _name in ids],
+            _links, lambda ids: [(_name, _path) for _name, _path in _mounts if _name in ids],
+            create_func=lambda name, path: logger.info("Adding mount path {} -> {}".format(
+                _mount_path + '/' + path,
+                _media_path + '/' + name,
+                utils.Filesystem.file_link(_mount_path + '/' + path, _media_path + '/' + name))),
+            delete_func=lambda name, path: logger.info("Removing mount path {}".format(
+                _media_path + '/' + name,
+                utils.Filesystem.file_delete(_media_path + '/' + name))))
 
     def timezone_activate(self):
         self._time_zone = frontend.Frontend.get().get_config().get_config().sys_time_zone
