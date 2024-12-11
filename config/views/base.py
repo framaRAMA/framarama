@@ -54,7 +54,7 @@ class BaseConfigView(BaseAuthenticatedView):
                 _thumbnail_data = item.thumbnail.data()
                 _thumbnail_mime = item.thumbnail.data_mime
         except Exception as e:
-            logger.error("Can not load thumbnail data #{}: {}".format(data.thumbnail.id, e))
+            logger.error("Can not load thumbnail data #{}: {}".format(item.thumbnail.id, e))
         self.response(context, _thumbnail_data, _thumbnail_mime)
 
     def response_item_download(self, context, item):
