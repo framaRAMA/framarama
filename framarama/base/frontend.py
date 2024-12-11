@@ -145,8 +145,8 @@ class Frontend(Singleton):
                 self.init_set(self.get_status())
                 self._bg_hint("")
             else:
-                _init_status = self.get_init_status()
-                self._bg_hint("{}{}".format('Error: ' if _init_status['status'] == 'Error' else '', _init_status['phase']))
+                _init_status = self.get_init_status()['phase']
+                self._bg_hint("{}{}".format('Error: ' if _init_status['status'] == 'Error' else '', _init_status['name']))
         elif self._init_phase < _last_pre_init_phase:
             self._init_phase = _last_pre_init_phase
         if self.get_config().get_config() is None:
