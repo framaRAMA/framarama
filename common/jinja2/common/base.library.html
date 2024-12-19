@@ -587,9 +587,11 @@
   {% set field_groups = form.field_groups()|default({}) %}
   {% if field_groups|count %}
     {% for field_group_name, field_group in field_groups.items() %}
-      <div class="pt-3 fw-bold">{{ field_group['title'] }}</div>
-      <div class="mb-3 w-100 gradient-form-group"></div>
-      {% for field_name in field_group['fields'] %}{{ form_field(form, form[field_name]) }}{% endfor %}
+      {% if field_group['fields'] %}
+        <div class="pt-3 fw-bold">{{ field_group['title'] }}</div>
+        <div class="mb-3 w-100 gradient-form-group"></div>
+        {% for field_name in field_group['fields'] %}{{ form_field(form, form[field_name]) }}{% endfor %}
+      {% endif %}
     {% endfor %}
   {% else %}
     {% for field in form %}{{ form_field(form, field) }}{% endfor %}
