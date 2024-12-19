@@ -13,7 +13,9 @@ class GroupForm(FinishingForm):
     dependencies = {}
 
     class Meta(FinishingForm.Meta):
-        pass
+        entangled_fields = {'plugin_config': []}
+
+    field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
 
 
 class Implementation(FinishingPluginImplementation):
