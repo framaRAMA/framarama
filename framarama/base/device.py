@@ -316,7 +316,8 @@ class Capabilities:
                         _value = True if _value == 'yes' else False
                     _profile[_column] = _value
                     _i = _i + 1
-                _profiles[_profile['name']] = _profile
+                if _profile['name'] != 'lo':
+                    _profiles[_profile['name']] = _profile
         return _profiles
 
     def nmcli_ap_active(profiles):
