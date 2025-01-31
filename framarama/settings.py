@@ -232,6 +232,8 @@ FRAMARAMA = {
     'API_URL': 'http://127.0.0.1:8000',
     'IMAGE_PROCESSING_ADAPTER': 'config.utils.finishing.WandImageProcessingAdapter',
     'GIT_REMOTE': 'origin',
+    'AP_NAME': 'framaRAMA',
+    'AP_PASS': 'framarama',
     'FRONTEND_KEYSTROKES': False,
     'FRONTEND_ITEM_UPDATE_INTERVAL': '00:05:00',
     'FRONTEND_THUMBNAIL_SIZE': [640, 480],

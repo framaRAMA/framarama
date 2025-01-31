@@ -397,7 +397,9 @@ class Capabilities:
         if not Capabilities.nmcli_ap_active(_profiles):
             logger.info("Activating Access Point.")
             if 'framarama' not in _profiles:
-                Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', 'framaRAMA', 'password', 'framarama', 'band', 'bg'], sudo=True)
+                _ap_ssid = settings.FRAMARAMA['AP_SSID']
+                _ap_pass = settings.FRAMARAMA['AP_PASS']
+                Process.exec_run(['sudo', '-n', 'nmcli', 'device', 'wifi', 'hotspot', 'con-name', 'framarama', 'ssid', _ap_ssid, 'password', _ap_pass, 'band', 'bg'], sudo=True)
             else:
                 Process.exec_run(['sudo', '-n', 'nmcli', 'connection', 'up', 'framarama'], sudo=True)
         else:

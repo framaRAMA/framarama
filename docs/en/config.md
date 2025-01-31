@@ -119,6 +119,19 @@ value to `None` to disable automatic updates completely.
 
 ### Frontend
 
+#### `FRAMARAMA.AP_NAME`
+
+Default: `framaRAMA`
+
+In case the wireless network connection can not be established a fallback
+access point will be started with this name.
+
+#### `FRAMARAMA.AP_PASS`
+
+Default: `framarama`
+
+When the fallback access point is started it is using this password.
+
 #### `FRAMARAMA.FRONTEND_KEYSTROKES`
 
 Default: `True`
