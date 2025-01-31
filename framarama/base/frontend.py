@@ -687,7 +687,7 @@ class FrontendMonitoring(threading.Thread):
         self._xinput = None
         self._running = False
         self._key_events = []
-        if Process.exec_search('Xxinput') and Process.exec_search('Xxmodmap'):
+        if Process.exec_search('xinput') and Process.exec_search('xmodmap'):
             self._xinput = True
         else:
             logger.warning("Not monitoring for keyboard events (xinput/xmodmap is missing)")
