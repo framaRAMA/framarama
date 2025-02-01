@@ -145,7 +145,7 @@ class DisplayStatus(BaseModel):
         max_length=32, blank=True, null=True,
         verbose_name='Operating system distribution', help_text='Distribution of installed operating system')
     os_name = models.CharField(
-        max_length=32, blank=True, null=True,
+        max_length=64, blank=True, null=True,
         verbose_name='Operating system', help_text='Name of installed operating system')
     os_version = models.CharField(
         max_length=32, blank=True, null=True,
