@@ -194,6 +194,12 @@ class Filesystem:
             _result = _result.relative_to(_root)
         return str(_result)
 
+    def path_create(path):
+        os.makedirs(path, exist_ok=True)
+
+    def path_exists(path):
+        return os.path.isdir(path)
+
 
 class Process:
 

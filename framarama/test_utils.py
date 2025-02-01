@@ -171,6 +171,24 @@ class FilesystemTestCase(TestCase):
         os.remove('test-1.txt')
         os.remove('test-2.txt')
 
+    def test_path_create(self):
+        utils.Filesystem.path_create('test')
+        _result = os.path.isdir('test')
+        os.rmdir('test')
+        self.assertEquals(True, _result, 'Created directory does not exist')
+
+    def test_path_create_recursive(self):
+        utils.Filesystem.path_create('test/test')
+        _result1 = os.path.isdir('test')
+        _result2 = os.path.isdir('test/test')
+        os.rmdir('test/test')
+        os.rmdir('test')
+        self.assertEquals(True, _result1, 'Created directory does not exist')
+        self.assertEquals(True, _result2, 'Created sub-directory does not exist')
+
+    def test_path_exists(self):
+        self.assertEquals(False, utils.Filesystem.path_exists('unknown'))
+
     def test_path_normalize_relative(self):
         _pathes = {
             None: None,
