@@ -80,6 +80,10 @@ class Scheduler(jobs.Scheduler):
         _media_path = settings.FRAMARAMA['MEDIA_PATH']
         _mount_path = settings.FRAMARAMA['MOUNT_PATH']
         _mount_level = settings.FRAMARAMA['MOUNT_LEVEL']
+        if not utils.Filesystem.path_exists(_mount_path):
+            return
+        if not utils.Filesystem.path_exists(_media_path):
+            utils.Filesystem.path_create(_media_path)
         _links = [(os.path.basename(_mount[0]), _mount[0]) for _mount in utils.Filesystem.file_match(
             _media_path, '.*', files=False, links=True)] if _media_path else []
         _mounts = [(os.path.basename(_link[0]), _link[0]) for _link in utils.Filesystem.file_match(
