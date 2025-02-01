@@ -466,6 +466,9 @@ class FrontendDevice(Singleton):
             ['json', 'image', 'preview'],
             start=start, reverse=reverse)
 
+    def bg_hint(self, msg):
+        Frontend.get()._bg_hint(msg)
+
     def monitor(self):
         return self._monitor
 
@@ -591,6 +594,7 @@ class FrontendDevice(Singleton):
         return self.FILE_UPLOAD
 
     def network_connect(self, name):
+        self.bg_hint("Connecting to network {}".format(name))
         self.get_capability().net_profile_connect(name=name)
         self._network['started'] = None
         self._network['connected'] = None
@@ -615,6 +619,8 @@ class FrontendDevice(Singleton):
             if _ap_active:
                 logger.info("Access Point active - disabling first!")
                 self.network_ap_toggle()
+            elif not self._network['profile'] is None:
+                self.bg_hint("Checking network connectivity")
         if _ap_active:
             return False
         _profile_list = [_name for _name in _profile_list if _profile_list[_name]['active']]
@@ -626,11 +632,13 @@ class FrontendDevice(Singleton):
                     self._network['networks'] = self.get_capability().net_wifi_list()
                     self.network_ap_toggle()
                     self._network['connected'] = DateTime.now()
+                    self.bg_hint("Connect to framaRAMA and open http://framarama/")
                 else:
                     logger.info("Not connected within 30 seconds - try to connect previous network {}".format(_previous))
                     self._network['profile'] = None
                     self._network['previous'] = None
                     self.network_connect(_previous)
+                    self.bg_hint("Connecting to {}".format(_previous))
             else:
                 _ip = self.get_capability().net_config()
                 if _ip['ip']:
@@ -646,7 +654,10 @@ class FrontendDevice(Singleton):
         else:
             self._network['connected'] = DateTime.now()
             self._network['profile'] = _profile_list[0]
-            logger.info("Connected to {}".format(self._network['profile']))
+            _ip = self.get_capability().net_config()
+            _msg = "Connected to {} (IP {})".format(self._network['profile'], ','.join(_ip['ip']))
+            logger.info(_msg)
+            self.bg_hint(_msg)
             return True
         return False
 
