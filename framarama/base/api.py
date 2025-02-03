@@ -87,10 +87,10 @@ class ApiClient(Singleton):
     def _http(self, url, method, data=None, headers={}, **kwargs):
         return Network.get_url(url, method, data, headers, self._user_agent, **kwargs)
 
-    def _request(self, path, method=METHOD_GET, data=None, raw=False):
+    def _request(self, path, method=METHOD_GET, data=None, raw=False, **kwargs):
         if not self.configured():
             raise Exception("API client not configured")
-        _response = self._http(self._base_url + path, method, data, {'X-Display': self._display_access_key})
+        _response = self._http(self._base_url + path, method, data, {'X-Display': self._display_access_key}, **kwargs)
         _response.raise_for_status()
         return _response if raw else _response.json()
 
@@ -114,7 +114,10 @@ class ApiClient(Singleton):
         return ApiResultItem(data, lambda d: self._map(d, model, serializer))
 
     def get_url(self, url, method=METHOD_GET, data=None, headers={}, **kwargs):
-        return self._http(url, method, data, headers, **kwargs)
+        if url.startswith(self._base_url):
+            return self._request(url[len(self._base_url):], method, data, True, **kwargs)
+        else:
+            return self._http(url, method, data, headers, **kwargs)
 
     def get_display(self):
         _data = self._request('/displays')
