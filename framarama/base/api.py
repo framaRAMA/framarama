@@ -14,7 +14,12 @@ class ApiResult:
         self._mapper = mapper
 
     def _map(self, data):
+        if data is None:
+            return None
         return self._mapper(data)
+
+    def get(self, name, default=None):
+        return self._data.get(name, default) if self._data else None
 
 
 class ApiResultItem(ApiResult):
@@ -23,9 +28,6 @@ class ApiResultItem(ApiResult):
         super().__init__(data, mapper)
         self._item = None
 
-    def get(self, name, default=None):
-        return self._data.get(name, default) if self._data else None
-
     def get_link(self, name, default=None):
         for _link in self.get('links'):
             if _link['rel'] == name:
@@ -33,8 +35,6 @@ class ApiResultItem(ApiResult):
         return default
 
     def item(self):
-        if self._data is None:
-            return None
         if self._item is None:
             self._item = self._map(self._data)
         return self._item
@@ -47,16 +47,14 @@ class ApiResultList(ApiResult):
         self._items = None
 
     def count(self):
-        return self._data.get('count', 0) if self._data else None
+        return self.get('count', 0)
 
     def items(self):
-        if self._data is None:
-            return None
         if self._items is None:
-            self._items = [ApiResultItem(_item, self._map) for _item in self._data['results']]
+            self._items = [ApiResultItem(_item, self._map) for _item in self.get('results')]
         return self._items
 
-    def get(self, index):
+    def item(self, index):
         return self.items()[index]
 
 
@@ -140,7 +138,7 @@ class ApiClient(Singleton):
     def get_items_next(self, display_id):
         _data = self._request('/displays/{}/items/next'.format(display_id))
         _result = self._list(_data, config_models.RankedItem, config_views.RankedItemDisplaySerializer)
-        return _result.get(0) if _result.count() > 0 else None
+        return _result.item(0) if _result.count() > 0 else None
 
     def submit_item_hit(self, display_id, data, thumbnail=None, mime=None, meta=None):
         if thumbnail or mime:
