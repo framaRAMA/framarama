@@ -422,17 +422,17 @@ class Display(Singleton):
 
     def get_next_item(self, refresh=False):
         if self._next is None or refresh:
-            self._next = self._client.get_items_next(self.get_id())
+            self._next = self._client.get_items_next(self.get_id()).item()
         return self._next
 
     def get_contexts(self, refresh=False):
         if self._contexts is None or refresh:
-            self._contexts = self._client.get_contexts(self.get_id())
+            self._contexts = [_item.item() for _item in self._client.get_contexts(self.get_id()).items()]
         return self._contexts
 
     def get_finishings(self, refresh=False):
         if self._finishings is None or refresh:
-            self._finishings = self._client.get_finishings(self.get_id())
+            self._finishings = [_item.item() for _item in self._client.get_finishings(self.get_id()).items()]
         return self._finishings
 
 
