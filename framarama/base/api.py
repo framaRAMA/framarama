@@ -26,6 +26,12 @@ class ApiResultItem(ApiResult):
     def get(self, name, default=None):
         return self._data.get(name, default) if self._data else None
 
+    def get_link(self, name, default=None):
+        for _link in self.get('links'):
+            if _link['rel'] == name:
+                return _link['href']
+        return default
+
     def item(self):
         if self._data is None:
             return None
