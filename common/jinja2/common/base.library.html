@@ -443,12 +443,12 @@
     'CheckboxSelectMultiple' : 'form-check-multiple',
     'ClearableFileInput' : 'form-field',
   } %}
-  {% set field_class = field.field.widget.__class__.__name__ %}
-  {% set input_class = class_map[field_class] if field_class in class_map else 'form-floating' %}
-  {% set input_error_class = 'is-invalid' if field.name in form.errors else '' %}
   {% if field.is_hidden %}
     {{ field }}
   {% else %}
+    {% set field_class = field.field.widget.__class__.__name__ %}
+    {% set input_class = class_map[field_class] if field_class in class_map else 'form-floating' %}
+    {% set input_error_class = 'is-invalid' if field.name in form.errors else '' %}
     <div class="mb-3 {{ input_class }} {{ input_error_class }}">
         {% if field_class != 'CheckboxSelectMultiple' and field_class != 'ClearableFileInput' %}
           {{ field }}
@@ -592,17 +592,67 @@
 {% endmacro %}
 
 {% macro form_fields(form) %}
-  {% set field_groups = form.field_groups()|default({}) %}
-  {% if field_groups|count %}
-    {% for field_group_name, field_group in field_groups.items() %}
-      {% if field_group['fields'] %}
-        <div class="pt-3 fw-bold">{{ field_group['title'] }}</div>
-        <div class="mb-3 w-100 gradient-form-group"></div>
-        {% for field_name in field_group['fields'] %}{{ form_field(form, form[field_name]) }}{% endfor %}
-      {% endif %}
+  {% if form.management_form %}
+    {{ form.management_form }}
+    {% for f in form.forms %}
+      <div id="{{ form.prefix }}-{{ loop.index0 }}">
+        <hr/>
+        {% if f.TITLE %}
+          <h6>
+            {{ f.TITLE }}
+            <a id="{{ form.prefix }}-del-{{ loop.index0 }}" class="btn btn-danger btn-xs float-end px-2 py-1">{{ icon('action.delete', '') }}</a>
+          </h6>
+        {% endif %}
+        {{ form_fields(f) }}
+      </div>
     {% endfor %}
+    <hr id="{{ form.prefix }}-divider"/>
+    <a id="{{ form.prefix }}-add" class="btn btn-success float-end">{{ icon('action.add') }}</a>
+    <script type="text/javascript">
+      window.document.getElementById('{{ form.prefix }}-add').onclick = function () {
+        const forms = document.querySelectorAll('div[id ^= "{{ form.prefix }}-"]');
+        const formsCount = forms.length;
+        const formDivider = document.getElementById('{{ form.prefix }}-divider');
+        const newForm = forms[formsCount-1].outerHTML
+          .replaceAll('{{ form.prefix }}-'+(formsCount-1), '{{ form.prefix }}-'+formsCount)
+          .replaceAll(/value="[^"]*"/gi, 'value=""');
+        formDivider.outerHTML = newForm + formDivider.outerHTML;
+        document.getElementById('id_{{ form.prefix }}-TOTAL_FORMS').setAttribute('value', formsCount+1);
+        document.getElementById('id_{{ form.prefix }}-INITIAL_FORMS').setAttribute('value', formsCount+1);
+      };
+      window.document.querySelectorAll('a[id ^= "{{ form.prefix }}-del-"]').forEach(el => el.onclick = function (evt) {
+        const forms = document.querySelectorAll('div[id ^= "{{ form.prefix }}-"]');
+        const formsCount = forms.length;
+        let clicked = evt.target;
+        while (!clicked.id.startsWith('{{ form.prefix }}-del-')) clicked = clicked.parentNode;
+        const formNum = parseInt(clicked.id.substring('{{ form.prefix }}-del-'.length));
+        const formDel = document.getElementById('{{ form.prefix }}-'+formNum);
+        formDel.parentNode.removeChild(formDel);
+        for (i=formNum+1; i<formsCount; i++) {
+          const formUpdate = document.getElementById('{{ form.prefix }}-'+i);
+          formUpdate.outerHTML = formUpdate.outerHTML
+            .replaceAll('{{ form.prefix }}-'+i, '{{ form.prefix }}-'+(i-1))
+            .replaceAll('{{ form.prefix }}-del-'+i, '{{ form.prefix }}-'+(i-1));
+        }
+        document.getElementById('id_{{ form.prefix }}-TOTAL_FORMS').setAttribute('value', formsCount-1);
+        document.getElementById('id_{{ form.prefix }}-INITIAL_FORMS').setAttribute('value', formsCount-1);
+      });
+    </script>
+  {% elif form.chain %}
+    {% for f in form.chain() %}{{ form_fields(f) }}{% endfor %}
   {% else %}
-    {% for field in form %}{{ form_field(form, field) }}{% endfor %}
+    {% set field_groups = form.field_groups()|default({}) %}
+    {% if field_groups|count %}
+      {% for field_group_name, field_group in field_groups.items() %}
+        {% if field_group['fields'] %}
+          <div class="pt-3 fw-bold">{{ field_group['title'] }}</div>
+          <div class="mb-3 w-100 gradient-form-group"></div>
+          {% for field_name in field_group['fields'] %}{{ form_field(form, form[field_name]) }}{% endfor %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% for field in form %}{{ form_field(form, field) }}{% endfor %}
+    {% endif %}
   {% endif %}
 {% endmacro %}
 
