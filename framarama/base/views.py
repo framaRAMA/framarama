@@ -118,6 +118,9 @@ class BaseQuerySetMixin:
               'contexts': (
                   _user.qs_contexts if hasattr(_user, 'qs_contexts') else
                   models.FrameContext.objects).filter(frame__user=_user),
+              'settings': (
+                  _user.qs_settings if hasattr(_user, 'qs_settings') else
+                  models.Settings.objects).filter(user=_user),
             })
         return self._qs
 

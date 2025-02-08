@@ -92,6 +92,19 @@ class BaseModel(models.Model):
         )
 
 
+class JsonPropertiesModel(BaseModel):
+    STR_FIELDS = BaseModel.STR_FIELDS + ["properties"]
+
+    category = models.CharField(
+        max_length=64)
+    properties = models.JSONField(
+        blank=True, null=True, editable=True, default=dict,
+        verbose_name='List of properties', help_text='All properties as key/value pairs in JSON structure')
+
+    class Meta:
+        abstract = True
+
+
 class PluginModel(BaseModel):
     STR_FIELDS = BaseModel.STR_FIELDS + ["plugin"]
 

@@ -1,0 +1,35 @@
+{% extends "config/base.settings.html" %}
+
+{% block content_settings %}
+<div class="row pt-3">
+
+{% for variable in variables %}
+  {% set body %}
+    {% for var_name, var_value in variable.properties.items() %}
+      {% if var_name not in ['id', 'created', 'updated', 'frame', 'category', 'properties'] and field_value != None %}
+        <strong>{{ var_name }}:</strong> {{ var_value }}{{ "\n" }}<br/>
+      {% endif %}
+    {% endfor %}
+  {% endset %}
+  {{ lib.card_list_item(
+    '<span>%d. %s</span>'|format(loop.index, variable.name)|safe,
+    '<div class="smaller font-monospace">%s</div>'|format(body)|safe,
+    [
+      {'title': 'Edit', 'icon': 'action.edit', 'url': url('settings_vars_edit', args=[variable.id])},
+      {'title': 'Delete', 'icon': 'action.delete', 'target': 'deleteSettings%s'|format(variable.id), 'classes': 'text-danger'}
+    ]
+  ) }}
+  {{ lib.modal_delete('deleteSettings%s'|format(variable.id), 'Delete variable', 'Do you really want to delete the selected variable "%s"?'|format(variable.name), url('settings_vars_action', args=[variable.id])+'?action=delete') }}
+{% else %}
+  <div class="col-12 pt-2">
+    {{ lib.note('No variables defined. Click on the add button to create a new one.', 'info') }}
+  </div>
+{% endfor %}
+
+</div>
+
+{{ lib.nav_actions([
+  {'icon': 'action.add', 'url': url('settings_vars_create'), 'type': 'success', 'title': 'Add variable'},
+]) }}
+
+{% endblock %}

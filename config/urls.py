@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from config.views import LoginView, LogoutView, IndexView, ProfileView, ProfileEditView
-from config.views import frame, display
+from config.views import frame, display, settings
 
 urlpatterns = [
     path('accounts/login', LoginView.as_view()),
@@ -68,4 +68,10 @@ urlpatterns = [
     path('displays/<int:display_id>/access', display.ViewAccessDisplayView.as_view(), name='display_access'),
     path('displays/<int:display_id>/access/edit', display.UpdateAccessDisplayView.as_view(), name='display_access_edit'),
     path('displays/<int:display_id>/thumbnail', display.ThumbnailDisplayView.as_view(), name='display_thumbnail'),
+
+    path('settings', settings.ListSettingsView.as_view(), name='settings_list'),
+    path('settings/variables', settings.ListVarsSettingsView.as_view(), name='settings_vars_list'),
+    path('settings/variables/create', settings.CreateVarsSettingsView.as_view(), name='settings_vars_create'),
+    path('settings/variables/<int:settings_id>/edit', settings.UpdateVarsSettingsView.as_view(), name='settings_vars_edit'),
+    path('settings/variables/<int:settings_id>/action', settings.ActionVarsSettingsView.as_view(), name='settings_vars_action'),
 ]

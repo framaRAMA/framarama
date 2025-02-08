@@ -76,3 +76,20 @@ class BaseModelForm(forms.ModelForm, BaseForm):
 class UploadFieldForm(forms.Form):
     upload = forms.FileField(label='File', widget=fileWidget())
 
+
+class BaseChainedForm(BaseForm):
+
+    def __init__(self, forms, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self._chain = forms
+        self.is_bound = all(_form.is_bound for _form in self._chain)
+
+    def chain(self):
+        return self._chain
+
+    def clean(self):
+        for _form in self._chain:
+            _form.clean()
+
+    def is_valid(self):
+        return all(_form.is_valid() for _form in self._chain)

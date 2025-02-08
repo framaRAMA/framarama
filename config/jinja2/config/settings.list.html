@@ -1,0 +1,12 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<div class="row pt-3">
+
+  {{ lib.card_item('Global variables', 'Use variables in frame or display setups', [
+    {'title': 'View', 'icon': 'action.view', 'url': url('settings_vars_list'), 'align': 'center'}
+  ], lib.icon('settings.vars'), null, null, 'col-12 col-md-4') }}
+
+</div>
+
+{% endblock %}

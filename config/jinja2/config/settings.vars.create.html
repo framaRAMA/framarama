@@ -1,0 +1,8 @@
+{% extends "config/base.settings.html" %}
+
+{% block content_settings %}
+{{ lib.form_start(form, csrf_input, 'Add variables') }}
+{{ lib.form_fields(form) }}
+{{ lib.form_end(form, submit_class="btn-success", cancel=url('settings_vars_list')) }}
+{% endblock %}
+

@@ -111,7 +111,10 @@
   'display.access' : 'key',
   'display.items.latest': 'clock',
   'display.items.top': 'arrow-trend-up',
-  'display.items.least': 'arrow-trend-down'
+  'display.items.least': 'arrow-trend-down',
+
+  'settings.list' : 'sliders',
+  'settings.vars' : 'list',
 }
 %}
 
@@ -186,6 +189,11 @@
           <li class="nav-item">
             <a class="nav-link{{ nav_active(request, 'display_list') }}" href="{{ url('display_list') }}">
               {{ icon('display') }} Displays
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{{ nav_active(request, 'settings_list') }}" href="{{ url('settings_list') }}">
+              {{ icon('settings.list') }} Settings
             </a>
           </li>
           {% if config != None and 'frontend' in MODES %}
