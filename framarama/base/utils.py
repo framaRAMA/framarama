@@ -628,12 +628,24 @@ class Network:
 class Template:
 
     @staticmethod
-    def render(template, globals_vars={}):
-        if template is None:
-            return None
+    def _env():
         _env = SandboxedEnvironment()
-        _env.globals.update(globals_vars)
         _env.keep_trailing_newline = True
         _env.filters['split'] = lambda v, sep=None, maxsplit=-1: str(v).split(sep, maxsplit)
         _env.filters['keys'] = lambda v: dict(v).keys()
+        return _env
+
+    @staticmethod
+    def render(template, globals_vars={}):
+        if template is None:
+            return None
+        _env = Template._env()
+        _env.globals.update(globals_vars)
         return _env.from_string(template).render()
+
+    @staticmethod
+    def parse(template):
+        if template is None:
+            return None
+        _env = Template._env()
+        _env.parse(_env.from_string(template))

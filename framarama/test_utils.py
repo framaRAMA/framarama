@@ -1,6 +1,7 @@
 import os
 import datetime
 import zoneinfo
+import jinja2
 
 from unittest import TestCase
 
@@ -785,3 +786,16 @@ hello \"\"\" world \"\"\"
 </html>
 """
         self.assertEqual('\n<html>\n<head>\n  <script>\n  function dummy() {\n    return \'hello world\';\n  }\n  </script>\n</head>\n<body/>\n</html>\n', utils.Template.render(_text))
+
+    def test_parse_none(self):
+        utils.Template.parse(None)
+
+    def  test_parse_string(self):
+        utils.Template.parse("{{ 'Hello World' }}")
+
+    def test_parse_filter(self):
+        utils.Template.parse("{{ 'Hello World'|lower }}")
+
+    def test_parse_invalid_string(self):
+        with self.assertRaises(jinja2.exceptions.TemplateSyntaxError):
+            utils.Template.parse("{{ 'Hello }}")
