@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from config import models
 from config.forms.base import BasePluginForm, TreeBasePluginForm
-from framarama.base import forms as base
+from framarama.base import utils, forms as base
 
 
 class CreateFrameForm(base.BaseModelForm):
@@ -125,7 +125,7 @@ class FinishingForm(TreeBasePluginForm):
             if _value is None or type(_value) != str:
                 continue
             try:
-                jinja2.Environment().from_string(_value)
+                utils.Template.parse(_value)
             except jinja2.exceptions.TemplateSyntaxError as e:
                 raise ValidationError('Invalid template in {}: {}'.format(_name, e))
         return _data
