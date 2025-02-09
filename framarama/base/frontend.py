@@ -482,14 +482,14 @@ class FrontendDevice(Singleton):
 
     def _finish(self, display, item, output):
         logger.info('Finishing item {}'.format(item))
-        _adapter = finishing.ImageProcessingAdapter.get_default()
         _context = finishing.Context(
             display.display(),
             display.frame(),
             display.get_contexts(True),
             item,
             display.get_finishings(True),
-            _adapter,
+            display.get_setting_variables(),
+            finishing.ImageProcessingAdapter.get_default(),
             self)
         with _context:
             _start = DateTime.now()

@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 class Context:
     DEFAULT_IMAGE_NAME = 'default'
 
-    def __init__(self, display, frame, contexts, item, finishings, adapter, device=None):
+    def __init__(self, display, frame, contexts, item, finishings, variables, adapter, device=None):
         self._display = display
         self._frame = frame
         self._contexts = contexts
         self._item = item
         self._finishings = finishings
+        self._variables = variables
         self._image_data = {}
         self._adapter = adapter
         self._context = context.Context()
@@ -52,6 +53,9 @@ class Context:
 
     def get_finishings(self):
         return self._finishings
+
+    def get_variables(self):
+        return self._variables
 
     def get_adapter(self):
         return self._adapter
@@ -304,7 +308,7 @@ class Processor:
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
             self._context.set_resolver('item', context.ObjectResolver(_item))
-            self._context.set_resolver('var', context.MapResolver({}))
+            self._context.set_resolver('globals', context.MapResolver(self._context.get_variables()))
             self._context.set_resolver('env', context.EnvironmentResolver())
             self._context.set_resolver('image', context.MapResolver(_image_meta))
             self._context.set_resolver('images', context.MapResolver(_image_metas))
