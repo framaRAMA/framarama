@@ -8,6 +8,8 @@ from framarama.base.models import JsonPropertiesModel
 class Settings(JsonPropertiesModel):
     STR_FIELDS = JsonPropertiesModel.STR_FIELDS + []
 
+    CAT_VARS = 'vars'
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(
         max_length=255,
