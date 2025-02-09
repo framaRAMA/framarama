@@ -270,9 +270,9 @@ class Processor:
         _frame= self._context.get_frame()
         if not _frame.enabled:
             return None
-        _context_plugins = ContextPluginRegistry.get_enabled(self._context.get_contexts())
         logger.info("Finishing {}".format(_item))
-        _adapter = self._context.get_adapter()
+        _contexts = []
+        _contexts.extend(ContextPluginRegistry.get_enabled(self._context.get_contexts()))
         _finishings = []
         _finishings.extend([models.Finishing(frame=_frame, enabled=True, **{
             'plugin': 'image', 'plugin_config': { 'url': _item.url }
@@ -281,6 +281,7 @@ class Processor:
         _finishings.extend(self._watermark)
         _meta = {'duration': None, 'steps': []}
         _start = DateTime.now()
+        _adapter = self._context.get_adapter()
         for _plugin, _finishing in FinishingPluginRegistry.get_enabled(_finishings):
             logger.info("Processing finishing {}".format(_finishing))
             _start_finishing = DateTime.now()
@@ -303,7 +304,7 @@ class Processor:
 
             _image_meta = _adapter.image_meta(_image) if _image.get_images() else {}
 
-            self._register_context_resolvers(_context_plugins, _image)
+            self._register_context_resolvers(_contexts, _image)
 
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
