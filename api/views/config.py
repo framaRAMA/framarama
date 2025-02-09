@@ -379,6 +379,15 @@ class ContextDisplaySerializer(BaseSerializer):
         ) if _display_id else ()
 
 
+class SettingsSerializer(BaseSerializer):
+
+    class Meta:
+        model = models.Settings
+        fields = BaseSerializer.Meta.fields + ('name', 'category', 'properties',)
+        read_only_fields = BaseSerializer.Meta.read_only_fields
+        map_fields = BaseSerializer.Meta.fields + ('properties',)
+
+
 class BaseListView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -522,4 +531,17 @@ class ContextDisplayViewSet(BaseViewSet):
         return self.qs().contexts.filter(frame__display__id=_display_id)
 
 
+class SettingsViewSet(BaseViewSet):
+    serializer_class = SettingsSerializer
+
+    def get_queryset(self):
+        return self.qs().settings.all()
+
+
+class CategorySettingsViewSet(BaseViewSet):
+    serializer_class = SettingsSerializer
+
+    def get_queryset(self):
+        _category = self.kwargs.get('category')
+        return self.qs().settings.filter(category=_category)
 

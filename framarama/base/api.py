@@ -167,6 +167,11 @@ class ApiClient(Singleton):
             self._request('/displays/{}/finishings'.format(display_id)),
             config_models.Finishing, config_views.FinishingDisplaySerializer)
 
+    def get_setting_variables(self) -> ApiResultList:
+        return self._list(
+            self._request('/settings/vars'),
+            config_models.Settings, config_views.SettingsSerializer)
+
     def submit_status(self, display_id: int, status: dict) -> ApiResultList:
         return self._request('/displays/{}/status'.format(display_id), ApiClient.METHOD_POST, status)
 

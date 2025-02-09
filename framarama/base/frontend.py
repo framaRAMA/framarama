@@ -343,6 +343,7 @@ class Display(Singleton):
         self._next = None
         self._finishings = None
         self._contexts = None
+        self._setting_vars = None
 
     def display(self):
         return self._data.item()
@@ -434,6 +435,13 @@ class Display(Singleton):
         if self._finishings is None or refresh:
             self._finishings = [_item.item() for _item in self._client.get_finishings(self.get_id()).items()]
         return self._finishings
+
+    def get_setting_variables(self, refresh=False):
+        if self._setting_vars is None or refresh:
+            self._setting_vars = {}
+            for _item in self._client.get_setting_variables().items():
+                self._setting_vars.update({_item.item().name: _item.item().properties})
+        return self._setting_vars
 
 
 class FrontendDevice(Singleton):
