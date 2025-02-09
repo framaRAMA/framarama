@@ -79,11 +79,7 @@ class StreamDisplayDashboardView(base.BaseFrontendView):
         return _context
 
     def _finish_streamed(self, device, display):
-        device.finish_file(
-            display,
-            display.get_contexts(True),
-            device.upload_file(),
-            display.get_finishings(True))
+        device.finish_file(display, device.upload_file())
         device.activate_item(device.get_streamed()[0])
 
 class ItemStreamDisplayDashboardView(base.BaseFrontendView):

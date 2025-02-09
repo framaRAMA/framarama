@@ -472,15 +472,15 @@ class FrontendDevice(Singleton):
     def monitor(self):
         return self._monitor
 
-    def _finish(self, display, contexts, item, finishings, output):
+    def _finish(self, display, item, output):
         logger.info('Finishing item {}'.format(item))
         _adapter = finishing.ImageProcessingAdapter.get_default()
         _context = finishing.Context(
             display.display(),
             display.frame(),
-            contexts,
+            display.get_contexts(True),
             item,
-            finishings,
+            display.get_finishings(True),
             _adapter,
             self)
         with _context:
@@ -512,15 +512,15 @@ class FrontendDevice(Singleton):
                     _result.get_image_mime()))
                 return _result
 
-    def finish_item(self, display, contexts, item, finishings):
+    def finish_item(self, display, item):
         _config = Frontend.get().get_config().get_config()
-        _result = self._finish(display, contexts, item, finishings, lambda: self._items_rotate(_config.count_items_keep))
+        _result = self._finish(display, item, lambda: self._items_rotate(_config.count_items_keep))
         if _result:
             return self.get_items(0, count=1)[0]
 
-    def finish_file(self, display, contexts, filename, finishings):
+    def finish_file(self, display, filename):
         _item = config_models.Item(**{'id_ext': -1, 'url': filename, 'date_creation': DateTime.now()})
-        _result = self._finish(display, contexts, _item, finishings, lambda: {
+        _result = self._finish(display, _item, lambda: {
             'json': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'json'),
             'image': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'image'),
             'preview': self.DATA_PATH + self.FILE_STREAM_FORMAT.format('stream', 'preview')
