@@ -606,11 +606,11 @@ class Network:
     METHOD_HEAD = 'HEAD'
 
     @staticmethod
-    def get_url(url, method, data=None, headers={}, user_agent={}, **kwargs):
+    def get_url(url, method, data=None, headers=None, user_agent={}, **kwargs):
         _headers = {}
         _headers['Connection'] = 'close'
         _headers['User-Agent'] = '/'.join(['framaRAMA'] + [_t+':'+str(_v) for _t, _v in user_agent.items() if _v])
-        _headers.update(headers)
+        _headers.update(headers or {})
         if method == Network.METHOD_GET:
             _response = requests.get(url, timeout=(15, 30), headers=_headers, **kwargs)
         elif method == Network.METHOD_POST:
