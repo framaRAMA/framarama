@@ -5,10 +5,18 @@ from django.conf import settings
 from framarama.base.models import JsonPropertiesModel
 
 
+class SettingsQuerySet(models.QuerySet):
+
+    def variables(self):
+        return self.filter(category=Settings.CAT_VARS)
+
+
 class Settings(JsonPropertiesModel):
     STR_FIELDS = JsonPropertiesModel.STR_FIELDS + []
 
     CAT_VARS = 'vars'
+
+    objects = SettingsQuerySet.as_manager()
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(

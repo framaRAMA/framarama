@@ -63,10 +63,7 @@ class Scheduler(jobs.Scheduler):
                 break
 
     def run_source_update(self, source):
-        _variables = {}
-        for _setting in models.Settings.objects.filter(user=source.frame.user, category=models.Settings.CAT_VARS):
-            _variables.update({_setting.name: _setting.properties})
-        _processor = source_util.Processor(source_util.Context(source.frame, source, _variables))
+        _processor = source_util.Processor(source_util.Context(source.frame, source, source.frame.get_variables()))
         _processor.process()
 
     def item_thumbnail(self, item):

@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from framarama.base import utils
 from framarama.base.models import BaseModel, PluginModel, TreePluginModel, TreeManager, TreeQuerySet
 from config.models.base import Data, ItemThumbnailData
-
+from config.models.settings import Settings
 
 MIME_CHOICES = [
   ('', 'Auto (automatically detect mime type)'),
@@ -44,6 +44,9 @@ class Frame(BaseModel):
     def get_last_update(self):
         _max = self.sources.aggregate(models.Max('update_date_start'))
         return _max['update_date_start__max'] if _max else None
+
+    def get_variables(self):
+        return {_settings.name: _settings.properties for _settings in Settings.objects.filter(user=self.user).variables()}
 
 
 class Source(BaseModel):

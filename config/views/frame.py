@@ -617,7 +617,6 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
         _width = request.GET['w'] if 'w' in request.GET else 1024
         _height = request.GET['h'] if 'h' in request.GET else 768
         _display = models.Display(**{'name': 'Preivew display', 'description': 'Display for preparing previews', 'enabled': True, 'device_width': int(_width), 'device_height': int(_height)})
-        _variables = {_settings.name: _settings.properties for _settings in self.qs().settings.filter(category=models.Settings.CAT_VARS)}
         if _item:
             _finishing_context = finishing.Context(
                 _display,
@@ -625,7 +624,7 @@ class PreviewImageFrameView(base.BaseFrameConfigView):
                 _frame.contexts.all(),
                 _item,
                 _frame.finishings.all(),
-                _variables,
+                _frame.get_variables(),
                 finishing.ImageProcessingAdapter.get_default())
             with _finishing_context:
                 _result = finishing.Processor(_finishing_context).process()
