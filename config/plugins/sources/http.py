@@ -23,7 +23,7 @@ METHOD_CHOICES = [
 
 
 class HttpForm(SourceStepForm):
-    url = forms.URLField(
+    url = forms.CharField(
         max_length=1024, widget=base.charFieldWidget(),
         label='Address (URL)', help_text='Enter the complete address (URL) to load')
     url_formatted = forms.BooleanField(
