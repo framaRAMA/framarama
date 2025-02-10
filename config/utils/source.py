@@ -6,7 +6,7 @@ from django.utils.dateparse import parse_datetime
 
 from framarama.base import utils
 
-from config.plugins import SourcePluginRegistry
+from config.plugins import PluginContext, SourcePluginRegistry
 from config.utils.data import DataType, DataContainer, NoopDataConverter
 from config import models
 from config.utils import context
@@ -15,12 +15,13 @@ from config.utils import context
 logger = logging.getLogger(__name__)
 
 
-class Context:
+class Context(PluginContext):
 
-    def __init__(self, frame, source=None, data={}):
+    def __init__(self, frame, source=None, variables=None):
+        super().__init__(variables)
         self._frame = frame
         self._source = source
-        self._data = data
+        self._data = {}
         self._time_zone = utils.DateTime.tz(self._frame.user.time_zone)
     
     def get_frame(self):

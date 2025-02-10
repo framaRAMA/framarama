@@ -8,26 +8,25 @@ from django.core.paginator import Paginator
 from framarama.base import api
 from framarama.base.utils import Filesystem, Classes, DateTime
 from config import models
-from config.plugins import FinishingPluginRegistry, ContextPluginRegistry
+from config.plugins import PluginContext, FinishingPluginRegistry, ContextPluginRegistry
 from config.utils import context
 
 
 logger = logging.getLogger(__name__)
 
 
-class Context:
+class Context(PluginContext):
     DEFAULT_IMAGE_NAME = 'default'
 
     def __init__(self, display, frame, contexts, item, finishings, variables, adapter, device=None):
+        super().__init__(variables)
         self._display = display
         self._frame = frame
         self._contexts = contexts
         self._item = item
         self._finishings = finishings
-        self._variables = variables
         self._image_data = {}
         self._adapter = adapter
-        self._context = context.Context()
         self._device = device
 
     def __enter__(self):
@@ -54,9 +53,6 @@ class Context:
     def get_finishings(self):
         return self._finishings
 
-    def get_variables(self):
-        return self._variables
-
     def get_adapter(self):
         return self._adapter
 
@@ -74,15 +70,6 @@ class Context:
     
     def set_image_data(self, image_name, image):
         self._image_data[image_name] = image
-
-    def set_resolver(self, name, resolver):
-        self._context.set_resolver(name, resolver)
-
-    def evaluate(self, expr):
-        return self._context.evaluate(expr)
-
-    def evaluate_model(self, model):
-        return self._context.evaluate_model(model)
 
     def close(self):
         _names = list(self._image_data.keys())
@@ -309,8 +296,6 @@ class Processor:
             self._context.set_resolver('display', context.ObjectResolver(_display))
             self._context.set_resolver('frame', context.ObjectResolver(_frame))
             self._context.set_resolver('item', context.ObjectResolver(_item))
-            self._context.set_resolver('globals', context.MapResolver(self._context.get_variables()))
-            self._context.set_resolver('env', context.EnvironmentResolver())
             self._context.set_resolver('image', context.MapResolver(_image_meta))
             self._context.set_resolver('images', context.MapResolver(_image_metas))
 

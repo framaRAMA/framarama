@@ -5,13 +5,14 @@ from django.db import connections, models as Model
 from django.db.models import functions as Function
 
 from framarama.base import utils
-from config.plugins import SortingPluginRegistry
+from config.plugins import PluginContext, SortingPluginRegistry
 from config.utils import context
 
 
-class Context:
+class Context(PluginContext):
 
-    def __init__(self, frame, random_item=False, sortings=None):
+    def __init__(self, frame, random_item=False, sortings=None, variables=None):
+        super().__init__(variables)
         self._frame = frame
         self._random_item = random_item
         self._sortings = sortings

@@ -66,6 +66,23 @@ class Plugin:
         return self._instances[instance].run(*args, **kwargs)
 
 
+class PluginContext:
+
+    def __init__(self, variables=None):
+        self._context = context.Context()
+        self.set_resolver('env', context.EnvironmentResolver())
+        self.set_resolver('globals', context.MapResolver(variables or {}))
+
+    def set_resolver(self, name, resolver):
+        self._context.set_resolver(name, resolver)
+
+    def evaluate(self, expr):
+        return self._context.evaluate(expr)
+
+    def evaluate_model(self, model):
+        return self._context.evaluate_model(model)
+
+
 class PluginRegistry:
     EXPORT_JSON = 'json'
     EXPORT_JSON_PRETTY = 'json-pretty'
