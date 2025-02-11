@@ -1,22 +1,17 @@
-import json
 
 from django import forms
-from django.forms.models import inlineformset_factory
-from entangled.forms import EntangledModelFormMixin
 
 from config import models
-from config.forms.base import BasePluginForm, TreeBasePluginForm
 from framarama.base import forms as base
 
 
-class SettingsForm(EntangledModelFormMixin, base.BaseModelForm):
+class SettingsForm(base.BaseModelForm):
     class Meta:
         model = models.Settings
         fields = ['name']
         widgets = {
             'name': base.charFieldWidget()
         }
-        untangled_fields = ['name']
 
 
 class VariableForm(base.BaseForm):
