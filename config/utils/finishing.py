@@ -122,7 +122,7 @@ class Processor:
                 'font': 'Helvetica', 'weight': '700', 'size': '{{' + _scale + '*0.3}}',
                 'color_stroke': '#ffffff', 'color_alpha': '50',
                 'start_x': "{{images['line']['width']/2}}",
-                'start_y': "{{" + _scale + "*0.17}}",
+                'start_y': "{{" + _scale + "*0.35}}",
             }
         }, {
             'plugin': 'transform', 'image_in': 'linetl', 'image_out': 'linetl', 'plugin_config': {
@@ -601,7 +601,7 @@ class ImageProcessingAdapter:
     def draw_circle(self, image, _pos, _size, _brush):
         raise NotImplementedException()
 
-    def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None):
+    def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None, rotate=None):
         raise NotImplementedException()
 
 
@@ -652,6 +652,19 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
     def _apply(self, image, func):
         for _image in image.get_images():
             func(_image)
+
+    def _draw_rotated(self, drawing, rotation, start, end, func):
+        _width = end.get_x() - start.get_x()
+        _height = end.get_y() - start.get_y()
+        _width2 = int(_width/2)
+        _height2 = int(_height/2)
+        _center_x = start.get_x() + _width2
+        _center_y = start.get_y() + _height2
+        drawing.translate(_center_x, _center_y)
+        drawing.rotate(rotation)
+        drawing.translate(-_width2, -_height2)
+        func(drawing, Position(0, 0), _width, _height)
+        drawing.translate(-_center_x+_width2, -_center_y+_height2)
 
     def prepare(self, device):
         _capability = device.get_capability()
@@ -778,9 +791,14 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             _drawing.line((start.get_x(), start.get_y()), (end.get_x(), end.get_y()))
             self._apply_drawing(image, _drawing)
 
-    def draw_rect(self, image, start, end, brush, radius=None):
+    def draw_rect(self, image, start, end, brush, radius=None, rotate=None):
         with self._drawing(brush=brush) as _drawing:
-            _drawing.rectangle(start.get_x(), start.get_y(), end.get_x(), end.get_y(), radius=radius)
+            self._draw_rotated(
+                _drawing,
+                rotate if rotate else 0,
+                start,
+                end,
+                lambda drawing, start, width, height: drawing.rectangle(start.get_x(), start.get_y(), start.get_x()+width, start.get_y()+height, radius=radius))
             self._apply_drawing(image, _drawing)
 
     def draw_circle(self, image, pos, size, brush):
@@ -788,7 +806,7 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
           _drawing.circle((pos.get_x(), pos.get_y()), (size.get_width(), size.get_height()))
           self._apply_drawing(image, _drawing)
 
-    def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None):
+    def draw_text(self, image, pos, text, brush, border_brush=None, border_radius=None, border_padding=None, rotate=None):
         with self._drawing(text=text, brush=brush) as _drawing:
             _text = text.get_text()
             _metrics = _drawing.get_font_metrics(image.get_images()[0], _text)
@@ -809,19 +827,34 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
             # ascender and descrender). Vertically shift down by descender. Horizontally
             # increased by descender for equal padding.
             # ascender (to top) is positive, descender (to bottom) is negative
+            #
+            #    _______________________________________________________________________
+            #    __X__X________X_____X_________________________________|<-- ascender   |
+            #      X  X   XX   X     X      XX       X  X   XX   X  X                  |
+            #      XXXX  XXXX  X     X     X  X      X  X  X  X  X  X                  |
+            #      X  X  X     X     X     X  X      X  X  X  X  X  X                  | text height
+            #    __X__X___XXX__ XXX__ XXX__ XX _______XXX___XX____XX___ <-- baseline   |
+            # x/y_/|                                    X           |  |<-- descender  |
+            #    __|__________________________________XX____________|__|_______________|
+            #      |               text width                       |
+            #
+            #
             _x1 = pos.get_x() - _padding + _xoffset + _metrics.descender
             _y1 = pos.get_y() - _padding + _yoffset - _metrics.text_height - _metrics.descender
             _x2 = pos.get_x() + _padding + _xoffset + _metrics.text_width - _metrics.descender
             _y2 = pos.get_y() + _padding + _yoffset - _metrics.descender
-            _x = pos.get_x()
-            _y = int(pos.get_y() + _yoffset)
             if border_brush and border_brush.get_stroke_width() is not None:
                 if border_brush.get_stroke_width() == 0:
                     border_brush = Brush(
                         None, 0,
                         border_brush.get_fill_color())
-                self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius)
-            _drawing.text(_x, _y, _text)
+                self.draw_rect(image, Position(_x1, _y1), Position(_x2, _y2), border_brush, radius=border_radius, rotate=rotate)
+            self._draw_rotated(
+                _drawing,
+                rotate if rotate else 0,
+                Position(_x1, _y1),
+                Position(_x2, _y2),
+                lambda drawing, start, width, height: drawing.text(int(start.get_x()-_xoffset+_padding-_metrics.descender), int(start.get_y()-_yoffset+_padding+_metrics.text_height+_metrics.descender), _text))
             self._apply_drawing(image, _drawing)
 
 

@@ -60,6 +60,9 @@ class TextForm(FinishingForm, ColorStrokeFillAlpha):
     border_padding = forms.IntegerField(
         required=False, widget=base.charFieldWidget(),
         label='Border padding', help_text='Spacing between text and border')
+    rotate = forms.IntegerField(
+        required=False, widget=base.charFieldWidget(),
+        label='Rotation', help_text='Rotate text with given angle')
 
     dependencies = {}
 
@@ -67,7 +70,7 @@ class TextForm(FinishingForm, ColorStrokeFillAlpha):
         entangled_fields = {'plugin_config':
             ['font', 'weight', 'text', 'size'] +
             ColorStrokeFillAlpha.Meta.entangled_fields['plugin_config'] +
-            ['alignment', 'start_x', 'start_y', 'border', 'border_radius', 'border_alpha', 'border_padding']
+            ['alignment', 'start_x', 'start_y', 'border', 'border_radius', 'border_alpha', 'border_padding', 'rotate']
         }
 
     field_order = FinishingForm.Meta.untangled_fields + Meta.entangled_fields['plugin_config']
@@ -98,6 +101,7 @@ class Implementation(FinishingPluginImplementation):
         _border_radius = config.border_radius.as_int()
         _border_alpha = config.border_alpha.as_int()
         _border_padding = config.border_padding.as_int()
+        _rotate = config.rotate.as_int()
         
         _pos = finishing.Position(_start_x, _start_y)
         _brush = finishing.Brush(
@@ -112,6 +116,6 @@ class Implementation(FinishingPluginImplementation):
             stroke_width=_border,
             fill_color=_fill_color)
         _text = finishing.Text(_text, font=_font, size=_size, weight=_weight, alignment=_alignment, alignment_vertical=_alignment_vertical)
-        _adapter.draw_text(image, _pos, _text, _brush, border_brush=_brush_border, border_radius=_border_radius, border_padding=_border_padding)
+        _adapter.draw_text(image, _pos, _text, _brush, border_brush=_brush_border, border_radius=_border_radius, border_padding=_border_padding, rotate=_rotate)
         return image
 
