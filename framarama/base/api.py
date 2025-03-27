@@ -86,17 +86,17 @@ class ApiClient(Singleton):
     def configured(self) -> bool:
         return self._base_url != None and self._display_access_key != None
 
-    def _http(self, url: str, method: str, data: str|None=None, headers: dict|None=None, **kwargs) -> object:
+    def _http(self, url: str, method: str, data: typing.Union[str, None]=None, headers: typing.Union[dict, None]=None, **kwargs) -> object:
         return Network.get_url(url, method, data, headers, self._user_agent, **kwargs)
 
-    def _request(self, path: str, method: str=METHOD_GET, data:str|None=None, raw:bool=False, **kwargs) -> object:
+    def _request(self, path: str, method: str=METHOD_GET, data: typing.Union[str, None]=None, raw:bool=False, **kwargs) -> object:
         if not self.configured():
             raise Exception("API client not configured")
         _response = self._http(self._base_url + path, method, data, {'X-Display': self._display_access_key}, **kwargs)
         _response.raise_for_status()
         return _response if raw else _response.json()
 
-    def _map(self, data: dict, model, serializer: serializers.ModelSerializer|None=None) -> object:
+    def _map(self, data: dict, model, serializer: typing.Union[serializers.ModelSerializer, None]=None) -> object:
         _fields = [_field.name for _field in model._meta.fields]
         _model_fields = {k: v for k, v in data.items() if k in _fields}
         _additional_fields = {k: v for k, v in data.items() if k not in _fields}
@@ -109,13 +109,13 @@ class ApiClient(Singleton):
         _model._additional_fields = _additional_fields
         return _model
 
-    def _list(self, data: dict, model: BaseModel, serializer: serializers.ModelSerializer|None=None) -> ApiResultList:
+    def _list(self, data: dict, model: BaseModel, serializer: typing.Union[serializers.ModelSerializer, None]=None) -> ApiResultList:
         return ApiResultList(data, lambda d: self._map(d, model, serializer))
 
-    def _item(self, data: dict, model: BaseModel, serializer: serializers.ModelSerializer|None=None) -> ApiResultItem:
+    def _item(self, data: dict, model: BaseModel, serializer: typing.Union[serializers.ModelSerializer, None]=None) -> ApiResultItem:
         return ApiResultItem(data, lambda d: self._map(d, model, serializer))
 
-    def get_url(self, url: str, method: str=METHOD_GET, data: dict|None=None, headers: dict|None=None, **kwargs) -> object:
+    def get_url(self, url: str, method: str=METHOD_GET, data: typing.Union[dict, None]=None, headers: typing.Union[dict, None]=None, **kwargs) -> object:
         if url.startswith(self._base_url):
             return self._request(url[len(self._base_url):], method, data, True, **kwargs)
         else:
@@ -145,7 +145,7 @@ class ApiClient(Singleton):
         _result = self._list(_data, config_models.RankedItem, config_views.RankedItemDisplaySerializer)
         return _result.item(0) if _result.count() > 0 else None
 
-    def submit_item_hit(self, display_id: int, data: dict, thumbnail: bytes|None=None, mime: str|None=None, meta: str|None=None) -> object:
+    def submit_item_hit(self, display_id: int, data: dict, thumbnail: typing.Union[bytes, None]=None, mime: typing.Union[str, None]=None, meta: typing.Union[str, None]=None) -> object:
         if thumbnail or mime:
             _thumbnail = {}
             if thumbnail:
