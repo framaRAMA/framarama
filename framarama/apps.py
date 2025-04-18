@@ -12,10 +12,7 @@ class BaseAppConfig(AppConfig):
     def get_scheduler(self):
         return self._scheduler
 
-    def setup_server(self):
-        pass
-
-    def setup_frontend(self):
+    def setup(self):
         pass
 
     def ready(self):
@@ -27,11 +24,5 @@ class BaseAppConfig(AppConfig):
         if is_manage_py and not is_runserver:
             return
 
-        self._scheduler = jobs.Scheduler()
-
-        if 'server' in settings.FRAMARAMA['MODES']:
-            self.setup_server()
-
-        if 'frontend' in settings.FRAMARAMA['MODES']:
-            self.setup_frontend()
+        self.setup()
 
