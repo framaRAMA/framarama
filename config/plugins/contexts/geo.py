@@ -1,5 +1,6 @@
 import logging
 import requests
+import functools
 
 from django import forms
 from django.template import Context
@@ -36,22 +37,17 @@ class Implementation(ContextPluginImplementation):
         self._cache = {}
 
     def _coord(self, ref, coord):
-        if ref == 'W' or ref == 'S':
-            _factor = -1
-        else:
-            _factor = 1
+        _factor = -1 if ref == 'W' or ref == 'S' else 1
         _info = coord.split()  # split string "49/1, 28/1, 50264282/1000000"
-        _deg = _info[0].strip(',') if len(_info) > 0 else 0
-        _min = _info[1].strip(',') if len(_info) > 1 else 0
-        _sec = _info[2].strip(',') if len(_info) > 2 else 0
-        _coord = 0
+        _deg = _info[0].strip(',') if len(_info) > 0 else '0/0'
+        _min = _info[1].strip(',') if len(_info) > 1 else '0/0'
+        _sec = _info[2].strip(',') if len(_info) > 2 else '0/0'
+        _fractions = []
         for _val in [_sec, _min, _deg]:
             _num, _fract = _val.split('/')
-            _num = int(_num) if len(_num) else 0
-            _fract = int(_fract) if len(_fract) else 0
-            if _num and _fract:
-                _coord = _coord / 60 + _factor * _num / _fract
-        return _coord
+            if len(_num) and len(_fract) and _fract != '0':
+                _fractions.append(_factor * int(_num) / int(_fract))
+        return functools.reduce(lambda _coord, _fract: _coord / 60 + _fract, _fractions, 0) if len(_fractions) else None
 
     def _resolve(self, data, attrs, level=0):
         _info = []
@@ -66,29 +62,26 @@ class Implementation(ContextPluginImplementation):
         return ', '.join(_info) if level == 0 else _info
 
     def _geo(self, exif):
-        _coords = {}
+        _coords = {'lat': None, 'long': None}
         for _name in ['lat', 'long']:
             _key_ref = 'gps{}ituderef'.format(_name)  # exif:GPSLatitudeRef=N
             _key_str = 'gps{}itude'.format(_name)     # exif:GPSLatitude=49/1, 28/1, 50264282/1000000
             _vals = [exif[_key] for _key in [_key_ref, _key_str] if _key in exif]
-            if len(_vals) < 2:
-                return {}
-            _coord = self._coord(_vals[0], _vals[1])
-            if _coord is None:
-                return {}
-            _coords[_name] = _coord
+            _coords[_name] = self._coord(_vals[0], _vals[1]) if len(_vals) > 1 else None
+        return _coords
 
-        if _coords['lat'] == 0 and _coords['long'] == 0:
+    def _lookup(self, coords):
+        if coords['lat'] is None or coords['long'] is None:
             return {}
 
         # Use OpenStreetMap API
         # https://nominatim.org/release-docs/develop/api/Overview/ - entry point
         # https://nominatim.org/release-docs/develop/api/Output/ - output formats
-        _key = " ".join([f"{k}:{v}" for k, v in _coords.items()])
+        _key = " ".join([f"{k}:{v}" for k, v in coords.items()])
         if _key not in self._cache:
             _url = "https://nominatim.openstreetmap.org/reverse.php?lat={}&lon={}&zoom=18&format=jsonv2".format(
-                _coords['lat'],
-                _coords['long'])
+                coords['lat'],
+                coords['long'])
 
             try:
                 _response = api.ApiClient.get().get_url(_url)
@@ -157,7 +150,7 @@ class Implementation(ContextPluginImplementation):
             if 'address' in _json:
                 _fields = [['road'], [['postcode'], ['city', 'town', 'village']], ['state'], ['country']]
                 _json['geo_display_name'] = self._resolve(_json['address'], _fields)
-            logger.debug("Resolving coordinates via {} to {}".format(_url, _json))
+            logger.debug("Resolving coordinates {} via {} to {}".format(coords, _url, _json))
             self._cache[_key] = _json
         return self._cache[_key]
 
@@ -170,7 +163,7 @@ class Implementation(ContextPluginImplementation):
         for _name, _img in self.get_images(ctx, _image).items():
             _image_exif = _adapter.image_exif(_img) if _img.get_images() else {}
 
-            _resolver = context.MapResolver(self._geo(_image_exif))
+            _resolver = context.MapResolver(self._lookup(self._geo(_image_exif)))
             if _name == 'default':
                 _resolvers['geo'] = _resolver
             else:
