@@ -204,14 +204,23 @@ class Filesystem:
 class Process:
 
     @staticmethod
+    def is_superuser():
+        return os.getuid() == 0
+
+    @staticmethod
     def exec_run(args, silent=False, env=None, sudo=False):
         if sudo:
             if 'sudo' not in args[0]:
                 raise Exception("Error checking sudo permssion: Command does not contain sudo command: {}".format(args))
-            _sudo_check = args.copy()
-            _sudo_check.insert(1, '-l')
-            if Process.exec_run(_sudo_check, silent=True) is None:
-                return None
+            if Process.is_superuser():  # Remove "sudo" and arguments when already superuser
+                args.pop(0)
+                while args[0].startswith('-'):
+                    args.pop(0)
+            else:
+                _sudo_check = args.copy()
+                _sudo_check.insert(1, '-l')
+                if Process.exec_run(_sudo_check, silent=True) is None:
+                    return None
         _result = subprocess.run(args, env=env, capture_output=True)
         if _result.returncode == 0:
             _args = ' '.join([str(_arg) for _arg in args])
