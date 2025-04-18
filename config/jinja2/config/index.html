@@ -169,7 +169,7 @@
         <div class="card-body">
           <ul class="card-text">
             <li>Software Version:<br/>- {{ system.app.branch }} - {{ system.app.date|date_format('%d.%m.%Y') }}</li>
-            <li>Available Versions:<br/>{% for revision in system.app.revisions %}- {{ revision }}<br/>{% endfor %}</li>
+            <li>Available Versions:<br/>{% for revision in (system.app.revisions if system.app.revisions else []) %}- {{ revision }}<br/>{% else %}(no versions){% endfor %}</li>
             <li>Environment: <strong>{% if config %}{{ config.mode }}{% else %}cloud{% endif %}</strong> setup</li>
           </ul>
         </div>
