@@ -52,7 +52,7 @@
   <div class="row">
   {% for name, plugin in source_plugins.items() %}
     {{ lib.card_item(plugin.title, plugin.descr, actions=[
-        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_source_step_create', args=[frame.id, source.id, plugin.name])}
+        {'title': 'Add', 'icon': 'action.add', 'url': url('frame_source_step_create', args=[frame.id, source.id, plugin.name])}
     ], icon=lib.icon('source.plugin.'+plugin.cat)) }}
   {% endfor %}
   </div>

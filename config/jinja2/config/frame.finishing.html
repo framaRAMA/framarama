@@ -61,7 +61,7 @@
       <div class="row">
       {% for name, finishing_plugin in finishing_plugins.items() %}
         {{ lib.card_item(finishing_plugin.title, finishing_plugin.descr, actions=[
-            {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_finishing_create', args=[frame.id, name])}
+            {'title': 'Add', 'icon': 'action.add', 'url': url('frame_finishing_create', args=[frame.id, name])}
         ], icon=lib.icon('finishing.plugin.' + finishing_plugin.cat)) }}
       {% endfor %}
       </div>

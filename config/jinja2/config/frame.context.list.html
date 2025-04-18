@@ -40,7 +40,7 @@
   <div class="row">
   {% for name, context_plugin in context_plugins.items() %}
     {{ lib.card_item(context_plugin.title, context_plugin.descr, actions=[
-        {'title': 'Add ' + lib.icon("action.add", "ms-2"), 'url': url('frame_context_create', args=[frame.id, name])}
+        {'title': 'Add', 'icon': 'action.add', 'url': url('frame_context_create', args=[frame.id, name])}
     ], icon=lib.icon('context.plugin.' + context_plugin.cat)) }}
   {% endfor %}
   </div>
