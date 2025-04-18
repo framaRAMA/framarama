@@ -2,5 +2,5 @@
 from framarama import apps
 
 
-class ApiConfig(apps.BaseAppConfig):
+class ApiAppConfig(apps.BaseAppConfig):
     name = 'api'
