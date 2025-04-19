@@ -124,3 +124,30 @@ This will start the application and serve it using the following URLs:
 * [http://server:8000/frontend/](http://server:8000/frontend/) - the frontend running on the device showing pictures
 * [http://server:8000/config/](http://server:8000/config/) - the server running to configure the photo collections
 
+## Docker
+
+It is also possible to run the application using docker container. To
+build the docker container checkout the source code and run the following
+command:
+
+```
+docker build .
+```
+
+After this you can create a new container, e.g.:
+
+```
+docker container create \
+  --name framarama \
+  --publish "0.0.0.0:8000:8000/tcp" \
+  --env 'TZ=Europe/Berlin' \
+  --env 'DJANGO_DEBUG=True' \
+  --env 'DJANGO_SECRET_KEY=some-really-secure-secret' \
+  --env 'FRAMARAMA_MODES=server,frontend' \
+  --env 'FRAMARAMA_PORT=8000' \
+  --tty \
+  --restart unless-stopped \
+  --volume '/path/to/data:/home/framarama/data' \
+  IMAGE_ID
+```
+

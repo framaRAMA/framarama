@@ -161,3 +161,32 @@ Default: `23:00:00`
 Default the interval for the update check. This will only fetch the updates
 but does not install them.
 
+### Docker
+
+When using the docker container the following environment variables can
+be used. Some of them refer to the settings listed above, others are docker-only
+settings.
+
+#### `DJANGO_DEUBG`
+
+Default: `True`
+
+Enables or disable Django debug logging and debug mode.
+
+#### `DJANGO_SECRET_KEY`
+
+Default: some non-secure secret
+
+Configures the common Django secret key. This should be set in any environment to
+a secure value.
+
+#### `FRAMARAMA_MODES`
+
+See `FRAMARAMA.MODES`.
+
+#### `FRAMARAMA_PORT`
+
+Default: `8000`
+
+Specifies the HTTP port to use for the application.
+

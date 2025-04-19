@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from os import path
+from os import path, getenv, environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,10 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@+o7lclaqfg8rkb0dp$q&eibn1b$-#-!)@ayalffvx7ztlwkf@'
+SECRET_KEY = environ.get('DJANGO_SECRET', 'django-insecure-@+o7lclaqfg8rkb0dp$q&eibn1b$-#-!)@ayalffvx7ztlwkf@')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# But required when serving static files via "runserver" command!
+DEBUG = environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -217,10 +218,7 @@ REST_FRAMEWORK = {
 
 FRAMARAMA = {
     'TITLE': 'framaRAMA',
-    'MODES': [
-        'server',
-        'frontend'
-    ],
+    'MODES': environ.get('FRAMARAMA_MODES', 'server,frontend').split(','),
     'DATA_PATH': './data/',
     'MEDIA_PATH': './data/media/',
     'MOUNT_PATH': '/media/',
@@ -229,7 +227,7 @@ FRAMARAMA = {
     'ADMIN_USERNAME': 'admin',
     'ADMIN_PASSWORD': 'testabc123',
     'ADMIN_MAIL': 'admin@some-domain.tld',
-    'API_URL': 'http://127.0.0.1:8000',
+    'API_URL': 'http://127.0.0.1:' + environ.get('FRAMARAMA_PORT', '8000'),
     'IMAGE_PROCESSING_ADAPTER': 'config.utils.finishing.WandImageProcessingAdapter',
     'GIT_REMOTE': 'origin',
     'AP_NAME': 'framaRAMA',
