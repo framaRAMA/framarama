@@ -147,6 +147,33 @@ The frontend component depends on the following dependencies:
 
 After application startup you can open the frontend setup in the browser.
 
+## Docker
+
+It is also possible to run the application using docker container. To
+build the docker container checkout the source code and run the following
+command:
+
+```
+docker build .
+```
+
+After this you can create a new container, e.g.:
+
+```
+docker container create \
+  --name framarama \
+  --publish "0.0.0.0:8000:8000/tcp" \
+  --env 'TZ=Europe/Berlin' \
+  --env 'DJANGO_DEBUG=True' \
+  --env 'DJANGO_SECRET_KEY=some-really-secure-secret' \
+  --env 'FRAMARAMA_MODES=server,frontend' \
+  --env 'FRAMARAMA_PORT=8000' \
+  --tty \
+  --restart unless-stopped \
+  --volume '/path/to/data:/home/framarama/data' \
+  IMAGE_ID
+```
+
 ## ☯ Final notes
 
 This project was born because we all have large collection of photo but
