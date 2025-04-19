@@ -1,6 +1,6 @@
 # basic
-Django==4.2.15
-Jinja2==3.1.4
+Django==4.2.20
+Jinja2==3.1.6
 djangorestframework==3.15.2
 drf-extensions==0.7.1
 django-apscheduler==0.6.2
