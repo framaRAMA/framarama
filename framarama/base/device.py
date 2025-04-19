@@ -434,46 +434,58 @@ class Capabilities:
         #    _revisions.extend(_out)
         return _revisions
 
-    def _git_log(args, ref=None):
-        _remote = settings.FRAMARAMA['GIT_REMOTE']
+    def _git_log_parse(line, remote, ref=None):
+        # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
+        # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
+        _commit, _date, _values = line.split(maxsplit=2)
+        _refs, _comment = _values[1:].split(') ', maxsplit=1)
+        _refs = [_ref.strip() for _ref in _refs.split(',')]       # separate tags
+        _refs = [_ref.replace('HEAD -> ', 'branch:') for _ref in _refs]  # remove HEAD pointer
+        _refs = [_ref.replace('tag: ', 'tag:') for _ref in _refs]     # remove tag: prefix
+        _refs = [_ref.replace(remote+'/', 'branch:') for _ref in _refs] # remove remote name
+        _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
+        _refs = [_ref for _ref in _refs if _ref not in ['HEAD']]  # remove special names (HEAD)
+        _refs = [_ref.split(':') for _ref in _refs]               # split in type and name
+        _refs = [{'type': _ref[0], 'name': _ref[1]} for _ref in _refs] # convert to map with type and name
+        _ref = [_ref for _ref in _refs if _ref['name'] == ref]    # filter out for given ref to check
+        return {
+            'hash': _commit,
+            'date': DateTime.parse(_date),
+            'comment': _comment,
+            'ref': _ref[0] if len(_ref) else _refs[0],
+            'refs': _refs
+        }
+
+    def _git_log(args, remote, ref=None):
         _args = ['git', 'log', '--pretty=format:%h %aI %d %s', '--decorate']
         _args.extend(args)
         _log = Process.exec_run(_args)
         _logs = []
         for _line in [_line for _line in _log.decode().split("\n")] if _log else []:
-            # de4a83b 2022-12-17T11:14:06+01:00  (HEAD, tag: v0.2.0) Implement frontend capability to retrieve display size (using xrandr)
-            # 7034857 2023-01-07T11:42:25+01:00  (HEAD -> master) Silent sudo check command execution in Process.exec_run()
-            _commit, _date, _values = _line.split(maxsplit=2)
-            _refs, _comment = _values[1:].split(') ', maxsplit=1)
-            _refs = [_ref.strip() for _ref in _refs.split(',')]       # separate tags
-            _refs = [_ref.replace('HEAD -> ', 'branch:') for _ref in _refs]  # remove HEAD pointer
-            _refs = [_ref.replace('tag: ', 'tag:') for _ref in _refs]     # remove tag: prefix
-            _refs = [_ref.replace(_remote+'/', 'branch:') for _ref in _refs] # remove remote name
-            _refs = [_ref for _ref in _refs if '/' not in _ref]       # remove remote branches
-            _refs = [_ref for _ref in _refs if _ref not in ['HEAD']]  # remove special names (HEAD)
-            _refs = [_ref.split(':') for _ref in _refs]               # split in type and name
-            _refs = [{'type': _ref[0], 'name': _ref[1]} for _ref in _refs] # convert to map with type and name
-            _ref = [_ref for _ref in _refs if _ref['name'] == ref]    # filter out for given ref to check
-            _logs.append({
-                'hash': _commit,
-                'date': DateTime.parse(_date),
-                'comment': _comment,
-                'ref': _ref[0] if len(_ref) else _refs[0],
-                'refs': _refs
-            })
+            _logs.append(Capabilities._git_log_parse(_line, remote, ref))
         return _logs
 
     def app_revision():
-        _logs = Capabilities._git_log(['-1'])
+        _remote = settings.FRAMARAMA['GIT_REMOTE']
+        if Filesystem.file_exists('VERSION'):
+            _lines = Filesystem.file_read('VERSION').decode().split('\n')
+            _versions = _lines[0].split('-')
+            _rev = Capabilities._git_log_parse(_lines[1], _remote)
+            _rev.update({
+                'remote': {'name': None, 'url': None},
+                'revisions': [_versions[0]],
+                'updates': None
+            })
+            return _rev
+        _logs = Capabilities._git_log(['-1'], _remote)
         if _logs:
-            _remote = settings.FRAMARAMA['GIT_REMOTE']
             _revisions = Capabilities._git_revisions()
             _update_revs = {}
             for _i, _rev in enumerate(_revisions):
                 if _rev == 'master':
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{2}/{1}'.format(_logs[0]['hash'], _rev, _remote)], _rev)
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{2}/{1}'.format(_logs[0]['hash'], _remote, _rev)], _rev)
                 elif _i == 0 or _logs_update:
-                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)], _rev)
+                    _logs_update = Capabilities._git_log(['-1', '{0}..{1}'.format(_logs[0]['hash'], _rev)], _remote, _rev)
                 if _logs_update:
                     _update_revs[_rev] = _logs_update[0]
             _rev = _logs[0]
