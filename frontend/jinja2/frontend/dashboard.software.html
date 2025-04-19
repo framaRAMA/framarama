@@ -4,35 +4,39 @@
 
 <div class="pt-2">
   {{ lib.field_text('Version', '%s (%s, %s)'|format(app.revision.ref['name'], app.revision.date|date_format('%d.%m.%Y'), app.revision.hash)) }}
-  {{ lib.field_text('Update check', '%s (%s)'|format(
-    'each %s'|format(app_update_check|duration) if app_update_check else 'manually',
-    'checked %s ago'|format(app_update_check_date|duration(short=true)) if app_update_check_date else 'not checked'
-  )) }}
-  {% if app_update_check_status and 'Error' in app_update_check_status %}
-    {{ lib.field_text('', '<span class="text-danger">%s</span>'|format(app_update_check_status)|safe) }}
-  {% elif app_update_check_status %}
-    {{ lib.field_text('', app_update_check_status) }}
-  {% endif %}
-  {{ lib.field_text('Update install', '%s%s'|format(
-    'automatically' if app_update_install else 'manually',
-    '%s'|format(', anytime' if not app_update_install_hour else ', between %d and %d o\'clock'|format(app_update_install_hour.seconds/60/60, 2+app_update_install_hour.seconds/60/60)) if app_update_install else ''
-  )) }}
-  {% if app.revision.updates %}
-    {% set app_updates = namespace(items = []) %}
-    {% for app_rev in app.revision.updates %}
-      {% set app_update = app.revision.updates[app_rev] %}
-      {% set app_updates.items = app_updates.items + ['<span class="text-success">%s (%s, %s)</span><br/>'|format(
-        app_rev, app_update['date']|date_format('%d.%m.%Y'), app_update['hash']
-      )|safe] %}
-    {% endfor %}
-    {{ lib.field_list('Versions', app_updates.items) }}
+  {% if app.revision.updates is none %}
+    {{ lib.field_text('Update check', 'Docker based setup - no updates possible.') }}
   {% else %}
-    {{ lib.field_text('New versions', 'No updates available') }}
+    {{ lib.field_text('Update check', '%s (%s)'|format(
+      'each %s'|format(app_update_check|duration) if app_update_check else 'manually',
+      'checked %s ago'|format(app_update_check_date|duration(short=true)) if app_update_check_date else 'not checked'
+    )) }}
+    {% if app_update_check_status and 'Error' in app_update_check_status %}
+      {{ lib.field_text('', '<span class="text-danger">%s</span>'|format(app_update_check_status)|safe) }}
+    {% elif app_update_check_status %}
+      {{ lib.field_text('', app_update_check_status) }}
+    {% endif %}
+    {{ lib.field_text('Update install', '%s%s'|format(
+      'automatically' if app_update_install else 'manually',
+      '%s'|format(', anytime' if not app_update_install_hour else ', between %d and %d o\'clock'|format(app_update_install_hour.seconds/60/60, 2+app_update_install_hour.seconds/60/60)) if app_update_install else ''
+    )) }}
+    {% if app.revision.updates %}
+      {% set app_updates = namespace(items = []) %}
+      {% for app_rev in app.revision.updates %}
+        {% set app_update = app.revision.updates[app_rev] %}
+        {% set app_updates.items = app_updates.items + ['<span class="text-success">%s (%s, %s)</span><br/>'|format(
+          app_rev, app_update['date']|date_format('%d.%m.%Y'), app_update['hash']
+        )|safe] %}
+      {% endfor %}
+      {{ lib.field_list('Versions', app_updates.items) }}
+    {% else %}
+      {{ lib.field_text('New versions', 'No updates available') }}
+    {% endif %}
   {% endif %}
 </div>
 
 <div class="pt-4 text-center">
-  <a data-bs-toggle="modal" data-bs-target="#appCheck" class="btn btn-{% if not check and not update %}outline-{% endif %}primary btn-floating btn-lg{% if check or update %} disabled{% endif %}" title="Check for updates">{{ lib.icon('action.refresh') }}</a>
+  <a data-bs-toggle="modal" data-bs-target="#appCheck" class="btn btn-{% if not check and not update and app.revision.updates is not none %}outline-{% endif %}primary btn-floating btn-lg{% if check or update or app.revision.updates is none %} disabled{% endif %}" title="Check for updates">{{ lib.icon('action.refresh') }}</a>
   <a data-bs-toggle="modal" data-bs-target="#appUpdate" class="btn btn-{% if not check and not update and app.revision.updates %}outline-{% endif %}primary btn-floating btn-lg{% if check or update or not app.revision.updates %} disabled{% endif %}" title="Update to revision">{{ lib.icon('action.update') }}</a>
 </div>
 
