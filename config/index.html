@@ -15,7 +15,7 @@
         <link rel="next" href="../server/">
       
       <link rel="icon" href="../assets/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
     
     
       
@@ -448,6 +448,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#framaramamedia_path" class="md-nav__link">
+    FRAMARAMA.MEDIA_PATH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramamount_path" class="md-nav__link">
+    FRAMARAMA.MOUNT_PATH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramamount_level" class="md-nav__link">
+    FRAMARAMA.MOUNT_LEVEL
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -510,6 +531,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#framaramaap_name" class="md-nav__link">
+    FRAMARAMA.AP_NAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramaap_pass" class="md-nav__link">
+    FRAMARAMA.AP_PASS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#framaramafrontend_keystrokes" class="md-nav__link">
     FRAMARAMA.FRONTEND_KEYSTROKES
   </a>
@@ -533,6 +568,47 @@
           <li class="md-nav__item">
   <a href="#framaramafrontend_app_update_interval" class="md-nav__link">
     FRAMARAMA.FRONTEND_APP_UPDATE_INTERVAL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#django_deubg" class="md-nav__link">
+    DJANGO_DEUBG
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#django_secret_key" class="md-nav__link">
+    DJANGO_SECRET_KEY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framarama_modes" class="md-nav__link">
+    FRAMARAMA_MODES
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framarama_port" class="md-nav__link">
+    FRAMARAMA_PORT
   </a>
   
 </li>
@@ -961,6 +1037,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#framaramamedia_path" class="md-nav__link">
+    FRAMARAMA.MEDIA_PATH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramamount_path" class="md-nav__link">
+    FRAMARAMA.MOUNT_PATH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramamount_level" class="md-nav__link">
+    FRAMARAMA.MOUNT_LEVEL
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1023,6 +1120,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#framaramaap_name" class="md-nav__link">
+    FRAMARAMA.AP_NAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framaramaap_pass" class="md-nav__link">
+    FRAMARAMA.AP_PASS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#framaramafrontend_keystrokes" class="md-nav__link">
     FRAMARAMA.FRONTEND_KEYSTROKES
   </a>
@@ -1046,6 +1157,47 @@
           <li class="md-nav__item">
   <a href="#framaramafrontend_app_update_interval" class="md-nav__link">
     FRAMARAMA.FRONTEND_APP_UPDATE_INTERVAL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#django_deubg" class="md-nav__link">
+    DJANGO_DEUBG
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#django_secret_key" class="md-nav__link">
+    DJANGO_SECRET_KEY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framarama_modes" class="md-nav__link">
+    FRAMARAMA_MODES
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framarama_port" class="md-nav__link">
+    FRAMARAMA_PORT
   </a>
   
 </li>
@@ -1106,6 +1258,23 @@ to define what to start.</p>
 <p>Should point to a directory where the application can store some data. Please
 do not point this to a temporary directory. It will contain persistent data
 which should not be deleted.</p>
+<h4 id="framaramamedia_path"><code>FRAMARAMA.MEDIA_PATH</code></h4>
+<p>Default: <code>./data/media/</code></p>
+<p>Points to a directory where some media files can be placed to read. The directory
+source plugin will read the files located in this directory.</p>
+<h4 id="framaramamount_path"><code>FRAMARAMA.MOUNT_PATH</code></h4>
+<p>Default: <code>/media</code></p>
+<p>To automatically provide mounted storaged in media path to use for picture collecton,
+this settings points to the standard system mount path for external storages (e.g.
+when using <code>automount</code>).</p>
+<h4 id="framaramamount_level"><code>FRAMARAMA.MOUNT_LEVEL</code></h4>
+<p>Default: <code>1</code></p>
+<p>When <code>MOUNT_PATH</code> is configured to watch for new mounted storaged, this setting
+will define how many directory levels to check (useful when external storages
+will be mounted in sub-directory of <code>MOUNT_PATH</code> (e.g. <code>/media/username/ext-storage</code>).
+Using level of <code>0</code> will make directories one level below <code>MOUNT_PATH</code> available,
+<code>1</code> will make directories two levels below <code>MOUNT_PATH</code> as media directories (e.g.
+<code>ext-storage</code>).</p>
 <h3 id="server">Server</h3>
 <h4 id="framaramaadmin_username"><code>FRAMARAMA.ADMIN_USERNAME</code></h4>
 <p>Default: <code>admin</code></p>
@@ -1129,6 +1298,13 @@ on the server side.</p>
 photo collection and adding, removing or updating them on the server. Set the
 value to <code>None</code> to disable automatic updates completely.</p>
 <h3 id="frontend">Frontend</h3>
+<h4 id="framaramaap_name"><code>FRAMARAMA.AP_NAME</code></h4>
+<p>Default: <code>framaRAMA</code></p>
+<p>In case the wireless network connection can not be established a fallback
+access point will be started with this name.</p>
+<h4 id="framaramaap_pass"><code>FRAMARAMA.AP_PASS</code></h4>
+<p>Default: <code>framarama</code></p>
+<p>When the fallback access point is started it is using this password.</p>
 <h4 id="framaramafrontend_keystrokes"><code>FRAMARAMA.FRONTEND_KEYSTROKES</code></h4>
 <p>Default: <code>True</code></p>
 <p>Register key strokes to control the frontend device when connecting a keyboard
@@ -1146,6 +1322,22 @@ and - when activated - when sumbmitting them to the server.</p>
 <p>Default: <code>23:00:00</code></p>
 <p>Default the interval for the update check. This will only fetch the updates
 but does not install them.</p>
+<h3 id="docker">Docker</h3>
+<p>When using the docker container the following environment variables can
+be used. Some of them refer to the settings listed above, others are docker-only
+settings.</p>
+<h4 id="django_deubg"><code>DJANGO_DEUBG</code></h4>
+<p>Default: <code>True</code></p>
+<p>Enables or disable Django debug logging and debug mode.</p>
+<h4 id="django_secret_key"><code>DJANGO_SECRET_KEY</code></h4>
+<p>Default: some non-secure secret</p>
+<p>Configures the common Django secret key. This should be set in any environment to
+a secure value.</p>
+<h4 id="framarama_modes"><code>FRAMARAMA_MODES</code></h4>
+<p>See <code>FRAMARAMA.MODES</code>.</p>
+<h4 id="framarama_port"><code>FRAMARAMA_PORT</code></h4>
+<p>Default: <code>8000</code></p>
+<p>Specifies the HTTP port to use for the application.</p>
 
 
 

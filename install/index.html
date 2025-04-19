@@ -15,7 +15,7 @@
         <link rel="next" href="../config/">
       
       <link rel="icon" href="../assets/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
     
     
       
@@ -444,6 +444,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
   
 </li>
       
@@ -907,6 +914,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    Docker
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1014,6 +1028,26 @@ using a password manager):</p>
 <li><a href="http://server:8000/frontend/">http://server:8000/frontend/</a> - the frontend running on the device showing pictures</li>
 <li><a href="http://server:8000/config/">http://server:8000/config/</a> - the server running to configure the photo collections</li>
 </ul>
+<h2 id="docker">Docker</h2>
+<p>It is also possible to run the application using docker container. To
+build the docker container checkout the source code and run the following
+command:</p>
+<pre><code>docker build .
+</code></pre>
+<p>After this you can create a new container, e.g.:</p>
+<pre><code>docker container create \
+  --name framarama \
+  --publish &quot;0.0.0.0:8000:8000/tcp&quot; \
+  --env 'TZ=Europe/Berlin' \
+  --env 'DJANGO_DEBUG=True' \
+  --env 'DJANGO_SECRET_KEY=some-really-secure-secret' \
+  --env 'FRAMARAMA_MODES=server,frontend' \
+  --env 'FRAMARAMA_PORT=8000' \
+  --tty \
+  --restart unless-stopped \
+  --volume '/path/to/data:/home/framarama/data' \
+  IMAGE_ID
+</code></pre>
 
 
 

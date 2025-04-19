@@ -13,7 +13,7 @@
       
       
       <link rel="icon" href="../assets/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.1.6">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
     
     
       
@@ -774,6 +774,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    TODO
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v050-not-yet-released" class="md-nav__link">
     v0.5.0 - not yet released
   </a>
@@ -843,6 +850,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    TODO
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v050-not-yet-released" class="md-nav__link">
     v0.5.0 - not yet released
   </a>
@@ -896,15 +910,44 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="todo">TODO</h2>
+<ul>
+<li>fix saving text finishing: enabled column may no be null (DB error)</li>
+<li>text finishing with text rotation setting</li>
+<li>config settings for plugins or plugin templates (like parameters for plugins, but settings/configs)</li>
+<li>show which finishing failed (with error message) in finishing preview</li>
+<li>when updating system only run "collectstatic" when static folder contains changes</li>
+<li>when updating system only run "pip install" when requirements.txt changed</li>
+<li>admin frontend, editing for finishings, contexts, trees/treebeard, etc.</li>
+<li>implement new context plugin: weather (for given coordinates or picture coordinates)</li>
+<li>implement new context plugin: calendar (for adding current date/time/week/year info)</li>
+<li>database reconnect to avoid "server is gone" (on source update), https://stackoverflow.com/questions/59773675/why-am-i-getting-the-mysql-server-has-gone-away-exception-in-django</li>
+<li>configure email in profile and notify user on update errors</li>
+<li>in edit/delete forms/views check if given instance exists, if not redirect to listing pages</li>
+<li>make update and edit consistent (templates, views, forms, urls &amp; pages), same logic everywhere, maybe base classes/templates</li>
+<li>auto mount usb sticks or access network shares (useful for "directory" source)</li>
+<li>is a network/USB mount helpful for filesystem source?</li>
+</ul>
 <h2 id="v050-not-yet-released">v0.5.0 - not yet released</h2>
 <ul>
-<li>update to Django 4.2.15, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2</li>
+<li>start providing Docker based setup</li>
+<li>update to Django 4.2.20, Jinja2 3.1.6, requests 2.31.0, jsonpickle 3.2.2</li>
 <li>create some documentation pages and add workflows</li>
+<li>frontend: set display status via API will ignore auto on/off now</li>
+<li>frontend: upload items from remote device to frontend to show them</li>
+<li>frontend: show startup message on initial background screen</li>
 <li>frontend: show application logs on 3rd console</li>
 <li>frontend: include versions in status submission</li>
 <li>frontend: use serializer for client API to be more robust</li>
 <li>frontend: configure options for auto update check and auto install</li>
 <li>frontend: configure option for keystroke registration</li>
+<li>frontend: make external storages available in media directory automatically</li>
+<li>config: support rotation in text finishing plugin</li>
+<li>config: add settings with global variables</li>
+<li>config: !! global variables are now used in source, finishing plugins !!</li>
+<li>config: new directory source to read files from media directory</li>
+<li>config: validate finishing fields and sorting query for correct syntax</li>
+<li>config: item sorting ranks now based on weight gaps</li>
 <li>config: wrap all plugin config values into ResultValue to be more failsafe</li>
 <li>config: refactor plugin storage to use django-entangled for JSON config</li>
 <li>config: separate models into modules</li>
