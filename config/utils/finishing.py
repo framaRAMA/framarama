@@ -683,10 +683,13 @@ class WandImageProcessingAdapter(ImageProcessingAdapter):
                 Filesystem.file_delete(_path + '/' + _file[0])
 
     def image_open(self, source, background=None):
+        _media_path = settings.FRAMARAMA['MEDIA_PATH']
         if type(source) == str and (source.startswith('http://') or source.startswith('https://')):
             _image = self._wand_image.Image(blob=api.ApiClient.get().get_url(source, stream=True).raw)
         elif type(source) == str and Filesystem.file_exists(source):
             _image = self._wand_image.Image(filename=source)
+        elif type(source) == str and Filesystem.file_exists(Filesystem.path_normalize(source, root=_media_path, absolute=True)):
+            _image = self._wand_image.Image(filename=Filesystem.path_normalize(source, root=_media_path, absolute=True))
         elif type(source) == bytes:
             _image = self._wand_image.Image(blob=source)
         else:
