@@ -34,16 +34,17 @@ class UpdateFrameForm(base.BaseModelForm):
 class CreateSourceForm(base.BaseModelForm):
     class Meta:
         model = models.Source
-        fields = ['name', 'map_item_url']
+        fields = ['name', 'enabled', 'map_item_url']
         widgets = {
             'name': base.charFieldWidget(),
+            'enabled': base.booleanFieldWidget(),
             'map_item_url': base.charFieldWidget(),
         }
     def field_groups(self):
         return {
             'default': {
                 'title': 'Source',
-                'fields': ['name'],
+                'fields': ['name', 'enabled'],
             },
             'mapping': {
                 'title': 'Result to item mapping',
@@ -55,9 +56,10 @@ class CreateSourceForm(base.BaseModelForm):
 class UpdateSourceForm(base.BaseModelForm):
     class Meta:
         model = models.Source
-        fields = ['name', 'update_interval', 'map_item_id_ext', 'map_item_url', 'map_item_date_creation', 'map_item_meta']
+        fields = ['name', 'enabled', 'update_interval', 'map_item_id_ext', 'map_item_url', 'map_item_date_creation', 'map_item_meta']
         widgets = {
             'name': base.charFieldWidget(),
+            'enabled': base.booleanFieldWidget(),
             'update_interval': base.selectFieldWidget(choices=models.SOURCE_UPDATE_INTERVAL_CHOICES),
             'map_item_id_ext': base.charFieldWidget(),
             'map_item_url': base.charFieldWidget(),
@@ -68,7 +70,7 @@ class UpdateSourceForm(base.BaseModelForm):
         return {
             'default': {
                 'title': 'Source',
-                'fields': ['name', 'update_interval'],
+                'fields': ['name', 'enabled', 'update_interval'],
             },
             'mapping': {
                 'title': 'Result to item mapping',

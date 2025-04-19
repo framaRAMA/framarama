@@ -56,6 +56,9 @@ class Source(BaseModel):
     name = models.CharField(
         max_length=255,
         verbose_name='Name', help_text='Name describing the source')
+    enabled = models.BooleanField(
+        default=True,
+        verbose_name='Enabled')
     map_item_id_ext = models.CharField(
         max_length=32, blank=True,
         verbose_name='ID', help_text='Which field to map to item\'s ID (optional, can be used for an external reference)')
