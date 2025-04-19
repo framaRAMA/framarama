@@ -150,7 +150,7 @@ After application startup you can open the frontend setup in the browser.
 ## Docker
 
 It is also possible to run the application using docker container. To
-build the docker container checkout the source code and run the following
+build the docker image checkout the source code and run the following
 command:
 
 ```
