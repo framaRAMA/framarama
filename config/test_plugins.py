@@ -123,18 +123,24 @@ class GeoContextPluginTestCase(TestCase):
 
   def test_empty(self):
       _plugin = plugins.ContextPluginRegistry.get('geo')
-      self.assertEquals({}, _plugin.impl()._geo({}))
+      self.assertEquals({'lat': None, 'long': None}, _plugin.impl()._geo({}))
 
   def test_only_lat(self):
       _plugin = plugins.ContextPluginRegistry.get('geo')
-      self.assertEquals({}, _plugin.impl()._geo({
+      self.assertEquals({
+          'lat': 49.48062896722222,
+          'long': None,
+      }, _plugin.impl()._geo({
           'gpslatituderef': 'N',
           'gpslatitude': '49/1, 28/1, 50264282/1000000',
       }))
 
   def test_only_long(self):
       _plugin = plugins.ContextPluginRegistry.get('geo')
-      self.assertEquals({}, _plugin.impl()._geo({
+      self.assertEquals({
+          'lat': None,
+          'long': 8.263962300555555,
+      }, _plugin.impl()._geo({
           'gpslongituderef': 'N',
           'gpslongitude': '8/1, 15/1, 50264282/1000000',
       }))
