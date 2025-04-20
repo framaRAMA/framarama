@@ -132,12 +132,12 @@ class ResultValue:
         return str(self._value)        
 
     def as_int(self):
-        if self._value is None:
+        if self._value is None or self._value == '':
             return None
         return int(float(self._value))
 
     def as_float(self):
-        if self._value is None:
+        if self._value is None or self._value == '':
             return None
         return float(self._value)
 

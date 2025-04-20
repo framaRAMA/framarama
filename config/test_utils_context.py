@@ -27,6 +27,7 @@ class ResultValueTestCase(TestCase):
         self.assertEqual(1, context.ResultValue(1).as_int())
 
     def test_as_int_str(self):
+        self.assertIsNone(context.ResultValue('').as_int())
         self.assertEqual(1, context.ResultValue('1').as_int())
 
     def test_as_int_float(self):
@@ -42,6 +43,7 @@ class ResultValueTestCase(TestCase):
         self.assertEqual(1.5, context.ResultValue(1.5).as_float())
 
     def test_as_float_str(self):
+        self.assertIsNone(context.ResultValue('').as_float())
         self.assertEqual(2.2, context.ResultValue('2.2').as_float())
 
     def test_as_float_int(self):
