@@ -213,7 +213,7 @@ class FilesystemTestCase(TestCase):
         for _path, _expected in _pathes.items():
             self.assertEqual(_expected, utils.Filesystem.path_normalize(_path, absolute=True))
 
-    def test_path_normalize_root(self):
+    def test_path_normalize_absolute_root(self):
         _cwd = os.getcwd()
         _pathes = {
             None: None,
