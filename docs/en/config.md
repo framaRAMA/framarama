@@ -161,6 +161,21 @@ Default: `23:00:00`
 Default the interval for the update check. This will only fetch the updates
 but does not install them.
 
+#### `FRAMARAMA.FRONTEND_APP_UPDATE_PRECMD`
+
+Default: ``
+
+This command is use in every case the software is updated. It can be used to
+prepare something before running the update (e.g. mount something, delete
+something, etc.).
+
+#### `FRAMARAMA.FRONTEND_APP_UPDATE_POSTCMD`
+
+Default: ``
+
+Like the pre-command this is a command executed after the software update
+is completed.
+
 ### Docker
 
 When using the docker container the following environment variables can
@@ -189,4 +204,16 @@ See `FRAMARAMA.MODES`.
 Default: `8000`
 
 Specifies the HTTP port to use for the application.
+
+#### `FRAMARAMA_APP_UPDATE_PRECMD`
+
+Default: ``
+
+See `FRAMARAMA.FRONTEND_APP_UPDATE_PRECMD`.
+
+#### `FRAMARAMA_APP_UPDATE_POSTCMD`
+
+Default: ``
+
+See `FRAMARAMA.FRONTEND_APP_UPDATE_POSTCMD`.
 

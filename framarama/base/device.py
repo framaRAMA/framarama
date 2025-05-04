@@ -497,6 +497,18 @@ class Capabilities:
             return _rev
         return None
 
+    def _app_update_precmd():
+        _cmd = settings.FRAMARAMA['FRONTEND_APP_UPDATE_PRECMD']
+        if _cmd:
+            _result = Process.exec_run(_cmd)
+            logger.info("Update pre-command: {}".format(_result))
+
+    def _app_update_postcmd():
+        _cmd = settings.FRAMARAMA['FRONTEND_APP_UPDATE_POSTCMD']
+        if _cmd:
+            _result = Process.exec_run(_cmd)
+            logger.info("Update post-command: {}".format(_result))
+
     def app_check(url=None, username=None, password=None):
         _remote = settings.FRAMARAMA['GIT_REMOTE']
         _remotes = Capabilities._git_remotes()
@@ -506,6 +518,7 @@ class Capabilities:
             _url = re.sub(_username_pattern, '\\1' + re.escape(username) + '@\\3', _url)
         else:
             _url = re.sub(_username_pattern, '\\1\\3', _url)
+        Capabilities._app_update_precmd()
         logger.info("Check version update from {} using {} ...".format(_url, _remote))
         if _remote in _remotes:
             logger.info("Update remote {} to {}".format(_remote, _url))
@@ -515,12 +528,14 @@ class Capabilities:
             _remote_update = Process.exec_run(['git', 'remote', 'add', _remote, _url])
         if _remote_update is None:
             logger.error("Can not setup remote {} with {}".format(_remote, _url))
+            Capabilities._app_update_postcmd()
             return 'Error: Can not prepare update source'
         _fetch = Process.exec_run(['git', 'fetch', _remote], env={
             'GIT_ASKPASS': settings.BASE_DIR / 'docs' / 'git' / 'git-ask-pass.sh' ,
             'GIT_PASSWORD': password if password is not None else '',
         })
         Process.exec_run(['git', 'remote', 'set-url', _remote, _remotes[_remote]])
+        Capabilities._app_update_postcmd()
         if _fetch is None:
             logger.error("Can not fetch updates!")
             return 'Error: Fetching updates'
@@ -544,9 +559,11 @@ class Capabilities:
         if len(_revision['updates']) == 0 and _revision['ref']['name'] == revision:
             logger.info("No new version available for {}!".format(revision))
             return False
+        Capabilities._app_update_precmd()
         _stash = Process.exec_run(['git', 'stash'])
         if _stash is None:
             logger.error("Can not stash changes!")
+            Capabilities._app_update_postcmd()
             return 'Error: Backing up configuration failed'
         logger.info("Changes stashed!")
         if _revision['updates'][revision]['ref']['type'] == 'branch':
@@ -569,5 +586,6 @@ class Capabilities:
         if _pop is None:
             logger.error("Can not pop stash again!")
             _msg.append('Error: Applying configuration')
+        Capabilities._app_update_postcmd()
         return 'Error: {}'.format(' / '.join(_msg)) if len(_msg) else True
 
