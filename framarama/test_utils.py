@@ -236,6 +236,10 @@ class ProcessTestCase(TestCase):
         _result = utils.Process.exec_run(['ls', '-l'])
         self.assertIsNotNone(_result)
 
+    def test_exec_run_args_str(self):
+        _result = utils.Process.exec_run('ls -l')
+        self.assertIsNotNone(_result)
+
     def test_exec_run_error(self):
         with self.assertRaises(FileNotFoundError):
             _result = utils.Process.exec_run(['notfound'])

@@ -209,6 +209,7 @@ class Process:
 
     @staticmethod
     def exec_run(args, silent=False, env=None, sudo=False):
+        _shell = type(args) == str
         if sudo:
             if 'sudo' not in args[0]:
                 raise Exception("Error checking sudo permssion: Command does not contain sudo command: {}".format(args))
@@ -221,7 +222,7 @@ class Process:
                 _sudo_check.insert(1, '-l')
                 if Process.exec_run(_sudo_check, silent=True) is None:
                     return None
-        _result = subprocess.run(args, env=env, capture_output=True)
+        _result = subprocess.run(args, env=env, capture_output=True, shell=_shell)
         if _result.returncode == 0:
             _args = ' '.join([str(_arg) for _arg in args])
             logger.info('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(_args, _result.returncode, len(_result.stdout), len(_result.stderr)))
