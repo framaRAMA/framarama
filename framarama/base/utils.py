@@ -224,7 +224,7 @@ class Process:
                     return None
         _result = subprocess.run(args, env=env, capture_output=True, shell=_shell)
         if _result.returncode == 0:
-            _args = ' '.join([str(_arg) for _arg in args])
+            _args = ' '.join([str(_arg) for _arg in args]) if not _shell else args
             logger.info('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(_args, _result.returncode, len(_result.stdout), len(_result.stderr)))
             return _result.stdout
         elif not silent:
