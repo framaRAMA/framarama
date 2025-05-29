@@ -80,8 +80,25 @@ class PluginContext:
 
     def __init__(self, variables=None):
         self._context = context.Context()
+        self._variables = {}
         self.set_resolver('env', context.EnvironmentResolver())
-        self.set_resolver('globals', context.MapResolver(variables or {}))
+        self.push_variables(variables)
+
+    def push_variables(self, variables, name=None):
+        if name is None or name == '':
+            name = 'globals'
+        if name not in self._variables:
+            self._variables[name] = [{}]
+        _new_variables = dict(self._variables[name][-1])
+        _new_variables.update(variables)
+        self._variables[name].append(_new_variables)
+        self.set_resolver(name, self._variables[name][-1])
+
+    def pop_variables(self, name=None):
+        if name is None or name == '':
+            name = 'globals'
+        self._variables[name].pop()
+        self.set_resolver(name, self._variables[name][-1])
 
     def set_resolver(self, name, resolver):
         self._context.set_resolver(name, resolver)
