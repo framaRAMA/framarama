@@ -269,7 +269,23 @@ class Processor:
         _meta = {'duration': None, 'steps': []}
         _start = DateTime.now()
         _adapter = self._context.get_adapter()
+
+        _stack = []
+        _depth = 1
         for _plugin, _finishing in FinishingPluginRegistry.get_enabled(_finishings):
+            _config = _finishing.get_config()
+            if _depth > _finishing.get_depth():
+                while _stack and _depth > _stack[-1][1].get_depth():
+                    _last_stack = _stack.pop()
+                    logger.info("Leave: {}: {}".format(_depth, _last_stack[1]))
+                    _last_stack[0].leave(_last_stack[1], _last_stack[2], self._context)
+                    _depth = _depth - 1
+                _depth = _depth - 1
+            if _depth < _finishing.get_depth():
+                _stack.append((_plugin, _finishing, _config))
+                logger.info("Enter: {}: {}".format(_depth, _stack[-1][1]))
+                _plugin.enter(_finishing, _config, self._context)
+                _depth = _finishing.get_depth() + 1
             logger.info("Processing finishing {}".format(_finishing))
             _start_finishing = DateTime.now()
 
@@ -300,7 +316,7 @@ class Processor:
             self._context.set_resolver('images', context.MapResolver(_image_metas))
 
             logger.info("Input: {} = {}".format(_images_in, _image))
-            _image_out = _plugin.run(_finishing, self._context.evaluate(_finishing.get_config()), _image, self._context)
+            _image_out = _plugin.run(_finishing, self._context.evaluate(config), _image, self._context)
             logger.info("Output: {} = {}".format(_images_out, _image_out))
     
             for _name_out in _images_out:
