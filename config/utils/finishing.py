@@ -147,7 +147,7 @@ class Processor:
                 'top': " {{" + _scale + "+image['height']-images['linebr']['height']}}",
             }
         }]
-        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
+        return [models.Finishing(frame=frame, enabled=True, **_config|{'depth': 1}) for _config in _finishings]
 
     def _watermark_hbars(self, frame, shift, scale):
         _factor = "images['default']['width']*0.01"
@@ -190,7 +190,7 @@ class Processor:
                 'top': "{{" + _shift + "*-1+image['height']-images['lineb']['height']}}",
             }
         }]
-        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
+        return [models.Finishing(frame=frame, enabled=True, **_config|{'depth': 1}) for _config in _finishings]
 
     def _watermark_vbars(self, frame, shift, scale):
         _factor = "images['default']['width']*0.01"
@@ -238,7 +238,7 @@ class Processor:
                 'top': "0",
             }
         }]
-        return [models.Finishing(frame=frame, enabled=True, **_config) for _config in _finishings]
+        return [models.Finishing(frame=frame, enabled=True, **_config|{'depth': 1}) for _config in _finishings]
 
     def _register_context_resolvers(self, plugins, image):
         _resolvers = {}
@@ -262,7 +262,7 @@ class Processor:
         _contexts.extend(ContextPluginRegistry.get_enabled(self._context.get_contexts()))
         _finishings = []
         _finishings.extend([models.Finishing(frame=_frame, enabled=True, **{
-            'plugin': 'image', 'plugin_config': { 'url': _item.url }
+            'depth': 1, 'plugin': 'image', 'title': 'LOAD', 'plugin_config': { 'url': _item.url }
         })])
         _finishings.extend(list(self._context.get_finishings()))
         _finishings.extend(self._watermark)
