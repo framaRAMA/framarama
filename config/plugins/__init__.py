@@ -58,13 +58,22 @@ class Plugin:
             kwargs['instance'] = self._model()
         return self.impl.Form(*args, **kwargs)
 
+    def enter(self, *args, **kwargs):
+        return self._run_instance('__default__', lambda instance: instance.enter(*args, **kwargs))
+
+    def leave(self, *args, **kwargs):
+        return self._run_instance('__default__', lambda instance: instance.leave(*args, **kwargs))
+
     def run(self, *args, **kwargs):
-        return self.run_instance('__default__', *args, **kwargs)
+        return self._run_instance('__default__', lambda instance: instance.run(*args, **kwargs))
 
     def run_instance(self, instance, *args, **kwargs):
+         return self._run_instance(instance, lambda instance: instance.run(*args, **kwargs))
+
+    def _run_instance(self, instance, func):
         if instance not in self._instances:
             self._instances[instance] = self.impl()
-        return self._instances[instance].run(*args, **kwargs)
+        return func(self._instances[instance])
 
 
 class PluginContext:
@@ -235,6 +244,12 @@ class PluginImplementation:
         if formatted and data_in:
             return value.format(**data_in)
         return value
+
+    def enter(self, *args, **kwargs):
+        pass
+
+    def leave(self, *args, **kwargs):
+        pass
 
     def run(self, *args, **kwargs):
         raise Exception('Implementation missing')
