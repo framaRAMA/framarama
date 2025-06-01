@@ -228,7 +228,7 @@ class Process:
             logger.info('Run "{}": code={}, stdout={} bytes, stderr={} bytes'.format(_args, _result.returncode, len(_result.stdout), len(_result.stderr)))
             return _result.stdout
         elif not silent:
-            _args = ' '.join([str(_arg) for _arg in args])
+            _args = ' '.join([str(_arg) for _arg in args]) if not _shell else args
             logger.error('Error running "{}": code={}, stdout={}, stderr={}'.format(_args, _result.returncode, _result.stdout, _result.stderr))
         return None
 
