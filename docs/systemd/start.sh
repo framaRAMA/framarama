@@ -36,7 +36,9 @@ rm -f ./data/background.txt
 . ../venv/bin/activate
 if [ ! -f ./data/framarama-init.json ] ; then
   echo "Updating ..." > ./data/background.txt
+  [ "$FRAMARAMA_APP_UPDATE_PRECMD" = "" ] || eval "$FRAMARAMA_UPDATE_PRECMD"
   pip install -r requirements/default.txt
+  [ "$FRAMARAMA_APP_UPDATE_POSTCMD" = "" ] || eval "$FRAMARAMA_UPDATE_POSTCMD"
 fi
 
 # Start main loop
