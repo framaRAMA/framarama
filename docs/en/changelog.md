@@ -2,18 +2,31 @@
 
 ## v0.5.0 - not yet released
 
-* update to Django 4.2.15, Jinja2 3.1.3, requests 2.31.0, jsonpickle 3.2.2
+* start providing Docker based setup
+* update to Django 4.2.20, Jinja2 3.1.6, requests 2.31.0, jsonpickle 3.2.2
 * create some documentation pages and add workflows
+* frontend: set display status via API will ignore auto on/off now
+* frontend: upload items from remote device to frontend to show them
+* frontend: show startup message on initial background screen
 * frontend: show application logs on 3rd console
 * frontend: include versions in status submission
 * frontend: use serializer for client API to be more robust
 * frontend: configure options for auto update check and auto install
 * frontend: configure option for keystroke registration
+* frontend: make external storages available in media directory automatically
+* frontend: set internal pre/post updates command in settings
+* config: enter/leaving finishing steps and define variables in group
+* config: support rotation in text finishing plugin
+* config: add settings with global variables
+* config: !! global variables are now used in source, finishing plugins !!
+* config: new directory source to read files from media directory
+* config: validate finishing fields and sorting query for correct syntax
+* config: item sorting ranks now based on weight gaps
 * config: wrap all plugin config values into ResultValue to be more failsafe
 * config: refactor plugin storage to use django-entangled for JSON config
 * config: separate models into modules
 * config: replace format strings with Jinja templating for model expressions
-* config: !! update all model expression to Jinja templating !!
+* config: !! all model expression are Jinja templates, use "{%raw%}" in "data" plugin !!
 * config: support tree structures in finishings (for grouping)
 * config: switch to use Jinja2 templats in "data" plugin
 * config: ignore duplicates when updating source items
@@ -23,7 +36,6 @@
 * config: some dashboard improvements (media/version info, short dates, resources)
 * config: start JSON exports and imports for frame configuration
 * config: add query evaluation popup for sorting queries
-
 
 ## v0.4.0 - 2023-04-09
 
