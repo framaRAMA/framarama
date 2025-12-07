@@ -27,7 +27,7 @@ The software consists of mainly two parts:
 In the standard setup both components will run on the same device. In this case
 the configuration and the display of photos will be handled by the this device.
 
-To be able to adminstrate and manage multiple devices centrally and only display
+To be able to administrate and manage multiple devices centrally and only display
 the photos on several other devices, the server can be installed on a single
 central device and the frontend on the several other devices showing the images.
 
@@ -78,6 +78,9 @@ Initial setup:
 python manage.py migrate
 python manage.py collectstatic
 python manage.py createsuperuser
+```
+Configure system:
+```
 python manage.py setup --set mode=local
 python manage.py setup --set local_db_type=local
 ```
@@ -115,13 +118,14 @@ The server component depends on the following dependencies:
 * ☝ `gsfonts`, `gsfonts-other`, `fonts-liberation`, `fonts-urw-base35`, `fonts-freefont-ttf`, `fonts-freefont-otf` - fonts support, might be other packages (install them and check via `convert -list font`)
 * 💡 `libmariadb3` - for external database support
 
-When just running the server component, setup the initial configuration using
-following command:
+When just running the server component, setup the initial configuration
+(see general setup) and use the following command to configure system:
 ```
 python manage.py setup --set mode=cloud
 ```
 
-After application startup you can open the server setup in the browser.
+After application startup (command see general setup) you can open the
+server setup in the browser.
 
 ### 📺 Frontend setup
 
@@ -143,9 +147,10 @@ The frontend component depends on the following dependencies:
 * 💡 `network-manager`, `dnsmasq-base` - configuring and setting up networking
 * 💡 `plymouth`, `plymouth-themes`, `plymouth-x11` - create startup booting screen
 * 💡 `xserver-xorg`, `xrandr|x11-server-utils`, `xinit`, `openbox`, `feh`, `imagemagick` - show pictures using graphical frontend
-* 💡 `xinput` - register keystores for fallback commands
+* 💡 `xinput` - register keystrokes for fallback commands
 
-After application startup you can open the frontend setup in the browser.
+After application startup (command see general setup) you can open the
+frontend setup in the browser.
 
 ## Docker
 
@@ -176,12 +181,12 @@ docker container create \
 
 ## ☯ Final notes
 
-This project was born because we all have large collection of photo but
+This project was born because we all have large collections of photos but
 don't regularly look at them to benefit. Maybe we have some photos
 in some photo frames on walls or we have some of them in paper albums. But
-how often do we look at them to enjoy the memory?
+how often do we look at them to enjoy the memories?
 
-With this project you can resurrect you memories by showing your photos
+With this project you can resurrect your memories by showing your photos
 on a digital photo frame.
 
 If you like this project, please [donate](https://www.paypal.com/donate?hosted_button_id=5TDSCVP5X7QFA). Thanks!
