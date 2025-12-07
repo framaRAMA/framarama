@@ -207,13 +207,13 @@ Specifies the HTTP port to use for the application.
 
 #### `FRAMARAMA_APP_UPDATE_PRECMD`
 
-Default: ``
+Default: (empty)
 
 See `FRAMARAMA.FRONTEND_APP_UPDATE_PRECMD`.
 
 #### `FRAMARAMA_APP_UPDATE_POSTCMD`
 
-Default: ``
+Default: (empty)
 
 See `FRAMARAMA.FRONTEND_APP_UPDATE_POSTCMD`.
 

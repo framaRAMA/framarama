@@ -23,7 +23,7 @@ The software consists of mainly two parts:
 * the **frontend** component, for displaying the photos
 
 Usually the server component is setup on a central device or server and
-the frontend component is runningo on a device attached to a display (e.g.
+the frontend component is running on a device attached to a display (e.g.
 a Raspberry Pi with a display connected). But it's also possible to run
 both components on the same device.
 
@@ -34,6 +34,7 @@ want to separate them, see sections below.
 
 📢 Before starting check the requirements of the components below and install
 them if required (enable them in requirements/config.txt):
+
 * mysqlclient==2.1.0 - if you want to use MySQL as backend (configuration
   see below)
 
@@ -71,6 +72,9 @@ Initial setup:
 python manage.py migrate
 python manage.py collectstatic
 python manage.py createsuperuser
+```
+Configure system:
+```
 python manage.py setup --set mode=local
 python manage.py setup --set local_db_type=local
 ```
@@ -114,7 +118,8 @@ following command:
 python manage.py setup --set mode=cloud
 ```
 
-After application startup you can open the server setup in the browser.
+After application startup (command see general setup) you can open the
+server setup in the browser (see URL above).
 
 ### Frontend setup
 
@@ -136,13 +141,14 @@ The frontend component depends on the following dependencies:
 * 💡 `network-manager`, `dnsmasq-base` - configuring and setting up networking
 * 💡 `plymouth`, `plymouth-themes`, `plymouth-x11` - create startup booting screen
 * 💡 `xserver-xorg`, `xrandr|x11-server-utils`, `xinit`, `openbox`, `feh`, `imagemagick` - show pictures using graphical frontend
-* 💡 `xinput` - register keystores for fallback commands
+* 💡 `xinput` - register keystrokes for fallback commands
 
-After application startup you can open the frontend setup in the browser.
+After application startup (command see general setup) you can open the
+frontend setup in the browser (see URL above).
 
 ## Final notes
 
-This project was born because we all have large collection of photo but
+This project was born because we all have large collections of photos but
 don't regularly look at them to benefit. Maybe we have some photos
 in some photo frames on walls or we have some of them in paper albums. But
 how often do we look at them to enjoy the memory?
