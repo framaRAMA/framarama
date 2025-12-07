@@ -125,7 +125,7 @@ python manage.py setup --set mode=cloud
 ```
 
 After application startup (command see general setup) you can open the
-server setup in the browser.
+server setup in the browser (see URL above).
 
 ### 📺 Frontend setup
 
@@ -150,7 +150,7 @@ The frontend component depends on the following dependencies:
 * 💡 `xinput` - register keystrokes for fallback commands
 
 After application startup (command see general setup) you can open the
-frontend setup in the browser.
+frontend setup in the browser (see URL above).
 
 ## Docker
 
