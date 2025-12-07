@@ -275,7 +275,7 @@ class HitItemDisplaySerializer(BaseSerializer):
     class Meta:
         model = models.DisplayItem
         fields = BaseSerializer.Meta.fields + ('date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail', 'duration_download', 'duration_finishing')
-        read_only_fields = BaseSerializer.Meta.read_only_fields + ('date_first_see', 'date_last_seen', 'count_hit')
+        read_only_fields = BaseSerializer.Meta.read_only_fields + ('date_first_seen', 'date_last_seen', 'count_hit')
         map_fields = BaseSerializer.Meta.fields
 
     def get_links(self, obj):
@@ -479,6 +479,8 @@ class HitItemDisplayViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, Ba
             'date_last_seen': 'config_display_item.date_last_seen',
             'count_hit' : 'config_display_item.count_hit',
             'thumbnail_id': 'config_display_item.thumbnail_id',
+            'duration_download': 'config_display_item.duration_download',
+            'duration_finishing': 'config_display_item.duration_finishing',
         })
         return _filter
 
