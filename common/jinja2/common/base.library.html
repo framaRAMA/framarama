@@ -889,10 +889,10 @@
       <div class="card border rounded-5">
         <div class="card-body p-0">
           <div class="accordion-header p-1 d-flex flex-wrap bg-light">
-            <div class="sortable-handle align-middle mt-1">{{ icon('grip') }}</div>
+            <div class="sortable-handle align-middle ms-1 my-1">{{ icon('grip') }}</div>
             <button class="col accordion-button flex-wrap bg-transparent shadow-none ps-0 py-0 collapsed{% if collapsed %}.show{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#{{ id }}-{{ entity.id }}-children" aria-expanded="false" aria-controls="collapseOne">
-              <p class="col-auto fw-bold m-0 mx-2">{{ title }}</p>
-              {{ badge_group(badges) }}
+              <p class="col-auto fw-bold m-0 ms-1">{{ title }}</p>
+              {{ badge_group(badges, 'ms-1') }}
             </button>
             {{ card_actions(actions, 'col-12 col-md-5') }}
           </div>
