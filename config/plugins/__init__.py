@@ -85,12 +85,13 @@ class PluginContext:
         self.push_variables(variables)
 
     def push_variables(self, variables, name=None):
+        _variables = variables if variables else {}
         if name is None or name == '':
             name = 'globals'
         if name not in self._variables:
             self._variables[name] = [{}]
         _new_variables = dict(self._variables[name][-1])
-        _new_variables.update(variables)
+        _new_variables.update(_variables)
         self._variables[name].append(_new_variables)
         self.set_resolver(name, self._variables[name][-1])
 
