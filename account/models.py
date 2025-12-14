@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 from framarama.base.models import TIMEZONE_CHOICES
+from config.models import Settings
 
 
 ''' Use our own User model
@@ -60,3 +61,5 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_variables(self):
+        return Settings.objects.filter(user=self, category=Settings.CAT_USER_VARS)

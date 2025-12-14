@@ -46,7 +46,7 @@ class Frame(BaseModel):
         return _max['update_date_start__max'] if _max else None
 
     def get_variables(self):
-        return {_settings.name: _settings.properties for _settings in Settings.objects.filter(user=self.user).variables()}
+        return {_settings.name: _settings.properties for _settings in self.user.get_variables()}
 
 
 class Source(BaseModel):

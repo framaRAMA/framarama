@@ -38,7 +38,7 @@ class CreateVarsSettingsView(base.BaseConfigView):
 
     def _post(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _settings = models.Settings(user=request.user, category=models.Settings.CAT_VARS)
+        _settings = models.Settings(user=request.user, category=models.Settings.CAT_USER_VARS)
         _form = forms.VariablesSettingsForm(request.POST, instance=_settings)
         if _form.is_valid():
             _form.save()
