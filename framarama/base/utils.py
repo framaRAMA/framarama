@@ -20,6 +20,7 @@ import dateutil.parser
 
 from django.utils import dateparse, timezone
 
+from jinja2 import Undefined
 from jinja2.sandbox import SandboxedEnvironment
 
 
@@ -72,8 +73,11 @@ class Config(Singleton):
     def get_config(self):
         if self._config is None:
             from frontend import models
-            _configs = list(models.Config.objects.all())
-            self._config = _configs[0] if len(_configs) else None
+            try:
+                _configs = list(models.Config.objects.all())
+                self._config = _configs[0] if len(_configs) else None
+            except Exception as e:
+                logger.warn("No config exists currently: {}".format(e))
         return self._config
 
     def is_local_mode(self):
@@ -637,9 +641,13 @@ class Network:
 
 class Template:
 
+    class IgnoreUndefined(Undefined):
+        def _fail_with_undefined_error(self, *args, **kwargs):
+            return ''
+
     @staticmethod
-    def _env():
-        _env = SandboxedEnvironment()
+    def _env(**kwargs):
+        _env = SandboxedEnvironment(**kwargs)
         _env.keep_trailing_newline = True
         _env.filters['split'] = lambda v, sep=None, maxsplit=-1: str(v).split(sep, maxsplit)
         _env.filters['keys'] = lambda v: dict(v).keys()
@@ -649,7 +657,7 @@ class Template:
     def render(template, globals_vars={}):
         if template is None:
             return None
-        _env = Template._env()
+        _env = Template._env(undefined=Template.IgnoreUndefined)
         _env.globals.update(globals_vars)
         return _env.from_string(template).render()
 
