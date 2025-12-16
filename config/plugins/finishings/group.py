@@ -59,10 +59,12 @@ class Implementation(FinishingPluginImplementation):
     Form = VariablesGroupForm
 
     def enter(self, model, config, ctx):
-        ctx.push_variables(config['variables'], config['name'])
+        if 'variables' in config:
+            ctx.push_variables(config['variables'], config['name'])
 
     def leave(self, model, config, ctx):
-        ctx.pop_variables(config['name'])
+        if 'variables' in config:
+            ctx.pop_variables(config['name'])
     
     def run(self, model, config, image, ctx):
         return image
