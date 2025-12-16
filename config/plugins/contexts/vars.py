@@ -31,8 +31,5 @@ class Implementation(ContextPluginImplementation):
     Form = VariablesForm
 
     def run(self, model, config, image, ctx):
-        _name = config.name.as_str()
-        _variables = config.variables
-        _resolvers = {_name: context.EvaluatedResolver(ctx, context.MapResolver(_variables))}
-        return _resolvers
+        return {config.name.as_str(): context.EvaluatedResolver(ctx, context.MapResolver(config.variables))}
 

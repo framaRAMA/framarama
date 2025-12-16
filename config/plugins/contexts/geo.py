@@ -159,15 +159,19 @@ class Implementation(ContextPluginImplementation):
 
         _adapter = ctx.get_adapter()
 
-        _resolvers = {'geos': {}}
+        _default = {}
+        _additional = {}
         for _name, _img in self.get_images(ctx, _image).items():
             _image_exif = _adapter.image_exif(_img) if _img.get_images() else {}
 
-            _resolver = context.MapResolver(self._lookup(self._geo(_image_exif)))
+            _image_geo = self._lookup(self._geo(_image_exif))
             if _name == 'default':
-                _resolvers['geo'] = _resolver
+                _default = _image_geo
             else:
-                _resolvers['geos'][_name] = _resolver
+                _additional[_name] = _image_geo
 
-        return _resolvers
+        _resolver = {}
+        _resolver.update(_default)
+        _resolver.update(_additional)
+        return {config.name.as_str(): context.MapResolver(_resolver)}
 

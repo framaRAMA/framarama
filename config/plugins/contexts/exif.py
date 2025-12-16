@@ -36,14 +36,17 @@ class Implementation(ContextPluginImplementation):
 
         _adapter = ctx.get_adapter()
 
-        _resolvers = {'exifs': {}}
+        _default = {}
+        _additional = {}
         for _name, _img in self.get_images(ctx, _image).items():
             _image_exif = _adapter.image_exif(_img) if _img.get_images() else {}
-            _resolver = context.MapResolver(_image_exif)
             if _name == 'default':
-                _resolvers['exif'] = _resolver
+                _default = _image_exif
             else:
-                _resolvers['exifs'][_name] = _resolver
+                _additional[_name] = _image_exif
 
-        return _resolvers
+        _resolver = {}
+        _resolver.update(_default)
+        _resolver.update(_additional)
+        return {config.name.as_str(): context.MapResolver(_resolver)}
 
