@@ -121,6 +121,9 @@ class BaseQuerySetMixin:
               'settings': (
                   _user.qs_settings if hasattr(_user, 'qs_settings') else
                   models.Settings.objects).filter(user=_user),
+              'settings_user_vars': (
+                  _user.qs_settings_user_vars if hasattr(_user, 'qs_settings_user_vars') else
+                  _user.get_variables()).filter(user=_user),
             })
         return self._qs
 
