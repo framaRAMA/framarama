@@ -60,7 +60,7 @@ class Implementation(FinishingPluginImplementation):
 
     def enter(self, model, config, ctx):
         if 'variables' in config:
-            ctx.push_variables(config['variables'], config['name'])
+            ctx.push_variables(config['name'], config['variables'])
 
     def leave(self, model, config, ctx):
         if 'variables' in config:
