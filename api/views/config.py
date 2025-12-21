@@ -537,7 +537,7 @@ class SettingsViewSet(BaseViewSet):
     serializer_class = SettingsSerializer
 
     def get_queryset(self):
-        return self.qs().settings.all()
+        return self.qs().settings.filter(~Q(category=models.Settings.CAT_INTERNAL)).all()
 
 
 class CategorySettingsViewSet(BaseViewSet):
