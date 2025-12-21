@@ -23,7 +23,7 @@ class ListVarsSettingsView(base.BaseConfigView):
         _page = request.GET.get('page')
         _page_size = request.GET.get('page_size', 20)
         _result = {}
-        _result['variables'] = Paginator(self.qs().settings_user_vars, _page_size).get_page(_page)
+        _result['variables'] = Paginator(self.qs().settings_vars, _page_size).get_page(_page)
         _context.update(_result)
         return _context
 
@@ -38,7 +38,7 @@ class CreateVarsSettingsView(base.BaseConfigView):
 
     def _post(self, request, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _settings = models.Settings(user=request.user, category=models.Settings.CAT_USER_VARS)
+        _settings = models.Settings(user=request.user, category=models.Settings.CAT_VARIABLE)
         _form = forms.VariablesSettingsForm(request.POST, instance=_settings)
         if _form.is_valid():
             _form.save()
@@ -52,13 +52,13 @@ class UpdateVarsSettingsView(base.BaseConfigView):
 
     def _get(self, request, settings_id, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _settings = self.qs().settings_user_vars.get(pk=settings_id)
+        _settings = self.qs().settings_vars.get(pk=settings_id)
         _context['form'] = forms.VariablesSettingsForm(instance=_settings)
         return _context
 
     def _post(self, request, settings_id, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _settings = self.qs().settings_user_vars.get(pk=settings_id)
+        _settings = self.qs().settings_vars.get(pk=settings_id)
         _form = forms.VariablesSettingsForm(request.POST, instance=_settings)
         if _form.is_valid():
             _settings = _form.save()
@@ -71,7 +71,7 @@ class ActionVarsSettingsView(base.BaseConfigView):
 
     def _get(self, request, settings_id, *args, **kwargs):
         _context = super()._get(request, *args, **kwargs)
-        _settings = self.qs().settings_user_vars.get(pk=settings_id)
+        _settings = self.qs().settings_vars.get(pk=settings_id)
         _action = request.GET['action']
         if _action == 'delete':
             _settings.delete()

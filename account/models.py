@@ -62,4 +62,4 @@ class User(AbstractUser):
         return self.username
 
     def get_variables(self):
-        return Settings.objects.filter(user=self, category=Settings.CAT_USER_VARS)
+        return Settings.objects.filter(user=self).variables()

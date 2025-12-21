@@ -8,14 +8,15 @@ from framarama.base.models import JsonPropertiesModel
 class SettingsQuerySet(models.QuerySet):
 
     def variables(self):
-        return self.filter(category=Settings.CAT_USER_VARS)
+        return self.filter(category=Settings.CAT_VARIABLE)
 
 
 class Settings(JsonPropertiesModel):
     STR_FIELDS = JsonPropertiesModel.STR_FIELDS + []
 
-    CAT_INTERNAL = 'internal'
-    CAT_USER_VARS = 'user.vars'
+    CAT_VENDOR = 'vendor'
+    CAT_INTERNAL = 'internals'
+    CAT_VARIABLE = 'vars'
 
     objects = SettingsQuerySet.as_manager()
 
