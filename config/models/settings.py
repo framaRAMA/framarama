@@ -14,6 +14,7 @@ class SettingsQuerySet(models.QuerySet):
 class Settings(JsonPropertiesModel):
     STR_FIELDS = JsonPropertiesModel.STR_FIELDS + []
 
+    CAT_INTERNAL = 'internal'
     CAT_USER_VARS = 'user.vars'
 
     objects = SettingsQuerySet.as_manager()

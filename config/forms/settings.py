@@ -14,6 +14,15 @@ class SettingsForm(base.BaseModelForm):
         }
 
 
+class InternalUserSettingsForm(SettingsForm):
+    version_fix = forms.CharField(
+        max_length=64, widget=base.charFieldWidget(),
+        label='Version', help_text='List of valid versions to use for this user - see PEP-0404')
+
+    class Meta(SettingsForm.Meta):
+        entangled_fields = {'properties': ['version_fix']}
+
+
 class VariableForm(base.BaseForm):
     TITLE = 'Variable'
     var_name = forms.CharField(label='Name', help_text='Name of variable', widget=base.charFieldWidget())
