@@ -169,7 +169,7 @@ class ApiClient(Singleton):
 
     def get_setting_variables(self) -> ApiResultList:
         return self._list(
-            self._request('/settings/vars'),
+            self._request('/settings/user.vars'),
             config_models.Settings, config_views.SettingsSerializer)
 
     def submit_status(self, display_id: int, status: dict) -> ApiResultList:

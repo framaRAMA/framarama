@@ -18,7 +18,7 @@ router.register('displays/(?P<display_id>[0-9]+)/contexts', views.ContextDisplay
 router.register('displays/(?P<display_id>[0-9]+)/status', views.StatusDisplayViewSet, 'display_status')
 
 router.register('settings/all', views.SettingsViewSet, 'settings_list')
-router.register('settings/(?P<category>[a-z]+)', views.CategorySettingsViewSet, 'settings_category_list')
+router.register('settings/(?P<category>[a-z\.]+)', views.CategorySettingsViewSet, 'settings_category_list')
 
 urlpatterns = [
     path('', include(router.urls)),
