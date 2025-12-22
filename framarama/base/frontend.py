@@ -422,10 +422,12 @@ class Display(Singleton):
         else:
             self._client.submit_item_hit(self.get_id(), _data)
 
-    def submit_item_hit_error(self, item, ex):
+    def submit_item_hit_error(self, ex: finishing.ProcessingException):
+        _item = ex.get_context().get_item()
+        _finishing = ex.get_finishing()
         _data = {
-          'id': item.id,
-          'error_message': "{}: {}".format(type(ex).__name__, str(ex))
+            'id': _item.id,
+            'error_message': "Finishing #{}: {}".format(_finishing.id, str(ex))[0:64]
         }
         logger.info("Submit display item error status: {}".format(_data))
         self._client.submit_item_hit(self.get_id(), _data)

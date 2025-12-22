@@ -78,6 +78,20 @@ class Context(PluginContext):
             del self._image_data[_name]
 
 
+class ProcessingException(Exception):
+
+    def __init__(self, context, finishing, msg):
+        super().__init__(msg)
+        self.context = context
+        self.finishing = finishing
+
+    def get_context(self):
+        return self.context
+
+    def get_finishing(self):
+        return self.finishing
+
+
 class Processor:
 
     def __init__(self, context):
@@ -320,7 +334,7 @@ class Processor:
                 _image_out = _plugin.run(_finishing, self._context.evaluate(_config), _image, self._context)
                 logger.info("Output: {} = {}".format(_images_out, _image_out))
             except Exception as e:
-                raise Exception("Error in finishing: {} [id #{}]: {}".format(_finishing.title, _finishing.id, str(e))) from e
+                raise ProcessingException(self._context, _finishing, str(e)) from e
     
             for _name_out in _images_out:
                 self._context.set_image_data(_name_out, _image_out)
