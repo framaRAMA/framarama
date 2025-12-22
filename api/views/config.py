@@ -274,8 +274,8 @@ class HitItemDisplaySerializer(BaseSerializer):
 
     class Meta:
         model = models.DisplayItem
-        fields = BaseSerializer.Meta.fields + ('date_first_seen', 'date_last_seen', 'count_hit', 'thumbnail', 'duration_download', 'duration_finishing')
-        read_only_fields = BaseSerializer.Meta.read_only_fields + ('date_first_seen', 'date_last_seen', 'count_hit')
+        fields = BaseSerializer.Meta.fields + ('date_first_seen', 'date_last_seen', 'date_last_error', 'count_hit', 'count_error', 'error_message', 'thumbnail', 'duration_download', 'duration_finishing')
+        read_only_fields = BaseSerializer.Meta.read_only_fields + ('date_first_seen', 'date_last_seen', 'date_last_error', 'count_hit', 'count_error')
         map_fields = BaseSerializer.Meta.fields
 
     def get_links(self, obj):
@@ -299,13 +299,15 @@ class HitItemDisplaySerializer(BaseSerializer):
             _display_item = models.DisplayItem(
                 display=_view.qs().displays.get(pk=_display_id),
                 item=_view.qs().items.get(pk=item_id),
-                date_first_seen=_now,
-                date_last_seen=_now,
-                duration_download=validated_data.get('duration_download'),
-                duration_finishing=validated_data.get('duration_finishing'),
-                count_hit=1)
+                count_hit=0,
+                count_error=0)
         else:
             _display_item = _display_items[0]
+        if validated_data.get('error_message'):
+            _display_item.date_last_error = _now
+            _display_item.count_error = _display_item.count_error + 1
+            _display_item.error_message = validated_data.get('error_message')
+        else:
             _display_item.date_last_seen = _now
             _display_item.duration_download = validated_data.get('duration_download')
             _display_item.duration_finishing = validated_data.get('duration_finishing')

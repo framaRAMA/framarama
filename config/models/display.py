@@ -179,6 +179,9 @@ class DisplayItem(BaseModel):
     date_last_seen = models.DateTimeField(
         blank=True, null=True,
         verbose_name='Last seen', help_text='Date when the item was last shown on the display')
+    date_last_error = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name='Last error date', help_text='Date of the last error while finishing')
     duration_download = models.IntegerField(
         blank=True, null=True,
         verbose_name='Download duration', help_text='Duration in seconds used for downloading')
@@ -186,8 +189,14 @@ class DisplayItem(BaseModel):
         blank=True, null=True,
         verbose_name='Finishing duration', help_text='Duration in seconds used for finishing')
     count_hit = models.IntegerField(
-        blank=True, null=True,
+        default=0,
         verbose_name='Hits', help_text='Amount of hits for this item')
+    count_error = models.IntegerField(
+        default=0,
+        verbose_name='Errors', help_text='Count of errors while finishing')
+    error_message = models.CharField(
+        max_length=64, blank=True, null=True,
+        verbose_name='Error message', help_text='Text of last error message')
     thumbnail = models.OneToOneField(DisplayItemThumbnailData, null=True, on_delete=models.SET_NULL)
 
     class Meta:

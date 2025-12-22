@@ -416,11 +416,19 @@ class Display(Singleton):
                 'duration_download': _meta['steps'][0]['duration'] if len(_meta['steps']) else None,
                 'duration_finishing': _meta['duration'],
             })
-        logger.info("Sumit display item status: {}".format(_data))
+        logger.info("Submit display item status: {}".format(_data))
         if thumbnail:
             self._client.submit_item_hit(self.get_id(), _data, _thumbnail, _mime, _thumbnail_meta)
         else:
             self._client.submit_item_hit(self.get_id(), _data)
+
+    def submit_item_hit_error(self, item, ex):
+        _data = {
+          'id': item.id,
+          'error_message': "{}: {}".format(type(ex).__name__, str(ex))
+        }
+        logger.info("Submit display item error status: {}".format(_data))
+        self._client.submit_item_hit(self.get_id(), _data)
 
     def get_next_item(self, refresh=False):
         if self._next is None or refresh:

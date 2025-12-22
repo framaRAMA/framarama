@@ -186,6 +186,7 @@ class Scheduler(jobs.Scheduler):
             _last_update = self._last_update
             _config = frontend.Frontend.get().get_config().get_config()
             _restrictions = _config.cloud_status_restriction
+            _next_item = None
             try:
                 self._last_update = utils.DateTime.now()
                 logger.info("Retrieve next item ...")
@@ -197,6 +198,8 @@ class Scheduler(jobs.Scheduler):
             except Exception as e:
                 self._last_update = _last_update
                 _config.count_errors = _config.count_errors + 1
+                if _next_item:
+                    self._display.submit_item_hit_error(_next_item, e)
                 raise
             finally:
                 _config.save()
