@@ -315,9 +315,12 @@ class Processor:
             self._context.set_resolver('image', context.MapResolver(_image_meta))
             self._context.set_resolver('images', context.MapResolver(_image_metas))
 
-            logger.info("Input: {} = {}".format(_images_in, _image))
-            _image_out = _plugin.run(_finishing, self._context.evaluate(_config), _image, self._context)
-            logger.info("Output: {} = {}".format(_images_out, _image_out))
+            try:
+                logger.info("Input: {} = {}".format(_images_in, _image))
+                _image_out = _plugin.run(_finishing, self._context.evaluate(_config), _image, self._context)
+                logger.info("Output: {} = {}".format(_images_out, _image_out))
+            except Exception as e:
+                raise Exception("Error in finishing: {} [id #{}]: {}".format(_finishing.title, _finishing.id, str(e))) from e
     
             for _name_out in _images_out:
                 self._context.set_image_data(_name_out, _image_out)
