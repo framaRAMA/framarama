@@ -51,7 +51,9 @@ class BaseSetupView(BaseView):
         else:
             _db = "{}\n"
         eval(_db, {}, {})
-        Filesystem.file_write(settings.BASE_DIR / 'framarama' / 'settings_db.py', b'dbs = ' + _db.encode())
+        _filename = settings.BASE_DIR / 'framarama' / 'settings_db.py'
+        if _db or Filesystem.file_exists(_filename):
+            Filesystem.file_write(_filename, b'dbs = ' + _db.encode())
 
     def redirect_startup(self, context, page=None, url=None, message=None, wait=None, negate=False, errors=True):
         if page is None and url is None:
