@@ -117,13 +117,13 @@ class FilesystemTestCase(TestCase):
         os.rmdir('test/test-1')
         os.rmdir('test/test-2')
         os.rmdir('test')
-        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_all)
-        self.assertEqual([('test-1',), ('test-2',)], _result_level_0)
-        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_level_1)
-        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_min_level_0)
-        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], _result_min_level_1)
-        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], _result_min_level_0_true)
-        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], _result_min_level_1_true)
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], sorted(_result_all))
+        self.assertEqual([('test-1',), ('test-2',)], sorted(_result_level_0))
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], sorted(_result_level_1))
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], sorted(_result_min_level_0))
+        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], sorted(_result_min_level_1))
+        self.assertEqual([('test-1',), ('test-2',), ('test-1/test-1',), ('test-1/test-2',)], sorted(_result_min_level_0_true))
+        self.assertEqual([('test-1/test-1',), ('test-1/test-2',)], sorted(_result_min_level_1_true))
 
     def test_file_exists(self):
         with open('test', 'wb') as f:
