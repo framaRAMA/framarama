@@ -1,5 +1,5 @@
 # basic
-Django==4.2.20
+Django==4.2.27
 Jinja2==3.1.6
 djangorestframework==3.15.2
 drf-extensions==0.7.1
@@ -11,6 +11,6 @@ uritemplate==4.1.1
 python-dateutil==2.9.0
 
 # plugins
-requests==2.32.0
+requests==2.32.4
 jsonpath-python==1.0.6
 
